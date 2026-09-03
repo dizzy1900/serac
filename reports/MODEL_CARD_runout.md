@@ -160,3 +160,18 @@ Re-measured at 60 m with the fix, members stop themselves:
 The version bump invalidated the frozen ensemble, which is what the version is for. Member
 outputs are now written under `data/interim/runout/<aoi>/v<SOLVER_VERSION>/<run_id>/` so that a
 future bump cannot leave `data/manifest.jsonl` pointing at deleted files.
+
+## Surrogate architecture note
+
+Both heads emit the 5th, 50th and 95th percentile directly, trained with the pinball loss. The
+lowest quantile is a ReLU and the two above it are non-negative increments on top of it. The
+obvious construction — `cumsum(softplus(raw))` — was tried first and is wrong for this problem:
+it makes every quantile strictly positive, and max depth is zero over most of the corridor, so
+a 5th percentile that can never reach zero leaves every dry bin outside the 5-95% interval by
+construction. Measured on a 14-member partial ensemble, depth interval coverage was 0.1208
+against a 0.85-0.95 target and no amount of training could have moved it; with the ReLU it went
+to 1.0 and median inundation IoU at 1 m rose from 0.5094 to 0.9533 on the same data.
+
+Coverage is consequently reported twice. Over **all** chainage bins it is dominated by dry ones,
+which the fixed head covers trivially by outputting zero. The gated figure is coverage over bins
+whose true max depth exceeds 1 m, where the interval has to do some work.
