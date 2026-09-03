@@ -1,0 +1,14 @@
+{
+  "scheme": "loro_hma",
+  "challenger": "cnn-station-transformer",
+  "incumbent": "lgbm-3class",
+  "challenger_f1": 0.5,
+  "incumbent_f1": 0.5161290322580644,
+  "delta_f1": -0.01612903225806439,
+  "delta_low": -0.20512820512820507,
+  "delta_high": 0.16252403846153843,
+  "n_resamples": 2000,
+  "promoted": false,
+  "rule": "The challenger becomes default only if the paired-bootstrap 95% lower bound on delta F1 exceeds 0. Fixed before either model was trained.",
+  "notes": []
+}

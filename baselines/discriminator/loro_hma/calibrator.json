@@ -1,0 +1,7 @@
+{
+  "method": "sigmoid",
+  "slope": 0.8870491290155569,
+  "intercept": -0.3476576820543487,
+  "fitted_on": "val",
+  "n_fitted": 365
+}

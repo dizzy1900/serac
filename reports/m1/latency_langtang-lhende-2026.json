@@ -1,0 +1,60 @@
+{
+  "latency_version": "0.1.0",
+  "measured_at_utc": "2026-09-03T20:56:43.980762Z",
+  "event_id": "langtang-lhende-2026",
+  "origin_utc": "2026-08-26T02:52:10Z",
+  "n_receivers": 12,
+  "modes": [
+    {
+      "mode": "batch_600s",
+      "fired": false,
+      "first_detection_utc": null,
+      "stream_latency_s": null,
+      "compute_seconds_total": 0.2443807499948889,
+      "compute_seconds_per_poll_p50": 2.1669548004865646e-6,
+      "compute_seconds_per_poll_p95": 3.0419323593378067e-6,
+      "compute_seconds_per_scored_window": null,
+      "polls": 702,
+      "windows_scored": 0,
+      "chunks_ingested": 702,
+      "probability": null,
+      "class_label": null,
+      "theoretical_floor_s": 573.3333333333334,
+      "meets_brief_budget": false,
+      "notes": [
+        "theoretical floor 573 s = 100 km / 3 km/s travel + 600 s record - 60 s pre-origin lead-in",
+        "wall-clock here is computation only: chunks are fed at max speed, so no transport, acquisition or telemetry delay is included",
+        "most polls return before scoring, so the per-poll percentiles are near zero; compute_seconds_per_scored_window is the load-bearing engineering number"
+      ]
+    },
+    {
+      "mode": "sliding_180s",
+      "fired": false,
+      "first_detection_utc": null,
+      "stream_latency_s": null,
+      "compute_seconds_total": 0.10154262487776577,
+      "compute_seconds_per_poll_p50": 6.541842594742775e-6,
+      "compute_seconds_per_poll_p95": 0.000027125002816319466,
+      "compute_seconds_per_scored_window": null,
+      "polls": 702,
+      "windows_scored": 0,
+      "chunks_ingested": 702,
+      "probability": null,
+      "class_label": null,
+      "theoretical_floor_s": 153.33333333333334,
+      "meets_brief_budget": false,
+      "notes": [
+        "theoretical floor 153 s = 100 km / 3 km/s travel + 180 s record - 60 s pre-origin lead-in",
+        "wall-clock here is computation only: chunks are fed at max speed, so no transport, acquisition or telemetry delay is included",
+        "most polls return before scoring, so the per-poll percentiles are near zero; compute_seconds_per_scored_window is the load-bearing engineering number"
+      ]
+    }
+  ],
+  "brief_budget_s": 60.0,
+  "budget_met": false,
+  "verdict": "No mode fired on this event, so no latency was measured. This is reported as the result; it is not a budget pass.",
+  "notes": [
+    "replayed from data/raw/discriminator/waveforms/pos_serac-langtang-lhende-2026.mseed (raw counts, ledgered by the M1 build); the detector's own response removal is inside the timed section",
+    "model lgbm-3class trained under loro_hma; langtang-lhende-2026 is a forced test group and was not in training"
+  ]
+}

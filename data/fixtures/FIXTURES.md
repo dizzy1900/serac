@@ -23,6 +23,43 @@ Licence `null` means the data-centre page linked in the ledger's `licence_source
 | `data/fixtures/osm/blatten-lotschental_overpass_2026-09-03.json` | https://overpass-api.de/api/interpreter (POST, query in ledger params) | 2026-09-03T10:08:48+00:00 | `572463e35ee4029410b4d7fdd5bddfa90503fb3608a271520b05fa44ea8ab798` | 85044 | ODbL-1.0 (© OpenStreetMap contributors) |
 | `data/fixtures/osm/chamoli-rishiganga_overpass_2026-09-03.json` | https://overpass-api.de/api/interpreter (POST, query in ledger params) | 2026-09-03T10:22:41+00:00 | `cbbd382ca9bdd5b6f8aaf0135270ccca918dcf43f26eac71729ff79128bf2e25` | 138783 | ODbL-1.0 (© OpenStreetMap contributors) |
 | `data/fixtures/osm/lhende-khola-trishuli_overpass_2026-09-03.json` | https://overpass-api.de/api/interpreter (POST, query in ledger params) | 2026-09-03T10:17:27+00:00 | `10962690511b1706db79bc9a9243b4216ff4d7066b14672204e254093c718c96` | 846118 | ODbL-1.0 (© OpenStreetMap contributors) |
+## ESEC (Exotic Seismic Events Catalog)
+
+| path | source URL | retrieved_at | sha256 | size | licence |
+|---|---|---|---|---|---|
+| `data/fixtures/esec/esec_events_2026-09-03.xml` | https://ds.iris.edu/spudservice/esec (GET with `Accept: application/xml`) | 2026-09-03T12:19:00+00:00 | `e4d0ef527c9eabbc8de7b70d0d3a64eba74071045ebd916071ae31c34637104c` | 790780 | null |
+
+The IRIS/EarthScope SPUD ESEC data product: **319 events, 1977-2024**, the positive set for
+the M1 discriminator. Committed verbatim so the discriminator gate and the dataset build
+parse offline exactly what the service returned.
+
+The gate is `serac.validation.discriminator.run_suite`. At the time of writing it is **not**
+reachable as `make validate-discriminator` or as a `serac` sub-command: `src/serac/cli_data.py`
+and `src/serac/cli_models.py` are not yet wired into `src/serac/cli.py`, and the Makefile has
+no target. Wiring both is the orchestrator's change (those files are orchestrator-owned). Until
+it lands, run the suite directly:
+
+```python
+from pathlib import Path
+
+from serac.validation.discriminator import run_suite
+
+run_suite(Path("."))
+```
+
+**The `Accept` header is load-bearing.** With no `Accept` header the same URL returns the
+document HTML-escaped inside a `<pre>` block (1,075,875 bytes of `&lt;Results&gt;...`), which
+is not parseable XML. `Accept: application/xml` returns the real document (790,780 bytes).
+`serac.adapters.seismic.esec.parse_esec_xml` refuses the escaped form and says so.
+
+**Units.** ESEC names a unit only in a handful of tag names (`MaxdisthfKm`, `LocuncertKm`).
+`H`, `L`, `Volume`, `Mass`, `AreaTotal`, `PeakDischarge` carry none, and the service publishes
+no machine-readable schema, so the parser stores them with `unit: null` rather than assuming
+metres and cubic metres. Nothing in M1 consumes them as physical quantities.
+
+Licence: EarthScope Terms of Service state no licence; users must acknowledge EarthScope
+Consortium (NSF award 2435260). Product page: https://ds.iris.edu/ds/products/esec/
+
 ## EO fixtures
 
 Real bytes read from public services by `scripts/fetch_eo_fixtures.py`; every row has a
