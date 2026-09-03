@@ -129,6 +129,7 @@ def test_ledger_rows_for_fixtures_are_real_and_hashed(
                 DataSource.fdsn_waveforms,
                 DataSource.usgs_comcat,
                 DataSource.vendored_schema,
+                DataSource.hydrometric_icimod,
             }
             or entry.adapter != "fixture-fetch"
         )

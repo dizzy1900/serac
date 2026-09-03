@@ -1,0 +1,75 @@
+{
+  "contract_version": "0.1.0",
+  "status": "fetched",
+  "event_id": "langtang-lhende-2026",
+  "event_date": "2026-08-26",
+  "description": "Reported Trishuli River stage changes at Galchhi and Malekhu during the 26 August 2026 Lhende Khola / Bhote Koshi / Trishuli flood, transcribed from an ICIMOD media advisory. These are quoted figures from public reporting, not gauge records; no time series was retrievable (Nepal DHM gauges have no open API, RELEASE_STATUS.md Known gaps 2). Every value carries the sentence it was read from.",
+  "sources": [
+    {
+      "id": "icimod-media-advisory-2026-08-26",
+      "kind": "agency_official",
+      "publisher": "ICIMOD (International Centre for Integrated Mountain Development)",
+      "title": "Major flash flood sweeps through Nepal's Rasuwa district, raising fears of further downstream flooding",
+      "url": "https://www.icimod.org/press-release/major-flash-flood-sweeps-through-nepals-rasuwa-district-raising-fears-of-further-downstream-flooding/",
+      "published_at": "2026-08-26T19:40:36+05:45",
+      "accessed_utc": "2026-09-03T10:09:30Z",
+      "sha256": "10db563a5d44fee7230df36d5e6649203fa1fb69180a59c445bb5bc778182aca",
+      "size_bytes": 112021,
+      "content_type": "text/html; charset=UTF-8",
+      "licence": "ICIMOD (c) 2026. All rights reserved; cited-only (page not stored)",
+      "licence_source_url": "https://www.icimod.org/terms-of-use/",
+      "stored_copy": null,
+      "notes": "sha256 and size are of the HTML bytes retrieved with curl on 2026-09-03; the page is all-rights-reserved so only short quotations are kept here. The page attributes the Malekhu figure to DHM in an image caption ('Rapid rise in Trisuli River water level at Malekhu. Source: DHM.')."
+    }
+  ],
+  "stations": [
+    {
+      "station_id": "galchhi",
+      "name": "Trishuli River at Galchhi (spelled 'Galchchi' and 'Glachchi' in the source)",
+      "river": "Trishuli",
+      "latitude": null,
+      "longitude": null,
+      "operator": null,
+      "source_refs": ["icimod-media-advisory-2026-08-26"]
+    },
+    {
+      "station_id": "malekhu",
+      "name": "Trishuli River at Malekhu",
+      "river": "Trishuli",
+      "latitude": null,
+      "longitude": null,
+      "operator": "DHM (per the source's image caption 'Source: DHM')",
+      "source_refs": ["icimod-media-advisory-2026-08-26"]
+    }
+  ],
+  "observations": [
+    {
+      "station_id": "galchhi",
+      "time_utc": null,
+      "time_basis": "not_stated_in_source: the advisory gives no clock time for this rise; it reports that Bhote Koshi basin levels 'began rising rapidly around 9:00 AM local time on August 26' (NPT, UTC+05:45)",
+      "variable": "stage_change_m",
+      "value": 9.0,
+      "interval_s": 1800,
+      "uncertainty": null,
+      "source_ref": "icimod-media-advisory-2026-08-26",
+      "excerpt": "Water levels on the Trishuli River at Galchchi reportedly rose by as much as nine metres within 30 minutes, while levels at Malekhu increased by seven metres over a similar period.",
+      "notes": "'as much as' - the figure is an upper reported value; 'reportedly' - ICIMOD relays it rather than measuring it."
+    },
+    {
+      "station_id": "malekhu",
+      "time_utc": null,
+      "time_basis": "not_stated_in_source: 'over a similar period' to the Galchhi rise; no clock time given",
+      "variable": "stage_change_m",
+      "value": 7.0,
+      "interval_s": 1800,
+      "uncertainty": null,
+      "source_ref": "icimod-media-advisory-2026-08-26",
+      "excerpt": "Water levels on the Trishuli River at Galchchi reportedly rose by as much as nine metres within 30 minutes, while levels at Malekhu increased by seven metres over a similar period.",
+      "notes": "interval_s = 1800 is read from 'over a similar period' relative to the 30-minute Galchhi figure."
+    }
+  ],
+  "excerpts": [
+    "According to local reports, water levels in the Bhote Koshi basin began rising rapidly around 9:00 AM local time on August 26.",
+    "Several water monitoring stations along the Trishuli River were reportedly damaged or washed away during the event, although the Glachchi monitoring station remains operational."
+  ]
+}
