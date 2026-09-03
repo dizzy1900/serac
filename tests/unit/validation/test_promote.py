@@ -9,6 +9,7 @@ from typer.testing import CliRunner
 
 from serac.cli import app
 from serac.validation.promote import (
+    REQUIRED_SUITES,
     PromotionRefusedError,
     make_stamp,
     promote,
@@ -17,7 +18,8 @@ from serac.validation.promote import (
 )
 from serac.validation.result import Check, SuiteResult, write_report
 
-SUITES = ("events", "aoi", "ingest", "cube", "stream", "contracts")
+# Track the real list, so adding a gate cannot leave these fixtures silently stale.
+SUITES = REQUIRED_SUITES
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -77,9 +79,9 @@ def test_promote_refuses_failed_or_missing_suite(repo: Path) -> None:
     write_stamp(stamp, reports)
     with pytest.raises(PromotionRefusedError, match="suites failed: cube"):
         promote(repo, reports, repo / "reports" / "promotion")
-    reports = _reports(repo, skip="aoi")
+    reports = _reports(repo, skip=SUITES[1])
     stamp = make_stamp(repo, reports)
-    assert stamp.missing == ["aoi"]
+    assert stamp.missing == [SUITES[1]]
 
 
 def test_promote_refuses_dirty_tree_and_stale_sha(repo: Path) -> None:
