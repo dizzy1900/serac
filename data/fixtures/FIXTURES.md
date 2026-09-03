@@ -92,3 +92,28 @@ convention and the azimuthal rotation offline.
 
 All three carry `source: iris_syngine`, `provenance: derived`, `params.modelled: true` rows in
 `data/manifest.jsonl`.
+
+## M2 force-history fixtures
+
+Everything the force-history gate needs to run with no network. The 20-150 s working band is
+why 1 sps LH? channels suffice, and that is what keeps the whole set under a megabyte.
+
+| Path | Bytes | What | Provenance |
+|---|---|---|---|
+| `lfh/<target>/*.mseed` | ~700 kB total | Real 1 sps LH? records, 9-10 open stations per event, -180 s to +840 s about origin, six events | `real`, `fdsn_waveforms` |
+| `lfh/<target>/stations.xml.gz` | ~45 kB each | Response-level StationXML, gzipped (ObsPy reads it transparently; uncompressed it is 20x larger and 90% of the fixture bytes) | `real`, `fdsn_waveforms` |
+| `lfh/<target>/manifest.json` | small | Window, station geometry, azimuthal gap, per-file checksums | — |
+| `greens/lfh/prem_a_20s/*.json.gz` | 144 kB | The eight modelled Green's sets needed to re-invert Taan Fiord at its recorded best-fitting location, so `validate-lfh` can re-run the physics offline | **`derived`**, `iris_syngine`, `modelled: true` |
+| `greens/convention/*.npz` | 106 kB | Syngine responses pinning the force convention, the azimuthal rotation and the geocentric-latitude correction | **`derived`**, `iris_syngine` |
+| `esec/esec_catalogue.xml.gz` | 52 kB | The full 319-entry EarthScope Exotic Seismic Events Catalog, which carries the published Bingham, Taan and Lamplugh masses | `real`, `esec_spud` |
+
+Two notes worth keeping:
+
+- The **full** Green's requirement for a run is 0.8-2.5 MB per event (grid nodes x stations x
+  bootstrap depths), which is far too much to commit. Only the single-location subset for one
+  event is committed; the rest lives under the gitignored, DVC-tracked `data/interim/greens/`
+  and is rebuilt in about 40 s by `serac lfh greens build`.
+- The ESEC endpoint is intermittent. It served 1.05 MB and began returning 404 on its own
+  trailing-slash redirect within the hour, which is exactly why the bytes are committed here
+  and why `scripts/build_lfh_references.py` falls back to this copy while keeping the
+  timestamp of the retrieval that actually happened.

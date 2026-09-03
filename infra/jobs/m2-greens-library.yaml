@@ -1,0 +1,151 @@
+# serac job manifest — pre-build the modelled Green's-function library for one AOI.
+# Generic container-host description; the aws: block is annotation only. See infra/jobs/README.md.
+# Status: designed; the equivalent work HAS been run locally, so the estimates below are
+# measurements rather than assumptions. Both are labelled.
+
+apiVersion: serac.jobs/v0
+kind: ContainerJob
+
+metadata:
+  name: m2-greens-library
+  description: >
+    Fetch and cache the 1-D Green's functions the force-history inversion needs for one AOI,
+    so that a real detection never waits on a third-party service. Two Syngine requests per
+    (distance, depth) serve every azimuth and every force direction by rotation, which is why
+    a 0.5-15 degree library at 0.05 degree steps is 582 requests rather than 8712.
+
+    This job is the DEPLOYMENT PRECONDITION for M2 meeting its 120 s budget. Warm, an
+    inversion takes about 75 s on ten cores. Cold, it additionally waits on Syngine, and a
+    service that is usually fast is not a latency budget: during development the neighbouring
+    ESEC endpoint served 1 MB happily and began returning 404 within the hour.
+
+    Everything written here is MODELLED, not observed: physics evaluated from a published
+    Earth model. Every file is ledgered as provenance=derived, source=iris_syngine,
+    params.modelled=true (ADR-0016), and Green's functions are never published on the bus.
+  owner_role: inversion
+  status: designed
+
+image: "<registry>/serac:<git-sha>"
+
+command:
+  - serac
+  - lfh
+  - greens
+  - build
+  - --workers
+  - "${workers}"
+  - --cache
+  - "${cache_root}"
+
+parameters:
+  aoi_id: lhende-khola-trishuli
+  earth_model: prem_a_20s
+  min_distance_deg: "0.5"
+  max_distance_deg: "15.0"
+  step_deg: "0.05"
+  depths_m: "500,1000,2000"            # the source depths the bootstrap resamples over
+  workers: "6"
+  cache_root: /data/data/interim/greens
+
+env:
+  - name: SERAC_DATA_DIR
+    from: value:/data
+  - name: SERAC_REPORTS_DIR
+    from: value:/data/reports
+
+resources:
+  cpu: 4                               # network-bound, not compute-bound
+  memory_gb: 8
+  gpu: 0
+  storage_gb: 20                       # see estimated_storage_gb
+
+parallelism:
+  array_size: 1                        # one task per AOI; concurrency is the --workers pool
+  shard_by: aoi_id
+  concurrency_note: >
+    Six concurrent requests were measured as courteous and effective. Do not raise this
+    without asking EarthScope: the service is free, shared, and not contracted to serac.
+
+estimated_core_hours:
+  low: 0.02
+  high: 0.4
+  basis: >
+    MEASURED, 2026-09-03, on a 10-core Apple Silicon box against the live service. Uncached
+    distances returned at 2.9 requests/s serially and 16.2 requests/s with six workers. The
+    full 0.5-15 degree library at 0.05 degrees is 291 distances = 582 requests, so about 40 s
+    of wall clock at six workers (0.04 core-hours at four vCPU) or about 200 s serially. The
+    405 (distance, depth) pairs actually needed by the six events in data/references took 26 s
+    for 810 requests. The high end allows for all three bootstrap depths across the full
+    distance range (873 distance-depth pairs, 1746 requests) and for a slower service day.
+
+estimated_storage_gb:
+  low: 0.005
+  high: 0.05
+  basis: >
+    MEASURED. One (distance, depth) set is five elementary traces of 901 float32 samples,
+    stored as gzipped JSON with mtime=0 for byte-stable hashing: about 18 kB on disk. The
+    405 sets built locally occupy 8.0 MB. The full library at three depths would be roughly
+    873 sets, about 16 MB. Storage is not a constraint for this job; latency is.
+
+inputs:
+  - data/references/lfh_published.json # supplies the origins and source positions
+  - data/fixtures/lfh/                 # station geometry decides which distances are needed
+  - data/manifest.jsonl
+
+outputs:
+  - data/interim/greens/${earth_model}/            # DVC-tracked, gitignored
+  - data/interim/greens/${earth_model}/index.json  # cache_key -> (path, sha256, retrieved_at)
+  - data/manifest.jsonl                            # one appended row per cached set
+
+ledger:
+  - source: iris_syngine
+    provenance: derived
+    status: fetched
+    params: { modelled: true }
+    note: >
+      derived, never synthetic and never real. `synthetic` is reserved for a fabricated
+      stand-in for an observation and may only live under tests/fixtures/synthetic/;
+      `real` would claim these were recorded. ADR-0016.
+
+preconditions:
+  - data/references/lfh_published.json exists and validates (serac lfh targets).
+  - The waveform fixtures for the AOI's events are present, since the station geometry decides
+    which distances the library must cover.
+  - Outbound HTTPS to service.iris.edu, which 307-redirects to service.earthscope.org.
+    Redirects MUST be followed.
+
+postconditions:
+  - serac lfh greens plan reports to_fetch = 0 for every target in the AOI.
+  - serac lfh invert --offline succeeds for those targets.
+
+alternatives:
+  local_instaseis: >
+    A local instaseis database removes the third-party dependency entirely and is the right
+    answer for an operational deployment. It was not used here because instaseis needs
+    compilation and a multi-gigabyte database per Earth model, neither of which fits a
+    laptop-scale session. The GreensLibrary port exists precisely so an InstaseisGreensLibrary
+    can replace SyngineGreensLibrary without touching the inversion.
+  cadence: >
+    The library depends only on the Earth model and the geometry, not on any event, so it is
+    built once per AOI and reused indefinitely. Rebuild only when the AOI's station set
+    changes or the Earth model is changed.
+
+aws:
+  note: annotation only; any container host can run this job from the generic fields above.
+  instance_family: c6i                 # network-bound; the smallest sensible general-purpose box
+  suggested_instance: c6i.xlarge
+  batch_job_definition:
+    type: container
+    containerProperties:
+      image: "<registry>/serac:<git-sha>"
+      vcpus: 4
+      memory: 8192
+      command: ["serac", "lfh", "greens", "build", "--workers", "Ref::workers", "--cache", "Ref::cache_root"]
+      volumes:
+        - name: scratch
+          host: { sourcePath: /scratch }
+      mountPoints:
+        - containerPath: /data
+          sourceVolume: scratch
+    retryStrategy: { attempts: 3 }     # a transient 404 or 5xx from a free service is expected
+    timeout: { attemptDurationSeconds: 3600 }
