@@ -1,0 +1,5 @@
+data/manifest.jsonl merge=union
+data/fixtures/FIXTURES.md merge=union
+*.mseed binary
+*.tif binary
+*.parquet binary
