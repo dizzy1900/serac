@@ -66,7 +66,7 @@ class SealBrokenError(EvaluationError):
 def config_fingerprint() -> dict[str, Any]:
     """Every constant that could be tuned toward a test score, in one dict."""
     return {
-        "seal_version": 1,
+        "seal_version": 2,
         "features": {"names": list(FEATURE_NAMES), "version": "0.1.0"},
         "windows": {
             "min_distance_km": win.MIN_DISTANCE_KM,
@@ -93,6 +93,7 @@ def config_fingerprint() -> dict[str, Any]:
             "window_pre_origin_s": cat.WINDOW_PRE_ORIGIN_S,
             "window_length_s": cat.WINDOW_LENGTH_S,
             "forced_test_groups": sorted(cat.FORCED_TEST_GROUPS),
+            "positive_sources": sorted(s.value for s in cat.CatalogSource),
         },
         "splits": {
             "time_forward_train_before": TIME_FORWARD_TRAIN_BEFORE,

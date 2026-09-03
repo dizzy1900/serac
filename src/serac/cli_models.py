@@ -349,3 +349,134 @@ def write_model_card(
     from serac.models.discriminator.model_card import write
 
     typer.echo(f"wrote {write(repo)}")
+
+
+@app.command("case-study")
+def case_study(
+    repo: Annotated[Path, typer.Option(help="Repository root.")] = Path(),
+    event_group: Annotated[str, typer.Option(help="Event group to score.")] = (
+        "langtang-lhende-2026"
+    ),
+    scheme: Annotated[str, typer.Option(help="Which trained artifact to load.")] = "loro_hma",
+) -> None:
+    """Score one event's window with the sealed model, below the dataset's own quality bar.
+
+    Some events are excluded from the dataset because fewer than `MIN_STATIONS_PER_WINDOW`
+    receivers yielded response-removed data. Langtang 2026 is one: eight days after the event
+    only two of its twelve selected receivers had data in the open archives.
+
+    Lowering that threshold *after discovering it excludes the headline event* would be exactly
+    the post-hoc tuning this component is built to avoid, so the threshold does not move. This
+    command instead applies the already-trained, already-sealed model to the window as it
+    actually is, and labels the result as what it is: **a single-window case study below the
+    dataset's own quality bar, not a test-set metric.** It is never averaged into any score.
+    """
+    import json as _json
+    import warnings
+
+    from serac.models.discriminator import baseline as bl
+    from serac.models.discriminator.catalog import build_positives
+    from serac.models.discriminator.features import FEATURE_NAMES, compute_features
+    from serac.models.discriminator.windows import (
+        COMPONENTS,
+        MAX_STATIONS_PER_EVENT,
+        MIN_STATIONS_PER_WINDOW,
+        N_SAMPLES,
+        StationChoice,
+        process_station_window,
+    )
+
+    positives, _, _ = build_positives(repo)
+    positive = next((p for p in positives if p.event_group == event_group), None)
+    if positive is None:
+        typer.secho(f"no positive with group {event_group!r}", fg=typer.colors.RED)
+        raise typer.Exit(2)
+
+    raw = repo / "data/raw/discriminator/waveforms" / f"{positive.entry_id.replace('/', '_')}.mseed"
+    selection = repo / "data/interim/discriminator/stations" / f"{event_group}.json"
+    if not raw.exists() or not selection.exists():
+        typer.secho("run `serac data build-discriminator-set` first", fg=typer.colors.RED)
+        raise typer.Exit(2)
+
+    stations = [
+        StationChoice.model_validate(row)
+        for row in _json.loads(selection.read_text(encoding="utf-8"))["stations"]
+    ]
+    waveform = np.zeros((MAX_STATIONS_PER_EVENT, len(COMPONENTS), N_SAMPLES), dtype=np.float32)
+    valid = np.zeros((MAX_STATIONS_PER_EVENT, len(COMPONENTS)), dtype=bool)
+    used: list[str] = []
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        from obspy import read, read_inventory
+
+        stream = read(str(raw), format="MSEED")
+        for station in stations:
+            response = (
+                repo
+                / "data/raw/discriminator/responses"
+                / f"{station.key.replace('.', '_')}_{positive.origin_utc.year}.xml"
+            )
+            if not response.exists() or response.stat().st_size == 0:
+                continue
+            picked = stream.select(
+                network=station.network, station=station.station, channel=f"{station.band_code}H?"
+            )
+            if station.location:
+                picked = picked.select(location=station.location)
+            if len(picked) == 0:
+                continue
+            try:
+                block, mask = process_station_window(
+                    picked, read_inventory(str(response), format="STATIONXML"), positive, station
+                )
+            except Exception:
+                continue
+            if not mask.any():
+                continue
+            waveform[len(used)] = block
+            valid[len(used)] = mask
+            used.append(station.key)
+
+    model = bl.load(repo / bl.ARTIFACT_DIR / scheme)
+    features = np.array(
+        [[compute_features(waveform, valid)[name] for name in FEATURE_NAMES]], dtype=np.float64
+    )
+    class_probabilities = model.class_probabilities(features)[0]
+    probability = float(model.calibrated_probability(features)[0])
+    predicted = bl.CLASSES[int(np.argmax(class_probabilities))]
+
+    below_bar = len(used) < MIN_STATIONS_PER_WINDOW
+    record = {
+        "event_group": event_group,
+        "origin_utc": positive.origin_utc.isoformat(),
+        "receivers_selected": len(stations),
+        "receivers_with_response_removed_data": len(used),
+        "receivers_used": used,
+        "min_stations_required_by_the_dataset": MIN_STATIONS_PER_WINDOW,
+        "below_the_datasets_quality_bar": below_bar,
+        "predicted_class": predicted,
+        "calibrated_probability_mass_movement": probability,
+        "class_probabilities": {
+            name: float(v) for name, v in zip(bl.CLASSES, class_probabilities, strict=True)
+        },
+        "model": {
+            "name": model.artifact.name,
+            "split_scheme": model.artifact.split_scheme,
+            "model_sha256": model.artifact.model_sha256,
+            "train_event_groups_sha256": model.artifact.train_event_groups_sha256,
+            "event_group_in_training": event_group in model.artifact.train_event_groups,
+        },
+        "caveat": (
+            "This is a single-window case study, not a test-set metric, and it is never "
+            f"averaged into one. The window has {len(used)} receiver(s) with response-removed "
+            f"data against the dataset's minimum of {MIN_STATIONS_PER_WINDOW}, so it was "
+            "excluded from the built dataset and recorded as `not_fetched` with that reason. "
+            "The threshold was deliberately NOT lowered to admit it: moving a data-quality "
+            "threshold after discovering it excludes the headline event is post-hoc tuning. "
+            "The model here is the already-trained, already-sealed one, applied unchanged."
+        ),
+    }
+    out = repo / REPORTS_DIR / f"case_study_{event_group}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    typer.echo(json.dumps(record, indent=2))

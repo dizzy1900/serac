@@ -1,0 +1,60 @@
+{
+  "latency_version": "0.1.0",
+  "measured_at_utc": "2026-09-03T20:56:18.251293Z",
+  "event_id": "chamoli-2021",
+  "origin_utc": "2021-02-07T04:51:18Z",
+  "n_receivers": 12,
+  "modes": [
+    {
+      "mode": "batch_600s",
+      "fired": true,
+      "first_detection_utc": "2021-02-07T05:00:17.990000Z",
+      "stream_latency_s": 539.99,
+      "compute_seconds_total": 26.519304791931063,
+      "compute_seconds_per_poll_p50": 5.666166543960571e-6,
+      "compute_seconds_per_poll_p95": 7.2910916060209274e-6,
+      "compute_seconds_per_scored_window": 26.519304791931063,
+      "polls": 2386,
+      "windows_scored": 1,
+      "chunks_ingested": 2386,
+      "probability": 0.585423759711845,
+      "class_label": "mass_movement",
+      "theoretical_floor_s": 573.3333333333334,
+      "meets_brief_budget": false,
+      "notes": [
+        "theoretical floor 573 s = 100 km / 3 km/s travel + 600 s record - 60 s pre-origin lead-in",
+        "wall-clock here is computation only: chunks are fed at max speed, so no transport, acquisition or telemetry delay is included",
+        "most polls return before scoring, so the per-poll percentiles are near zero; compute_seconds_per_scored_window is the load-bearing engineering number"
+      ]
+    },
+    {
+      "mode": "sliding_180s",
+      "fired": true,
+      "first_detection_utc": "2021-02-07T04:54:47.990000Z",
+      "stream_latency_s": 209.99,
+      "compute_seconds_total": 52.18205529102124,
+      "compute_seconds_per_poll_p50": 2.1669548004865646e-6,
+      "compute_seconds_per_poll_p95": 0.00005691591650247574,
+      "compute_seconds_per_scored_window": 13.04551382275531,
+      "polls": 1061,
+      "windows_scored": 4,
+      "chunks_ingested": 1061,
+      "probability": 0.5267548717594978,
+      "class_label": "mass_movement",
+      "theoretical_floor_s": 153.33333333333334,
+      "meets_brief_budget": false,
+      "notes": [
+        "theoretical floor 153 s = 100 km / 3 km/s travel + 180 s record - 60 s pre-origin lead-in",
+        "wall-clock here is computation only: chunks are fed at max speed, so no transport, acquisition or telemetry delay is included",
+        "most polls return before scoring, so the per-poll percentiles are near zero; compute_seconds_per_scored_window is the load-bearing engineering number"
+      ]
+    }
+  ],
+  "brief_budget_s": 60.0,
+  "budget_met": false,
+  "verdict": "The brief's 60 s budget is NOT met and is not reachable for this architecture. The fastest mode fired 210 s after origin against a theoretical floor of 153 s. The floor is set by travel time to a >=100 km receiver plus the record length a 20-100 s band requires; no amount of compute moves it. Reaching 60 s would need receivers inside 100 km and a shorter-period discriminant, which is a different component with different physics, not a faster version of this one.",
+  "notes": [
+    "replayed from data/raw/discriminator/waveforms/pos_serac-chamoli-2021.mseed (raw counts, ledgered by the M1 build); the detector's own response removal is inside the timed section",
+    "model lgbm-3class trained under loro_hma; chamoli-2021 is a forced test group and was not in training"
+  ]
+}

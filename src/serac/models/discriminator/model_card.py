@@ -307,17 +307,21 @@ def render(repo: Path) -> str:
             continue
         add(f"### {report['event_id']}")
         add("")
-        add("| mode | fired | stream latency | theoretical floor | compute p95/poll | p |")
+        add("| mode | fired | stream latency | theoretical floor | compute per scored window | p |")
         add("|---|---|---|---|---|---|")
         for mode in report["modes"]:
             latency = (
                 f"{mode['stream_latency_s']:.0f} s" if mode["stream_latency_s"] is not None else "-"
             )
             probability = f"{mode['probability']:.3f}" if mode["probability"] is not None else "-"
+            compute = (
+                f"{mode['compute_seconds_per_scored_window']:.1f} s"
+                if mode.get("compute_seconds_per_scored_window")
+                else "-"
+            )
             add(
                 f"| `{mode['mode']}` | {mode['fired']} | {latency} | "
-                f"{mode['theoretical_floor_s']:.0f} s | "
-                f"{mode['compute_seconds_per_poll_p95'] * 1000:.0f} ms | {probability} |"
+                f"{mode['theoretical_floor_s']:.0f} s | {compute} | {probability} |"
             )
         add("")
         add(f"**Verdict.** {report['verdict']}")

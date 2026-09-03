@@ -31,6 +31,12 @@ The physics being measured, in order:
   more linearly polarised at long period than a double-couple source at the same distance.
 * **cross-trace envelope coherence.** A real source produces envelopes with a common shape at
   every receiver; incoherent envelopes are noise.
+
+**What was removed, and why.** An early version carried `valid_channel_fraction`, the share of
+the 12x3 slots holding usable data. It looks like a harmless quality flag and it is not one:
+how many receivers a window has tracks network density, which tracks region and epoch, so a
+model could use it to infer where and when an event happened. It was dropped before the test
+set was scored. The same reasoning is why no receiver count reaches the model in any form.
 """
 
 from __future__ import annotations
@@ -182,7 +188,6 @@ PER_TRACE_STEMS: Final[tuple[str, ...]] = (
 FEATURE_NAMES: Final[tuple[str, ...]] = (
     *(f"{stem}_{aggregate}" for stem in PER_TRACE_STEMS for aggregate in AGGREGATES),
     "lp_envelope_coherence",
-    "valid_channel_fraction",
 )
 
 N_FEATURES: Final = len(FEATURE_NAMES)
@@ -253,14 +258,18 @@ def compute_features(waveform: np.ndarray, valid: np.ndarray) -> dict[str, float
         if not bool(valid[slot, 0]):
             continue
         vertical = np.asarray(waveform[slot, 0], dtype=np.float64)
-        if not np.any(vertical):
+        if not np.any(vertical) or not np.all(np.isfinite(vertical)):
             continue
         for name, value in _trace_features(vertical, "vert").items():
             per_trace[name].append(value)
 
-        has_horizontals = bool(valid[slot, 1]) and bool(valid[slot, 2])
         north = np.asarray(waveform[slot, 1], dtype=np.float64)
         east = np.asarray(waveform[slot, 2], dtype=np.float64)
+        has_horizontals = (
+            bool(valid[slot, 1])
+            and bool(valid[slot, 2])
+            and bool(np.all(np.isfinite(north)) and np.all(np.isfinite(east)))
+        )
         if has_horizontals:
             horizontal = np.hypot(north, east)
             for name, value in _trace_features(horizontal, "horiz").items():
@@ -281,7 +290,6 @@ def compute_features(waveform: np.ndarray, valid: np.ndarray) -> dict[str, float
     for stem in PER_TRACE_STEMS:
         features.update(_aggregate(per_trace[stem], stem))
     features["lp_envelope_coherence"] = _coherence(envelopes)
-    features["valid_channel_fraction"] = float(np.asarray(valid, dtype=np.float64).mean())
     return {name: features[name] for name in FEATURE_NAMES}
 
 

@@ -292,9 +292,12 @@ def process_station_window(
         data = np.asarray(trace.data, dtype=np.float64)
         if data.size < N_SAMPLES:
             data = np.pad(data, (0, N_SAMPLES - data.size))
-        sliced = data[:N_SAMPLES]
+        # Check finiteness *after* the float32 cast: response removal near a sensor's
+        # low-frequency corner can produce float64 values above float32 max, which become inf
+        # on the cast and would enter the store as a silently poisoned trace.
+        sliced = data[:N_SAMPLES].astype(np.float32)
         if not np.all(np.isfinite(sliced)) or float(np.abs(sliced).max()) == 0.0:
             continue
-        out[index] = sliced.astype(np.float32)
+        out[index] = sliced
         valid[index] = True
     return out, valid

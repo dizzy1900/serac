@@ -48,11 +48,16 @@ def _prepare(
     """Phases 1-2: tectonic candidates and station selection. Network, but no bulk download."""
     from concurrent.futures import ThreadPoolExecutor
 
+    from serac.adapters.seismic.usgs_comcat import load_fixture
     from serac.models.discriminator.catalog import build_positives
 
+    comcat_path = repo / "data/fixtures/usgs_comcat/landslide_2000-01-01_2026-09-03.geojson"
+    landslides = load_fixture(comcat_path) if comcat_path.exists() else []
+    if echo:
+        typer.echo(f"ComCat eventtype=landslide: {len(landslides)} events")
     cache = _Cache(repo)
     cache.ensure()
-    positives, _, _ = build_positives(repo)
+    positives, _, _ = build_positives(repo, comcat_landslides=landslides)
     if echo:
         typer.echo(f"positives after dedupe: {len(positives)}")
     with _client() as client:
@@ -71,7 +76,7 @@ def _prepare(
     stations_by_group = {
         p.event_group: choice for p, (_, choice) in zip(positives, selections, strict=True)
     }
-    catalogue = assemble(repo, tectonic_by_positive=tectonic)
+    catalogue = assemble(repo, comcat_landslides=landslides, tectonic_by_positive=tectonic)
     if echo:
         typer.echo(f"windows: {len(catalogue.entries):,} over {len(catalogue.groups):,} groups")
     return catalogue, stations_by_group

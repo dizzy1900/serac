@@ -1,0 +1,103 @@
+{
+  "n_positives": 323,
+  "n_negatives": 1544,
+  "n_noise": 323,
+  "n_windows": 2190,
+  "n_groups": 322,
+  "n_unique_stations": 1062,
+  "estimated_waveform_bytes": 5450940000,
+  "estimated_response_bytes": 159300000,
+  "estimated_zarr_bytes": 2081376000,
+  "estimated_total_bytes": 7691616000,
+  "estimate_basis": "waveforms: 600 s x channel sampling rate x 3 components x 2 bytes/sample (Steim2 upper bound), summed over the selected stations; rates from fdsnws-station channel metadata, 40 Hz assumed where absent. responses: 150 kB per unique station-year (level=response StationXML, measured on the committed fixtures). zarr: n_windows x 12 x 3 x 12000 x 4 B float32 x 0.55 for zstd.",
+  "class_by_region": {
+    "alaska_yukon": {
+      "mass_movement": 74,
+      "noise": 74,
+      "tectonic": 370
+    },
+    "andes": {
+      "mass_movement": 1,
+      "noise": 1,
+      "tectonic": 5
+    },
+    "caucasus": {
+      "mass_movement": 1,
+      "noise": 1,
+      "tectonic": 5
+    },
+    "eastern_north_america": {
+      "mass_movement": 1,
+      "noise": 1,
+      "tectonic": 1
+    },
+    "european_alps": {
+      "mass_movement": 83,
+      "noise": 83,
+      "tectonic": 415
+    },
+    "high_mountain_asia": {
+      "mass_movement": 10,
+      "noise": 10,
+      "tectonic": 50
+    },
+    "mediterranean_anatolia": {
+      "mass_movement": 1,
+      "noise": 1,
+      "tectonic": 5
+    },
+    "new_zealand": {
+      "mass_movement": 1,
+      "noise": 1,
+      "tectonic": 5
+    },
+    "north_american_cordillera": {
+      "mass_movement": 142,
+      "noise": 142,
+      "tectonic": 648
+    },
+    "other": {
+      "mass_movement": 7,
+      "noise": 7,
+      "tectonic": 30
+    },
+    "scandinavia_iceland": {
+      "mass_movement": 2,
+      "noise": 2,
+      "tectonic": 10
+    }
+  },
+  "class_by_decade": {
+    "1970s": {
+      "mass_movement": 1,
+      "noise": 1,
+      "tectonic": 5
+    },
+    "1980s": {
+      "mass_movement": 4,
+      "noise": 4,
+      "tectonic": 20
+    },
+    "1990s": {
+      "mass_movement": 4,
+      "noise": 4,
+      "tectonic": 29
+    },
+    "2000s": {
+      "mass_movement": 68,
+      "noise": 68,
+      "tectonic": 309
+    },
+    "2010s": {
+      "mass_movement": 164,
+      "noise": 164,
+      "tectonic": 799
+    },
+    "2020s": {
+      "mass_movement": 82,
+      "noise": 82,
+      "tectonic": 382
+    }
+  },
+  "warnings": []
+}

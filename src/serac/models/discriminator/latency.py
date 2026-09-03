@@ -69,6 +69,12 @@ class ModeLatency(BaseModel):
     compute_seconds_total: float = Field(ge=0)
     compute_seconds_per_poll_p50: float = Field(ge=0)
     compute_seconds_per_poll_p95: float = Field(ge=0)
+    compute_seconds_per_scored_window: float | None = Field(
+        default=None,
+        description="Total compute divided by the number of windows actually scored. The "
+        "percentiles above are dominated by the cheap polls that return before scoring, so "
+        "this is the number that says what the hardware has to do.",
+    )
     polls: int = Field(ge=0)
     windows_scored: int = Field(ge=0)
     chunks_ingested: int = Field(ge=0)
@@ -158,6 +164,9 @@ def measure(
         compute_seconds_per_poll_p95=p95,
         polls=polls,
         windows_scored=detector.windows_scored,
+        compute_seconds_per_scored_window=(
+            total / detector.windows_scored if detector.windows_scored else None
+        ),
         chunks_ingested=detector.chunks_seen,
         probability=probability,
         class_label=label,
@@ -170,6 +179,8 @@ def measure(
             "- 60 s pre-origin lead-in",
             "wall-clock here is computation only: chunks are fed at max speed, so no "
             "transport, acquisition or telemetry delay is included",
+            "most polls return before scoring, so the per-poll percentiles are near zero; "
+            "compute_seconds_per_scored_window is the load-bearing engineering number",
         ],
     )
 
