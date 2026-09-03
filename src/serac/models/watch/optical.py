@@ -122,6 +122,15 @@ def match_chip(
     peak_c = wc + max(lo_c, 0)
     mean = float(correlation.mean())
     quality = 0.0 if mean <= 0 else float((correlation[peak_r, peak_c] - mean) / mean)
+    # A peak sitting on the edge of the search window is not a measurement: either the true
+    # displacement is larger than the search radius, or the chip decorrelated and the "peak" is
+    # the largest value of a flat noise field, which piles up at the boundary. Either way the
+    # value is unusable, so it is failed rather than reported. Without this, a decorrelated
+    # scene produces a field of displacements all equal to the search radius, which looks like
+    # coherent motion.
+    on_edge = wr in (0, window.shape[0] - 1) or wc in (0, window.shape[1] - 1)
+    if on_edge:
+        return 0.0, 0.0, 0.0
     dr = _parabolic_subpixel(correlation[:, peak_c], peak_r)
     dc = _parabolic_subpixel(correlation[peak_r, :], peak_c)
     return float(peak_c + dc - centre[1]), float(peak_r + dr - centre[0]), quality
@@ -167,8 +176,31 @@ class NoiseFloor:
         "RGI 7.0 glacier outline, and is not water"
     )
 
+    HEAVY_TAIL_RATIO: float = 5.0
+    """`p95 / median` above which the median stops being a usable discriminator."""
+
     def is_significant(self, displacement_m: float) -> bool:
         return abs(displacement_m) > self.median_abs_displacement_m
+
+    @property
+    def heavy_tailed(self) -> bool:
+        """Is the stable-ground distribution so skewed that the median understates the noise?
+
+        Pre-registration section 9 fixes the median as the floor, and that threshold is not
+        changed here. But when the 95th percentile of the *same stable-ground sample* is many
+        times the median, the median is describing the well-behaved chips and saying nothing
+        about the tail, so a "significant" flag derived from it means very little. Reporting
+        the ratio is the honest response; moving the threshold would be tuning.
+        """
+        if not (
+            np.isfinite(self.median_abs_displacement_m)
+            and np.isfinite(self.p95_abs_displacement_m)
+            and self.median_abs_displacement_m > 0
+        ):
+            return True
+        return bool(
+            self.p95_abs_displacement_m / self.median_abs_displacement_m > self.HEAVY_TAIL_RATIO
+        )
 
 
 def measure_noise_floor(
@@ -309,6 +341,15 @@ def run_optical_tracking(
                 else round(floor.p95_abs_displacement_m, 3),
                 "noise_floor_definition": floor.definition,
                 "n_stable_chips": floor.n_stable_chips,
+                "noise_floor_heavy_tailed": floor.heavy_tailed,
+                "noise_floor_caveat": (
+                    "the stable-ground distribution is heavy-tailed (p95 / median > "
+                    f"{NoiseFloor.HEAVY_TAIL_RATIO:.0f}), so the pre-registered median floor "
+                    "describes the well-behaved chips only and the significance flag derived "
+                    "from it should not be read as a detection"
+                )
+                if floor.heavy_tailed
+                else None,
                 "n_units_measured": sum(
                     1 for v in units.values() if v["displacement_m"] is not None
                 ),

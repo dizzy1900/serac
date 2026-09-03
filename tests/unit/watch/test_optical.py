@@ -152,3 +152,45 @@ def test_low_quality_chips_are_discarded_before_aggregation() -> None:
 def test_the_module_says_it_is_not_autorift() -> None:
     assert "NOT autoRIFT" in NOT_AUTORIFT
     assert "ITS_LIVE" in NOT_AUTORIFT
+
+
+def test_a_peak_on_the_search_boundary_is_failed_not_reported() -> None:
+    """A displacement at the search radius cannot be told from one beyond it, so it fails.
+
+    This is also what protects against a decorrelated chip, whose "peak" is just the largest
+    value of a flat noise field and piles up at the window boundary.
+    """
+    reference = _texture((64, 64))
+    at_search_radius = _shift(reference, 0, 4)
+    assert match_chip(reference, at_search_radius, max_shift_px=4) == (0.0, 0.0, 0.0)
+
+
+def test_a_pure_noise_pair_is_failed_rather_than_given_a_displacement() -> None:
+    a, b = _texture((64, 64)), _texture((64, 64))
+    dx, dy, quality = match_chip(a, b, max_shift_px=2)
+    if quality > 0:
+        # Not on the boundary: then it must at least be a small displacement, not the radius.
+        assert max(abs(dx), abs(dy)) < 2.0
+    else:
+        assert (dx, dy) == (0.0, 0.0)
+
+
+def test_a_shift_inside_the_search_radius_still_reports() -> None:
+    reference = _texture((64, 64))
+    dx, dy, quality = match_chip(reference, _shift(reference, 0, 2), max_shift_px=4)
+    assert dx == pytest.approx(2, abs=0.35)
+    assert dy == pytest.approx(0, abs=0.35)
+    assert quality > 0
+
+
+def test_a_heavy_tailed_stable_sample_is_flagged() -> None:
+    assert NoiseFloor(
+        median_abs_displacement_m=3.0, p95_abs_displacement_m=80.0, n_stable_chips=500
+    ).heavy_tailed
+    assert not NoiseFloor(
+        median_abs_displacement_m=3.0, p95_abs_displacement_m=9.0, n_stable_chips=500
+    ).heavy_tailed
+
+
+def test_an_unmeasurable_floor_counts_as_heavy_tailed() -> None:
+    assert NoiseFloor(float("nan"), float("nan"), 0).heavy_tailed
