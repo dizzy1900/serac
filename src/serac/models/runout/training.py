@@ -17,6 +17,7 @@ than no forecast at all.
 
 from __future__ import annotations
 
+import copy
 import json
 import time
 from dataclasses import dataclass
@@ -163,6 +164,11 @@ class TrainedSurrogate:
         )
 
 
+def _clone_state(state: Any) -> dict[str, Any]:
+    """A loadable deep copy of a `state_dict`, without the non-tensor `_metadata` entry."""
+    return {k: copy.deepcopy(v) for k, v in state.items() if k != "_metadata"}
+
+
 def train(
     data: Dataset,
     *,
@@ -251,9 +257,11 @@ def train(
         value = float(v)
         if value < best:
             best = value
+            # neuralop's state_dict carries a `_metadata` entry that is not a tensor and that
+            # `load_state_dict` rejects on the way back in, so deep-copy and drop it
             best_state = {
-                "fno": {k: t.detach().clone() for k, t in fno.state_dict().items()},
-                "regressor": {k: t.detach().clone() for k, t in regressor.state_dict().items()},
+                "fno": _clone_state(fno.state_dict()),
+                "regressor": _clone_state(regressor.state_dict()),
             }
         if progress and epoch % 25 == 0:
             print(f"epoch {epoch:4d} val {value:.5f} best {best:.5f}", flush=True)  # noqa: T201
