@@ -346,6 +346,16 @@ def run_replay(
     first_detection = _mark(rec_detector.first) if rec_detector.first else None
     first_cap = _mark(rec_cap.first) if rec_cap.first else None
     wall_valid = config.speed == 1.0 and status == "completed"
+    first_det_lag = _seconds(
+        first_detection.stream_time_utc if first_detection else None, origin.origin_time_utc
+    )
+    if first_det_lag is not None and first_det_lag < 0:
+        caveats.append(
+            f"The first candidate precedes the event origin by {abs(first_det_lag):.0f} s, so it "
+            "cannot be a detection of this event: the placeholder threshold is crossed by "
+            "background noise. Negative origin-relative latencies mean exactly that."
+        )
+
     report = ReplayReport(
         replay_run_id=run_id,
         event_id=config.event_id,
