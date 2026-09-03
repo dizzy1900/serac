@@ -46,7 +46,7 @@ validate-lfh: ## Force history: published reproductions, refusals, fixtures, sea
 	$(UV) run serac validate lfh
 
 validate-discriminator: ## M1: leakage assertions, forced-group detection, F1 vs baseline
-	$(UV) run serac validate discriminator
+	$(UV) run serac models validate-discriminator --repo .
 
 validate-serac: validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator ## All validation suites
 	$(UV) run serac validate stamp

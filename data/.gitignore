@@ -5,3 +5,10 @@
 !/raw/.gitkeep
 !/interim/.gitkeep
 !/features/.gitkeep
+
+# The discriminator's window index and chunk hashes are metadata, not samples: they carry no
+# waveform data (1.7 MB total) and every leakage assertion needs them. Without these in git,
+# `validate discriminator` cannot prove anything on a fresh clone or in CI.
+!/features/discriminator/
+!/features/discriminator/windows.json
+!/features/discriminator/chunk_hashes.tsv

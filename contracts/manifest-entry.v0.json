@@ -22,6 +22,7 @@
         "iris_syngine",
         "rgi_glaciers",
         "simulation_output",
+        "serac_artefact",
         "synthetic"
       ],
       "title": "DataSource",
