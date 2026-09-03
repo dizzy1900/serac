@@ -74,7 +74,19 @@ def _resolve_doi(doi: str, *, agency: str) -> dict[str, Any]:
     response.raise_for_status()
     print(f"  DOI {doi} resolved via {agency} (HTTP {response.status_code})")
     payload: dict[str, Any] = response.json()
-    return {"url": url, "payload": payload}
+    return {"url": url, "payload": payload, "title": _doi_title(payload, agency)}
+
+
+def _doi_title(payload: dict[str, Any], agency: str) -> str:
+    """The registrant's own title, so a recorded title cannot drift from its DOI."""
+    if agency == "crossref":
+        titles = payload.get("message", {}).get("title") or []
+        return re.sub(r"\s+", " ", unescape(str(titles[0]))).strip() if titles else ""
+    attributes = payload.get("data", {}).get("attributes", {})
+    titles = attributes.get("titles") or []
+    if titles and isinstance(titles[0], dict):
+        return re.sub(r"\s+", " ", unescape(str(titles[0].get("title", "")))).strip()
+    return ""
 
 
 def _text(html_bytes: bytes) -> str:
@@ -130,7 +142,7 @@ def main() -> None:
     # is for. On a failed fetch the stored copy is used, and `esec_accessed` keeps the
     # timestamp of the retrieval that actually happened rather than pretending this one did.
     esec_store = repo / "data" / "fixtures" / "esec" / "esec_catalogue.xml.gz"
-    esec_note = ""
+    esec_fallback_note = ""
     esec_accessed = now
     try:
         print("fetching ESEC catalogue")
@@ -153,7 +165,7 @@ def main() -> None:
                 if entry["id"] == "esec-bingham-1" and entry["sha256"] == esec_sha:
                     esec_accessed = datetime.fromisoformat(entry["accessed_utc"])
                     break
-        esec_note = (
+        esec_fallback_note = (
             f" The endpoint was unreachable at regeneration time ({type(exc).__name__}); these "
             f"bytes are the committed copy retrieved at {esec_accessed.isoformat()}, whose "
             "sha256 matches."
@@ -205,7 +217,11 @@ def main() -> None:
                 year=2025,
                 doi=(element.findtext("DOI") or "").strip() or None,
                 doi_resolved_via=None,
-                url=element.findtext("Link") or ESEC_URL,
+                # The sha256 is of the whole-catalogue response, so the recorded url must be
+                # the catalogue endpoint: a reader who fetches `url` and hashes it must get
+                # `sha256`. The per-event page goes in its own field.
+                url=ESEC_URL,
+                related_url=(element.findtext("Link") or "").strip() or None,
                 accessed_utc=esec_accessed,
                 sha256=esec_sha,
                 content_type=esec_type,
@@ -252,7 +268,7 @@ def main() -> None:
     # --- van Wyk de Vries et al. 2022: Chamoli collapse volume ------------------------------
     print("fetching van Wyk de Vries et al. 2022")
     vwdv_doi = "10.5194/nhess-22-3309-2022"
-    _resolve_doi(vwdv_doi, agency="crossref")
+    vwdv_resolved = _resolve_doi(vwdv_doi, agency="crossref")
     vwdv_url = "https://nhess.copernicus.org/articles/22/3309/2022/"
     vwdv_bytes, vwdv_sha, vwdv_type = _fetch(vwdv_url)
     vwdv_text = _text(vwdv_bytes)
@@ -264,10 +280,7 @@ def main() -> None:
         SourceRef(
             id="vanwykdevries-2022",
             kind="peer_reviewed",
-            title=(
-                "Detecting the impact of climate change on alpine mass movements: the 2021 "
-                "Chamoli rock and ice avalanche (as published in NHESS 22, 3309-2022)"
-            ),
+            title=vwdv_resolved["title"],
             container="Natural Hazards and Earth System Sciences",
             authors="van Wyk de Vries, M. et al.",
             year=2022,
@@ -418,7 +431,7 @@ def main() -> None:
     )
 
     # --- Targets ------------------------------------------------------------------------------
-    esec_note = (
+    esec_mass_note = (
         "ESEC records this event's mass with an explicit low and high; the interval below is "
         "those two numbers, not a derived one."
     )
@@ -434,7 +447,7 @@ def main() -> None:
             f"MassLow {bingham.findtext('MassLow')}, MassHigh {bingham.findtext('MassHigh')} kg; "
             f"Volume {bingham.findtext('Volume')} m3; DOI {bingham_doi}."
         ),
-        notes=esec_note,
+        notes=esec_mass_note,
     )
     taan_mass = PublishedQuantity(
         low=1.0e11,
@@ -672,7 +685,7 @@ def main() -> None:
             adapter_version="0.1.0",
             notes=(
                 f"Bulk ESEC response, sha256 of the retrieved bytes {esec_sha}. Stored gzipped; "
-                "the uncompressed sha256 is what the reference file records." + esec_note
+                "the uncompressed sha256 is what the reference file records." + esec_fallback_note
             ),
         )
     )
