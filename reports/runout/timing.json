@@ -1,0 +1,178 @@
+{
+  "contention": {
+    "cores": 10,
+    "load_average": 26,
+    "note": "Measured while the ensemble ran: the machine is shared with sibling agents and another project, so a 30 m member costs about 950 s of wall clock rather than 330 s. This is why the resolution blocks were re-sized before any member output was analysed; see ENSEMBLE_FROZEN.md.",
+    "observed_cpu_share_per_worker": 0.35,
+    "workers": 9
+  },
+  "cost_model": {
+    "basis": "1077.6 * 0.03 = 32.3 and 326.8 * 0.10 = 32.7 at 30 m",
+    "cost_ratio_30m_over_60m": [
+      8.95,
+      10.97
+    ],
+    "form": "wall_s ~ k / mu",
+    "k_s": 32.5,
+    "mean_30m_member_s_at_3600": 330.0,
+    "mean_30m_member_s_at_7200": 560.0,
+    "measured_first_two_members_s": [
+      289.6,
+      376.3
+    ]
+  },
+  "generated_utc": "2026-09-03T22:32:09.703934+00:00",
+  "max_time_s": 3600.0,
+  "note": "One member per resolution with the same parameter vector. The ensemble size is chosen against these measured numbers, not an estimate. Wall clock is single-core; the ensemble runs one member per process.",
+  "parameters": {
+    "critical_shear_pa": 500.0,
+    "entrainment_coefficient": 0.01,
+    "ice_fraction": 0.5,
+    "mu": 0.05,
+    "release_elevation_band_m": [
+      3800.0,
+      4600.0
+    ],
+    "release_volume_m3": 100000000.0,
+    "xi_m_s2": 1000.0
+  },
+  "per_resolution": [
+    {
+      "active_cells": 37072,
+      "mass_relative_error": -4.289467099136521e-16,
+      "max_depth_m": 180.343,
+      "ms_per_step": 2.8583,
+      "reach_m": 15309.6,
+      "resolution_m": 90.0,
+      "simulated_time_s": 1179.41,
+      "solver_wall_s": 5.428,
+      "steps": 1899,
+      "terrain_build_s": 1.252
+    },
+    {
+      "active_cells": 82429,
+      "mass_relative_error": 1.4346513006490124e-16,
+      "max_depth_m": 192.082,
+      "ms_per_step": 4.9657,
+      "reach_m": 14521.9,
+      "resolution_m": 60.0,
+      "simulated_time_s": 1129.0,
+      "solver_wall_s": 16.273,
+      "steps": 3277,
+      "terrain_build_s": 2.452
+    },
+    {
+      "active_cells": 325553,
+      "mass_relative_error": 0.0,
+      "max_depth_m": 195.6,
+      "ms_per_step": 19.8985,
+      "reach_m": 14535.2,
+      "resolution_m": 30.0,
+      "simulated_time_s": 1126.29,
+      "solver_wall_s": 153.199,
+      "steps": 7699,
+      "terrain_build_s": 10.079
+    }
+  ],
+  "pre_ensemble_measurements": {
+    "fixed_parameters": {
+      "critical_shear_pa": 500.0,
+      "entrainment_coefficient": 0.01,
+      "ice_fraction": 0.5,
+      "release_elevation_band_m": [
+        3800.0,
+        4600.0
+      ],
+      "release_volume_m3": 100000000.0,
+      "xi_m_s2": 1000.0
+    },
+    "max_time_s": 7200.0,
+    "note": "Measured on solver v0.1.0 with a 7200 s simulated-time limit, BEFORE the ensemble was sized. Two friction values per resolution, because cost is dominated by mu. These are the numbers the ensemble size was chosen against; the block above is a fresh measurement on v0.2.0 at the frozen 3600 s limit.",
+    "runs": [
+      {
+        "active_cells": 37072,
+        "entrained_volume_m3": 12000000.0,
+        "max_depth_chainage_m": 1490.0,
+        "max_depth_m": 180.5,
+        "ms_per_step": 5.12,
+        "mu": 0.03,
+        "reach_m": 35170.0,
+        "resolution_m": 90.0,
+        "simulated_time_s": 7200.0,
+        "solver_wall_s": 33.3,
+        "steps": 6511,
+        "terrain_build_s": 1.2
+      },
+      {
+        "active_cells": 37072,
+        "entrained_volume_m3": 3800000.0,
+        "max_depth_chainage_m": 1490.0,
+        "max_depth_m": 179.8,
+        "ms_per_step": 4.12,
+        "mu": 0.1,
+        "reach_m": 14400.0,
+        "resolution_m": 90.0,
+        "simulated_time_s": 1684.0,
+        "solver_wall_s": 9.2,
+        "steps": 2235,
+        "terrain_build_s": 1.2
+      },
+      {
+        "active_cells": 82429,
+        "entrained_volume_m3": 9300000.0,
+        "max_depth_chainage_m": 1540.0,
+        "max_depth_m": 192.5,
+        "ms_per_step": 11.01,
+        "mu": 0.03,
+        "reach_m": 30660.0,
+        "resolution_m": 60.0,
+        "simulated_time_s": 7200.0,
+        "solver_wall_s": 120.4,
+        "steps": 10931,
+        "terrain_build_s": 2.1
+      },
+      {
+        "active_cells": 82429,
+        "entrained_volume_m3": 3800000.0,
+        "max_depth_chainage_m": 1540.0,
+        "max_depth_m": 191.0,
+        "ms_per_step": 5.99,
+        "mu": 0.1,
+        "reach_m": 15400.0,
+        "resolution_m": 60.0,
+        "simulated_time_s": 2218.0,
+        "solver_wall_s": 29.8,
+        "steps": 4984,
+        "terrain_build_s": 2.1
+      },
+      {
+        "active_cells": 325553,
+        "entrained_volume_m3": 9200000.0,
+        "max_depth_chainage_m": 1520.0,
+        "max_depth_m": 196.1,
+        "ms_per_step": 41.45,
+        "mu": 0.03,
+        "reach_m": 29970.0,
+        "resolution_m": 30.0,
+        "simulated_time_s": 7200.0,
+        "solver_wall_s": 1077.6,
+        "steps": 26000,
+        "terrain_build_s": 17.7
+      },
+      {
+        "active_cells": 325553,
+        "entrained_volume_m3": 4200000.0,
+        "max_depth_chainage_m": 1520.0,
+        "max_depth_m": 194.3,
+        "ms_per_step": 18.21,
+        "mu": 0.1,
+        "reach_m": 16790.0,
+        "resolution_m": 30.0,
+        "simulated_time_s": 4384.0,
+        "solver_wall_s": 326.8,
+        "steps": 17949,
+        "terrain_build_s": 17.7
+      }
+    ]
+  }
+}

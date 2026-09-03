@@ -16,7 +16,7 @@ from pydantic import AwareDatetime, BaseModel, Field, model_validator
 from serac.domain.common import DOMAIN_CONFIG, SEMVER_PATTERN, Range, Slug
 from serac.domain.geometry import MultiPolygon, Point, Polygon
 
-FORECAST_CONTRACT_VERSION = "0.1.0"
+FORECAST_CONTRACT_VERSION = "0.2.0"
 
 
 class ModelProvenance(StrEnum):
@@ -61,6 +61,22 @@ class TransectArrival(BaseModel):
     )
 
 
+class SecondarySurge(BaseModel):
+    """A surge released by a landslide-dam breach, arriving after the primary flow.
+
+    Cascade rules v0: the breach model is parametric, so `label` must name the rule set that
+    produced the estimate and every number is a `Range`.
+    """
+
+    model_config = DOMAIN_CONFIG
+
+    origin_chainage_km: float = Field(ge=0, allow_inf_nan=False)
+    transect_id: Slug
+    arrival_after_breach_min: Range
+    peak_discharge_m3s: Range | None = None
+    label: str = Field(min_length=1, description="e.g. 'cascade rules v0'")
+
+
 class DammingEstimate(BaseModel):
     """Whether, where and how large a landslide dam / barrier lake may form."""
 
@@ -71,6 +87,7 @@ class DammingEstimate(BaseModel):
     dam_height_m: Range | None = None
     lake_volume_m3: Range | None = None
     breach_time_after_formation_min: Range | None = None
+    secondary_surges: list[SecondarySurge] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _probability_bounds(self) -> Self:

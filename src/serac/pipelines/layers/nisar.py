@@ -53,9 +53,7 @@ PROCESSING = (
 def read_gcov_hh(path: Path) -> tuple[np.ndarray, Affine, int]:
     """(HHHH array, affine, EPSG) from a GCOV HDF5. Requires h5py; untested on real data."""
     try:
-        # h5py ships no py.typed; the extra `unused-ignore` keeps this green whether or
-        # not the `insar` extra (which pulls h5py in via mintpy) is installed.
-        import h5py  # type: ignore[import-not-found,import-untyped,unused-ignore]
+        import h5py  # type: ignore[import-untyped]  # not-found without the `insar` extra
     except ImportError as exc:  # pragma: no cover - environment-dependent
         raise ImportError(
             "reading NISAR GCOV HDF5 needs h5py, which the locked environment does not ship"

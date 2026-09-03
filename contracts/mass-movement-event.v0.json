@@ -657,6 +657,20 @@
           "default": null,
           "title": "Publisher"
         },
+        "related_url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://\\S+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Landing page for a reader, when it differs from the bytes that were hashed.",
+          "title": "Related Url"
+        },
         "sha256": {
           "pattern": "^[0-9a-f]{64}$",
           "title": "Sha256",
@@ -681,6 +695,7 @@
           "type": "string"
         },
         "url": {
+          "description": "The URL whose bytes produced `sha256`. A reader who fetches this and hashes it must get `sha256`; put a human-facing landing page in `related_url` instead.",
           "pattern": "^https?://\\S+$",
           "title": "Url",
           "type": "string"

@@ -1,0 +1,444 @@
+{
+  "type": "FeatureCollection",
+  "name": "serac_discriminator_regions",
+  "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation.",
+  "held_out_region": "high_mountain_asia",
+  "matching_rule": "Boxes are tested in ascending `priority` and the first containing box wins; a point in no box is labelled `other`.",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "european_alps",
+        "label": "European Alps",
+        "priority": 0,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              4.0,
+              43.0
+            ],
+            [
+              17.5,
+              43.0
+            ],
+            [
+              17.5,
+              48.5
+            ],
+            [
+              4.0,
+              48.5
+            ],
+            [
+              4.0,
+              43.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "caucasus",
+        "label": "Caucasus",
+        "priority": 1,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              37.0,
+              38.0
+            ],
+            [
+              50.0,
+              38.0
+            ],
+            [
+              50.0,
+              45.5
+            ],
+            [
+              37.0,
+              45.5
+            ],
+            [
+              37.0,
+              38.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "new_zealand",
+        "label": "New Zealand",
+        "priority": 2,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              165.0,
+              -48.0
+            ],
+            [
+              179.9,
+              -48.0
+            ],
+            [
+              179.9,
+              -33.0
+            ],
+            [
+              165.0,
+              -33.0
+            ],
+            [
+              165.0,
+              -48.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "japan_kuril",
+        "label": "Japan and the Kuril arc",
+        "priority": 3,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              127.0,
+              29.0
+            ],
+            [
+              160.0,
+              29.0
+            ],
+            [
+              160.0,
+              51.0
+            ],
+            [
+              127.0,
+              51.0
+            ],
+            [
+              127.0,
+              29.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "high_mountain_asia",
+        "label": "High Mountain Asia",
+        "priority": 4,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              65.0,
+              25.0
+            ],
+            [
+              105.0,
+              25.0
+            ],
+            [
+              105.0,
+              45.0
+            ],
+            [
+              65.0,
+              45.0
+            ],
+            [
+              65.0,
+              25.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "alaska_yukon",
+        "label": "Alaska and Yukon",
+        "priority": 5,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -170.0,
+              54.0
+            ],
+            [
+              -125.0,
+              54.0
+            ],
+            [
+              -125.0,
+              72.0
+            ],
+            [
+              -170.0,
+              72.0
+            ],
+            [
+              -170.0,
+              54.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "north_american_cordillera",
+        "label": "North American Cordillera",
+        "priority": 6,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -145.0,
+              30.0
+            ],
+            [
+              -100.0,
+              30.0
+            ],
+            [
+              -100.0,
+              54.0
+            ],
+            [
+              -145.0,
+              54.0
+            ],
+            [
+              -145.0,
+              30.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "andes",
+        "label": "Andes",
+        "priority": 7,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.0,
+              -56.0
+            ],
+            [
+              -60.0,
+              -56.0
+            ],
+            [
+              -60.0,
+              13.0
+            ],
+            [
+              -82.0,
+              13.0
+            ],
+            [
+              -82.0,
+              -56.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "scandinavia_iceland",
+        "label": "Scandinavia and Iceland",
+        "priority": 8,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -25.0,
+              58.0
+            ],
+            [
+              33.0,
+              58.0
+            ],
+            [
+              33.0,
+              72.0
+            ],
+            [
+              -25.0,
+              72.0
+            ],
+            [
+              -25.0,
+              58.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "mediterranean_anatolia",
+        "label": "Mediterranean and Anatolia",
+        "priority": 9,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -10.0,
+              30.0
+            ],
+            [
+              45.0,
+              30.0
+            ],
+            [
+              45.0,
+              43.0
+            ],
+            [
+              -10.0,
+              43.0
+            ],
+            [
+              -10.0,
+              30.0
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "region_id": "eastern_north_america",
+        "label": "Eastern North America",
+        "priority": 10,
+        "geometry_quality": "hand_digitised_approximate",
+        "authoritative": false,
+        "purpose": "model_evaluation_stratification",
+        "note": "serac project artefact for model-evaluation stratification only. Hand-drawn rectangles chosen by this project; NOT an authoritative, published, tectonic, physiographic or political boundary. Do not cite or reuse as a regionalisation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -100.0,
+              24.0
+            ],
+            [
+              -52.0,
+              24.0
+            ],
+            [
+              -52.0,
+              54.0
+            ],
+            [
+              -100.0,
+              54.0
+            ],
+            [
+              -100.0,
+              24.0
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

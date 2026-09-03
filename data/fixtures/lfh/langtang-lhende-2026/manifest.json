@@ -1,0 +1,150 @@
+{
+  "target_id": "langtang-lhende-2026",
+  "origin_utc": "2026-08-26T02:52:10Z",
+  "source_latitude": 28.271,
+  "source_longitude": 85.515,
+  "window": {
+    "start_utc": "2026-08-26T02:49:10+00:00",
+    "end_utc": "2026-08-26T03:06:10+00:00"
+  },
+  "n_candidates": 11,
+  "azimuthal_gap_deg": 161.3,
+  "licence": null,
+  "licence_source_url": "https://www.earthscope.org/terms-of-service/",
+  "notes": "Data centres publish terms of service rather than a licence. Acknowledge the operating networks and cite their DOIs; EarthScope requests acknowledgement of NSF award 2435260.",
+  "stations_xml_sha256": "0453d3ce9b9f02ac4b094abeb9fc78de61ac939d9a431c375365aebf4a0e042e",
+  "files": [
+    {
+      "path": "G.WUS.00.LHE.mseed",
+      "sncl": "G.WUS.00.LHE",
+      "sha256": "91ee1c0a8ba82aeb37c835e3bf94bb655b252727c5d1a6435e078dad4caaa52a",
+      "size_bytes": 2048,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 13.892879698197175,
+      "azimuth_deg": 339.8313679615532
+    },
+    {
+      "path": "G.WUS.00.LHN.mseed",
+      "sncl": "G.WUS.00.LHN",
+      "sha256": "1ea28281469a542469980d3a820f873c12a30052538493f01da58ebc6fa0468b",
+      "size_bytes": 2048,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 13.892879698197175,
+      "azimuth_deg": 339.8313679615532
+    },
+    {
+      "path": "G.WUS.00.LHZ.mseed",
+      "sncl": "G.WUS.00.LHZ",
+      "sha256": "fbb68d9731d57f3271c7483143c09103c8179e8d38670f262be084ce3171279b",
+      "size_bytes": 2048,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 13.892879698197175,
+      "azimuth_deg": 339.8313679615532
+    },
+    {
+      "path": "G.WUS.10.LHE.mseed",
+      "sncl": "G.WUS.10.LHE",
+      "sha256": "4b01b77982eb152795c64227a2e12931ea381d01a27bb2d2176a6ce916e59747",
+      "size_bytes": 1536,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 13.892879698197175,
+      "azimuth_deg": 339.8313679615532
+    },
+    {
+      "path": "G.WUS.10.LHN.mseed",
+      "sncl": "G.WUS.10.LHN",
+      "sha256": "e4bc4bedecb529fbb3f842fd3f0b3f18ad8d28df198954d23aeb7d63488e29e1",
+      "size_bytes": 1536,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 13.892879698197175,
+      "azimuth_deg": 339.8313679615532
+    },
+    {
+      "path": "G.WUS.10.LHZ.mseed",
+      "sncl": "G.WUS.10.LHZ",
+      "sha256": "0481c952d4a2df36536d49bd30de524c2777cbf703b95bd411f136cfe992598c",
+      "size_bytes": 1536,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 13.892879698197175,
+      "azimuth_deg": 339.8313679615532
+    },
+    {
+      "path": "II.NIL.10.LH1.mseed",
+      "sncl": "II.NIL.10.LH1",
+      "sha256": "61d65dee2ecd74d867501b7383ab36b1db4989192eaf1b4976db90c1527eba67",
+      "size_bytes": 2560,
+      "npts": 1020,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 11.796200616931946,
+      "azimuth_deg": 300.0600878633963
+    },
+    {
+      "path": "II.NIL.10.LH2.mseed",
+      "sncl": "II.NIL.10.LH2",
+      "sha256": "7036c175fdb9a7654d1b907f664e0b18db658f731c88a1221783647dc655878c",
+      "size_bytes": 2048,
+      "npts": 1020,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 11.796200616931946,
+      "azimuth_deg": 300.0600878633963
+    },
+    {
+      "path": "II.NIL.10.LHZ.mseed",
+      "sncl": "II.NIL.10.LHZ",
+      "sha256": "9f5377d9cdbe5e9890941097c528d826cfd32fb2b7854efeccdbe385f7e60d96",
+      "size_bytes": 2048,
+      "npts": 1020,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "EARTHSCOPE",
+      "distance_deg": 11.796200616931946,
+      "azimuth_deg": 300.0600878633963
+    },
+    {
+      "path": "KC.MRZ1..LHE.mseed",
+      "sncl": "KC.MRZ1..LHE",
+      "sha256": "8734ce44520a02832d301c41fc02e9a6a44e3e72192c1e36f91070eb44f18177",
+      "size_bytes": 1536,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "GEOFON",
+      "distance_deg": 14.662453650513225,
+      "azimuth_deg": 343.1922013057704
+    },
+    {
+      "path": "KC.MRZ1..LHN.mseed",
+      "sncl": "KC.MRZ1..LHN",
+      "sha256": "9f90bd9528d9d8b92a153871efbe2973bcb43ae0bc09450150d2d2dea6cdc691",
+      "size_bytes": 1024,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "GEOFON",
+      "distance_deg": 14.662453650513225,
+      "azimuth_deg": 343.1922013057704
+    },
+    {
+      "path": "KC.MRZ1..LHZ.mseed",
+      "sncl": "KC.MRZ1..LHZ",
+      "sha256": "43514ea070d1d54c4227f737b6427ef4a701e749222859154336a02f0099dc7b",
+      "size_bytes": 1536,
+      "npts": 1021,
+      "sampling_rate_hz": 1.0,
+      "data_centre": "GEOFON",
+      "distance_deg": 14.662453650513225,
+      "azimuth_deg": 343.1922013057704
+    }
+  ]
+}

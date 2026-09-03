@@ -1,1 +1,1 @@
-"""Model components (M1-M4). Each subpackage owns one component and its reports."""
+"""Model components: the discriminator, the force-history inversion, watch and runout."""

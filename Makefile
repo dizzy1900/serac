@@ -3,7 +3,7 @@ UV ?= uv
 EVENT ?= chamoli-2021
 SPEED ?= max
 
-.PHONY: help sync lint typecheck test smoke-online validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-serac promote underwriting-check replay dvc-remote clean
+.PHONY: help sync lint typecheck test smoke-online validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-serac promote underwriting-check replay dvc-remote clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -42,7 +42,16 @@ validate-aoi: ## AOI geometry, grid and sources
 validate-contracts: ## contracts/*.v0.json match the models
 	$(UV) run serac validate contracts
 
-validate-serac: validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts ## All validation suites
+validate-lfh: ## Force history: published reproductions, refusals, fixtures, seal
+	$(UV) run serac validate lfh
+
+validate-discriminator: ## M1: leakage assertions, forced-group detection, F1 vs baseline
+	$(UV) run serac models validate-discriminator --repo .
+
+validate-runout: ## M4: surrogate gates, frozen design, NOT-r.avaflow disclosure
+	$(UV) run serac validate runout
+
+validate-serac: validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout ## All validation suites
 	$(UV) run serac validate stamp
 
 promote: validate-serac ## Refuses unless validate-serac passed on a clean tree at HEAD
