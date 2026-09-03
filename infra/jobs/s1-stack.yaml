@@ -1,0 +1,119 @@
+# serac job manifest — Sentinel-1 SLC/GRD stack listing and download for one AOI.
+# Generic container-host description; the aws: block is annotation only. See infra/jobs/README.md.
+# Status: designed, never executed. Every estimate states its basis.
+
+apiVersion: serac.jobs/v0
+kind: ContainerJob
+
+metadata:
+  name: s1-stack
+  description: >
+    Search ASF for Sentinel-1 IW products over an AOI and date range, group by relative
+    orbit, and download the selected stack to data/raw/sentinel1_asf/<aoi>/ with a ledger
+    entry per product. Search is public; download requires Earthdata Login. This job
+    downloads only; interferometry is delegated to hyp3-insar-batch.yaml.
+  owner_role: eo-data-engineer
+  status: designed
+
+image: "<registry>/serac:<git-sha>"
+
+command:
+  - serac
+  - ingest
+  - s1
+  - --aoi
+  - "${aoi_id}"
+  - --from
+  - "${date_from}"
+  - --to
+  - "${date_to}"
+  - --product
+  - "${product}"
+  - --relative-orbit
+  - "${relative_orbit}"
+  - --confirm-bytes
+  - "${confirm_bytes}"
+
+parameters:
+  aoi_id: lhende-khola-trishuli
+  date_from: "2026-06-01"
+  date_to: "2026-08-31"
+  product: GRD                         # GRD or SLC; SLC stacks are much larger
+  relative_orbit: ""                   # empty = all orbits found by the search
+  confirm_bytes: "0"                   # operator sets the confirmed ceiling after a --dry-run
+
+env:
+  - name: EARTHDATA_USERNAME
+    from: secret:EARTHDATA_USERNAME
+  - name: EARTHDATA_PASSWORD
+    from: secret:EARTHDATA_PASSWORD
+  - name: SERAC_DATA_DIR
+    from: value:/data
+
+resources:
+  cpu: 2
+  memory_gb: 4
+  gpu: 0
+  storage_gb: 1000                     # scratch; SLC stacks are large
+
+parallelism:
+  array_size: 4                        # shard by relative orbit when several are found
+  shard_by: relative_orbit
+
+estimated_core_hours:
+  low: 0.5
+  high: 8
+  basis: >
+    ASSUMPTION, not a measurement. Download-bound: CPU is idle while bytes stream. Range
+    assumes a season of GRD to a season of SLC over one AOI at 2 vCPU. No run recorded.
+
+estimated_storage_gb:
+  low: 5
+  high: 500
+  basis: >
+    ASSUMPTION. Per-product sizes vary by product type; the adapter's --dry-run prints the
+    estimated bytes from the ASF listing before any download. The 5 GB ask-first gate will
+    trigger for almost any SLC stack.
+
+inputs:
+  - data/aoi/${aoi_id}/
+  - data/manifest.jsonl
+
+outputs:
+  - data/raw/sentinel1_asf/${aoi_id}/  # DVC-tracked
+  - data/manifest.jsonl
+
+ledger:
+  - source: sentinel1_asf
+    statuses: [listed, fetched, failed, not_fetched]
+
+preconditions:
+  - Earthdata Login credentials present in the host secret store.
+  - serac ingest s1 --dry-run run and reviewed; operator confirmation recorded if > 5 GB.
+  - dvc remote configured so outputs can be pushed.
+
+aws:
+  note: annotation only; any container host can run this job from the generic fields above.
+  instance_family: m6i                 # network-bound; choose an instance with adequate network bandwidth
+  suggested_instance: m6i.large
+  batch_job_definition:
+    type: container
+    containerProperties:
+      image: "<registry>/serac:<git-sha>"
+      vcpus: 2
+      memory: 4096
+      command: ["serac", "ingest", "s1", "--aoi", "Ref::aoi_id", "--from", "Ref::date_from", "--to", "Ref::date_to", "--product", "Ref::product", "--relative-orbit", "Ref::relative_orbit", "--confirm-bytes", "Ref::confirm_bytes"]
+      secrets:
+        - name: EARTHDATA_USERNAME
+          valueFrom: "<secrets-manager arn>"
+        - name: EARTHDATA_PASSWORD
+          valueFrom: "<secrets-manager arn>"
+      volumes:
+        - name: scratch
+          host: { sourcePath: /scratch }
+      mountPoints:
+        - containerPath: /data
+          sourceVolume: scratch
+    arrayProperties: { size: 4 }
+    retryStrategy: { attempts: 2 }
+    timeout: { attemptDurationSeconds: 43200 }

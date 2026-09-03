@@ -1,0 +1,107 @@
+# serac job manifest — feature-cube build for one AOI.
+# Generic container-host description; the aws: block is annotation only. See infra/jobs/README.md.
+# Status: designed, never executed. Every estimate states its basis.
+
+apiVersion: serac.jobs/v0
+kind: ContainerJob
+
+metadata:
+  name: cube-build
+  description: >
+    Build the Zarr v3 feature cube and STAC catalog for one AOI on its fixed 30 m grid from
+    whatever is present under data/raw (dem, slope, aspect, s1_coherence_t, s1_los_velocity_t,
+    s2_ndsi_t, s2_cloud_t, nisar_hh_t, era5_t2m_t). Missing layers are written all-NaN with
+    status: not_fetched; nothing is invented. Writes reports/cube/<aoi>.json.
+  owner_role: eo-data-engineer
+  status: designed
+
+image: "<registry>/serac:<git-sha>"
+
+command:
+  - serac
+  - cube
+  - build
+  - --aoi
+  - "${aoi_id}"
+  - --from
+  - "${date_from}"
+  - --to
+  - "${date_to}"
+
+parameters:
+  aoi_id: chamoli-rishiganga
+  date_from: "2021-01-01"
+  date_to: "2021-02-15"
+
+env:
+  - name: SERAC_DATA_DIR
+    from: value:/data
+  - name: SERAC_REPORTS_DIR
+    from: value:/data/reports
+
+resources:
+  cpu: 8
+  memory_gb: 32
+  gpu: 0
+  storage_gb: 500                      # raw inputs (dvc pull) + cube + scratch
+
+parallelism:
+  array_size: 1                        # one task per AOI
+  shard_by: aoi_id
+
+estimated_core_hours:
+  low: 0.5
+  high: 40
+  basis: >
+    ASSUMPTION, not a measurement. Low end: a fixture-scale build (a few 64x64 px Sentinel-2
+    crops and one DEM crop) which the CI acceptance run performs on a laptop in well under an
+    hour. High end: the planned Lhende extent (source zone + corridor buffered 3 km, on the
+    order of 2,000 x 3,700 pixels at 30 m) over a multi-year Sentinel-2 archive with
+    per-scene windowed reads and reprojection at 8 vCPU. Scales roughly linearly with the
+    number of scenes; no run has been timed.
+
+estimated_storage_gb:
+  low: 0.1
+  high: 100
+  basis: >
+    ASSUMPTION. Zarr chunks 1x512x512 with zstd; the cube size depends on the number of time
+    slices and layers actually present. Raw inputs pulled from the DVC remote dominate the
+    scratch requirement.
+
+inputs:
+  - data/aoi/${aoi_id}/                # committed
+  - data/raw/                          # dvc pull (only the sources present for this AOI)
+  - data/manifest.jsonl
+
+outputs:
+  - data/features/${aoi_id}/cube.zarr  # DVC-tracked
+  - data/features/${aoi_id}/stac/      # DVC-tracked
+  - reports/cube/${aoi_id}.json        # uncached DVC metric
+
+ledger:
+  - source: none                       # the cube references existing ledger entries by id; it appends none
+
+preconditions:
+  - dvc pull data/raw completed for the sources this AOI needs (or the build is expected to
+    produce not_fetched layers, which is a valid outcome).
+  - make validate-ingest passes on the pulled data.
+
+aws:
+  note: annotation only; any container host can run this job from the generic fields above.
+  instance_family: r6i                 # memory-optimised; xarray/zarr rechunking is memory-bound
+  suggested_instance: r6i.2xlarge
+  batch_job_definition:
+    type: container
+    containerProperties:
+      image: "<registry>/serac:<git-sha>"
+      vcpus: 8
+      memory: 32768
+      command: ["serac", "cube", "build", "--aoi", "Ref::aoi_id", "--from", "Ref::date_from", "--to", "Ref::date_to"]
+      volumes:
+        - name: scratch
+          host: { sourcePath: /scratch }
+      mountPoints:
+        - containerPath: /data
+          sourceVolume: scratch
+    retryStrategy: { attempts: 1 }
+    timeout: { attemptDurationSeconds: 86400 }
