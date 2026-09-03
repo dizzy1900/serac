@@ -1,0 +1,11 @@
+{
+  "aoi_id": "chamoli-rishiganga",
+  "epsg": 32644,
+  "resolution_m": 30.0,
+  "x_min": 358500.0,
+  "y_min": 3352920.0,
+  "x_max": 387960.0,
+  "y_max": 3386550.0,
+  "width": 982,
+  "height": 1121
+}

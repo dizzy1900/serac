@@ -11,7 +11,11 @@ from serac.adapters.storage.manifest_ledger import JsonlManifestLedger, sha256_o
 from serac.domain.manifest import DataSource, ManifestStatus, Provenance
 from serac.domain.replay import FixtureManifest
 
-FIXTURE_ROOTS = ("data/fixtures/", "contracts/vendor/")
+FIXTURE_ROOTS = (
+    "data/fixtures/seismic/",
+    "data/fixtures/usgs_comcat/",
+    "contracts/vendor/",
+)
 
 
 def _seismic_manifests(repo_root: Path) -> list[Path]:
@@ -129,6 +133,7 @@ def test_ledger_rows_for_fixtures_are_real_and_hashed(
                 DataSource.fdsn_waveforms,
                 DataSource.usgs_comcat,
                 DataSource.vendored_schema,
+                DataSource.hydrometric_icimod,
             }
             or entry.adapter != "fixture-fetch"
         )

@@ -7,7 +7,9 @@
         "snapped_to_osm_centreline",
         "osm_centreline",
         "osm_node",
-        "hand_digitised_approximate"
+        "hand_digitised_approximate",
+        "osm_way_centroid",
+        "source_stated_location"
       ],
       "title": "GeometryQuality",
       "type": "string"
