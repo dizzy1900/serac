@@ -18,6 +18,8 @@ inherits no external conventions; everything it needs is defined in this reposit
 ## Workflow
 
 ```bash
+# macOS only: lightgbm needs the OpenMP runtime, which is not a Python package.
+#   brew install libomp
 uv sync --all-extras
 make lint typecheck test
 make validate-serac
