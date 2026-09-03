@@ -114,12 +114,18 @@ def _replay_checks(
         counts.chunks_consumed == counts.chunks_published,
         f"consumed {counts.chunks_consumed} of {counts.chunks_published} published",
     )
+    # The report's own flag must agree with the detector that produced it, and a stub run
+    # must still carry the STUB caveat. A trained detector is allowed here; what is not
+    # allowed is a report whose is_stub disagrees with its detector.
+    stub_caveat = any(STUB_MARKER in c for c in report.caveats)
+    consistent = report.is_stub == report.detector.is_stub and (
+        stub_caveat if report.detector.is_stub else True
+    )
     suite.check(
-        f"replay_is_stub:{event_id}",
-        report.is_stub
-        and report.detector.is_stub
-        and any(STUB_MARKER in c for c in report.caveats),
-        "report says is_stub and carries the STUB caveat",
+        f"replay_stub_flag_consistent:{event_id}",
+        consistent,
+        f"report.is_stub={report.is_stub}, detector.is_stub={report.detector.is_stub}, "
+        f"stub_caveat={stub_caveat}",
     )
     errors = _report_schema_errors(repo, report)
     suite.check(

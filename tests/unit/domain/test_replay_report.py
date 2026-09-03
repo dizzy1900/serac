@@ -125,9 +125,10 @@ class TestReplayReport:
         assert r.contains_synthetic is False
         assert ReplayReport.model_validate_json(r.model_dump_json()) == r
 
-    def test_is_stub_cannot_be_false(self) -> None:
-        with pytest.raises(ValidationError):
-            report(is_stub=False)
+    def test_is_stub_may_be_false_for_a_trained_detector(self) -> None:
+        # 0.3.0 widened this from Literal[True] so a trained detector can produce a valid
+        # report; validate-stream asserts it agrees with detector.is_stub.
+        assert report(is_stub=False).is_stub is False
 
     def test_caveats_required(self) -> None:
         with pytest.raises(ValidationError):

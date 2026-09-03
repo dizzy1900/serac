@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "AEff": {
+      "additionalProperties": false,
+      "description": "The effective acceleration used to turn a peak force into a mass.",
+      "properties": {
+        "basis": {
+          "description": "How it was derived; `assumed_range` means no DEM path was available.",
+          "enum": [
+            "dem_trajectory",
+            "assumed_range"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "friction_coefficient": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Interval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "slope_deg": {
+          "anyOf": [
+            {
+              "maximum": 90,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Slope Deg"
+        },
+        "value_m_s2": {
+          "exclusiveMinimum": 0,
+          "title": "Value M S2",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value_m_s2",
+        "basis"
+      ],
+      "title": "AEff",
+      "type": "object"
+    },
+    "Interval": {
+      "additionalProperties": false,
+      "description": "A 5-95% interval with its median. Never collapse this to a single number.",
+      "properties": {
+        "p05": {
+          "title": "P05",
+          "type": "number"
+        },
+        "p50": {
+          "title": "P50",
+          "type": "number"
+        },
+        "p95": {
+          "title": "P95",
+          "type": "number"
+        },
+        "units": {
+          "minLength": 1,
+          "title": "Units",
+          "type": "string"
+        }
+      },
+      "required": [
+        "p05",
+        "p50",
+        "p95",
+        "units"
+      ],
+      "title": "Interval",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/mass-estimate.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Bulk mobilised mass as an interval, with every assumption named.",
+  "properties": {
+    "a_eff": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AEff"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "assumptions": {
+      "description": "Every assumption behind the number, in words.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "consistency_ratio": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "M(estimator A) / M(estimator B); outside [1/3, 3] is reported, not hidden.",
+      "title": "Consistency Ratio"
+    },
+    "mass_kg_p05": {
+      "exclusiveMinimum": 0,
+      "title": "Mass Kg P05",
+      "type": "number"
+    },
+    "mass_kg_p50": {
+      "exclusiveMinimum": 0,
+      "title": "Mass Kg P50",
+      "type": "number"
+    },
+    "mass_kg_p95": {
+      "exclusiveMinimum": 0,
+      "title": "Mass Kg P95",
+      "type": "number"
+    },
+    "method": {
+      "enum": [
+        "fmax_over_aeff",
+        "impulse_over_velocity",
+        "combined"
+      ],
+      "title": "Method",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mass_kg_p05",
+    "mass_kg_p50",
+    "mass_kg_p95",
+    "method",
+    "assumptions"
+  ],
+  "title": "MassEstimate",
+  "type": "object"
+}

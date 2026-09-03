@@ -1,5 +1,150 @@
 {
   "$defs": {
+    "ContributingStation": {
+      "additionalProperties": false,
+      "description": "One station's part in a multi-station detection.",
+      "properties": {
+        "azimuth_deg": {
+          "anyOf": [
+            {
+              "maximum": 360,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Azimuth Deg"
+        },
+        "components_used": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Components Used",
+          "type": "array"
+        },
+        "distance_km": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Distance Km"
+        },
+        "sncl": {
+          "$ref": "#/$defs/Sncl"
+        },
+        "station_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Station Score"
+        }
+      },
+      "required": [
+        "sncl"
+      ],
+      "title": "ContributingStation",
+      "type": "object"
+    },
+    "DetectionLocation": {
+      "additionalProperties": false,
+      "description": "A source location produced by an inversion, never by a single-channel trigger.",
+      "properties": {
+        "azimuthal_gap_deg": {
+          "description": "Largest azimuthal gap in the contributing station set.",
+          "maximum": 360,
+          "minimum": 0,
+          "title": "Azimuthal Gap Deg",
+          "type": "number"
+        },
+        "depth_km": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Depth Km"
+        },
+        "grid_spacing_km": {
+          "exclusiveMinimum": 0,
+          "title": "Grid Spacing Km",
+          "type": "number"
+        },
+        "latitude": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "method": {
+          "const": "gsf_grid_search",
+          "description": "The only method allowed to set a location; extend deliberately.",
+          "title": "Method",
+          "type": "string"
+        },
+        "source_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "uncertainty_radius_km": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty Radius Km"
+        },
+        "variance_reduction": {
+          "description": "Fraction of data variance the best-fitting node explains.",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Variance Reduction",
+          "type": "number"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude",
+        "method",
+        "grid_spacing_km",
+        "variance_reduction",
+        "azimuthal_gap_deg"
+      ],
+      "title": "DetectionLocation",
+      "type": "object"
+    },
     "Sncl": {
       "additionalProperties": false,
       "description": "SEED network/station/location/channel identifier.",
@@ -38,12 +183,43 @@
   "$id": "https://github.com/dizzy1900/serac/contracts/detection-candidate.v0.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "A candidate long-period signal on one channel.",
+  "description": "A candidate mass-movement signal.\n\n`is_stub` distinguishes the Prompt 1 placeholder from a trained detector; it defaults to\nFalse now that a real detector exists, and the stub sets it explicitly.",
   "properties": {
+    "class_label": {
+      "anyOf": [
+        {
+          "enum": [
+            "mass_movement",
+            "tectonic",
+            "noise"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Class Label"
+    },
+    "class_probabilities": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Class Probabilities",
+      "type": "object"
+    },
     "contract_version": {
-      "default": "0.1.0",
+      "default": "0.2.0",
       "title": "Contract Version",
       "type": "string"
+    },
+    "contributing_stations": {
+      "items": {
+        "$ref": "#/$defs/ContributingStation"
+      },
+      "title": "Contributing Stations",
+      "type": "array"
     },
     "detected_at_stream_utc": {
       "description": "Stream time at which the detector fired (end of the triggering window).",
@@ -84,10 +260,23 @@
       "type": "array"
     },
     "is_stub": {
-      "default": true,
-      "description": "True while the detector is the Prompt 1 placeholder.",
+      "default": false,
+      "description": "True only for the Prompt 1 placeholder detector.",
       "title": "Is Stub",
       "type": "boolean"
+    },
+    "model_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Sha256"
     },
     "notes": {
       "anyOf": [
@@ -101,19 +290,62 @@
       "default": null,
       "title": "Notes"
     },
+    "probability": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Calibrated P(mass movement); needs a calibration.",
+      "title": "Probability"
+    },
+    "probability_calibration": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "How the probability was calibrated, e.g. `sigmoid`.",
+      "title": "Probability Calibration"
+    },
     "score": {
       "description": "Detector statistic, e.g. LP/SP energy ratio.",
       "title": "Score",
       "type": "number"
     },
     "sncl": {
-      "$ref": "#/$defs/Sncl"
+      "$ref": "#/$defs/Sncl",
+      "description": "Highest-scoring contributing channel."
+    },
+    "sncls": {
+      "description": "Every contributing channel, including `sncl`.",
+      "items": {
+        "$ref": "#/$defs/Sncl"
+      },
+      "title": "Sncls",
+      "type": "array"
     },
     "source_location": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DetectionLocation"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "default": null,
-      "description": "Always null in this prompt: no location is inferred from a single channel.",
-      "title": "Source Location",
-      "type": "null"
+      "description": "Null unless an inversion produced it; see the validator."
     },
     "threshold": {
       "description": "Threshold the score exceeded.",

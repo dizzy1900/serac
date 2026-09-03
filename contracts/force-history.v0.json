@@ -1,5 +1,350 @@
 {
   "$defs": {
+    "AEff": {
+      "additionalProperties": false,
+      "description": "The effective acceleration used to turn a peak force into a mass.",
+      "properties": {
+        "basis": {
+          "description": "How it was derived; `assumed_range` means no DEM path was available.",
+          "enum": [
+            "dem_trajectory",
+            "assumed_range"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "friction_coefficient": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Interval"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "slope_deg": {
+          "anyOf": [
+            {
+              "maximum": 90,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Slope Deg"
+        },
+        "value_m_s2": {
+          "exclusiveMinimum": 0,
+          "title": "Value M S2",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value_m_s2",
+        "basis"
+      ],
+      "title": "AEff",
+      "type": "object"
+    },
+    "BootstrapInfo": {
+      "additionalProperties": false,
+      "description": "What the uncertainty was resampled over.",
+      "properties": {
+        "n_draws": {
+          "exclusiveMinimum": 0,
+          "title": "N Draws",
+          "type": "integer"
+        },
+        "resampled": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Resampled",
+          "type": "array"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "n_draws",
+        "seed",
+        "resampled"
+      ],
+      "title": "BootstrapInfo",
+      "type": "object"
+    },
+    "DetectionLocation": {
+      "additionalProperties": false,
+      "description": "A source location produced by an inversion, never by a single-channel trigger.",
+      "properties": {
+        "azimuthal_gap_deg": {
+          "description": "Largest azimuthal gap in the contributing station set.",
+          "maximum": 360,
+          "minimum": 0,
+          "title": "Azimuthal Gap Deg",
+          "type": "number"
+        },
+        "depth_km": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Depth Km"
+        },
+        "grid_spacing_km": {
+          "exclusiveMinimum": 0,
+          "title": "Grid Spacing Km",
+          "type": "number"
+        },
+        "latitude": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "method": {
+          "const": "gsf_grid_search",
+          "description": "The only method allowed to set a location; extend deliberately.",
+          "title": "Method",
+          "type": "string"
+        },
+        "source_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "uncertainty_radius_km": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty Radius Km"
+        },
+        "variance_reduction": {
+          "description": "Fraction of data variance the best-fitting node explains.",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Variance Reduction",
+          "type": "number"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude",
+        "method",
+        "grid_spacing_km",
+        "variance_reduction",
+        "azimuthal_gap_deg"
+      ],
+      "title": "DetectionLocation",
+      "type": "object"
+    },
+    "GreensProvenance": {
+      "additionalProperties": false,
+      "description": "Which modelled Green's functions the inversion stood on.",
+      "properties": {
+        "band_s": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Band S",
+          "type": "array"
+        },
+        "cache_sha256": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Cache Sha256",
+          "type": "array"
+        },
+        "dt_s": {
+          "exclusiveMinimum": 0,
+          "title": "Dt S",
+          "type": "number"
+        },
+        "earth_model": {
+          "minLength": 1,
+          "title": "Earth Model",
+          "type": "string"
+        },
+        "modelled": {
+          "const": true,
+          "default": true,
+          "description": "Green's functions are modelled, never observed.",
+          "title": "Modelled",
+          "type": "boolean"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "provider_url": {
+          "minLength": 1,
+          "title": "Provider Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "earth_model",
+        "provider",
+        "provider_url",
+        "dt_s",
+        "band_s"
+      ],
+      "title": "GreensProvenance",
+      "type": "object"
+    },
+    "Interval": {
+      "additionalProperties": false,
+      "description": "A 5-95% interval with its median. Never collapse this to a single number.",
+      "properties": {
+        "p05": {
+          "title": "P05",
+          "type": "number"
+        },
+        "p50": {
+          "title": "P50",
+          "type": "number"
+        },
+        "p95": {
+          "title": "P95",
+          "type": "number"
+        },
+        "units": {
+          "minLength": 1,
+          "title": "Units",
+          "type": "string"
+        }
+      },
+      "required": [
+        "p05",
+        "p50",
+        "p95",
+        "units"
+      ],
+      "title": "Interval",
+      "type": "object"
+    },
+    "MassEstimate": {
+      "additionalProperties": false,
+      "description": "Bulk mobilised mass as an interval, with every assumption named.",
+      "properties": {
+        "a_eff": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AEff"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "assumptions": {
+          "description": "Every assumption behind the number, in words.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "consistency_ratio": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "M(estimator A) / M(estimator B); outside [1/3, 3] is reported, not hidden.",
+          "title": "Consistency Ratio"
+        },
+        "mass_kg_p05": {
+          "exclusiveMinimum": 0,
+          "title": "Mass Kg P05",
+          "type": "number"
+        },
+        "mass_kg_p50": {
+          "exclusiveMinimum": 0,
+          "title": "Mass Kg P50",
+          "type": "number"
+        },
+        "mass_kg_p95": {
+          "exclusiveMinimum": 0,
+          "title": "Mass Kg P95",
+          "type": "number"
+        },
+        "method": {
+          "enum": [
+            "fmax_over_aeff",
+            "impulse_over_velocity",
+            "combined"
+          ],
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mass_kg_p05",
+        "mass_kg_p50",
+        "mass_kg_p95",
+        "method",
+        "assumptions"
+      ],
+      "title": "MassEstimate",
+      "type": "object"
+    },
     "Sncl": {
       "additionalProperties": false,
       "description": "SEED network/station/location/channel identifier.",
@@ -38,10 +383,35 @@
   "$id": "https://github.com/dizzy1900/serac/contracts/force-history.v0.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "description": "Time series of the net force a mass movement exerts on the ground.\n\nSTUB (interface only, Prompt 1): every instance has `status == \"not_implemented\"` and no\nforce samples. Prompt 2 replaces the `status` literal with `computed` and fills the arrays.",
+  "description": "Time series of the net force a mass movement exerts on the ground.",
   "properties": {
+    "azimuthal_gap_deg": {
+      "anyOf": [
+        {
+          "maximum": 360,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Azimuthal Gap Deg"
+    },
+    "bootstrap": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BootstrapInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "contract_version": {
-      "default": "0.0.0",
+      "default": "0.2.0",
       "title": "Contract Version",
       "type": "string"
     },
@@ -58,23 +428,196 @@
       "description": "`DetectionCandidate.detection_id` that triggered inversion.",
       "title": "Detection Id"
     },
-    "force_east_n": {
+    "duration_s": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Interval"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "event_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "default": null,
-      "description": "Reserved: east component samples.",
-      "title": "Force East N",
-      "type": "null"
+      "title": "Event Id"
+    },
+    "force_azimuth_deg": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Interval"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "force_east_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Force East N"
+    },
+    "force_east_p05_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Force East P05 N"
+    },
+    "force_east_p95_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Force East P95 N"
     },
     "force_north_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "default": null,
-      "description": "Reserved: north component samples.",
-      "title": "Force North N",
-      "type": "null"
+      "title": "Force North N"
+    },
+    "force_north_p05_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Force North P05 N"
+    },
+    "force_north_p95_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Force North P95 N"
     },
     "force_up_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "default": null,
-      "description": "Reserved: vertical component samples.",
-      "title": "Force Up N",
-      "type": "null"
+      "title": "Force Up N"
+    },
+    "force_up_p05_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Force Up P05 N"
+    },
+    "force_up_p95_n": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Force Up P95 N"
+    },
+    "greens": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GreensProvenance"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "impulse_ns": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Interval"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "inversion_method": {
       "anyOf": [
@@ -88,11 +631,71 @@
       "default": null,
       "title": "Inversion Method"
     },
+    "lambda_value": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lambda Value"
+    },
+    "mass": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MassEstimate"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "n_samples": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "N Samples"
+    },
     "notes": {
       "default": "not implemented: single-force inversion is scheduled for Prompt 2",
       "minLength": 1,
       "title": "Notes",
       "type": "string"
+    },
+    "peak_force_n": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Interval"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "regularisation": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Regularisation"
     },
     "sample_interval_s": {
       "anyOf": [
@@ -115,9 +718,31 @@
       "title": "Sncls",
       "type": "array"
     },
+    "source_location": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DetectionLocation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "station_weights": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Station Weights",
+      "type": "object"
+    },
     "status": {
-      "const": "not_implemented",
       "default": "not_implemented",
+      "enum": [
+        "not_implemented",
+        "computed",
+        "failed"
+      ],
       "title": "Status",
       "type": "string"
     },
@@ -139,6 +764,20 @@
       "default": "N",
       "title": "Units",
       "type": "string"
+    },
+    "variance_reduction": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Variance Reduction"
     }
   },
   "title": "ForceHistory",

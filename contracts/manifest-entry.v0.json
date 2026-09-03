@@ -18,6 +18,10 @@
         "osm_overpass",
         "source_document",
         "vendored_schema",
+        "esec_spud",
+        "iris_syngine",
+        "rgi_glaciers",
+        "simulation_output",
         "synthetic"
       ],
       "title": "DataSource",
@@ -38,12 +42,22 @@
       "type": "string"
     },
     "Provenance": {
+      "description": "Where a record's numbers come from.\n\n`real` is observed. `synthetic` is a fabricated stand-in for an observation and may only\nlive under `tests/fixtures/synthetic/`. `derived` is computed: a reprojection, a feature\ncube, a simulation output, or physics evaluated from a published Earth model (Green's\nfunctions). The distinction matters because `derived` data is reproducible from stated\ninputs, whereas `synthetic` data stands in for something serac could not obtain.",
       "enum": [
         "real",
         "synthetic",
         "derived"
       ],
       "title": "Provenance",
+      "type": "string"
+    },
+    "Retention": {
+      "description": "Whether the recorded bytes are still on disk.\n\n`transient` records a file that was hashed on arrival and then deleted (a multi-GB HyP3\nzip cropped to an AOI, say). The sha256 is honest but no longer re-checkable, so\n`validate-ingest` reports these rows as a named warning rather than silently passing them.",
+      "enum": [
+        "retained",
+        "transient"
+      ],
+      "title": "Retention",
       "type": "string"
     }
   },
@@ -103,7 +117,7 @@
       "title": "Bbox 4326"
     },
     "contract_version": {
-      "default": "0.1.0",
+      "default": "0.2.0",
       "title": "Contract Version",
       "type": "string"
     },
@@ -208,6 +222,11 @@
       "format": "date-time",
       "title": "Recorded At",
       "type": "string"
+    },
+    "retention": {
+      "$ref": "#/$defs/Retention",
+      "default": "retained",
+      "description": "`transient` means the bytes were hashed then deleted; see the class docs."
     },
     "retrieved_at": {
       "anyOf": [

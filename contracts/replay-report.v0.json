@@ -397,7 +397,7 @@
       "type": "boolean"
     },
     "contract_version": {
-      "default": "0.2.0",
+      "default": "0.3.0",
       "title": "Contract Version",
       "type": "string"
     },
@@ -459,8 +459,8 @@
       "type": "array"
     },
     "is_stub": {
-      "const": true,
       "default": true,
+      "description": "True when the run used the Prompt 1 placeholder detector. Widened from Literal[True] in 0.3.0 so a trained detector can produce a valid report; validate-stream now asserts it agrees with detector.is_stub.",
       "title": "Is Stub",
       "type": "boolean"
     },

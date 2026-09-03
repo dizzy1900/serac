@@ -1,0 +1,87 @@
+{
+  "$id": "https://github.com/dizzy1900/serac/contracts/detection-location.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A source location produced by an inversion, never by a single-channel trigger.",
+  "properties": {
+    "azimuthal_gap_deg": {
+      "description": "Largest azimuthal gap in the contributing station set.",
+      "maximum": 360,
+      "minimum": 0,
+      "title": "Azimuthal Gap Deg",
+      "type": "number"
+    },
+    "depth_km": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Depth Km"
+    },
+    "grid_spacing_km": {
+      "exclusiveMinimum": 0,
+      "title": "Grid Spacing Km",
+      "type": "number"
+    },
+    "latitude": {
+      "maximum": 90,
+      "minimum": -90,
+      "title": "Latitude",
+      "type": "number"
+    },
+    "longitude": {
+      "maximum": 180,
+      "minimum": -180,
+      "title": "Longitude",
+      "type": "number"
+    },
+    "method": {
+      "const": "gsf_grid_search",
+      "description": "The only method allowed to set a location; extend deliberately.",
+      "title": "Method",
+      "type": "string"
+    },
+    "source_refs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Refs",
+      "type": "array"
+    },
+    "uncertainty_radius_km": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Uncertainty Radius Km"
+    },
+    "variance_reduction": {
+      "description": "Fraction of data variance the best-fitting node explains.",
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Variance Reduction",
+      "type": "number"
+    }
+  },
+  "required": [
+    "latitude",
+    "longitude",
+    "method",
+    "grid_spacing_km",
+    "variance_reduction",
+    "azimuthal_gap_deg"
+  ],
+  "title": "DetectionLocation",
+  "type": "object"
+}

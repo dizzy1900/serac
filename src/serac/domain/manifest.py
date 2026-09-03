@@ -15,7 +15,7 @@ from typing import Any, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
-MANIFEST_CONTRACT_VERSION = "0.1.0"
+MANIFEST_CONTRACT_VERSION = "0.2.0"
 
 SHA256_PATTERN = r"^[0-9a-f]{64}$"
 
@@ -38,6 +38,10 @@ class DataSource(StrEnum):
     osm_overpass = "osm_overpass"
     source_document = "source_document"
     vendored_schema = "vendored_schema"
+    esec_spud = "esec_spud"
+    iris_syngine = "iris_syngine"
+    rgi_glaciers = "rgi_glaciers"
+    simulation_output = "simulation_output"
     synthetic = "synthetic"
 
 
@@ -53,7 +57,28 @@ class ManifestStatus(StrEnum):
     synthetic = "synthetic"  # a labelled synthetic placeholder under tests/fixtures/synthetic
 
 
+class Retention(StrEnum):
+    """Whether the recorded bytes are still on disk.
+
+    `transient` records a file that was hashed on arrival and then deleted (a multi-GB HyP3
+    zip cropped to an AOI, say). The sha256 is honest but no longer re-checkable, so
+    `validate-ingest` reports these rows as a named warning rather than silently passing them.
+    """
+
+    retained = "retained"
+    transient = "transient"
+
+
 class Provenance(StrEnum):
+    """Where a record's numbers come from.
+
+    `real` is observed. `synthetic` is a fabricated stand-in for an observation and may only
+    live under `tests/fixtures/synthetic/`. `derived` is computed: a reprojection, a feature
+    cube, a simulation output, or physics evaluated from a published Earth model (Green's
+    functions). The distinction matters because `derived` data is reproducible from stated
+    inputs, whereas `synthetic` data stands in for something serac could not obtain.
+    """
+
     real = "real"
     synthetic = "synthetic"
     derived = "derived"
@@ -92,6 +117,10 @@ class ManifestEntry(BaseModel):
     time_end: AwareDatetime | None = None
     bbox_4326: tuple[float, float, float, float] | None = None
 
+    retention: Retention = Field(
+        default=Retention.retained,
+        description="`transient` means the bytes were hashed then deleted; see the class docs.",
+    )
     adapter: str = Field(min_length=1)
     adapter_version: str = Field(min_length=1)
     serac_git_sha: str | None = None

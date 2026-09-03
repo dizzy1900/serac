@@ -29,17 +29,52 @@ def make(**overrides: object) -> DetectionCandidate:
     return DetectionCandidate.model_validate(fields)
 
 
-def test_defaults_mark_the_stub() -> None:
+def test_defaults_are_not_a_stub_and_carry_no_location() -> None:
+    # 0.2.0 flipped the default: a stub must now say so explicitly.
     det = make()
-    assert det.is_stub is True
+    assert det.is_stub is False
     assert det.source_location is None
     assert det.features == {}
     assert det.input_trace_ids == []
 
 
-def test_source_location_can_only_be_none() -> None:
-    with pytest.raises(ValidationError, match="source_location"):
-        make(source_location={"lat": 28.27, "lon": 85.51})
+def test_source_location_needs_a_real_inversion() -> None:
+    # Coordinates alone are not a location: the method, grid spacing, variance reduction
+    # and azimuthal gap of the inversion that produced it are all required.
+    with pytest.raises(ValidationError):
+        make(source_location={"latitude": 20.5, "longitude": 10.5})
+    located = make(
+        source_location={
+            "latitude": 20.5,
+            "longitude": 10.5,
+            "method": "gsf_grid_search",
+            "grid_spacing_km": 11.0,
+            "variance_reduction": 0.72,
+            "azimuthal_gap_deg": 140.0,
+        }
+    )
+    assert located.source_location is not None
+
+
+def test_a_stub_may_not_attach_a_location() -> None:
+    with pytest.raises(ValidationError, match="stub detector must not attach"):
+        make(
+            is_stub=True,
+            source_location={
+                "latitude": 20.5,
+                "longitude": 10.5,
+                "method": "gsf_grid_search",
+                "grid_spacing_km": 11.0,
+                "variance_reduction": 0.72,
+                "azimuthal_gap_deg": 140.0,
+            },
+        )
+
+
+def test_probability_requires_its_calibration() -> None:
+    with pytest.raises(ValidationError, match="probability requires"):
+        make(probability=0.9)
+    assert make(probability=0.9, probability_calibration="sigmoid").probability == 0.9
     with pytest.raises(ValidationError, match="source_location"):
         make(source_location="28.27,85.51")
 
@@ -61,8 +96,10 @@ def test_json_round_trip() -> None:
 
 
 def test_contract_registry() -> None:
-    assert {"detection-candidate": DetectionCandidate} == CONTRACTS
-    assert {"force-history": ForceHistory} == FORCE_CONTRACTS
+    assert CONTRACTS["detection-candidate"] is DetectionCandidate
+    assert set(CONTRACTS) == {"detection-candidate", "detection-location"}
+    assert FORCE_CONTRACTS["force-history"] is ForceHistory
+    assert set(FORCE_CONTRACTS) == {"force-history", "mass-estimate"}
 
 
 class TestForceHistory:

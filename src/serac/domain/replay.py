@@ -16,7 +16,7 @@ from typing import Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
-REPLAY_CONTRACT_VERSION = "0.2.0"
+REPLAY_CONTRACT_VERSION = "0.3.0"
 FIXTURE_MANIFEST_CONTRACT_VERSION = "0.1.0"
 
 SHA256_PATTERN = r"^[0-9a-f]{64}$"
@@ -204,7 +204,14 @@ class ReplayReport(BaseModel):
     stream_time_latencies: StreamTimeLatencies
     wall_clock_latencies: WallClockLatencies
     detector: DetectorSummary
-    is_stub: Literal[True] = True
+    is_stub: bool = Field(
+        default=True,
+        description=(
+            "True when the run used the Prompt 1 placeholder detector. Widened from "
+            "Literal[True] in 0.3.0 so a trained detector can produce a valid report; "
+            "validate-stream now asserts it agrees with detector.is_stub."
+        ),
+    )
     started_at_utc: AwareDatetime
     finished_at_utc: AwareDatetime
     caveats: list[str] = Field(min_length=1)
