@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+ <FDSNStationXML xmlns="http://www.fdsn.org/xml/station/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:iris="http://www.fdsn.org/xml/station/1/iris" xsi:schemaLocation="http://www.fdsn.org/xml/station/1 http://www.fdsn.org/xml/station/fdsn-station-1.1.xsd" schemaVersion="1.1">
+  <Source>EarthScope</Source>
+  <Sender>EarthScope</Sender>
+  <Module>EarthScope WEB SERVICE: fdsnws-station | version: 1.1.56</Module>
+  <ModuleURI></ModuleURI>
+  <Created>2026-09-03T09:45:08.2568</Created>
+  <Network code="IO" startDate="2014-01-01T00:00:00.0000" restrictedStatus="open">
+   <Description>International OGS Network (ION)</Description>
+   <Identifier type="DOI">10.7914/SN/IO
+   </Identifier>
+   <TotalNumberStations>1</TotalNumberStations>
+   <SelectedNumberStations>1</SelectedNumberStations>
+   <Station code="EVN" startDate="2014-05-15T12:00:00.0000" restrictedStatus="open" iris:alternateNetworkCodes=".UNRESTRICTED">
+    <Latitude>27.958651</Latitude>
+    <Longitude>86.811653</Longitude>
+    <Elevation>5010.0</Elevation>
+    <Site>
+     <Name>EvK2CNR Pyramid Laboratory - Mount Everest</Name>
+    </Site>
+    <CreationDate>2014-05-15T12:00:00.0000</CreationDate>
+    <TotalNumberChannels>9</TotalNumberChannels>
+    <SelectedNumberChannels>1</SelectedNumberChannels>
+    <Channel code="BHZ" locationCode="" startDate="2014-05-15T12:00:00.0000" restrictedStatus="open">
+     <Comment>
+      <Value>T34228 / B290</Value>
+     </Comment>
+     <Latitude>27.958651</Latitude>
+     <Longitude>86.811653</Longitude>
+     <Elevation>5010</Elevation>
+     <Depth>0</Depth>
+     <Azimuth>0</Azimuth>
+     <Dip>-90</Dip>
+     <Type>CONTINUOUS</Type>
+     <Type>GEOPHYSICAL</Type>
+     <SampleRate>2E01</SampleRate>
+     <ClockDrift>0E00</ClockDrift>
+     <CalibrationUnits>
+      <Name>V</Name>
+      <Description>EMF in Volts</Description>
+     </CalibrationUnits>
+     <Sensor>
+      <Description>CMG-3ESPC 60 s - DM24 Mk3</Description>
+     </Sensor>
+     <Response>
+     <InstrumentSensitivity>
+       <Value>1.81222E9</Value>
+       <Frequency>0.05</Frequency>
+       <InputUnits>
+         <Name>M/S</Name>
+         <Description>Velocity in Meters Per Second</Description>
+       </InputUnits>
+       <OutputUnits>
+         <Name>COUNTS</Name>
+         <Description>Digital Counts</Description>
+       </OutputUnits>
+     </InstrumentSensitivity>
+     </Response>
+    </Channel>
+   </Station>
+  </Network>
+  <Network code="NK" startDate="1978-01-01T00:00:00.0000" restrictedStatus="open">
+   <Description>Nepal Kathmandu (NK)</Description>
+   <Identifier type="DOI">10.7914/SN/NK
+   </Identifier>
+   <TotalNumberStations>1</TotalNumberStations>
+   <SelectedNumberStations>1</SelectedNumberStations>
+   <Station code="KKN" startDate="2016-05-22T00:00:00.0000" restrictedStatus="open" iris:alternateNetworkCodes=".UNRESTRICTED">
+    <Latitude>27.8</Latitude>
+    <Longitude>85.279</Longitude>
+    <Elevation>2042.0</Elevation>
+    <Site>
+     <Name>Kakani, Nepal</Name>
+    </Site>
+    <CreationDate>2016-05-22T00:00:00.0000</CreationDate>
+    <TotalNumberChannels>3</TotalNumberChannels>
+    <SelectedNumberChannels>1</SelectedNumberChannels>
+    <Channel code="BHZ" locationCode="" startDate="2016-05-22T00:00:00.0000" restrictedStatus="open">
+     <Latitude>27.8</Latitude>
+     <Longitude>85.279</Longitude>
+     <Elevation>2042</Elevation>
+     <Depth>0</Depth>
+     <Azimuth>0</Azimuth>
+     <Dip>-90</Dip>
+     <SampleRate>5E01</SampleRate>
+     <ClockDrift>1E-04</ClockDrift>
+     <Sensor>
+      <Description>Guralp CMG 3T</Description>
+     </Sensor>
+     <Response>
+     <InstrumentSensitivity>
+       <Value>6.36672E8</Value>
+       <Frequency>0.05</Frequency>
+       <InputUnits>
+         <Name>m/s</Name>
+         <Description>Velocity in Meters per Second</Description>
+       </InputUnits>
+       <OutputUnits>
+         <Name>counts</Name>
+         <Description>Digital Counts</Description>
+       </OutputUnits>
+     </InstrumentSensitivity>
+     </Response>
+    </Channel>
+   </Station>
+  </Network>
+ </FDSNStationXML>

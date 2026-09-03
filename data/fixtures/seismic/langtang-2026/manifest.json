@@ -1,0 +1,76 @@
+{
+  "contract_version": "0.1.0",
+  "event_id": "langtang-2026",
+  "window": {
+    "start_utc": "2026-08-26T02:50:00Z",
+    "end_utc": "2026-08-26T02:58:00Z"
+  },
+  "files": [
+    {
+      "path": "NK.KKN..BHZ.mseed",
+      "kind": "miniseed",
+      "sha256": "1f8f359b9f1d6e69ff7543a1b238eba7c9848a07767d2d905f632e06d0047bac",
+      "size_bytes": 55296,
+      "sncl": "NK.KKN..BHZ",
+      "start_utc": "2026-08-26T02:50:00Z",
+      "end_utc": "2026-08-26T02:58:00Z",
+      "sampling_rate_hz": 50.0,
+      "npts": 24001,
+      "url": "https://service.earthscope.org/fdsnws/dataselect/1/query?net=NK&sta=KKN&loc=--&cha=BHZ&start=2026-08-26T02:50:00&end=2026-08-26T02:58:00"
+    },
+    {
+      "path": "IO.EVN..BHZ.mseed",
+      "kind": "miniseed",
+      "sha256": "0c5314e39a1be190233065eee205115e4b80f2afa935cd07ae96416535e279a3",
+      "size_bytes": 22528,
+      "sncl": "IO.EVN..BHZ",
+      "start_utc": "2026-08-26T02:50:00Z",
+      "end_utc": "2026-08-26T02:58:00Z",
+      "sampling_rate_hz": 20.0,
+      "npts": 9601,
+      "url": "https://service.earthscope.org/fdsnws/dataselect/1/query?net=IO&sta=EVN&loc=--&cha=BHZ&start=2026-08-26T02:50:00&end=2026-08-26T02:58:00"
+    },
+    {
+      "path": "stations.xml",
+      "kind": "stationxml",
+      "sha256": "183ad7bd8516e56b3f7a749d1fe1811234e0a1ff27948b7cc3474f12e5c5e752",
+      "size_bytes": 4091,
+      "sncl": null,
+      "start_utc": null,
+      "end_utc": null,
+      "sampling_rate_hz": null,
+      "npts": null,
+      "url": "https://service.earthscope.org/fdsnws/station/1/query?net=IO,NK&sta=EVN,KKN&cha=BHZ&level=channel&start=2026-08-26T02:50:00&end=2026-08-26T02:58:00"
+    }
+  ],
+  "missing": [],
+  "request": {
+    "client": "EARTHSCOPE",
+    "base_url": "https://service.earthscope.org",
+    "bulk": [
+      [
+        "NK",
+        "KKN",
+        "--",
+        "BHZ",
+        "2026-08-26T02:50:00",
+        "2026-08-26T02:58:00"
+      ],
+      [
+        "IO",
+        "EVN",
+        "--",
+        "BHZ",
+        "2026-08-26T02:50:00",
+        "2026-08-26T02:58:00"
+      ]
+    ],
+    "station_level": "channel",
+    "tool": "obspy 1.5.1"
+  },
+  "retrieved_at_utc": "2026-09-03T09:45:07.660615Z",
+  "licence": null,
+  "licence_source_url": "https://www.earthscope.org/terms-of-service/",
+  "status": "fetched",
+  "notes": "EarthScope Terms of Service state no licence; they require that a User 'must acknowledge EarthScope Consortium and our sponsors' (How to Cite: 'Data were accessed from the NSF NGF data archive operated by EarthScope Consortium (NSF award 2435260)') and that network data be cited by DOI. Network DOIs: IO: 10.7914/SN/IO, NK: 10.7914/SN/NK. Bytes are exactly as returned by fdsnws-dataselect; no re-encoding. Origin time is not stored here: replay reads it from the event-library record."
+}
