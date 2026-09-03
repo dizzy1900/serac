@@ -1,0 +1,37 @@
+# secrets
+.env
+.env.*
+!.env.example
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+# dvc
+.dvc/cache/
+.dvc/tmp/
+.dvc/config.local
+# data (DVC-tracked, never committed to git)
+data/raw/*
+data/interim/*
+data/features/*
+baselines/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/features/.gitkeep
+# reports produced by runs (validation stamps are regenerated)
+reports/replay/
+reports/validation/
+reports/promotion/
+reports/cube/
+# os / editors
+.DS_Store
+.idea/
+.vscode/

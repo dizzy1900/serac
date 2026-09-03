@@ -1,0 +1,122 @@
+[project]
+name = "serac"
+version = "0.1.0"
+description = "Open model of high-mountain rock-ice avalanche cascades: inventory, watch, detect, cascade."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "dizzy1900" }]
+dependencies = [
+    "pydantic>=2.13,<3",
+    "pydantic-settings>=2.6",
+    "typer>=0.27",
+    "rich>=13",
+    "httpx>=0.27",
+    "numpy>=2.0",
+    "obspy>=1.5.1",
+    "redis>=5.0",
+    "lxml>=5.0",
+    "jsonschema>=4.23",
+    "geopandas>=1.1",
+    "pyarrow>=17",
+    "shapely>=2.0",
+    "pyproj>=3.6",
+    "rasterio>=1.4",
+    "rioxarray>=0.23",
+    "xarray>=2026.7",
+    "zarr>=3.3",
+    "h5netcdf>=1.4",
+    "pystac>=1.15",
+    "pystac-client>=0.8",
+    "asf-search>=13",
+    "hyp3-sdk>=7.7",
+    "cdsapi>=0.7.7",
+    "dvc>=3.67",
+]
+
+[project.optional-dependencies]
+s3 = ["dvc-s3>=3"]
+
+[project.scripts]
+serac = "serac.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-xdist>=3.8",
+    "pytest-socket>=0.7",
+    "fakeredis>=2.26",
+    "ruff>=0.16",
+    "mypy>=1.14",
+    "lxml-stubs>=0.5",
+    "types-jsonschema>=4.23",
+    "types-shapely>=2.0",
+    "pandas-stubs>=2.2",
+    "pyarrow-stubs>=17",
+]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/serac"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "N", "T20"]
+ignore = ["RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["T20"]
+"src/serac/cli*.py" = ["T20"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_unreachable = true
+show_error_codes = true
+plugins = ["pydantic.mypy"]
+files = ["src"]
+
+[[tool.mypy.overrides]]
+module = [
+    "obspy", "obspy.*",
+    "asf_search", "asf_search.*",
+    "hyp3_sdk", "hyp3_sdk.*",
+    "cdsapi", "cdsapi.*",
+    "rasterio", "rasterio.*",
+    "rioxarray", "rioxarray.*",
+    "geopandas", "geopandas.*",
+    "pystac", "pystac.*",
+    "pystac_client", "pystac_client.*",
+    "zarr", "zarr.*",
+    "fakeredis", "fakeredis.*",
+    "pyproj", "pyproj.*",
+    "affine", "affine.*",
+    "dvc", "dvc.*",
+]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers --disable-socket --allow-unix-socket --import-mode=importlib -p no:cacheprovider"
+testpaths = ["tests"]
+markers = [
+    "online: needs internet; run via `make smoke-online` (SERAC_ONLINE=1); skips when offline",
+    "redis: needs a live Redis at SERAC_REDIS_URL; skipped otherwise",
+    "slow: long-running test",
+]
+filterwarnings = ["error::pytest.PytestUnraisableExceptionWarning"]
