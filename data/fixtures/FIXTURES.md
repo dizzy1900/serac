@@ -4,6 +4,8 @@ Real, small, licence-recorded samples used by offline tests and replay. Every fi
 
 Licence `null` means the data-centre page linked in the ledger's `licence_source_url` carries no licence statement; attribution requirements are recorded in the ledger `notes`.
 
+## Seismic, ComCat and CAP fixtures
+
 | path | source URL | retrieved_at | sha256 | size | licence |
 |---|---|---|---|---|---|
 | `data/fixtures/seismic/chamoli-2021/NK.KKN..BHZ.mseed` | https://service.earthscope.org/fdsnws/dataselect/1/query?net=NK&sta=KKN&loc=--&cha=BHZ&start=2021-02-07T04:49:00&end=2021-02-07T04:57:00 | 2026-09-03T09:45:06.799582+00:00 | `e64753b990ec74a96aaac4d50e1947aab5fccad6384f9550c097a84370c3f9dc` | 27136 | null |
@@ -18,13 +20,13 @@ Licence `null` means the data-centre page linked in the ledger's `licence_source
 | `data/fixtures/usgs_comcat/us20002926.geojson` | https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us20002926&format=geojson | 2026-09-03T09:45:08.945114+00:00 | `08b5b07faf9056cfd26be0614051e9b23bf880d6db5e2a7b9ef0a1b5ee276bb3` | 113416 | US-PD |
 | `contracts/vendor/cap/CAP-v1.2.xsd` | https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd | 2026-09-03T09:45:09.240927+00:00 | `b7798ef25868b068c97b268bda02d067c7d4ba9373adc5638bf37105804ee723` | 10098 | Copyright OASIS Open 2010 All Rights Reserved (OASIS IPR Policy) |
 | `contracts/vendor/cap/xmldsig-core-schema.xsd` | http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd | 2026-09-03T09:45:09.305047+00:00 | `d102ad3df7664c307e0c2c776ba4a90513b1969974d8a940bae1a77f9f21e15d` | 10292 | W3C Software Notice and License (19980720) |
-# EO fixtures
+## EO fixtures
 
 Real bytes read from public services by `scripts/fetch_eo_fixtures.py`; every row has a
 matching `data/manifest.jsonl` entry (`adapter: fixture-fetch`) whose sha256 is verified
 offline by `tests/unit/test_eo_fixture_integrity.py`. Nothing here is synthetic.
 
-## Design choices (not observations)
+### Design choices (not observations)
 
 Source-zone bounding boxes used for the crops, chosen for this project (W, S, E, N):
 
@@ -39,7 +41,7 @@ baseline, ranked by the fraction of SCL classes {3, 8, 9, 10, 11} over the fixtu
 window; two pre-event and one post-event scene around 2021-02-07
 (see `sentinel2/chamoli-rishiganga/candidates.json`).
 
-## Files
+### Files
 
 | path | source URL | retrieved_at | sha256 | size (B) | licence |
 |---|---|---|---|---|---|
@@ -63,7 +65,7 @@ window; two pre-event and one post-event scene around 2021-02-07
 | `data/fixtures/sentinel2/chamoli-rishiganga/S2B_44RLU_20210210_1_L2A/item.json` | https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_44RLU_20210210_1_L2A | 2026-09-03T09:51:09.351924+00:00 | `ab2530c8441f65b5093420a74a0694b8a2955d855c99f4e854002df49a366e22` | 28720 | [Copernicus Sentinel data](https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice) |
 | `data/fixtures/sentinel2/chamoli-rishiganga/candidates.json` | https://earth-search.aws.element84.com/v1/search | 2026-09-03T09:51:03.541572+00:00 | `3069ae9a467243db3b27379f7b9c297b3ec88aefdbd38c4cc11bb7c79e056c2c` | 8446 | [Copernicus Sentinel data](https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice) |
 
-## Licences
+### Licences
 
 - Copernicus DEM GLO-30: Copernicus DEM (GLO-30 Public): free for the general public under the Copernicus DEM licence (ESA / Airbus DS); attribution 'Produced using Copernicus WorldDEM-30 (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved'. Terms: https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM
 - Copernicus Sentinel data: Copernicus Sentinel data: free, full and open access under the Legal Notice on the use of Copernicus Sentinel Data and Service Information (attribution 'Contains modified Copernicus Sentinel data [year]'). Legal notice: https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice

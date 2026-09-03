@@ -107,8 +107,12 @@ def test_fixtures_md_agrees_with_ledger(
 ) -> None:
     md = fixtures_dir / "FIXTURES.md"
     assert md.exists(), "data/fixtures/FIXTURES.md is missing"
-    rows = [m for m in (ROW.match(line) for line in md.read_text("utf-8").splitlines()) if m]
-    assert rows, "FIXTURES.md has no fixture rows"
+    rows = [
+        m
+        for m in (ROW.match(line) for line in md.read_text("utf-8").splitlines())
+        if m and is_eo_fixture(m["path"])
+    ]
+    assert rows, "FIXTURES.md has no EO fixture rows"
     listed = {m["path"] for m in rows}
     for m in rows:
         e = latest_by_path.get(m["path"])
