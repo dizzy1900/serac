@@ -237,3 +237,116 @@ def load_arrays(root: Path) -> tuple[Any, Any]:
 
     store = zarr.open_group(str(root / ZARR_NAME), mode="r")
     return store["waveform"], store["valid"]
+
+
+# --- splits -------------------------------------------------------------------------------
+
+SplitName = Literal["train", "val", "test"]
+
+TIME_FORWARD_TRAIN_BEFORE: Final = 2020
+TIME_FORWARD_VAL_THROUGH: Final = 2023
+
+# Fraction of the non-held-out groups, most recent first, used as the LORO validation fold.
+# Validation must exist for early stopping and the calibrator, and taking it by time rather
+# than at random keeps the remaining leakage surface (shared epoch) visible.
+LORO_VAL_FRACTION: Final = 0.2
+
+
+class SplitAssignment(BaseModel):
+    """Which group went to which split, and the rule that put it there."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    scheme: Literal["time_forward", "loro_hma"]
+    by_group: dict[str, str]
+    forced_test_groups: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+    def for_windows(self, windows: list[WindowRecord]) -> np.ndarray:
+        """Per-window split labels, taken from each window's group and never from the window."""
+        return np.array([self.by_group[w.event_group] for w in windows], dtype=object)
+
+    def counts(self, windows: list[WindowRecord]) -> dict[str, dict[str, int]]:
+        table: dict[str, dict[str, int]] = {}
+        for window in windows:
+            row = table.setdefault(self.by_group[window.event_group], {})
+            row[window.class_label.value] = row.get(window.class_label.value, 0) + 1
+        return {k: dict(sorted(v.items())) for k, v in sorted(table.items())}
+
+
+def _group_attributes(index: DatasetIndex) -> dict[str, tuple[int, str]]:
+    """(origin year, region) per group, taken from the group's positive.
+
+    Negatives and noise inherit the group but not the origin time, so using a negative's year
+    would let a 2019 aftershock drag a 2018 positive into a later split. The positive defines
+    the group's epoch.
+    """
+    out: dict[str, tuple[int, str]] = {}
+    for window in index.windows:
+        if window.class_label is ClassLabel.mass_movement:
+            out[window.event_group] = (window.origin_utc.year, window.region_id)
+    for window in index.windows:
+        out.setdefault(window.event_group, (window.origin_utc.year, window.region_id))
+    return out
+
+
+def assign_time_forward(index: DatasetIndex) -> SplitAssignment:
+    """Train before 2020, validate 2020-2023, test 2024 onward; forced groups always test."""
+    from serac.models.discriminator.catalog import FORCED_TEST_GROUPS
+
+    attributes = _group_attributes(index)
+    by_group: dict[str, str] = {}
+    for group, (year, _) in attributes.items():
+        if group in FORCED_TEST_GROUPS:
+            by_group[group] = "test"
+        elif year < TIME_FORWARD_TRAIN_BEFORE:
+            by_group[group] = "train"
+        elif year <= TIME_FORWARD_VAL_THROUGH:
+            by_group[group] = "val"
+        else:
+            by_group[group] = "test"
+    return SplitAssignment(
+        scheme="time_forward",
+        by_group=by_group,
+        forced_test_groups=sorted(g for g in FORCED_TEST_GROUPS if g in by_group),
+        notes=[
+            f"train < {TIME_FORWARD_TRAIN_BEFORE}, val {TIME_FORWARD_TRAIN_BEFORE}-"
+            f"{TIME_FORWARD_VAL_THROUGH}, test {TIME_FORWARD_VAL_THROUGH + 1} onward, by group",
+            "ESEC's last event is 2024, so the test fold of this scheme is very small; the "
+            "leave-one-region-out scheme is the headline evaluation, not this one",
+        ],
+    )
+
+
+def assign_loro(index: DatasetIndex, held_out_region: str) -> SplitAssignment:
+    """Hold out one region entirely; split the rest by time so validation is not random."""
+    from serac.models.discriminator.catalog import FORCED_TEST_GROUPS
+
+    attributes = _group_attributes(index)
+    test = {g for g, (_, region) in attributes.items() if region == held_out_region}
+    test |= {g for g in FORCED_TEST_GROUPS if g in attributes}
+    remaining = sorted(
+        (g for g in attributes if g not in test), key=lambda g: (attributes[g][0], g)
+    )
+    n_val = max(1, round(LORO_VAL_FRACTION * len(remaining)))
+    val = set(remaining[-n_val:]) if remaining else set()
+    by_group = {
+        group: ("test" if group in test else "val" if group in val else "train")
+        for group in attributes
+    }
+    forced_outside = sorted(g for g in FORCED_TEST_GROUPS if g in attributes and g not in test)
+    return SplitAssignment(
+        scheme="loro_hma",
+        by_group=by_group,
+        forced_test_groups=sorted(g for g in FORCED_TEST_GROUPS if g in attributes),
+        notes=[
+            f"test = every group in region {held_out_region!r}, plus the forced groups",
+            f"val = the {n_val} most recent of the {len(remaining)} remaining groups by origin "
+            "year, so early stopping and the calibrator never touch the held-out region",
+            (
+                "no forced group fell outside the held-out region"
+                if not forced_outside
+                else f"forced groups outside the region, added to test anyway: {forced_outside}"
+            ),
+        ],
+    )
