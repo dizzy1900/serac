@@ -18,28 +18,28 @@ and operated; nothing is).
 | CLI skeleton (`serac --help`, `--version`) | yes | yes | yes | n/a | n/a | no |
 | Domain contracts (`Range`, `SourceRef`, `FieldNote`, `MassMovementEvent`, geo, forecast, avoided-loss) | yes | yes | yes (validators, both paths) | n/a | no | no |
 | `serac schema export` + `contracts/*.v0.json` + drift test | yes | yes (18 contracts) | yes | n/a | n/a | no |
-| Event library (11 records / 9 items) + `serac events add/report/build-index` | yes | no | no | no | no | no |
-| AOIs (lhende-khola-trishuli, chamoli-rishiganga, blatten-lotschental) | yes | no | no | no | no | no |
-| Sentinel-1 ASF adapter | yes | no | no | no | no | no |
-| HyP3 InSAR adapter + pair planner | yes | no | no | no | no | no |
-| Sentinel-2 CDSE adapter | yes | no | no | no | no | no |
+| Event library (11 records / 9 items) + `serac events add/report/build-index` | yes | yes | yes (`validate-events` 64 checks) | sources fetched live 2026-09-03 | n/a | no |
+| AOIs (lhende-khola-trishuli, chamoli-rishiganga, blatten-lotschental) | yes | yes | yes (`validate-aoi` 100 checks, 3 warnings) | OSM/agency sources fetched 2026-09-03 | n/a | no |
+| Sentinel-1 ASF adapter | yes | yes | yes | search only | no | no |
+| HyP3 InSAR adapter + pair planner | yes | yes | yes (fakes; synthetic pair fixture) | no (no Earthdata credentials) | no | no |
+| Sentinel-2 CDSE adapter | yes | yes | yes (fakes) | search only | no | no |
 | Sentinel-2 Earth Search adapter (fixture source) | yes | yes | yes (fake STAC, real crops) | yes (smoke 2026-09-03) | no | no |
-| NISAR adapter + level constraints | yes | no | no | no | no | no |
+| NISAR adapter + level constraints | yes | yes | yes (BETA/PROVISIONAL split on `collectionName`) | search only | no | no |
 | Copernicus GLO-30 DEM adapter | yes | yes | yes (real crops) | yes (smoke 2026-09-03) | no | no |
-| ERA5 adapter | yes | no | no | no | no | no |
-| GACOS request/poll adapter | yes | no | no | no | no | no |
-| Feature cube (`build_cube`, Zarr v3, STAC) + `serac cube build/describe` | yes | no | no | n/a | no | no |
-| DVC pipeline (`dvc.yaml`, `make dvc-remote`) | yes | no | no | no | n/a | no |
+| ERA5 adapter | yes | yes | yes (fakes) | no (no CDS key) | no | no |
+| GACOS request/poll adapter | yes | yes | yes (fakes) | no (email workflow) | no | no |
+| Feature cube (`build_cube`, Zarr v3, STAC) + `serac cube build/describe` | yes | yes | yes (`validate-cube` 23 checks on the Chamoli fixture cube) | n/a | no | no |
+| DVC pipeline (`dvc.yaml`, `make dvc-remote`) | yes | yes | yes (`dvc stage list`, 14 stages) | no (no remote configured) | n/a | no |
 | Message bus port + `InMemoryBus` | yes | yes | yes (contract test) | n/a | n/a | no |
 | `RedisStreamsBus` | yes | yes | yes (fakeredis) | no (no Redis on dev machine; `redis`-marked test skips) | n/a | no |
-| FDSN waveform adapter (EarthScope, GEOFON) | yes | no | no | no | no | no |
-| SeedLink feed + ingestor | yes | no | no | no | no | no |
-| USGS ComCat adapter | yes | no | no | no | no | no |
-| Hydrometric port + ICIMOD fixture adapter | yes | no | no | n/a | no | no |
-| Detector **stub** | yes | no | no | n/a | no | no |
-| CAP 1.2 renderer + **stub** + XSD validation | yes | no | no | n/a | no | no |
-| Replay + latency report | yes | no | no | no | no | no |
-| Validation harness (`validate-*`, `validate-serac`, `promote`) | yes | no | no | n/a | no | no |
+| FDSN waveform adapter (EarthScope, GEOFON) | yes | yes | yes (fixtures) | fixtures fetched live 2026-09-03 | no | no |
+| SeedLink feed + ingestor | yes | yes | yes (fake client) | no (endpoint unverified) | n/a | no |
+| USGS ComCat adapter | yes | yes | yes (57-event fixture) | fetched live 2026-09-03 | no | no |
+| Hydrometric port + ICIMOD fixture adapter | yes | yes | yes | n/a | 2 reported stage changes, no clock time | no |
+| Detector **stub** | yes | yes (placeholder LP/SP ratio, threshold 10 untuned) | yes (golden on chamoli-2021) | n/a | **no — fires on pre-event background noise in both real fixtures** | no |
+| CAP 1.2 renderer + **stub** + XSD validation | yes | yes | yes (offline XSD) | n/a | n/a (Test/Private, no area) | no |
+| Replay + latency report | yes | yes | yes (chamoli-2021, langtang-2026, synthetic-lp-burst) | no (redis path untested live) | plumbing only | no |
+| Validation harness (`validate-*`, `validate-serac`, `promote`) | yes | yes | yes (6 suites, 256 checks) | n/a | n/a | no |
 | `underwriting-check` (exits 2 "not implemented: Prompt 2") | yes | yes | yes | n/a | n/a | no |
 | Ingest port + `BaseIngestAdapter` (dry-run, 5 GiB gate, credentials path, ledger) | yes | yes | yes | n/a | n/a | no |
 | Seismic contracts (`SeismicTrace`, `Envelope`+codec, `DetectionCandidate`, `ForceHistory`=not_implemented, `CAPMessage`, `ReplayReport`) | yes | yes | yes | n/a | no | no |
@@ -97,3 +97,17 @@ Numbered so `TODO` comments can reference them (`TODO(RELEASE_STATUS#n)`).
     entries in this list.
 14. **Langtang 2026 figures are largely press-attributed.** No peer-reviewed source exists
     yet; volume is `null`, and press-derived ranges carry `best: null`.
+
+14. **The detector stub fires on pre-event background noise.** On both real fixtures the
+    placeholder long-period/short-period ratio exceeds the placeholder threshold in the first
+    evaluable window (Chamoli `NK.KKN..BHZ`, 2021-02-07T04:49:59Z, ratio 233; `IC.LSA.00.BHZ`
+    ratio 2056). Its detections are an observation about a placeholder, not evidence of
+    anything. The threshold was deliberately not tuned to change this.
+15. **Terrain layers in the Chamoli fixture cube are partial.** The committed GLO-30 crop
+    covers the source zone, not the whole corridor AOI, so `dem`/`slope`/`aspect` cover 11.7 %
+    of the cube grid and are `status: partial`, NaN elsewhere.
+16. **`h5py` is absent from the locked environment**, so the NISAR GCOV (HDF5) and ERA5
+    NetCDF-4 readers are written to spec but untested against real products.
+17. **No `dvc.lock`**: producing one requires running an ingest stage over the network.
+18. **The seismic and ComCat fixture ledger rows carry no `event_id`/`aoi_id`**, so those
+    columns show `-` in `serac events report`; the ledger is append-only and was not rewritten.
