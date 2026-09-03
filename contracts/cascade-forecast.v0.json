@@ -1,0 +1,597 @@
+{
+  "$defs": {
+    "AttributedEstimate": {
+      "additionalProperties": false,
+      "description": "One published figure, attributed to exactly one source.",
+      "properties": {
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "qualifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. 'order of magnitude', 'preliminary', 'bed erosion only'",
+          "title": "Qualifier"
+        },
+        "source_ref": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_ref"
+      ],
+      "title": "AttributedEstimate",
+      "type": "object"
+    },
+    "ConfidenceTier": {
+      "description": "Qualitative confidence; `unqualified` is the only tier a stub may claim.",
+      "enum": [
+        "unqualified",
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "ConfidenceTier",
+      "type": "string"
+    },
+    "DammingEstimate": {
+      "additionalProperties": false,
+      "description": "Whether, where and how large a landslide dam / barrier lake may form.",
+      "properties": {
+        "breach_time_after_formation_min": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "dam_height_m": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "dam_location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Point"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "lake_volume_m3": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "probability": {
+          "$ref": "#/$defs/Range"
+        }
+      },
+      "required": [
+        "probability"
+      ],
+      "title": "DammingEstimate",
+      "type": "object"
+    },
+    "ForecastModel": {
+      "additionalProperties": false,
+      "description": "Identity of the model that produced a forecast.",
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ModelProvenance"
+        },
+        "run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Run Id"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "provenance"
+      ],
+      "title": "ForecastModel",
+      "type": "object"
+    },
+    "ModelProvenance": {
+      "description": "What produced the numbers.",
+      "enum": [
+        "stub",
+        "surrogate",
+        "simulator"
+      ],
+      "title": "ModelProvenance",
+      "type": "string"
+    },
+    "MultiPolygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON MultiPolygon.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  {
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiPolygon",
+          "default": "MultiPolygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "MultiPolygon",
+      "type": "object"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "description": "GeoJSON Point.",
+      "properties": {
+        "coordinates": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Coordinates"
+        },
+        "type": {
+          "const": "Point",
+          "default": "Point",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "Point",
+      "type": "object"
+    },
+    "Polygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON Polygon: one exterior ring followed by any number of holes.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "Polygon",
+          "default": "Polygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "Polygon",
+      "type": "object"
+    },
+    "Range": {
+      "additionalProperties": false,
+      "description": "A sourced numeric interval. Every number in an event record is one of these.\n\n`best` is optional and may only be set when the owning record can show a qualifying source\n(see `BEST_QUALIFYING_KINDS`); the aggregate enforces that because a `Range` cannot see the\n`sources[]` list on its own.",
+      "properties": {
+        "best": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best"
+        },
+        "disputed": {
+          "default": false,
+          "title": "Disputed",
+          "type": "boolean"
+        },
+        "estimates": {
+          "items": {
+            "$ref": "#/$defs/AttributedEstimate"
+          },
+          "title": "Estimates",
+          "type": "array"
+        },
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_refs"
+      ],
+      "title": "Range",
+      "type": "object"
+    },
+    "TransectArrival": {
+      "additionalProperties": false,
+      "description": "Forecast arrival at one transect. Times are minutes after `origin_time_utc`.",
+      "properties": {
+        "arrival_time_min": {
+          "$ref": "#/$defs/Range"
+        },
+        "lead_time_min": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Minutes between the first alert and arrival"
+        },
+        "peak_discharge_m3s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "peak_stage_m": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "transect_id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Transect Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "transect_id",
+        "arrival_time_min"
+      ],
+      "title": "TransectArrival",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/cascade-forecast.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The L3 output for one detection: footprint, arrivals per transect, damming.",
+  "properties": {
+    "aoi_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Aoi Id",
+      "type": "string"
+    },
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "confidence_tier": {
+      "$ref": "#/$defs/ConfidenceTier"
+    },
+    "contract_version": {
+      "default": "0.1.0",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "damming": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DammingEstimate"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "detection_id": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Detection Id"
+    },
+    "event_id": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Set when replaying a known event",
+      "title": "Event Id"
+    },
+    "footprint": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Polygon"
+        },
+        {
+          "$ref": "#/$defs/MultiPolygon"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Footprint"
+    },
+    "forecast_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Forecast Id",
+      "type": "string"
+    },
+    "issued_utc": {
+      "format": "date-time",
+      "title": "Issued Utc",
+      "type": "string"
+    },
+    "model": {
+      "$ref": "#/$defs/ForecastModel"
+    },
+    "origin_time_utc": {
+      "format": "date-time",
+      "title": "Origin Time Utc",
+      "type": "string"
+    },
+    "runout_km": {
+      "$ref": "#/$defs/Range"
+    },
+    "source_location": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Point"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_volume_m3": {
+      "$ref": "#/$defs/Range"
+    },
+    "transect_arrivals": {
+      "items": {
+        "$ref": "#/$defs/TransectArrival"
+      },
+      "title": "Transect Arrivals",
+      "type": "array"
+    }
+  },
+  "required": [
+    "forecast_id",
+    "aoi_id",
+    "issued_utc",
+    "origin_time_utc",
+    "source_volume_m3",
+    "runout_km",
+    "model",
+    "confidence_tier"
+  ],
+  "title": "CascadeForecast",
+  "type": "object"
+}

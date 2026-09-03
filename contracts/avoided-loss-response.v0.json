@@ -1,0 +1,347 @@
+{
+  "$defs": {
+    "AttributedEstimate": {
+      "additionalProperties": false,
+      "description": "One published figure, attributed to exactly one source.",
+      "properties": {
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "qualifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. 'order of magnitude', 'preliminary', 'bed erosion only'",
+          "title": "Qualifier"
+        },
+        "source_ref": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_ref"
+      ],
+      "title": "AttributedEstimate",
+      "type": "object"
+    },
+    "AvoidedLossStatus": {
+      "enum": [
+        "not_implemented",
+        "computed"
+      ],
+      "title": "AvoidedLossStatus",
+      "type": "string"
+    },
+    "ForecastModel": {
+      "additionalProperties": false,
+      "description": "Identity of the model that produced a forecast.",
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ModelProvenance"
+        },
+        "run_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Run Id"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "provenance"
+      ],
+      "title": "ForecastModel",
+      "type": "object"
+    },
+    "ModelProvenance": {
+      "description": "What produced the numbers.",
+      "enum": [
+        "stub",
+        "surrogate",
+        "simulator"
+      ],
+      "title": "ModelProvenance",
+      "type": "string"
+    },
+    "MoneyRange": {
+      "additionalProperties": false,
+      "description": "A monetary interval in a stated currency and price year.",
+      "properties": {
+        "basis": {
+          "description": "How the figure was derived",
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        },
+        "best": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best"
+        },
+        "currency": {
+          "description": "ISO 4217",
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "high": {
+          "minimum": 0,
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "minimum": 0,
+          "title": "Low",
+          "type": "number"
+        },
+        "price_year": {
+          "maximum": 2100,
+          "minimum": 1900,
+          "title": "Price Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "currency",
+        "price_year",
+        "basis"
+      ],
+      "title": "MoneyRange",
+      "type": "object"
+    },
+    "Range": {
+      "additionalProperties": false,
+      "description": "A sourced numeric interval. Every number in an event record is one of these.\n\n`best` is optional and may only be set when the owning record can show a qualifying source\n(see `BEST_QUALIFYING_KINDS`); the aggregate enforces that because a `Range` cannot see the\n`sources[]` list on its own.",
+      "properties": {
+        "best": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best"
+        },
+        "disputed": {
+          "default": false,
+          "title": "Disputed",
+          "type": "boolean"
+        },
+        "estimates": {
+          "items": {
+            "$ref": "#/$defs/AttributedEstimate"
+          },
+          "title": "Estimates",
+          "type": "array"
+        },
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_refs"
+      ],
+      "title": "Range",
+      "type": "object"
+    },
+    "ScenarioLoss": {
+      "additionalProperties": false,
+      "description": "Expected loss under one scenario.",
+      "properties": {
+        "avoided_vs_baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MoneyRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "expected_fatalities": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "expected_loss": {
+          "$ref": "#/$defs/MoneyRange"
+        },
+        "scenario_id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Scenario Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scenario_id",
+        "expected_loss"
+      ],
+      "title": "ScenarioLoss",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/avoided-loss-response.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Expected loss with and without warning. `not_implemented` responses carry no numbers.",
+  "properties": {
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "computed_utc": {
+      "format": "date-time",
+      "title": "Computed Utc",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "0.0.0",
+      "default": "0.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "losses": {
+      "items": {
+        "$ref": "#/$defs/ScenarioLoss"
+      },
+      "title": "Losses",
+      "type": "array"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ForecastModel"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "request_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/AvoidedLossStatus"
+    }
+  },
+  "required": [
+    "request_id",
+    "status",
+    "computed_utc",
+    "assumptions"
+  ],
+  "title": "AvoidedLossResponse",
+  "type": "object"
+}

@@ -129,3 +129,6 @@ class ManifestEntry(BaseModel):
             if not (-180 <= w <= e <= 180 and -90 <= s <= n <= 90):
                 raise ValueError("bbox_4326 must be (west, south, east, north) in degrees")
         return self
+
+
+CONTRACTS: dict[str, type[BaseModel]] = {"manifest-entry": ManifestEntry}
