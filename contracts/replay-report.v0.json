@@ -166,6 +166,78 @@
       "title": "ReplayCounts",
       "type": "object"
     },
+    "ReplayStation": {
+      "additionalProperties": false,
+      "description": "A channel that was replayed, with its distance from the event source when known.",
+      "properties": {
+        "chunks_published": {
+          "minimum": 0,
+          "title": "Chunks Published",
+          "type": "integer"
+        },
+        "distance_from_source_km": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Great-circle distance to the event record's source location; null when the record or the station coordinates are unavailable.",
+          "title": "Distance From Source Km"
+        },
+        "elevation_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Elevation M"
+        },
+        "latitude": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latitude"
+        },
+        "longitude": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Longitude"
+        },
+        "sncl": {
+          "minLength": 1,
+          "title": "Sncl",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sncl",
+        "chunks_published"
+      ],
+      "title": "ReplayStation",
+      "type": "object"
+    },
     "StreamTimeLatencies": {
       "additionalProperties": false,
       "description": "Seconds between stream times; always meaningful.",
@@ -306,13 +378,26 @@
       "title": "Caveats",
       "type": "array"
     },
+    "chunk_seconds": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chunk Seconds"
+    },
     "contains_synthetic": {
       "default": false,
       "title": "Contains Synthetic",
       "type": "boolean"
     },
     "contract_version": {
-      "default": "0.1.0",
+      "default": "0.2.0",
       "title": "Contract Version",
       "type": "string"
     },
@@ -426,6 +511,13 @@
       "format": "date-time",
       "title": "Started At Utc",
       "type": "string"
+    },
+    "stations": {
+      "items": {
+        "$ref": "#/$defs/ReplayStation"
+      },
+      "title": "Stations",
+      "type": "array"
     },
     "status": {
       "enum": [

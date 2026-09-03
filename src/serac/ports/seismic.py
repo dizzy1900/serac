@@ -201,17 +201,36 @@ class HydroStation(BaseModel):
 
 
 class HydroObservation(BaseModel):
-    """One reported reading; every value must carry its own citation."""
+    """One reported reading; every value must carry its own citation.
+
+    `time_utc` is null when the source states the reading without a time (a press statement
+    such as "rose nine metres within 30 minutes" carries an interval but no clock time); the
+    adapter then attributes it to the report's `event_date` and `time_basis` says so. A
+    `stage_change_m` value without `interval_s` is meaningless, so the pair is enforced.
+    """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     station_id: str = Field(min_length=1)
-    time_utc: AwareDatetime
+    time_utc: AwareDatetime | None = None
+    time_basis: str = Field(
+        min_length=1, description="e.g. `gauge_timestamp`, `not_stated_in_source`."
+    )
     variable: Literal["stage_m", "discharge_m3s", "stage_change_m"]
     value: float
+    interval_s: float | None = Field(
+        default=None, gt=0, description="Interval over which a `stage_change_m` accrued."
+    )
     uncertainty: float | None = Field(default=None, ge=0)
     source_ref: str = Field(min_length=1)
+    excerpt: str | None = Field(default=None, description="Verbatim sentence the value comes from.")
     notes: str | None = None
+
+    @model_validator(mode="after")
+    def _change_needs_interval(self) -> Self:
+        if self.variable == "stage_change_m" and self.interval_s is None:
+            raise ValueError("stage_change_m requires interval_s")
+        return self
 
 
 class HydrometricSource(ABC):
