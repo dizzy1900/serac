@@ -1,0 +1,257 @@
+{
+  "target_id": "langtang-lhende-2026",
+  "generated_at_utc": "2026-09-03T21:51:36.107184+00:00",
+  "config_hash": "4762e79e5879b7b2559a0f7d476dddd45fc2dd869858f7a5e023535ff1a0d988",
+  "config": {
+    "config_version": "0.1.0",
+    "earth_model": "prem_a_20s",
+    "dt_s": 1.0,
+    "window_before_s": 120.0,
+    "window_after_s": 780.0,
+    "source_duration_s": 300.0,
+    "source_lead_s": 60.0,
+    "greens_duration_s": 900.0,
+    "greens_step_deg": 0.05,
+    "band": {
+      "short_period_s": 20.0,
+      "long_period_s": 150.0,
+      "corners": 4,
+      "zerophase": true
+    },
+    "grid": {
+      "half_width_km": 10.0,
+      "spacing_km": 2.0,
+      "depths_m": [
+        1000.0
+      ]
+    },
+    "regularisation": {
+      "order": 2,
+      "zero_endpoints": true,
+      "lambda_min": 0.0001,
+      "lambda_max": 10000.0,
+      "n_lambda": 40
+    },
+    "stations": {
+      "min_distance_deg": 0.5,
+      "max_distance_deg": 15.0,
+      "max_stations": 12,
+      "channels": [
+        "LHZ",
+        "LHN",
+        "LHE",
+        "LH1",
+        "LH2"
+      ],
+      "min_stations": 5,
+      "max_azimuthal_gap_deg": 200.0,
+      "amplitude_outlier_factor": 20.0,
+      "min_variance_reduction": 0.2
+    },
+    "mass": {
+      "friction_ratio_min": 0.2,
+      "friction_ratio_max": 0.8,
+      "rock_density_kg_m3": 2700.0,
+      "ice_density_kg_m3": 917.0,
+      "gravity_m_s2": 9.81,
+      "min_path_angle_deg": 8.0,
+      "max_path_angle_deg": 55.0
+    },
+    "bootstrap": {
+      "n_draws": 200,
+      "seed": 20260903,
+      "resample_stations": true,
+      "band_jitter": 1.25,
+      "lambda_jitter": 3.0,
+      "depths_m": [
+        500.0,
+        1000.0,
+        2000.0
+      ]
+    }
+  },
+  "wall_clock_s": 4.238,
+  "timings_s": {
+    "prepare_s": 4.237
+  },
+  "force_history": {
+    "contract_version": "0.2.0",
+    "status": "failed",
+    "detection_id": null,
+    "event_id": "langtang-lhende-2026",
+    "sncls": [],
+    "station_weights": {},
+    "time_start_utc": null,
+    "sample_interval_s": null,
+    "n_samples": null,
+    "units": "N",
+    "force_up_n": null,
+    "force_north_n": null,
+    "force_east_n": null,
+    "force_up_p05_n": null,
+    "force_up_p95_n": null,
+    "force_north_p05_n": null,
+    "force_north_p95_n": null,
+    "force_east_p05_n": null,
+    "force_east_p95_n": null,
+    "source_location": null,
+    "variance_reduction": null,
+    "azimuthal_gap_deg": 316.8678865576259,
+    "peak_force_n": null,
+    "impulse_ns": null,
+    "duration_s": null,
+    "force_azimuth_deg": null,
+    "mass": null,
+    "greens": null,
+    "regularisation": null,
+    "lambda_value": null,
+    "bootstrap": null,
+    "inversion_method": null,
+    "notes": "REFUSED: only 3 station(s) contributed, below the minimum of 5; 3 stations / 12 channels, azimuthal gap 317 deg, distance 11.80-14.66 deg, median pre-event SNR 3.52. serac does not publish a source location it cannot support. No location, no mass and no force history are reported for this event."
+  },
+  "geometry": {
+    "n_stations": 3,
+    "n_channels": 12,
+    "azimuthal_gap_deg": 316.87,
+    "median_pre_event_snr": 3.517,
+    "min_distance_deg": 11.796,
+    "max_distance_deg": 14.662,
+    "stations": [
+      "G.WUS",
+      "II.NIL",
+      "KC.MRZ1"
+    ]
+  },
+  "stations": [
+    {
+      "key": "G.WUS.00.LHE",
+      "component": "E",
+      "latitude": 41.200716,
+      "longitude": 79.216498,
+      "distance_deg": 13.8929,
+      "azimuth_deg": 339.83,
+      "peak_displacement_m": 9.772581710151605e-06,
+      "pre_event_snr": 3.213
+    },
+    {
+      "key": "G.WUS.00.LHN",
+      "component": "N",
+      "latitude": 41.200716,
+      "longitude": 79.216498,
+      "distance_deg": 13.8929,
+      "azimuth_deg": 339.83,
+      "peak_displacement_m": 4.313335717330383e-06,
+      "pre_event_snr": 1.702
+    },
+    {
+      "key": "G.WUS.00.LHZ",
+      "component": "Z",
+      "latitude": 41.200716,
+      "longitude": 79.216498,
+      "distance_deg": 13.8929,
+      "azimuth_deg": 339.83,
+      "peak_displacement_m": 5.984726273676724e-06,
+      "pre_event_snr": 0.974
+    },
+    {
+      "key": "G.WUS.10.LHE",
+      "component": "E",
+      "latitude": 41.200716,
+      "longitude": 79.216498,
+      "distance_deg": 13.8929,
+      "azimuth_deg": 339.83,
+      "peak_displacement_m": 9.574645553089576e-06,
+      "pre_event_snr": 3.694
+    },
+    {
+      "key": "G.WUS.10.LHN",
+      "component": "N",
+      "latitude": 41.200716,
+      "longitude": 79.216498,
+      "distance_deg": 13.8929,
+      "azimuth_deg": 339.83,
+      "peak_displacement_m": 1.136872682255893e-05,
+      "pre_event_snr": 1.267
+    },
+    {
+      "key": "G.WUS.10.LHZ",
+      "component": "Z",
+      "latitude": 41.200716,
+      "longitude": 79.216498,
+      "distance_deg": 13.8929,
+      "azimuth_deg": 339.83,
+      "peak_displacement_m": 9.678528506707837e-06,
+      "pre_event_snr": 1.715
+    },
+    {
+      "key": "II.NIL.10.LH1",
+      "component": "N",
+      "latitude": 33.6506,
+      "longitude": 73.2686,
+      "distance_deg": 11.7962,
+      "azimuth_deg": 300.06,
+      "peak_displacement_m": 1.2797741129452645e-05,
+      "pre_event_snr": 3.341
+    },
+    {
+      "key": "II.NIL.10.LH2",
+      "component": "E",
+      "latitude": 33.6506,
+      "longitude": 73.2686,
+      "distance_deg": 11.7962,
+      "azimuth_deg": 300.06,
+      "peak_displacement_m": 8.04071972706416e-06,
+      "pre_event_snr": 6.475
+    },
+    {
+      "key": "II.NIL.10.LHZ",
+      "component": "Z",
+      "latitude": 33.6506,
+      "longitude": 73.2686,
+      "distance_deg": 11.7962,
+      "azimuth_deg": 300.06,
+      "peak_displacement_m": 7.421876994264237e-06,
+      "pre_event_snr": 71.242
+    },
+    {
+      "key": "KC.MRZ1..LHE",
+      "component": "E",
+      "latitude": 42.2246,
+      "longitude": 79.8597,
+      "distance_deg": 14.6625,
+      "azimuth_deg": 343.19,
+      "peak_displacement_m": 3.3775418139445813e-06,
+      "pre_event_snr": 23.087
+    },
+    {
+      "key": "KC.MRZ1..LHN",
+      "component": "N",
+      "latitude": 42.2246,
+      "longitude": 79.8597,
+      "distance_deg": 14.6625,
+      "azimuth_deg": 343.19,
+      "peak_displacement_m": 1.3846320201869558e-06,
+      "pre_event_snr": 22.347
+    },
+    {
+      "key": "KC.MRZ1..LHZ",
+      "component": "Z",
+      "latitude": 42.2246,
+      "longitude": 79.8597,
+      "distance_deg": 14.6625,
+      "azimuth_deg": 343.19,
+      "peak_displacement_m": 2.7650332898043075e-06,
+      "pre_event_snr": 57.276
+    }
+  ],
+  "grid_search": null,
+  "l_curve": null,
+  "estimators": {
+    "a": null,
+    "b": null
+  },
+  "terrain": null,
+  "greens_cache_keys": [],
+  "bootstrap_failures": [],
+  "notes": []
+}

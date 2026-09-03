@@ -1,0 +1,80 @@
+{
+  "contract_version": "0.1.0",
+  "sealed_at_utc": "2026-09-03T20:55:39.051948Z",
+  "config_hash": "4762e79e5879b7b2559a0f7d476dddd45fc2dd869858f7a5e023535ff1a0d988",
+  "git_sha": "31861e78e3a784c943a8d931f7856e7afd014371",
+  "config": {
+    "config_version": "0.1.0",
+    "earth_model": "prem_a_20s",
+    "dt_s": 1.0,
+    "window_before_s": 120.0,
+    "window_after_s": 780.0,
+    "source_duration_s": 300.0,
+    "source_lead_s": 60.0,
+    "greens_duration_s": 900.0,
+    "greens_step_deg": 0.05,
+    "band": {
+      "short_period_s": 20.0,
+      "long_period_s": 150.0,
+      "corners": 4,
+      "zerophase": true
+    },
+    "grid": {
+      "half_width_km": 10.0,
+      "spacing_km": 2.0,
+      "depths_m": [
+        1000.0
+      ]
+    },
+    "regularisation": {
+      "order": 2,
+      "zero_endpoints": true,
+      "lambda_min": 0.0001,
+      "lambda_max": 10000.0,
+      "n_lambda": 40
+    },
+    "stations": {
+      "min_distance_deg": 0.5,
+      "max_distance_deg": 15.0,
+      "max_stations": 12,
+      "channels": [
+        "LHZ",
+        "LHN",
+        "LHE",
+        "LH1",
+        "LH2"
+      ],
+      "min_stations": 5,
+      "max_azimuthal_gap_deg": 200.0,
+      "amplitude_outlier_factor": 20.0,
+      "min_variance_reduction": 0.2
+    },
+    "mass": {
+      "friction_ratio_min": 0.2,
+      "friction_ratio_max": 0.8,
+      "rock_density_kg_m3": 2700.0,
+      "ice_density_kg_m3": 917.0,
+      "gravity_m_s2": 9.81,
+      "min_path_angle_deg": 8.0,
+      "max_path_angle_deg": 55.0
+    },
+    "bootstrap": {
+      "n_draws": 200,
+      "seed": 20260903,
+      "resample_stations": true,
+      "band_jitter": 1.25,
+      "lambda_jitter": 3.0,
+      "depths_m": [
+        500.0,
+        1000.0,
+        2000.0
+      ]
+    }
+  },
+  "reproductions": [
+    "bingham-canyon-2013-1",
+    "lamplugh-glacier-2016",
+    "taan-fiord-2015"
+  ],
+  "notes": "Sealed after the published reproductions passed and before Langtang 2026 and Blatten 2025 were run. Any later change to the config invalidates the seal."
+}

@@ -27,6 +27,10 @@ def copy_tree(repo_root: Path, tmp_path: Path) -> Path:
     shutil.copy(repo_root / "data" / "manifest.jsonl", fake / "data" / "manifest.jsonl")
     shutil.copytree(repo_root / "tests" / "fixtures", fake / "tests" / "fixtures")
     shutil.copytree(repo_root / "contracts", fake / "contracts")  # vendored CAP schemas
+    # The published-reference file for the force-history gate is ledgered like any other
+    # artefact under data/, so the copied tree needs it or `committed_files_present` fails on
+    # a path the real repository has.
+    shutil.copytree(repo_root / "data" / "references", fake / "data" / "references")
     return fake
 
 

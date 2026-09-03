@@ -35,6 +35,9 @@ REPLAY_DIR_OPTION = typer.Option(
     Path("reports/replay"), "--report-dir", help="Where replay reports are written."
 )
 PROMOTIONS_OPTION = typer.Option(Path("reports/promotion"), "--promotions-dir")
+M2_REPORTS_OPTION = typer.Option(
+    Path("reports/m2"), "--m2-dir", help="Where `serac lfh invert` wrote its run artefacts."
+)
 
 
 def _load_runner(name: str) -> Callable[..., SuiteResult]:
@@ -93,6 +96,16 @@ def stream(
 ) -> None:
     """Replay end-to-end on fixtures; CAP validates against the CAP 1.2 XSD."""
     _run("stream", repo, reports_dir, report_dir=report_dir)
+
+
+@app.command()
+def lfh(
+    repo: Path = REPO_OPTION,
+    reports_dir: Path = REPORTS_OPTION,
+    m2_dir: Path = M2_REPORTS_OPTION,
+) -> None:
+    """Force-history inversion: published reproductions, refusals, fixtures and the seal."""
+    _run("lfh", repo, reports_dir, m2_dir=m2_dir)
 
 
 @app.command()
