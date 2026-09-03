@@ -1,0 +1,203 @@
+{
+  "aoi_id": null,
+  "bulked_volume_m3": null,
+  "dammed_river": null,
+  "event_group": "marmolada-2022",
+  "event_id": "marmolada-2022",
+  "failure_type": "hanging_glacier_collapse",
+  "fall_height_m": null,
+  "fatalities": {
+    "best": 11.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 11.0,
+    "low": 11.0,
+    "notes": "'killing 11 mountaineers'; 'seven severely injured'",
+    "source_refs": [
+      "francese-2025"
+    ],
+    "unit": "persons"
+  },
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "No deposit volume was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "fall_height_m": {
+      "notes": "Francese et al. (2025) state the path 'extended from 3213 to 2300 m a.s.l.' and that the avalanche ended 'at an elevation of 2330 m a.s.l.'; the vertical drop is not stated as a figure and is not computed here.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "A pure ice (glacieret) failure per Francese et al. (2025); no rock fraction stated.",
+      "public_estimates": [],
+      "reason": "not_applicable"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "seismic": {
+      "notes": "Francese et al. (2025): 'An earthquake triggering the failure was excluded based on the processing of the available seismological observations'; no seismic signal of the collapse itself was read.",
+      "public_estimates": [],
+      "reason": "not_applicable"
+    }
+  },
+  "infrastructure_impacts": [],
+  "initially_reported_as": null,
+  "name": "Marmolada glacier (Punta Rocca glacieret) collapse, Dolomites, Italy",
+  "notes": "Small-volume, high-consequence ice avalanche. Olivieri et al. (2022, Remote Sensing Letters) was Crossref-resolved but its landing page is behind a bot challenge, so it is not cited.",
+  "peak_velocity_ms": {
+    "best": null,
+    "disputed": false,
+    "estimates": [],
+    "high": 25.0,
+    "low": 22.2,
+    "notes": "'The avalanche reached a maximum speed of 80–90 km h−1', converted to m/s",
+    "source_refs": [
+      "francese-2025"
+    ],
+    "unit": "m/s"
+  },
+  "precursors_observed": [
+    {
+      "description": "Francese et al. (2025): unusually high air temperatures 'led to an excess of meltwater, which, since mid-June, had overpressurized the englacial discharge network'; at collapse 'crevasses were completely water-filled'. No lead time is stated as such.",
+      "kind": "meltwater_overpressure",
+      "lead_time_days": null,
+      "observed_utc": null,
+      "source_refs": [
+        "francese-2025"
+      ]
+    }
+  ],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "reference",
+  "runout_km": {
+    "best": 2.3,
+    "disputed": false,
+    "estimates": [],
+    "high": 2.3,
+    "low": 2.3,
+    "notes": "'traveled for approximately 2.3 km along the northern slope'",
+    "source_refs": [
+      "francese-2025"
+    ],
+    "unit": "km"
+  },
+  "schema_version": "0.1.0",
+  "secondary_surge": null,
+  "seismic": null,
+  "source_elevation_m": {
+    "best": 3200.0,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 3200.0,
+        "low": 3200.0,
+        "qualifier": "'occurred at an altitude of approximately 3200 m'",
+        "source_ref": "francese-2025",
+        "unit": "m"
+      },
+      {
+        "high": 3213.0,
+        "low": 3213.0,
+        "qualifier": "figure caption: flow path 'extended from 3213 to 2300 m a.s.l.'",
+        "source_ref": "francese-2025",
+        "unit": "m"
+      }
+    ],
+    "high": 3213.0,
+    "low": 3200.0,
+    "notes": null,
+    "source_refs": [
+      "francese-2025"
+    ],
+    "unit": "m"
+  },
+  "source_location": {
+    "basis": "Marmolada Glacier coordinates 46°26′32″ N, 11°51′53″ E stated by Francese et al. (2025), converted to decimal degrees; the failed glacieret lies 'in a small cirque just below Punta Rocca (3309 m a.s.l.)'",
+    "lat": 46.44222,
+    "lon": 11.86472,
+    "source_refs": [
+      "francese-2025"
+    ],
+    "uncertainty_radius_m": 1000.0
+  },
+  "source_volume_m3": {
+    "best": 70400.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 70400.0,
+    "low": 70400.0,
+    "notes": "'The detached ice mass had an estimated volume of 70 400 m3'",
+    "source_refs": [
+      "francese-2025"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:27:59.910207Z",
+      "authors": [
+        "Francese, Roberto Giovanni",
+        "Valentino, Roberto",
+        "Haeberli, Wilfried",
+        "Bondesan, Aldino",
+        "Giorgi, Massimo",
+        "Picotti, Stefano",
+        "Pettenati, Franco",
+        "Sandron, Denis",
+        "Ramponi, Gianni",
+        "Valt, Mauro"
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_location",
+        "source_elevation_m",
+        "source_volume_m3",
+        "runout_km",
+        "peak_velocity_ms",
+        "fatalities",
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days"
+      ],
+      "content_type": "text/html",
+      "doi": "10.5194/nhess-25-3027-2025",
+      "excerpt": "The detached ice mass had an estimated volume of 70 400 m 3 and slid down the slope, killing 11 mountaineers after having traveled for approximately 2.3 km along the northern slope.",
+      "id": "francese-2025",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "4ad46a8443f223dddc5b89d969b407733d22657fc1ddac7cf0be9ab1b8e2d6a4",
+      "stored_copy": "data/raw/sources/marmolada-2022/francese-2025.html",
+      "title": "Failure of Marmolada Glacier (Dolomites, Italy) in 2022: data-based back analysis of possible collapse mechanisms",
+      "url": "https://nhess.copernicus.org/articles/25/3027/2025/nhess-25-3027-2025.html",
+      "year": 2025
+    }
+  ],
+  "time": {
+    "basis": "'The collapse in the early afternoon of 3 July 2022' (Francese et al. 2025); no clock time was read, so the instant is 14:00 CEST (UTC+2) with a two-hour uncertainty",
+    "datetime_utc": "2022-07-03T12:00:00Z",
+    "source_refs": [
+      "francese-2025"
+    ],
+    "uncertainty_s": 7200.0
+  },
+  "transect_observations": []
+}

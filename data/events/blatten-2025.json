@@ -1,0 +1,465 @@
+{
+  "aoi_id": "blatten-lotschental",
+  "bulked_volume_m3": null,
+  "dammed_river": true,
+  "event_group": "blatten-2025",
+  "event_id": "blatten-2025",
+  "failure_type": "bedrock_rock_ice_avalanche",
+  "fall_height_m": null,
+  "fatalities": null,
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "EGU26-6599 gives a deposit thickness of up to 32 m on the village but no deposit volume.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "fall_height_m": {
+      "notes": "No fall height was read in the retrieved communications and abstracts.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "fatalities": {
+      "notes": "Federal Council communication of 6 June 2025: 'Eine Person gilt weiterhin als vermisst' (one person still missing); no confirmed fatality count was read in the retrieved text.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "peak_velocity_ms": {
+      "notes": "No avalanche velocity was read in the retrieved text (the EGU26-3801 velocities are pre-failure glacier velocities, recorded as a precursor).",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "Described as 'ice and rock' (EGU26-3801) / 'debris-ice avalanche' (EGU26-6599); no ratio stated.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "runout_km": {
+      "notes": "No runout distance was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "seismic.agency_range": {
+      "notes": "No agency catalogue magnitude was retrieved; only a press-reported 3.1.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "source_elevation_m": {
+      "notes": "No detachment elevation was read in the retrieved communications and abstracts.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [
+    {
+      "asset_id": null,
+      "asset_name": "Blatten (village)",
+      "asset_type": "settlement",
+      "description": "Canton of Valais (28 May 2025): 'Die vollständige Evakuierung des Dorfes Blatten war am Montag, dem 19. Mai, vorsorglich angeordnet worden. Dreihundert Einwohner wurden evakuiert'; Federal Council (6 June 2025): on 19 May 2025 the municipal authority evacuated the roughly 300 residents",
+      "impact": "evacuated",
+      "source_refs": [
+        "vs-ch-2025-05-28",
+        "admin-ch-2025-06-06"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Blatten (village) and hamlet Ried",
+      "asset_type": "settlement",
+      "description": "Federal Council (6 June 2025): the debris and ice avalanche 'verschüttete das Dorf Blatten sowie den Weiler Ried'; a lake impounded behind the debris cone flooded the part of the village that was not buried. Canton of Valais: 'Ein Grossteil des Dorfes Blatten wurde zerstört'. Islam et al. (2025) and Bellwald (EGU26-6599) describe the destruction of the village.",
+      "impact": "destroyed",
+      "source_refs": [
+        "admin-ch-2025-06-06",
+        "vs-ch-2025-05-28",
+        "islam-2025",
+        "egu26-6599"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Wiler and Kippel (villages, parts)",
+      "asset_type": "settlement",
+      "description": "SRF chronology: on the evening of 28 May parts of the villages Wiler and Kippel were evacuated for fear that the lake behind the debris cone would overflow",
+      "impact": "evacuated",
+      "source_refs": [
+        "srf-2025-chronology"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "bridges at Gampel and Steg (Rhône valley)",
+      "asset_type": "bridge",
+      "description": "SRF chronology: 'In Gampel und Steg im Rhonetal werden Brücken gesperrt oder demontiert' as a precaution on 29 May; no damage stated",
+      "impact": "unknown",
+      "source_refs": [
+        "srf-2025-chronology"
+      ]
+    }
+  ],
+  "initially_reported_as": null,
+  "name": "Kleines Nesthorn rock collapse and Birch Glacier avalanche onto Blatten, Lötschental, Switzerland",
+  "notes": "Evacuation counterfactual: a monitored slope evacuated nine days before failure. dammed_river is true per the Federal Council ('Ein aufgestauter See hinter dem Geröllkegel'), the Canton ('Das Flussbett der Lonza wurde verschüttet') and EGU26-6599 ('river damming in the main valley, lake formation up-valley'); secondary_surge is false because EGU26-6599 describes 'outflow of impounded water and formation of a new river bed' rather than an outburst surge. Islam et al. (2025, Geology Today, CC-BY) is cited from its Crossref record because the Wiley page is behind a bot challenge. Transect ids blatten/wiler/gampel are defined by the blatten-lotschental AOI; no arrival times were read.",
+  "peak_velocity_ms": null,
+  "precursors_observed": [
+    {
+      "description": "Complete precautionary evacuation of Blatten ordered on 19 May 2025 (date only; the observed_utc instant is the start of that day); about 300 residents evacuated and looked after by the regional command staff. SRF: a partial evacuation (92 residents and 16 guests) had already been ordered on the evening of 17 May and was extended on the morning of 19 May.",
+      "kind": "evacuation_order",
+      "lead_time_days": {
+        "best": 9.0,
+        "disputed": false,
+        "estimates": [],
+        "high": 9.0,
+        "low": 9.0,
+        "notes": "The complete evacuation of Blatten was ordered on Monday 19 May 2025 (Canton of Valais; Federal Council) and the glacier collapsed on 28 May 2025; swissinfo states the village 'war ... bereits vor neun Tagen evakuiert worden'",
+        "source_refs": [
+          "vs-ch-2025-05-28",
+          "admin-ch-2025-06-06",
+          "swissinfo-2025-05-28"
+        ],
+        "unit": "days"
+      },
+      "observed_utc": "2025-05-19T00:00:00Z",
+      "source_refs": [
+        "vs-ch-2025-05-28",
+        "admin-ch-2025-06-06",
+        "swissinfo-2025-05-28",
+        "srf-2025-chronology"
+      ]
+    },
+    {
+      "description": "SRF chronology: on the afternoon of Saturday 17 May a rock collapse at the Kleines Nesthorn landed on the Birch Glacier and tore a small part of it away (date only). Federal Council: 'Bereits seit Mai gingen mehrmals kleinere Felsstürze auf den Birchgletscher nieder'. No lead time is stated as a figure.",
+      "kind": "rockfall_onto_glacier",
+      "lead_time_days": null,
+      "observed_utc": "2025-05-17T00:00:00Z",
+      "source_refs": [
+        "srf-2025-chronology",
+        "admin-ch-2025-06-06"
+      ]
+    },
+    {
+      "description": "Bellwald (EGU26-6599): 'Accelerated deformation of the rock slope of Kleines Nesthorn around two weeks before the debris-ice avalanche was the first process in a cascade of events'. 'Around two weeks' is not entered as a lead time because it is approximate and from a conference abstract.",
+      "kind": "displacement_acceleration",
+      "lead_time_days": null,
+      "observed_utc": null,
+      "source_refs": [
+        "egu26-6599"
+      ]
+    },
+    {
+      "description": "EGU26-3801 (Geoprevent): an interferometric radar was installed 'at the day, when Blatten was evacuated'; a camera installed one day before the collapse 'showed a rapid movement of the glacier, with measured velocities of several tens of meters per day in the hours leading to the collapse of the glacier'. No lead time is stated as a figure.",
+      "kind": "radar_and_camera_monitoring",
+      "lead_time_days": null,
+      "observed_utc": null,
+      "source_refs": [
+        "egu26-3801"
+      ]
+    }
+  ],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "evacuation_counterfactual",
+  "runout_km": null,
+  "schema_version": "0.1.0",
+  "secondary_surge": null,
+  "seismic": {
+    "agency_range": null,
+    "mag_type": null,
+    "magnitude": {
+      "best": null,
+      "disputed": false,
+      "estimates": [],
+      "high": 3.1,
+      "low": 3.1,
+      "notes": "swissinfo, citing the 'Walliser Bote': 'Der Gletscherabbruch habe ein Erdbeben der Stärke 3,1 auf der Richterskala verursacht' — press-only, no best",
+      "source_refs": [
+        "swissinfo-2025-05-28"
+      ],
+      "unit": "magnitude"
+    },
+    "notes": "Press-reported magnitude only; no agency catalogue entry was retrieved in this session.",
+    "single_force": false,
+    "source_refs": [
+      "swissinfo-2025-05-28"
+    ],
+    "usgs_id": null
+  },
+  "source_elevation_m": null,
+  "source_location": {
+    "basis": "OpenStreetMap Nominatim result for 'Kleines Nesthorn' (peak node 11537863918), the rock slope whose collapse loaded the Birch Glacier (Bellwald, EGU26-6599; admin.ch)",
+    "lat": 46.3967569,
+    "lon": 7.8405097,
+    "source_refs": [
+      "osm-kleines-nesthorn",
+      "egu26-6599",
+      "admin-ch-2025-06-06"
+    ],
+    "uncertainty_radius_m": 1500.0
+  },
+  "source_volume_m3": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 9000000.0,
+        "low": 9000000.0,
+        "qualifier": "'buried the village of Blatten under 9 million m3 of ice and rock'",
+        "source_ref": "egu26-3801",
+        "unit": "m3"
+      },
+      {
+        "high": 10000000.0,
+        "low": 10000000.0,
+        "qualifier": "'a volume of approximately 10 million cubic meters'",
+        "source_ref": "egu26-6599",
+        "unit": "m3"
+      }
+    ],
+    "high": 10000000.0,
+    "low": 9000000.0,
+    "notes": "Both figures come from EGU 2026 conference abstracts, which do not qualify for a best value; no peer-reviewed volume was read",
+    "source_refs": [
+      "egu26-3801",
+      "egu26-6599"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:28:13.797218Z",
+      "authors": [],
+      "claims_supported": [
+        "time",
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description",
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description",
+        "dammed_river"
+      ],
+      "content_type": "text/html;charset=UTF-8",
+      "doi": null,
+      "excerpt": "Die vollständige Evakuierung des Dorfes Blatten war am Montag, dem 19. Mai, vorsorglich angeordnet worden. Dreihundert Einwohner wurden evakuiert und vom regionalen Führungsstab betreut.",
+      "id": "vs-ch-2025-05-28",
+      "kind": "agency_official",
+      "licence": "© Canton du Valais; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "15e79f5b13ab5cd3e97ac9758245b6ce2c8810aa34be8c9fb3762020dd08477e",
+      "stored_copy": null,
+      "title": "Communication et médias",
+      "url": "https://www.vs.ch/de/web/communication/detail?groupId=529400&articleId=40208599",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:17.256849Z",
+      "authors": [],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_location",
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days",
+        "precursors_observed[1].description",
+        "precursors_observed[1].lead_time_days",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description",
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description",
+        "dammed_river"
+      ],
+      "content_type": "text/html;charset=utf-8",
+      "doi": null,
+      "excerpt": "Am 19. Mai 2025 evakuierte deshalb die Gemeindebehörde die rund 300 Dorfbewohnerinnen und -bewohner. Am 28. Mai 2025 brach ein grosser Teil des Birchgletschers unter der zusätzlichen Belastung des Bergsturzmaterials ab.",
+      "id": "admin-ch-2025-06-06",
+      "kind": "agency_official",
+      "licence": "© Swiss Confederation; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "e2d4f2aaabd007b5c56c8f8e9966bf305aa0ee67d16100842d491d372ffe0a2e",
+      "stored_copy": null,
+      "title": "Zeichen der Solidarität: Bundesrat beantragt Soforthilfe für Gemeinde Blatten",
+      "url": "https://www.admin.ch/de/newnsb/wdAvTXcfYkNbjX1zGthj9",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:19.337487Z",
+      "authors": [],
+      "claims_supported": [
+        "time",
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range",
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "Ein grosser Teil des absturzgefährdeten Birchgletschers unterhalb des Bergsturzgebiets war am Nachmittag gegen 15.30 Uhr in einem Mal abgebrochen.",
+      "id": "swissinfo-2025-05-28",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "131806a192a18f781bb1673cdf3af74b317bbd87f91e8eae0a8eff3272c64ace",
+      "stored_copy": null,
+      "title": "Schuttmassen begraben grossen Teil von Blatten VS unter sich",
+      "url": "https://www.swissinfo.ch/ger/schuttmassen-begraben-grossen-teil-von-blatten-vs-unter-sich/89424186",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:22.208451Z",
+      "authors": [],
+      "claims_supported": [
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days",
+        "precursors_observed[1].description",
+        "precursors_observed[1].lead_time_days",
+        "infrastructure_impacts[2].impact",
+        "infrastructure_impacts[2].description",
+        "infrastructure_impacts[3].impact",
+        "infrastructure_impacts[3].description",
+        "dammed_river"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "Montag, 19. Mai, Vormittag: Die Evakuation wird ausgeweitet. Betroffen sind insgesamt rund 300 Personen.",
+      "id": "srf-2025-chronology",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "531d4c2a3292c9305abc4d665cdac93f08383bdb92fdadb4e73524e955bc8c7d",
+      "stored_copy": null,
+      "title": "Die Naturkatastrophe in Blatten – eine Chronologie",
+      "url": "https://www.srf.ch/news/katastrophe-im-loetschental-wie-sich-die-lage-ob-blatten-ueber-tage-verschaerft-hat",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:24.573212Z",
+      "authors": [
+        "Carrel, Maxence",
+        "Gassner, Johannes",
+        "Wetter, Janine",
+        "Stitelmann, Ólafur",
+        "St.Pierre - Ostrander, Théo",
+        "Vincent, Stéphane"
+      ],
+      "claims_supported": [
+        "source_volume_m3",
+        "precursors_observed[3].description",
+        "precursors_observed[3].lead_time_days"
+      ],
+      "content_type": "text/html; charset=utf-8",
+      "doi": "10.5194/egusphere-egu26-3801",
+      "excerpt": "On May 28th 2025, a massive rock avalanche buried the village of Blatten under 9 million m3 of ice and rock.",
+      "id": "egu26-3801",
+      "kind": "conference_abstract",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": false,
+      "publisher": "Copernicus GmbH",
+      "sha256": "f8236d9296495b47288c1948509af26bfda4b3c580892de16ad5b9e0486e01c9",
+      "stored_copy": "data/raw/sources/blatten-2025/egu26-3801.html",
+      "title": "Monitoring of the \"Kleines Nesthorn\" and of the Birch Glacier before and during the rock avalanche in Blatten",
+      "url": "https://meetingorganizer.copernicus.org/EGU26/EGU26-3801.html",
+      "year": 2026
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:27.375810Z",
+      "authors": [
+        "Bellwald, Benjamin"
+      ],
+      "claims_supported": [
+        "source_location",
+        "source_volume_m3",
+        "precursors_observed[2].description",
+        "precursors_observed[2].lead_time_days",
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description",
+        "dammed_river"
+      ],
+      "content_type": "text/html; charset=utf-8",
+      "doi": "10.5194/egusphere-egu26-6599",
+      "excerpt": "a catastrophic debris-ice avalanche with a volume of approximately 10 million cubic meters led to the complete destruction of the village of Blatten",
+      "id": "egu26-6599",
+      "kind": "conference_abstract",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": false,
+      "publisher": "Copernicus GmbH",
+      "sha256": "3a08bfda6d0aa0d857961ca5690544c301e32fcff0e9d4c5155b63374d9b09e7",
+      "stored_copy": "data/raw/sources/blatten-2025/egu26-6599.html",
+      "title": "Anatomy of the Blatten rock-collapse debris-ice avalanche (28 May 2025): Insights from a local Quaternary geologist",
+      "url": "https://meetingorganizer.copernicus.org/EGU26/EGU26-6599.html",
+      "year": 2026
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:30.134842Z",
+      "authors": [
+        "Islam, Nazimul",
+        "Carrivick, Jonathan L.",
+        "Coulthard, Tom",
+        "Westoby, Matthew",
+        "Dunning, Stuart",
+        "Gindraux, Saskia"
+      ],
+      "claims_supported": [
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description"
+      ],
+      "content_type": "application/json",
+      "doi": "10.1111/gto.12526",
+      "excerpt": "the collapse of the Birch Glacier and the destruction of the alpine village of Blatten",
+      "id": "islam-2025",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0 (Crossref licence record; abstract read from Crossref metadata)",
+      "peer_reviewed": true,
+      "publisher": "Wiley",
+      "sha256": "3d83fda2ce490c22b299b8d5df4b44e1ccee7fad1a64d68e9579c261e04aefb0",
+      "stored_copy": null,
+      "title": "A growing threat of multi‐hazard cascades highlighted by the Birch Glacier collapse and Blatten landslide in the Swiss Alps",
+      "url": "https://api.crossref.org/works/10.1111/gto.12526",
+      "year": 2025
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:32.414451Z",
+      "authors": [],
+      "claims_supported": [
+        "source_location"
+      ],
+      "content_type": "application/json; charset=utf-8",
+      "doi": null,
+      "excerpt": null,
+      "id": "osm-kleines-nesthorn",
+      "kind": "dataset",
+      "licence": "ODbL-1.0",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "28c7cfd7cb7cde0d080f3b1691171d01f30c7c8b297e7c7c09f79daf16c7e649",
+      "stored_copy": "data/raw/sources/blatten-2025/osm-kleines-nesthorn.json",
+      "title": "OpenStreetMap Nominatim search result: Kleines Nesthorn peak, Blatten, Valais (node 11537863918)",
+      "url": "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=Kleines%20Nesthorn",
+      "year": null
+    }
+  ],
+  "time": {
+    "basis": "'am Nachmittag gegen 15.30 Uhr' local time (CEST = UTC+2) on 28 May 2025 per swissinfo/Keystone-SDA quoting the regional command staff; the date is confirmed by the Federal Council communication of 6 June 2025 and the Canton of Valais communication of 28 May 2025",
+    "datetime_utc": "2025-05-28T13:30:00Z",
+    "source_refs": [
+      "swissinfo-2025-05-28",
+      "admin-ch-2025-06-06",
+      "vs-ch-2025-05-28"
+    ],
+    "uncertainty_s": 900.0
+  },
+  "transect_observations": []
+}

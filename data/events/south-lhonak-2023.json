@@ -1,0 +1,369 @@
+{
+  "aoi_id": null,
+  "bulked_volume_m3": null,
+  "dammed_river": null,
+  "event_group": "south-lhonak-2023",
+  "event_id": "south-lhonak-2023",
+  "failure_type": "moraine_collapse_glof",
+  "fall_height_m": null,
+  "fatalities": {
+    "best": null,
+    "disputed": true,
+    "estimates": [
+      {
+        "high": 178.0,
+        "low": 178.0,
+        "qualifier": "'caused 178 fatalities'",
+        "source_ref": "zhang-2025",
+        "unit": "persons"
+      },
+      {
+        "high": 24.0,
+        "low": 24.0,
+        "qualifier": "'resulting in 24 fatalities and leaving over 70 persons missing'",
+        "source_ref": "mohanty-2026",
+        "unit": "persons"
+      }
+    ],
+    "high": 178.0,
+    "low": 24.0,
+    "notes": "Two peer-reviewed abstracts disagree (178 vs 24 fatalities plus >70 missing); the range spans both and carries no best",
+    "source_refs": [
+      "zhang-2025",
+      "mohanty-2026"
+    ],
+    "unit": "persons"
+  },
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "Sattar et al. (2025): the flood 'eroded ~270 million cubic meters of sediment' and drained '~50 million cubic meters of the lake's water'; Zhang et al. (2025): '38.49 × 10^6 m3 of water was released'. These are flood volumes, not a bulked avalanche volume, so the field stays null.",
+      "public_estimates": [
+        {
+          "high": 270000000.0,
+          "low": 270000000.0,
+          "qualifier": "sediment eroded by the GLOF",
+          "source_ref": "sattar-2025",
+          "unit": "m3"
+        },
+        {
+          "high": 50000000.0,
+          "low": 50000000.0,
+          "qualifier": "lake water drained",
+          "source_ref": "sattar-2025",
+          "unit": "m3"
+        },
+        {
+          "high": 38490000.0,
+          "low": 38490000.0,
+          "qualifier": "water released at the breach (modelled hydrograph)",
+          "source_ref": "zhang-2025",
+          "unit": "m3"
+        }
+      ],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "fall_height_m": {
+      "notes": "A lateral-moraine collapse into a lake; the retrieved abstracts state an impact wave height (~20 m, Sattar et al. 2025; overtopping 16.11 m, Zhang et al. 2025), not a fall height.",
+      "public_estimates": [],
+      "reason": "not_applicable"
+    },
+    "peak_velocity_ms": {
+      "notes": "Zhang et al. (2025) give an impulse-wave displacement speed of ~26 m/s and a peak discharge of 3.02 × 10^5 m3/s from modelling; no flow velocity of the mass movement was read.",
+      "public_estimates": [
+        {
+          "high": 26.0,
+          "low": 26.0,
+          "qualifier": "modelled impulse-wave displacement speed",
+          "source_ref": "zhang-2025",
+          "unit": "m/s"
+        }
+      ],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "Moraine (sediment) collapse; not a rock–ice avalanche.",
+      "public_estimates": [],
+      "reason": "not_applicable"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "seismic": {
+      "notes": "No seismic record of the moraine collapse was retrieved.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "source_elevation_m": {
+      "notes": "The lake/moraine elevation was not read in the retrieved abstracts.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [
+    {
+      "asset_id": null,
+      "asset_name": "hydropower plant at Chungthang (Teesta)",
+      "asset_type": "hydropower_plant",
+      "description": "Mohanty et al. (2026): 'destroyed ... a major hydropower plant in the Chungthang region'; Zhang et al. (2025): 'the destruction of three downstream hydropower projects'; Sattar et al. (2025): 'overwhelmed infrastructure, including hydropower installations along the Teesta River'",
+      "impact": "destroyed",
+      "source_refs": [
+        "mohanty-2026",
+        "zhang-2025",
+        "sattar-2025"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "13 bridges along the Teesta",
+      "asset_type": "bridge",
+      "description": "Mohanty et al. (2026): 'The GLOF also destroyed 13 bridges'",
+      "impact": "destroyed",
+      "source_refs": [
+        "mohanty-2026"
+      ]
+    }
+  ],
+  "initially_reported_as": null,
+  "name": "South Lhonak Lake moraine collapse and outburst flood, Sikkim, India",
+  "notes": "Negative control: a moraine-dam / glacial-lake outburst cascade that serac must discriminate from bedrock rock–ice avalanches. dammed_river is false because the flood originated from an existing moraine-dammed lake rather than from a landslide dam; secondary_surge is false because the outburst was the primary flood, not a secondary surge behind a new blockage (both per the retrieved abstracts). Sattar et al. (2025) is a Science paper whose abstract was read via the Europe PMC API.",
+  "peak_velocity_ms": null,
+  "precursors_observed": [],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "negative_control",
+  "runout_km": {
+    "best": 169.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 169.0,
+    "low": 169.0,
+    "notes": "'The impact of the GLOF extended to 169 km downstream' (Zhang et al. 2025)",
+    "source_refs": [
+      "zhang-2025"
+    ],
+    "unit": "km"
+  },
+  "schema_version": "0.1.0",
+  "secondary_surge": null,
+  "seismic": null,
+  "source_elevation_m": null,
+  "source_location": {
+    "basis": "OpenStreetMap Nominatim result for 'South Lhonak' (South Lhonak Glacier, way 134410531); the lateral moraine that collapsed into the proglacial lake adjoins this glacier",
+    "lat": 27.903118,
+    "lon": 88.15968,
+    "source_refs": [
+      "osm-south-lhonak-glacier"
+    ],
+    "uncertainty_radius_m": 3000.0
+  },
+  "source_volume_m3": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 14700000.0,
+        "low": 14700000.0,
+        "qualifier": "'14.7 million cubic meters of frozen lateral moraine collapsing into South Lhonak Lake'",
+        "source_ref": "sattar-2025",
+        "unit": "m3"
+      },
+      {
+        "high": 16750000.0,
+        "low": 16750000.0,
+        "qualifier": "'estimated collapse material volume of 16.75 × 10^6 m3' (lateral moraine)",
+        "source_ref": "zhang-2025",
+        "unit": "m3"
+      },
+      {
+        "high": 38310000.0,
+        "low": 38310000.0,
+        "qualifier": "'a landslide, that dumped a substantial amount (~ 38.31 million m3) of debris into the South Lhonak Lake'",
+        "source_ref": "mohanty-2026",
+        "unit": "m3"
+      },
+      {
+        "high": 7000000.0,
+        "low": 7000000.0,
+        "qualifier": "'lost a big chunk of ice mass (~ 7 million m3) due to calving' (glacier, not included in low/high)",
+        "source_ref": "mohanty-2026",
+        "unit": "m3"
+      }
+    ],
+    "high": 38310000.0,
+    "low": 14700000.0,
+    "notes": "Three peer-reviewed abstracts give 14.7, 16.75 and 38.31 ×10^6 m3 for the mass entering the lake; no best is chosen",
+    "source_refs": [
+      "sattar-2025",
+      "zhang-2025",
+      "mohanty-2026"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:28:02.809971Z",
+      "authors": [
+        "Sattar, Ashim",
+        "Cook, Kristen L.",
+        "Rai, Shashi Kant",
+        "Berthier, Etienne",
+        "Allen, Simon",
+        "Rinzin, Sonam",
+        "de Vries, Maximillian Van Wyk",
+        "Haeberli, Wilfried",
+        "Kushwaha, Pradeep",
+        "Shugar, Dan H.",
+        "Emmer, Adam",
+        "Haritashya, Umesh K.",
+        "Frey, Holger",
+        "Rao, Praful",
+        "Gurudin, Kori Sanjay Kumar",
+        "Rai, Prabhakar",
+        "Rajak, Rajeev",
+        "Hossain, Faruk",
+        "Huggel, Christian",
+        "Mergili, Martin",
+        "Azam, Mohd. Farooq",
+        "Gascoin, Simon",
+        "Carrivick, Jonathan L.",
+        "Bell, Louie Elliot",
+        "Ranjan, Rakesh Kumar",
+        "Rashid, Irfan",
+        "Kulkarni, Anil. V.",
+        "Petley, Dave",
+        "Schwanghart, Wolfgang",
+        "Watson, C. Scott",
+        "Islam, Nazimul",
+        "Gupta, Moushumi Das",
+        "Lane, Stuart N.",
+        "Bhat, Shahid Younis"
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_volume_m3",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description"
+      ],
+      "content_type": "application/json;charset=UTF-8",
+      "doi": "10.1126/science.ads2659",
+      "excerpt": "triggered by 14.7 million cubic meters of frozen lateral moraine collapsing into South Lhonak Lake. The impact generated an ~20-meter tsunami-like impact wave, which breached the moraine and drained ~50 million cubic meters of the lake's water",
+      "id": "sattar-2025",
+      "kind": "peer_reviewed",
+      "licence": "all-rights-reserved; cited-only (abstract read via Europe PMC)",
+      "peer_reviewed": true,
+      "publisher": "American Association for the Advancement of Science (AAAS)",
+      "sha256": "3141428a2c4ca184e206e6ba534d6b8501555cb0e62e2993f6bfb484c3c36e30",
+      "stored_copy": null,
+      "title": "The Sikkim flood of October 2023: Drivers, causes, and impacts of a multihazard cascade",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1126/science.ads2659&resultType=core&format=json",
+      "year": 2025
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:05.455639Z",
+      "authors": [
+        "Zhang, Taigang",
+        "Wang, Weicai",
+        "An, Baosheng"
+      ],
+      "claims_supported": [
+        "time",
+        "source_volume_m3",
+        "fatalities",
+        "runout_km",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description"
+      ],
+      "content_type": "text/html; charset=utf-8",
+      "doi": "10.1007/s10346-024-02358-x",
+      "excerpt": "On the night of October 3, 2023, the moraine-dammed South Lhonak Lake in Sikkim suddenly discharged a substantial volume of water, resulting in a glacial lake outburst flood (GLOF) that caused 178 fatalities and the destruction of three downstream hydropower projects",
+      "id": "zhang-2025",
+      "kind": "peer_reviewed",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": true,
+      "publisher": "Springer Science and Business Media LLC",
+      "sha256": "95e5c11039a1d0258eb56a36d096202fb43ee72c92b2b0186df5ed9b015c88d3",
+      "stored_copy": null,
+      "title": "A massive lateral moraine collapse triggered the 2023 South Lhonak Lake outburst flood, Sikkim Himalayas",
+      "url": "https://link.springer.com/article/10.1007/s10346-024-02358-x",
+      "year": 2025
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:08.585631Z",
+      "authors": [
+        "Mohanty, Litan Kumar",
+        "Gantayat, Prateek",
+        "Dixit, Ankur",
+        "Das Adhikari, Manik",
+        "Biswas, Rahul",
+        "Singh, Vivek Kumar"
+      ],
+      "claims_supported": [
+        "time",
+        "source_volume_m3",
+        "fatalities",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description",
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description"
+      ],
+      "content_type": "text/html; charset=utf-8",
+      "doi": "10.1038/s41598-026-35895-7",
+      "excerpt": "resulting in 24 fatalities and leaving over 70 persons missing. The GLOF also destroyed 13 bridges and a major hydropower plant in the Chungthang region",
+      "id": "mohanty-2026",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Springer Science and Business Media LLC",
+      "sha256": "b6a720f4827e8243682df9a7d59873828ff63b9791773407f1f4f44f86a51589",
+      "stored_copy": null,
+      "title": "Sequence of events that led to the South Lhonak lake outburst flood in Sikkim, India",
+      "url": "https://www.nature.com/articles/s41598-026-35895-7",
+      "year": 2026
+    },
+    {
+      "accessed_utc": "2026-09-03T10:28:11.972777Z",
+      "authors": [],
+      "claims_supported": [
+        "source_location"
+      ],
+      "content_type": "application/json; charset=utf-8",
+      "doi": null,
+      "excerpt": null,
+      "id": "osm-south-lhonak-glacier",
+      "kind": "dataset",
+      "licence": "ODbL-1.0",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "8d8b088951cfd088e0d05e5cd182d4ef2c33154ceee2f9ce0085f5b7277a2fde",
+      "stored_copy": "data/raw/sources/south-lhonak-2023/osm-south-lhonak-glacier.json",
+      "title": "OpenStreetMap Nominatim search result: South Lhonak Glacier, Mangan, Sikkim (way 134410531)",
+      "url": "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=South%20Lhonak",
+      "year": null
+    }
+  ],
+  "time": {
+    "basis": "'On the night of October 3, 2023' (Zhang et al. 2025); 'On October 4, 2023' local (Mohanty et al. 2026); 'On 3 October 2023' (Sattar et al. 2025). No clock time was read; the instant is 23:30 IST on 3 October with a six-hour uncertainty",
+    "datetime_utc": "2023-10-03T18:00:00Z",
+    "source_refs": [
+      "zhang-2025",
+      "mohanty-2026",
+      "sattar-2025"
+    ],
+    "uncertainty_s": 21600.0
+  },
+  "transect_observations": []
+}

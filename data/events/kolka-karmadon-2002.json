@@ -1,0 +1,306 @@
+{
+  "aoi_id": null,
+  "bulked_volume_m3": null,
+  "dammed_river": null,
+  "event_group": "kolka-karmadon-2002",
+  "event_id": "kolka-karmadon-2002",
+  "failure_type": "glacier_detachment",
+  "fall_height_m": {
+    "best": 2000.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 2000.0,
+    "low": 2000.0,
+    "notes": "'Drop H' = 2 km in Table 1 of Kääb et al. (2021), defined there as the elevation difference from the uppermost scarp to the lowermost deposit; the table gives one significant figure",
+    "source_refs": [
+      "kaab-2021-table1"
+    ],
+    "unit": "m"
+  },
+  "fatalities": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 140.0,
+        "low": 140.0,
+        "qualifier": "'ca. 140 people'",
+        "source_ref": "huggel-2005",
+        "unit": "persons"
+      },
+      {
+        "high": 135.0,
+        "low": 135.0,
+        "qualifier": "'∼135 lives'",
+        "source_ref": "kaab-2021",
+        "unit": "persons"
+      }
+    ],
+    "high": 140.0,
+    "low": 135.0,
+    "notes": null,
+    "source_refs": [
+      "huggel-2005",
+      "kaab-2021"
+    ],
+    "unit": "persons"
+  },
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "No deposit or bulked volume was read in the retrieved text.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "peak_velocity_ms": {
+      "notes": "Huggel et al. (2005) mention 'the high flow velocity' in the abstract without a figure; no number was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "Not stated in the retrieved text; Huggel et al. describe a slope failure that 'almost completely entrained Kolka glacier' without a rock/ice ratio.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "seismic": {
+      "notes": "No seismic catalogue entry or seismic study for the 2002 event was retrieved in this session.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "source_elevation_m": {
+      "notes": "The retrieved abstract and Table 1 do not state the elevation of the detachment zone; the full Huggel et al. (2005) text was not read in this session.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [],
+  "initially_reported_as": null,
+  "name": "Kolka–Karmadon rock/ice avalanche, Kazbek massif, North Ossetia, Russia",
+  "notes": "Huggel et al. (2005) characterise the event as a slope failure that entrained Kolka Glacier and describe two flow phases; Kääb et al. (2021) classify it as a low-angle glacier detachment, which is the failure_type used here.",
+  "peak_velocity_ms": null,
+  "precursors_observed": [],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "reference",
+  "runout_km": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 20.0,
+        "low": 20.0,
+        "qualifier": "avalanche 'traveled down the Genaldon valley for 20km' to the Karmadon gorge",
+        "source_ref": "huggel-2005",
+        "unit": "km"
+      },
+      {
+        "high": 15.0,
+        "low": 15.0,
+        "qualifier": "additional distal mudflow that 'continued for another 15km' beyond the gorge (not included in low/high)",
+        "source_ref": "huggel-2005",
+        "unit": "km"
+      },
+      {
+        "high": 19.0,
+        "low": 19.0,
+        "qualifier": "Table 1 'Reach L'",
+        "source_ref": "kaab-2021-table1",
+        "unit": "km"
+      }
+    ],
+    "high": 20.0,
+    "low": 19.0,
+    "notes": "low/high cover the avalanche reach only; Huggel et al. describe a further 15 km distal mudflow",
+    "source_refs": [
+      "huggel-2005",
+      "kaab-2021-table1"
+    ],
+    "unit": "km"
+  },
+  "schema_version": "0.1.0",
+  "secondary_surge": null,
+  "seismic": null,
+  "source_elevation_m": null,
+  "source_location": {
+    "basis": "Kolka Glacier location as listed in Table 1 of Kääb et al. (2021), stated to 0.01°",
+    "lat": 42.73,
+    "lon": 44.44,
+    "source_refs": [
+      "kaab-2021-table1"
+    ],
+    "uncertainty_radius_m": 2000.0
+  },
+  "source_volume_m3": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 100000000.0,
+        "low": 100000000.0,
+        "qualifier": "'about 100x10^6 m3' (abstract)",
+        "source_ref": "huggel-2005",
+        "unit": "m3"
+      },
+      {
+        "high": 130000000.0,
+        "low": 130000000.0,
+        "qualifier": "'released 130×10^6 m3 of ice and rock'",
+        "source_ref": "kaab-2021",
+        "unit": "m3"
+      },
+      {
+        "high": 130000000.0,
+        "low": 130000000.0,
+        "qualifier": "Table 1 'Volume' column",
+        "source_ref": "kaab-2021-table1",
+        "unit": "m3"
+      }
+    ],
+    "high": 130000000.0,
+    "low": 100000000.0,
+    "notes": "Two peer-reviewed figures differ by 30 %; no best is chosen",
+    "source_refs": [
+      "huggel-2005",
+      "kaab-2021",
+      "kaab-2021-table1"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:27:24.786152Z",
+      "authors": [
+        "Huggel, C.",
+        "Zgraggen-Oswald, S.",
+        "Haeberli, W.",
+        "Kääb, A.",
+        "Polkvoj, A.",
+        "Galushkin, I.",
+        "Evans, S. G."
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_volume_m3",
+        "runout_km",
+        "fatalities"
+      ],
+      "content_type": "text/html",
+      "doi": "10.5194/nhess-5-173-2005",
+      "excerpt": "traveled down the Genaldon valley for 20km, was stopped at the entrance of the Karmadon gorge, and was finally succeeded by a distal mudflow which continued for another 15km. The event caused the death of ca. 140 people",
+      "id": "huggel-2005",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-NC-SA-2.5",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "11164302676a2084766b4f09b58eaa428dd8adee4b83bd42b0dcc6c03158475f",
+      "stored_copy": null,
+      "title": "The 2002 rock/ice avalanche at Kolka/Karmadon, Russian Caucasus: assessment of extraordinary avalanche formation and mobility, and application of QuickBird satellite imagery",
+      "url": "https://nhess.copernicus.org/articles/5/173/2005/",
+      "year": 2005
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:27.644613Z",
+      "authors": [
+        "Kääb, Andreas",
+        "Jacquemart, Mylène",
+        "Gilbert, Adrien",
+        "Leinss, Silvan",
+        "Girod, Luc",
+        "Huggel, Christian",
+        "Falaschi, Daniel",
+        "Ugalde, Felipe",
+        "Petrakov, Dmitry",
+        "Chernomorets, Sergey",
+        "Dokukin, Mikhail",
+        "Paul, Frank",
+        "Gascoin, Simon",
+        "Berthier, Etienne",
+        "Kargel, Jeffrey S."
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_volume_m3",
+        "fatalities"
+      ],
+      "content_type": "text/html",
+      "doi": "10.5194/tc-15-1751-2021",
+      "excerpt": "The detachment of Kolka Glacier on 20 September 2002 released 130×10 6 m 3 of ice and rock that claimed ∼ 135 lives",
+      "id": "kaab-2021",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "d278073a19acd4ec41486f011489e5db666841182bb603c9155bc619ab3376f2",
+      "stored_copy": "data/raw/sources/kolka-karmadon-2002/kaab-2021.html",
+      "title": "Sudden large-volume detachments of low-angle mountain glaciers – more frequent than thought?",
+      "url": "https://tc.copernicus.org/articles/15/1751/2021/tc-15-1751-2021.html",
+      "year": 2021
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:30.701737Z",
+      "authors": [
+        "Kääb, Andreas",
+        "Jacquemart, Mylène",
+        "Gilbert, Adrien",
+        "Leinss, Silvan",
+        "Girod, Luc",
+        "Huggel, Christian",
+        "Falaschi, Daniel",
+        "Ugalde, Felipe",
+        "Petrakov, Dmitry",
+        "Chernomorets, Sergey",
+        "Dokukin, Mikhail",
+        "Paul, Frank",
+        "Gascoin, Simon",
+        "Berthier, Etienne",
+        "Kargel, Jeffrey S."
+      ],
+      "claims_supported": [
+        "source_location",
+        "fall_height_m",
+        "source_volume_m3",
+        "runout_km"
+      ],
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "doi": "10.5194/tc-15-1751-2021",
+      "excerpt": "Kolka | Caucasus | ~1835?, 1902, 2002 | 42.73 N, 44.44 E | Reach 19 km | Drop 2 km | Volume 130 x 10^6 m3 | slope 13",
+      "id": "kaab-2021-table1",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "dfbe47dae165ac403c274ba122e955e2fd780fef6e1ad3f4c5f3fe0c9952530c",
+      "stored_copy": "data/raw/sources/kolka-karmadon-2002/kaab-2021-table1.xlsx",
+      "title": "Table 1 of Kääb et al. (2021): parameters for the low-angle glacier detachments (XLSX)",
+      "url": "https://tc.copernicus.org/articles/15/1751/2021/tc-15-1751-2021-t01.xlsx",
+      "year": 2021
+    }
+  ],
+  "time": {
+    "basis": "calendar date (20 September 2002) stated by Huggel et al. (2005) and Kääb et al. (2021); no clock time was read in the retrieved text, so the instant is the start of that UTC day with a one-day uncertainty",
+    "datetime_utc": "2002-09-20T00:00:00Z",
+    "source_refs": [
+      "huggel-2005",
+      "kaab-2021"
+    ],
+    "uncertainty_s": 86400.0
+  },
+  "transect_observations": []
+}

@@ -1,0 +1,11 @@
+{
+  "aoi_id": "lhende-khola-trishuli",
+  "epsg": 32645,
+  "resolution_m": 30.0,
+  "x_min": 295800.0,
+  "y_min": 3071520.0,
+  "x_max": 358980.0,
+  "y_max": 3140070.0,
+  "width": 2106,
+  "height": 2285
+}

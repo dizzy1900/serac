@@ -183,8 +183,14 @@ class MassMovementEvent(BaseModel):
 
     seismic: SeismicAttribution | None = None
     related_seismic: list[SeismicAttribution] = Field(default_factory=list)
-    dammed_river: bool
-    secondary_surge: bool
+    dammed_river: bool | None = Field(
+        default=None,
+        description="None = not established in any retrieved source (needs a FieldNote)",
+    )
+    secondary_surge: bool | None = Field(
+        default=None,
+        description="None = not established in any retrieved source (needs a FieldNote)",
+    )
     initially_reported_as: str | None = None
 
     infrastructure_impacts: list[InfrastructureImpact] = Field(default_factory=list)
@@ -264,6 +270,9 @@ class MassMovementEvent(BaseModel):
         needing = {p for p in range_nulls if "[" not in p}
         if self.seismic is None:
             needing.add("seismic")
+        for flag in ("dammed_river", "secondary_surge"):
+            if getattr(self, flag) is None:
+                needing.add(flag)
         for path in sorted(needing - set(self.field_notes)):
             problems.append(f"{path}: is null but field_notes[{path!r}] is missing")
         items = {path: sub for path, sub in iter_models(self) if path.endswith("]")}

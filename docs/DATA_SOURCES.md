@@ -195,9 +195,9 @@ granule whose level cannot be established (`NisarLevel.unknown`) is always refus
 | Cadence | n/a (reported values, not a feed) |
 | Latency | n/a |
 | Credentials | none |
-| Adapter | `src/serac/ports/hydro.py` (`HydrometricSource`), `src/serac/adapters/hydro/icimod_reported.py` (planned) |
+| Adapter | `src/serac/ports/seismic.py` (`HydrometricSource`), `src/serac/adapters/hydro/icimod_fixture.py` (`IcimodReportedHydrometric`) |
 | Ledger source | `hydrometric_icimod` |
-| Fixture | Galchhi / Malekhu values from ICIMOD public reporting, each number with its own citation (planned) |
+| Fixture | `data/fixtures/hydro/icimod_trishuli_2026-08-26.json`: Galchhi (+9 m in 30 min) and Malekhu (+7 m) stage changes transcribed from the ICIMOD media advisory of 26 Aug 2026, each observation quoting its sentence; no clock time is stated in the source, so `time_utc` is null; the page is all-rights-reserved and cited only |
 | Known gaps | **no open real-time Nepal/China hydrometric feed**; anything not in the fixture is `status: not_fetched` and raises `DatasetNotFetchedError` |
 
 ## OSM Overpass

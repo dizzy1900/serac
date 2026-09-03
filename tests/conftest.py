@@ -75,3 +75,15 @@ def fixtures_dir() -> Path:
 @pytest.fixture(scope="session")
 def synthetic_dir() -> Path:
     return SYNTHETIC_DIR
+
+
+@pytest.fixture(autouse=True)
+def _stable_terminal_width(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Pin the width Click/rich wrap CLI output to.
+
+    Help text and usage errors are wrapped to the terminal width, so an assertion on an
+    option name passes on a wide developer terminal and fails on CI's 80 columns. Every test
+    sees the same width.
+    """
+    monkeypatch.setenv("COLUMNS", "200")
+    monkeypatch.setenv("TERMINAL_WIDTH", "200")
