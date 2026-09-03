@@ -72,8 +72,10 @@ Numbered so `TODO` comments can reference them (`TODO(RELEASE_STATUS#n)`).
    carry no location and CAP messages with `status: Test`. Prompt 2 replaces it.
 4. **No runout model yet.** `CascadeForecast` and `ForceHistory` are interfaces only;
    `underwriting-check` exits 2 with "not implemented: Prompt 2" by design.
-5. **SeedLink endpoint unverified.** `geofon.gfz.de:18000` is configuration; no live
-   connection has been made.
+5. **SeedLink endpoint unverified.** `geofon.gfz.de:18000` is configuration, not a verified
+   endpoint. `make smoke-online` on 2026-09-03 could not stream from it (the client raised
+   `'<' not supported between instances of 'float' and 'NoneType'`) and the test skipped, as
+   designed. No live SeedLink stream has ever reached this code.
 6. **Redis Streams untested against a live server.** `RedisStreamsBus` is unit-tested with
    fakeredis only; the `redis`-marked test has never run.
 7. **Docker Compose untested on the dev machine.** No Docker is installed there;
