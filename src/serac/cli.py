@@ -9,6 +9,7 @@ import typer
 
 from serac import (
     __version__,
+    cli_aoi,
     cli_ingest,
     cli_schema,
     cli_seismic,
@@ -27,6 +28,7 @@ app.add_typer(cli_stream.app, name="stream", help="Real-time lane: run stages, r
 app.command("replay")(cli_stream.replay)
 for _name in ("fdsn", "comcat", "hydro"):
     cli_ingest.app.command(_name)(getattr(cli_seismic, _name))
+app.add_typer(cli_aoi.app, name="aoi", help="AOI library: build, validate, describe.")
 app.add_typer(cli_validate.app, name="validate")
 app.command("promote")(cli_validate.promote_command)
 app.add_typer(cli_schema.app, name="schema", help="Export/check the JSON-Schema contracts.")

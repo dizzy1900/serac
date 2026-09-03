@@ -142,7 +142,7 @@ def test_osm_source_ref_hashes_the_fixture(lhende: BuiltAoi, repo_root: Path) ->
 
 def test_assets_are_located_and_linked(lhende: BuiltAoi) -> None:
     by_id = {a.id: a for a in lhende.assets}
-    assert by_id["rasuwagadhi-hep"].geometry_quality is GeometryQuality.osm_node
+    assert by_id["rasuwagadhi-hep"].geometry_quality is GeometryQuality.osm_way_centroid
     assert by_id["rasuwagadhi-hep"].transect_id == "rasuwagadhi-gyirong"
     assert by_id["sanjen-hep"].geometry_quality is GeometryQuality.hand_digitised_approximate
     assert by_id["sanjen-hep"].transect_id is None  # tributary, > 5 km from the centreline
