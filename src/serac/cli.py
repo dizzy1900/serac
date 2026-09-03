@@ -7,13 +7,15 @@ from __future__ import annotations
 
 import typer
 
-from serac import __version__
+from serac import __version__, cli_schema, cli_underwriting
 
 app = typer.Typer(
     name="serac",
     help="serac: open model of high-mountain rock-ice avalanche cascades.",
     no_args_is_help=True,
 )
+app.add_typer(cli_schema.app, name="schema", help="Export/check the JSON-Schema contracts.")
+app.command("underwriting-check")(cli_underwriting.underwriting_check)
 
 
 def _version_callback(value: bool) -> None:
