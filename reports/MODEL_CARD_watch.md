@@ -86,6 +86,45 @@ reported instead:
 See `reports/watch/backtest_chamoli.md` and `reports/watch/backtest_langtang.md` for the
 numbers. A result there is a description of one event, not a performance estimate.
 
+### Results as run
+
+| | chamoli-rishiganga | lhende-khola-trishuli |
+|---|---|---|
+| Sentinel-1 track (frozen rule) | 56 ASC IW1 | 121 DESC IW3 |
+| interferograms succeeded | 260 / 260 | 257 / 257 |
+| archive span | 2016-01-08 - 2021-01-29 | 2022-01-05 - 2026-08-19 |
+| epochs | 134 | 130 |
+| slope units | 6,541 | 26,935 |
+| units observable at any step | 375 (5.7%) | 3,879 (14.4%) |
+| source-zone units | 780 | 48 |
+| source-zone units observable | **0** | **0** |
+| labelled unit's tier | `insufficient_data` at all 56 steps | `insufficient_data` at all 122 steps |
+| lead time to first Watch | n/a — never entered the tier | n/a — never entered the tier |
+| other units at Watch, median / max per step | 1 / 35 | 0 / 271 |
+
+**Both events came out the same way, and it is the third of the three outcomes the
+pre-registration named in advance: an observability result.** In neither AOI was any part of
+the source zone measurable at any step, so the tier was never in a position to be asked. This
+is not "no precursor was detected" and it is not a failure of the thresholds.
+
+Why, measured rather than asserted:
+
+- **Chamoli**: the labelled unit is west-facing (aspect 271 degrees) and its signed LOS
+  sensitivity on the chosen ascending track is **-0.074** — the horizontal approach to the
+  satellite almost exactly cancels the vertical recession. 229 of the 780 source-zone units
+  fall below the sensitivity floor for that reason. The other 551 have no pixel clearing the
+  temporal-coherence floor at any epoch: median temporal coherence falls from 0.153 in the
+  4000-4500 m band to 0.133 above 5000 m, where the fraction of pixels above 0.40 is
+  **0.000**. The Ronti source zone spans 4749-5036 m.
+- **Langtang**: 19,385 units (72%) lie outside the processed burst footprint, because a
+  Sentinel-1 subswath is ~85 km wide and this AOI is a 100 km corridor; the plan records 25%
+  AOI coverage independently. Of the 48 source-zone units — all inside the footprint — 39 had
+  too few samples, 5 too little walk-forward history and 4 too little LOS sensitivity.
+
+The single most useful thing this component produced is therefore a quantified statement of
+what one Sentinel-1 track cannot see, which is a prerequisite for arguing for the second track
+and the tropospheric correction that would be needed to see it.
+
 ### What the optical layer actually showed
 
 Four season-matched post-monsoon scenes per AOI, three annual pairs each.
