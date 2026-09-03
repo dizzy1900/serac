@@ -117,6 +117,18 @@ rounded end-caps and the outer side of every bend, beyond the curve's medial axi
 `CorridorTerrain.frame_valid` publishes that set rather than averaging the failure in. Chainage
 binning — all the surrogate and the reports use the frame for — needs only `s` and is unaffected.
 
+Measured over the whole corridor (`reports/runout/terrain.json`):
+
+| Resolution | Round-trip RMS, frame-valid set | Round-trip RMS, outside it | Frame-valid share of the mask |
+|---|---|---|---|
+| 90 m | 2.6e-12 px | 3.03 px | 38.4% |
+| 60 m | 3.9e-12 px | 4.50 px | 38.5% |
+| 30 m | 7.9e-12 px | 8.88 px | 38.8% |
+
+The conditioned thalweg drains to the outlet at 30 m and 60 m. **At 90 m it does not** — the
+rasterised corridor pinches into fragments the flood cannot reach — which is one reason the
+ensemble runs at 60 m and 30 m only and 90 m appears solely in the convergence study.
+
 ## Failure modes
 
 * A member whose friction exceeds the local driving force **stops**, and on this corridor that
