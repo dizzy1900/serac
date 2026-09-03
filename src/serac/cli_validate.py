@@ -96,6 +96,12 @@ def stream(
 
 
 @app.command()
+def runout(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
+    """M4 gates: frozen hashes, no calibration language, the disclaimer, and the metrics."""
+    _run("runout", repo, reports_dir)
+
+
+@app.command()
 def contracts(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
     """contracts/*.v0.json match the models and are valid Draft 2020-12."""
     _run("contracts", repo, reports_dir)
