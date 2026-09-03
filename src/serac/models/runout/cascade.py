@@ -38,8 +38,9 @@ DAMMING_V0_LABEL = "cascade rules v0"
 
 DAMMING_INDEX_ASSUMPTION = (
     "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the "
-    "same 30 m DEM. It is a dimensionless indicator, not a calibrated probability: no inventory "
-    "of landslide dams exists for this corridor to calibrate against."
+    "same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no "
+    "inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a "
+    "stated value, not a survey -- wherever no measured cross-section is supplied."
 )
 BREACH_ASSUMPTION = (
     "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form "
@@ -61,6 +62,14 @@ shape parameter, not as a validated predictor for this corridor."""
 
 MIN_CHANNEL_DEPTH_M = 5.0
 """Below this the 30 m DEM is not resolving a channel at all and the index is not reported."""
+
+DEFAULT_CHANNEL_WIDTH_M = 60.0
+"""Stated default where no measured width is available -- two 30 m cells.
+
+There is no surveyed cross-section for this corridor, and the DEM cannot supply one at 30 m in a
+gorge narrower than two cells. Using NaN here instead propagated straight into a `Range` and was
+caught only by pydantic refusing to build one; a stated default that travels with an assumption
+string is the honest form."""
 
 
 @dataclass(frozen=True)
@@ -132,7 +141,11 @@ def find_constrictions(
         [padded[i : i + 2 * window + 1].max() for i in range(len(z))], dtype=np.float64
     )
     depth = shoulder - z
-    width = corridor_width_m if corridor_width_m is not None else np.full_like(depth, float("nan"))
+    width = (
+        corridor_width_m
+        if corridor_width_m is not None
+        else np.full_like(depth, DEFAULT_CHANNEL_WIDTH_M)
+    )
     order = np.argsort(depth)[::-1]
     chosen: list[Constriction] = []
     for i in order:

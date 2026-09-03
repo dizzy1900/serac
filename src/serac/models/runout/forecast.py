@@ -14,6 +14,7 @@ is outstanding.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -89,7 +90,17 @@ FORECAST_ASSUMPTIONS: tuple[str, ...] = (
 
 
 def _range(low: float, best: float, high: float, unit: str, *, notes: str | None = None) -> Range:
-    """A `Range` from three quantiles, ordered defensively so a crossing cannot construct one."""
+    """A `Range` from three quantiles, ordered defensively so a crossing cannot construct one.
+
+    Refuses non-finite input rather than letting a NaN reach the contract: a NaN here means an
+    upstream quantity was never measured, and the right response is to fail loudly at the point
+    the number was invented, not to publish it.
+    """
+    if not all(math.isfinite(v) for v in (low, best, high)):
+        raise ValueError(
+            f"refusing to build a {unit} Range from non-finite quantiles "
+            f"(low={low}, best={best}, high={high})"
+        )
     lo, hi = (low, high) if low <= high else (high, low)
     mid = min(max(best, lo), hi)
     return Range(
