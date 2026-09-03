@@ -271,6 +271,7 @@ class BaseIngestAdapter(IngestAdapter):
         merged_params: dict[str, Any] = {"request": request.params} if request.params else {}
         merged_params.update(params or {})
         return ManifestEntry(
+            recorded_at=now,
             source=self.source,
             product_id=product.product_id,
             product_level=product_level or product.product_level or request.product_level,

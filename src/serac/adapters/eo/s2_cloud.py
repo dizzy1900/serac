@@ -99,9 +99,9 @@ def collapse_reprocessings(candidates: Sequence[SceneCandidate]) -> list[SceneCa
     Earth Search lists reprocessed scenes twice (`..._0_L2A` baseline 02.14 and `..._1_L2A`
     baseline 05.00) with the same `datetime` to the millisecond.
     """
-    best: dict[datetime, SceneCandidate] = {}
+    best: dict[int, SceneCandidate] = {}
     for c in candidates:
-        key = c.acquired.replace(microsecond=0)
+        key = round(c.acquired.timestamp())
         current = best.get(key)
         if current is None or (c.processing_baseline or "") > (current.processing_baseline or ""):
             best[key] = c

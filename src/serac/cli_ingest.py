@@ -105,16 +105,20 @@ def _human(n: int | None) -> str:
 
 def print_plan(plan: DryRunPlan) -> None:
     table = Table(title=f"{plan.adapter} v{plan.adapter_version} dry run: {plan.source.value}")
-    table.add_column("product")
+    table.add_column("product", overflow="fold")
     table.add_column("level")
     table.add_column("time")
     table.add_column("est. bytes", justify="right")
-    table.add_column("url / assets")
+    table.add_column("url / assets", overflow="fold")
     for p in plan.products:
         when = p.time_start.date().isoformat() if p.time_start else "-"
         where = p.url or ", ".join(sorted(p.assets)) or "-"
         table.add_row(p.product_id, p.product_level or "-", when, _human(p.estimated_bytes), where)
     console.print(table)
+    for p in plan.products:
+        tiles = p.properties.get("tiles")
+        detail = ", ".join(tiles) if tiles else (p.url or ", ".join(sorted(p.assets)) or "-")
+        console.print(f"  {p.product_id}: {detail}", soft_wrap=True, highlight=False)
     console.print(f"AOI [bold]{plan.request.aoi_id}[/bold] bbox {plan.request.bbox_4326}")
     console.print(f"Total estimate: [bold]{_human(plan.estimated_bytes)}[/bold]")
     console.print(f"Estimate basis: {plan.estimate_basis}")
