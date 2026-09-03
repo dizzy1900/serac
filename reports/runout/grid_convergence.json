@@ -1,0 +1,134 @@
+{
+  "generated_utc": "2026-09-03T22:32:09.704840+00:00",
+  "note": "Differences between resolutions, not a fitted convergence rate: three points on a terrain-driven problem do not support one.",
+  "pairs": [
+    {
+      "arrival_delta_s": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "arrivals_coarse_s": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "arrivals_fine_s": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "coarse_m": 90.0,
+      "depth_profile_l1": 466.688,
+      "depth_profile_relative_l1": 0.0777,
+      "fine_m": 60.0,
+      "inundation_iou_1m": 0.9355,
+      "max_depth_delta_m": 11.74,
+      "reach_delta_m": -787.7,
+      "reach_relative_delta": -0.0514
+    },
+    {
+      "arrival_delta_s": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "arrivals_coarse_s": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "arrivals_fine_s": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "coarse_m": 60.0,
+      "depth_profile_l1": 405.91,
+      "depth_profile_relative_l1": 0.0645,
+      "fine_m": 30.0,
+      "inundation_iou_1m": 1.0,
+      "max_depth_delta_m": 3.518,
+      "reach_delta_m": 13.2,
+      "reach_relative_delta": 0.0009
+    }
+  ],
+  "parameters": {
+    "critical_shear_pa": 500.0,
+    "entrainment_coefficient": 0.01,
+    "ice_fraction": 0.5,
+    "mu": 0.05,
+    "release_elevation_band_m": [
+      3800.0,
+      4600.0
+    ],
+    "release_volume_m3": 100000000.0,
+    "xi_m_s2": 1000.0
+  },
+  "per_resolution": [
+    {
+      "active_cells": 37072,
+      "mass_relative_error": -4.289467099136521e-16,
+      "max_depth_m": 180.343,
+      "ms_per_step": 2.8583,
+      "reach_m": 15309.6,
+      "resolution_m": 90.0,
+      "simulated_time_s": 1179.41,
+      "solver_wall_s": 5.428,
+      "steps": 1899,
+      "terrain_build_s": 1.252
+    },
+    {
+      "active_cells": 82429,
+      "mass_relative_error": 1.4346513006490124e-16,
+      "max_depth_m": 192.082,
+      "ms_per_step": 4.9657,
+      "reach_m": 14521.9,
+      "resolution_m": 60.0,
+      "simulated_time_s": 1129.0,
+      "solver_wall_s": 16.273,
+      "steps": 3277,
+      "terrain_build_s": 2.452
+    },
+    {
+      "active_cells": 325553,
+      "mass_relative_error": 0.0,
+      "max_depth_m": 195.6,
+      "ms_per_step": 19.8985,
+      "reach_m": 14535.2,
+      "resolution_m": 30.0,
+      "simulated_time_s": 1126.29,
+      "solver_wall_s": 153.199,
+      "steps": 7699,
+      "terrain_build_s": 10.079
+    }
+  ],
+  "transects": [
+    {
+      "declared_chainage_km": 16.875,
+      "frame_chainage_m": 16875.1,
+      "transect_id": "rasuwagadhi-gyirong"
+    },
+    {
+      "declared_chainage_km": 31.121,
+      "frame_chainage_m": 31120.7,
+      "transect_id": "syabrubesi"
+    },
+    {
+      "declared_chainage_km": 62.371,
+      "frame_chainage_m": 62370.5,
+      "transect_id": "betrawati"
+    },
+    {
+      "declared_chainage_km": 96.975,
+      "frame_chainage_m": 96974.6,
+      "transect_id": "galchhi"
+    }
+  ]
+}

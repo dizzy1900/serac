@@ -19,20 +19,20 @@ of a landslide dam. In particular:
   a solved flood routing, and it ignores attenuation, so it **over-states** the surge downstream.
 
 Deposit depths are the ensemble median and 95th percentile per chainage bin over
-48 valid members. The index is evaluated at the median deposit; the breach and
+230 valid members. The index is evaluated at the median deposit; the breach and
 surge at the 95th percentile, so those are an upper case rather than a central one.
 
 ## Candidate damming sites
 
 | Chainage (km) | Channel (m) | Deposit p50 | Deposit p95 | Index | p(dam) | Breach peak (m3/s) |
 |---|---|---|---|---|---|---|
-| 1.6 | 822.6 | 2.1 | 5.3 | 0.00 | 0.08 | 77 |
-| 3.9 | 284.7 | 44.1 | 44.1 | 0.15 | 0.11 | 11448 |
-| 7.9 | 469.8 | 69.2 | 176.7 | 0.15 | 0.11 | 307365 |
-| 10.1 | 68.8 | 61.4 | 151.7 | 0.89 | 0.43 | 32838 |
-| 12.4 | 83.4 | 23.1 | 115.3 | 0.28 | 0.14 | 51911 |
-| 15.4 | 161.8 | 0.0 | 31.6 | 0.20 | 0.12 | 5200 |
-| 19.4 | 70.8 | 0.0 | 62.1 | 0.88 | 0.42 | 25779 |
+| 1.6 | 822.6 | 2.3 | 6.0 | 0.00 | 0.08 | 103 |
+| 3.9 | 284.7 | 44.1 | 61.2 | 0.15 | 0.11 | 24881 |
+| 7.9 | 469.8 | 43.5 | 187.1 | 0.09 | 0.09 | 352244 |
+| 10.1 | 68.8 | 51.3 | 133.1 | 0.75 | 0.35 | 32838 |
+| 12.4 | 83.4 | 20.7 | 98.6 | 0.25 | 0.13 | 51911 |
+| 15.4 | 161.8 | 0.0 | 37.1 | 0.23 | 0.13 | 7588 |
+| 19.4 | 70.8 | 0.0 | 71.3 | 1.01 | 0.50 | 35171 |
 
 ## Secondary-surge arrivals from the three most upstream sites
 
@@ -40,16 +40,16 @@ Minutes after the breach begins, not after the detachment.
 
 | Dam at (km) | Transect | Travel (min) | Celerity (m/s) | Peak (m3/s) |
 |---|---|---|---|---|
-| 1.6 | `rasuwagadhi-gyirong` | 23.4 | 10.8 | 77 |
-| 1.6 | `syabrubesi` | 45.3 | 10.8 | 77 |
-| 1.6 | `betrawati` | 93.3 | 10.8 | 77 |
-| 1.6 | `galchhi` | 146.5 | 10.8 | 77 |
-| 3.9 | `rasuwagadhi-gyirong` | 6.9 | 31.2 | 11448 |
-| 3.9 | `syabrubesi` | 14.6 | 31.2 | 11448 |
-| 3.9 | `betrawati` | 31.3 | 31.2 | 11448 |
-| 3.9 | `galchhi` | 49.8 | 31.2 | 11448 |
-| 7.9 | `rasuwagadhi-gyirong` | 2.4 | 62.4 | 307365 |
-| 7.9 | `syabrubesi` | 6.2 | 62.4 | 307365 |
-| 7.9 | `betrawati` | 14.5 | 62.4 | 307365 |
-| 7.9 | `galchhi` | 23.8 | 62.4 | 307365 |
+| 1.6 | `rasuwagadhi-gyirong` | 22.0 | 11.5 | 103 |
+| 1.6 | `syabrubesi` | 42.6 | 11.5 | 103 |
+| 1.6 | `betrawati` | 87.8 | 11.5 | 103 |
+| 1.6 | `galchhi` | 137.8 | 11.5 | 103 |
+| 3.9 | `rasuwagadhi-gyirong` | 5.9 | 36.7 | 24881 |
+| 3.9 | `syabrubesi` | 12.4 | 36.7 | 24881 |
+| 3.9 | `betrawati` | 26.5 | 36.7 | 24881 |
+| 3.9 | `galchhi` | 42.2 | 36.7 | 24881 |
+| 7.9 | `rasuwagadhi-gyirong` | 2.3 | 64.3 | 352244 |
+| 7.9 | `syabrubesi` | 6.0 | 64.3 | 352244 |
+| 7.9 | `betrawati` | 14.1 | 64.3 | 352244 |
+| 7.9 | `galchhi` | 23.1 | 64.3 | 352244 |
 

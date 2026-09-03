@@ -28,14 +28,39 @@ Positive means the model arrives **later** than the public figure.
 
 | Transect | Public | Reaching | Mismatch range (min) | Median | Closest abs |
 |---|---|---|---|---|---|
-| `rasuwagadhi-gyirong` | 7.5 | 0 / 14 | not reached by any member | — | — |
-| `syabrubesi` | 13.5 | 0 / 14 | not reached by any member | — | — |
-| `betrawati` | 45.0 | 0 / 14 | not reached by any member | — | — |
-| `galchhi` | 30.0 | 0 / 14 | not reached by any member | — | — |
+| `rasuwagadhi-gyirong` | 7.5 | 45 / 230 | +7.36 to +42.03 | +14.43 | 7.36 |
+| `syabrubesi` | 13.5 | 0 / 230 | not reached by any member | — | — |
+| `betrawati` | 45.0 | 0 / 230 | not reached by any member | — | — |
+| `galchhi` | 30.0 | 0 / 230 | not reached by any member | — | — |
 
 ## Closest member
 
-**No member reached any transect**, so there is no closest member to report. The comparison result is that the ensemble does not produce a flow that arrives at any of the four transects.
+Run `m0067-r060`, which reached 1 of the four transects
+with a mean absolute mismatch of 7.36 minutes.
+
+| Transect | Modelled arrival (min) | Mismatch (min) |
+|---|---|---|
+| `rasuwagadhi-gyirong` | 14.86 | +7.36 |
+| `syabrubesi` | not reached | — |
+| `betrawati` | not reached | — |
+| `galchhi` | not reached | — |
+
+Its parameters, for the record and for no other purpose:
+
+```json
+{
+  "critical_shear_pa": 500.0,
+  "entrainment_coefficient": 0.0009670823467262679,
+  "ice_fraction": 0.39434782608695657,
+  "mu": 0.04808186389857888,
+  "release_elevation_band_m": [
+    3645.6521739130435,
+    4433.478260869565
+  ],
+  "release_volume_m3": 272019630.62978584,
+  "xi_m_s2": 349.8794280098329
+}
+```
 
 ## What the mismatch is telling you
 

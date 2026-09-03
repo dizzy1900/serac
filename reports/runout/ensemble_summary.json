@@ -1,47 +1,48 @@
 {
   "bytes_cap": 3221225472,
-  "bytes_on_disk": 5549554,
+  "bytes_on_disk": 38628824,
   "bytes_within_cap": true,
   "design_hash": "ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac4943777f28484dae183",
   "flag_reasons": {
-    "N negative-depth repairs": 14,
-    "stopped at max_time_s": 2,
-    "velocity clipped on N steps": 7
+    "N negative-depth repairs": 230,
+    "stopped at max_time_s": 64,
+    "velocity clipped on N steps": 169
   },
   "frozen_solver_version": "0.2.0",
   "mu": {
-    "p25": 0.05,
-    "p5": 0.03,
+    "p25": 0.04,
+    "p5": 0.02,
     "p50": 0.08,
-    "p75": 0.14,
-    "p95": 0.2
+    "p75": 0.15,
+    "p95": 0.26
   },
-  "n_flagged_but_retained": 14,
+  "n_flagged_but_retained": 230,
   "n_invalid": 0,
-  "n_members_recorded": 14,
-  "n_valid": 14,
+  "n_members_recorded": 230,
+  "n_valid": 230,
   "reach_km": {
-    "max": 14.784,
-    "min": 11.392,
-    "p25": 12.454,
-    "p5": 11.76,
-    "p50": 13.794,
-    "p75": 14.474,
-    "p95": 14.65
+    "max": 28.717,
+    "min": 4.909,
+    "p25": 11.866,
+    "p5": 11.091,
+    "p50": 13.877,
+    "p75": 15.279,
+    "p95": 24.458
   },
   "resolution_counts": {
-    "60.0": 14
+    "30.0": 8,
+    "60.0": 222
   },
   "solver": {
     "name": "serac-swe-voellmy",
     "version": "0.2.0"
   },
   "wall_time_s": {
-    "p25": 129.5,
-    "p5": 93.95,
-    "p50": 183.05,
-    "p75": 222.47,
-    "p95": 277.6
+    "p25": 64.15,
+    "p5": 37.34,
+    "p50": 100.02,
+    "p75": 175.78,
+    "p95": 443.73
   },
-  "wall_time_total_core_s": 2534.2
+  "wall_time_total_core_s": 33396.5
 }

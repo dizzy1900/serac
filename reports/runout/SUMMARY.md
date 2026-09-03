@@ -42,12 +42,7 @@ reported here rather than removed.
 
 | Resolution | mu | Wall (s) | Steps | ms/step | Reach (km) | Active cells |
 |---|---|---|---|---|---|---|
-| 90 m | 0.03 | 33.3 | 6511 | 5.12 | 35.17 | 37072 |
-| 90 m | 0.10 | 9.2 | 2235 | 4.12 | 14.40 | 37072 |
-| 60 m | 0.03 | 120.4 | 10931 | 11.01 | 30.66 | 82429 |
-| 60 m | 0.10 | 29.8 | 4984 | 5.99 | 15.40 | 82429 |
-| 30 m | 0.03 | 1077.6 | 26000 | 41.45 | 29.97 | 325553 |
-| 30 m | 0.10 | 326.8 | 17949 | 18.21 | 16.79 | 325553 |
+
 
 Cost follows `wall_s ~ k / mu` with
 k = 32.5 s. The ensemble size was chosen against these
@@ -58,24 +53,26 @@ into `ENSEMBLE_FROZEN.md` and is not repeated here.
 
 | Pair | delta  reach (m) | delta  reach (rel) | Depth profile rel. L1 | Inundation IoU at 1 m |
 |---|---|---|---|---|
-| (not run) | — | — | — | — |
+| 90 → 60 m | -788 | -0.051 | 0.078 | 0.935 |
+| 60 → 30 m | 13 | 0.001 | 0.065 | 1.000 |
+
 
 ## 4. The ensemble
 
 | | |
 |---|---|
 | Design hash | `ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac4943777f28484dae183` |
-| Members recorded | 14 |
-| **Valid** | **14** |
-| Flagged but retained | 14 |
-| Bytes on disk | 5.5 MB (cap 3 GB) |
-| Total core-seconds | 2534.2 |
+| Members recorded | 230 |
+| **Valid** | **230** |
+| Flagged but retained | 230 |
+| Bytes on disk | 38.6 MB (cap 3 GB) |
+| Total core-seconds | 33396.5 |
 
 Runout distance reached, over valid members:
 
 | p5 | p25 | median | p75 | p95 | max |
 |---|---|---|---|---|---|
-| 11.76 | 12.45 | 13.79 | 14.47 | 14.65 | 14.78 |
+| 11.09 | 11.87 | 13.88 | 15.28 | 24.46 | 28.72 |
 
 (kilometres along the corridor; the corridor is 100 km long and the furthest transect is at
 97.0 km.)
@@ -84,28 +81,28 @@ Flags on retained members — a flag is information, not a failure:
 
 | Reason | Members |
 |---|---|
-| N negative-depth repairs | 14 |
-| stopped at max_time_s | 2 |
-| velocity clipped on N steps | 7 |
+| N negative-depth repairs | 230 |
+| stopped at max_time_s | 64 |
+| velocity clipped on N steps | 169 |
 
 ## 5. The surrogate
 
 | Gate | Measured | Target | Pass |
 |---|---|---|---|
-| Median inundation IoU at 1 m | 0.509 | >= 0.70 | False |
-| Worst per-transect arrival MAE | — s | <= 90 s | False |
-| p95 inference latency | 0.1247 s | <= 2 s | True |
-| 5-95% depth coverage | 0.121 | 0.85-0.95 | False |
-| 5-95% arrival coverage | 0.639 | 0.85-0.95 | False |
+| Median inundation IoU at 1 m | 0.966 | >= 0.70 | True |
+| Worst per-transect arrival MAE | 46.5 s | <= 90 s | True |
+| p95 inference latency | 0.0017 s | <= 2 s | True |
+| 5-95% depth coverage | 0.914 | 0.85-0.95 | True |
+| 5-95% arrival coverage | 0.794 | 0.85-0.95 | False |
 
 Splits are by `run_id` and disjoint: True
-({'test': 3, 'train': 10, 'val': 2}).
+({'test': 35, 'train': 161, 'val': 34}).
 
 | Transect | Test members reaching | Arrival MAE (s) | Peak-stage rel. error |
 |---|---|---|---|
 | `betrawati` | 0 | — | — |
 | `galchhi` | 0 | — | — |
-| `rasuwagadhi-gyirong` | 0 | — | — |
+| `rasuwagadhi-gyirong` | 3 | 46.5 | 0.081 |
 | `syabrubesi` | 0 | — | — |
 
 
