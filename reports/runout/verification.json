@@ -1,0 +1,48 @@
+{
+  "generated_utc": "2026-09-03T23:18:31.170067+00:00",
+  "generator": "scripts/runout_verification_report.py",
+  "lake_at_rest": {
+    "max_speed_m_s": 0.0,
+    "max_surface_deviation_m": 0.0,
+    "steps": 137
+  },
+  "mass_conservation_closed_domain": {
+    "absolute_relative_error": 1.7656795303782794e-16,
+    "expected_m3": 20603.84540059946,
+    "final_m3": 20603.845400599457,
+    "signed_relative_error": -1.7656795303782794e-16
+  },
+  "note": "Every case here is also asserted in tests/unit/models/test_runout_solver.py; this file records the numbers, the tests gate them.",
+  "production_cfl": 0.45,
+  "ritter_dam_break": [
+    {
+      "cells": 100,
+      "dx_m": 10.0,
+      "l1_m2": 114.9972,
+      "l1_relative": 0.10436
+    },
+    {
+      "cells": 200,
+      "dx_m": 5.0,
+      "l1_m2": 77.2839,
+      "l1_relative": 0.07324
+    },
+    {
+      "cells": 400,
+      "dx_m": 2.5,
+      "l1_m2": 50.8491,
+      "l1_relative": 0.04715
+    }
+  ],
+  "solver": "serac-swe-voellmy",
+  "solver_version": "0.2.0",
+  "voellmy_terminal_velocity_at_production_cfl": 0.08657,
+  "voellmy_terminal_velocity_note": "Gravity and friction are applied as separate operators within a step, so the balance is recovered only to first order in dt. At the production CFL of 0.45 the settled speed sits 8.7% below the analytic value, which biases every modelled arrival time late. An earlier version of this file quoted the CFL 0.4 figure as though it were the production one, understating the bias. Reported, not removed.",
+  "voellmy_terminal_velocity_relative_error_by_cfl": {
+    "0.05": 0.00807,
+    "0.1": 0.01666,
+    "0.2": 0.03506,
+    "0.4": 0.07591,
+    "0.45": 0.08657
+  }
+}

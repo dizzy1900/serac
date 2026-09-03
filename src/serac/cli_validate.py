@@ -99,6 +99,12 @@ def stream(
 
 
 @app.command()
+def runout(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
+    """M4 gates: frozen hashes, no calibration language, the disclaimer, and the metrics."""
+    _run("runout", repo, reports_dir)
+
+
+@app.command()
 def lfh(
     repo: Path = REPO_OPTION,
     reports_dir: Path = REPORTS_OPTION,

@@ -1,0 +1,64 @@
+# serac — surrogate training at scale (M4). Portable container-host manifest, AWS-annotated.
+apiVersion: serac.dev/v0
+kind: TrainingJob
+metadata:
+  name: fno-train-gpu
+  component: M4
+  model: serac-swe-voellmy-surrogate
+  model_version: "0.1.0"
+  disclaimer: >-
+    NOT r.avaflow. The training data is the in-repo Voellmy-Salm ensemble; a surrogate cannot be
+    better than the simulator it learns from, and that simulator is unvalidated against
+    r.avaflow.
+
+spec:
+  command:
+    ["serac", "runout", "train", "--repo", "/work", "--epochs", "2000", "--device", "cuda"]
+
+  data:
+    members: 10000
+    input_gib: 79
+    basis: "runout-ensemble-10k output; the trainer reads only corridor.parquet (~20 KB/member)."
+    working_set_mib: 200
+    working_set_basis: >-
+      MEASURED: the trainer stacks 400-bin float32 profiles. 10000 x 400 x 4 B x ~6 arrays.
+      The whole training set fits in GPU memory, so there is no data-loading bottleneck.
+
+  container:
+    image: ghcr.io/dizzy1900/serac:0.1.0-cuda
+    gpu: 1
+    gpu_type: "NVIDIA L4 or A10G"
+    vcpu: 8
+    memory_gib: 32
+    basis: >-
+      The corridor FNO is ~70k parameters over a 400-point 1-D grid; it is small. A single
+      mid-range GPU is chosen for wall clock on 2000 epochs, not because the model needs one.
+
+  compute:
+    gpu_hours: 3
+    basis: >-
+      EXTRAPOLATED, not measured on GPU. MEASURED locally: CPU training of the same
+      architecture on the 200-member ensemble; see reports/runout/surrogate_metrics.json for
+      the realised gates. Scaling to 10000 members and 2000 epochs is ~50x the local work;
+      3 GPU-hours assumes a 20x speed-up over this machine's CPU. Verify on a single short run
+      before booking a long one.
+    cpu_fallback_hours: 60
+    cpu_fallback_basis: "Same extrapolation without the GPU speed-up; MPS is untested at scale."
+
+  aws:
+    service: Batch
+    compute_environment: EC2 Spot
+    instance_types: ["g6.2xlarge", "g5.2xlarge"]
+    checkpointing: "Every 100 epochs to S3, so a Spot reclaim costs at most 100 epochs."
+
+  gates:
+    - "median IoU at 1 m depth >= 0.70 on the held-out split"
+    - "arrival-time MAE <= 90 s per transect"
+    - "p95 inference latency <= 2 s"
+    - "5-95% interval coverage in [0.85, 0.95]"
+    - "train/val/test disjoint by run_id"
+
+  notes: >-
+    Do not launch without confirmation. A denser ensemble tightens the surrogate's fit to the
+    solver; it does nothing about the solver's own structural error, which
+    reports/runout/langtang_sanity.md shows to be the dominant term.

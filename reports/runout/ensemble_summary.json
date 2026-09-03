@@ -1,0 +1,48 @@
+{
+  "bytes_cap": 3221225472,
+  "bytes_on_disk": 38628824,
+  "bytes_within_cap": true,
+  "design_hash": "ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac4943777f28484dae183",
+  "flag_reasons": {
+    "N negative-depth repairs": 230,
+    "stopped at max_time_s": 64,
+    "velocity clipped on N steps": 169
+  },
+  "frozen_solver_version": "0.2.0",
+  "mu": {
+    "p25": 0.04,
+    "p5": 0.02,
+    "p50": 0.08,
+    "p75": 0.15,
+    "p95": 0.26
+  },
+  "n_flagged_but_retained": 230,
+  "n_invalid": 0,
+  "n_members_recorded": 230,
+  "n_valid": 230,
+  "reach_km": {
+    "max": 28.717,
+    "min": 4.909,
+    "p25": 11.866,
+    "p5": 11.091,
+    "p50": 13.877,
+    "p75": 15.279,
+    "p95": 24.458
+  },
+  "resolution_counts": {
+    "30.0": 8,
+    "60.0": 222
+  },
+  "solver": {
+    "name": "serac-swe-voellmy",
+    "version": "0.2.0"
+  },
+  "wall_time_s": {
+    "p25": 64.15,
+    "p5": 37.34,
+    "p50": 100.02,
+    "p75": 175.78,
+    "p95": 443.73
+  },
+  "wall_time_total_core_s": 33396.5
+}
