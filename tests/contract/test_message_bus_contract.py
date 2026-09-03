@@ -215,7 +215,7 @@ class TestRedisSpecifics:
         bus = RedisStreamsBus(client, maxlen=5)
         for c in chunks(50):
             bus.publish(envelope(c))
-        assert client.xlen(topics.WAVEFORMS) <= 50
+        assert client.xlen(topics.WAVEFORMS) < 50
 
     def test_entry_without_envelope_field_is_an_error(self) -> None:
         client = fakeredis.FakeRedis(server=fakeredis.FakeServer())

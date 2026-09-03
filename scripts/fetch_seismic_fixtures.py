@@ -125,6 +125,8 @@ NETWORK_DOI: dict[str, tuple[str, str]] = {
 COMCAT_QUERY = "https://earthquake.usgs.gov/fdsnws/event/1/query"
 COMCAT_EVENT_IDS: tuple[str, ...] = ("us7000tbwb", "us7000tc90", "us20002926")
 COMCAT_LANDSLIDE_START = date(2000, 1, 1)
+# Pinned so the fixture filename and query are reproducible; bump deliberately to refresh.
+COMCAT_LANDSLIDE_END = date(2026, 9, 3)
 USGS_LICENCE = LicenceNote(
     licence="US-PD",
     source_url=(
@@ -175,6 +177,7 @@ def rel(path: Path) -> str:
 
 REFUSALS: list[str] = []
 
+_GENERATED = re.compile(rb'"generated":\s*\d+')
 _CREATED = re.compile(rb"<Created>[^<]*</Created>")
 
 
@@ -182,6 +185,9 @@ def _mask_volatile(name: str, data: bytes) -> bytes:
     """Strip fields that change on every download but carry no data (StationXML `Created`)."""
     if name.endswith(".xml"):
         return _CREATED.sub(b"<Created/>", data)
+    if name.endswith(".geojson"):
+        # ComCat stamps every response with metadata.generated (epoch ms); it carries no data.
+        return _GENERATED.sub(b'"generated":0', data)
     return data
 
 
@@ -539,20 +545,20 @@ def _obspy_version() -> str:
 def fetch_comcat(recorder: Recorder, *, force: bool) -> None:
     print("== USGS ComCat")
     COMCAT_DIR.mkdir(parents=True, exist_ok=True)
-    today = now_utc().date()
+    end = COMCAT_LANDSLIDE_END
     jobs: list[tuple[Path, dict[str, str], str]] = [
         (
             COMCAT_DIR
-            / f"landslide_{COMCAT_LANDSLIDE_START.isoformat()}_{today.isoformat()}.geojson",
+            / f"landslide_{COMCAT_LANDSLIDE_START.isoformat()}_{end.isoformat()}.geojson",
             {
                 "format": "geojson",
                 "eventtype": "landslide",
                 "starttime": COMCAT_LANDSLIDE_START.isoformat(),
-                "endtime": today.isoformat(),
+                "endtime": end.isoformat(),
                 "orderby": "time-asc",
                 "limit": "20000",
             },
-            f"landslide_{COMCAT_LANDSLIDE_START.isoformat()}_{today.isoformat()}",
+            f"landslide_{COMCAT_LANDSLIDE_START.isoformat()}_{end.isoformat()}",
         ),
     ]
     jobs.extend(
