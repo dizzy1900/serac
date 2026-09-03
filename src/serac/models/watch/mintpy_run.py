@@ -76,12 +76,11 @@ class MintPyConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     aoi_id: str
-    processor: str = "hyp3"
+    processor: str = "roipac"
     unw_glob: str
     cor_glob: str
     dem_glob: str
     inc_angle_glob: str
-    az_angle_glob: str
     reference_yx: tuple[int, int] | None = None
     tropo_method: str = TROPO_METHOD
     deramp: str = "linear"
@@ -99,8 +98,14 @@ class MintPyConfig(BaseModel):
             "mintpy.load.unwFile": self.unw_glob,
             "mintpy.load.corFile": self.cor_glob,
             "mintpy.load.demFile": self.dem_glob,
+            # Explicitly `auto` rather than absent. MintPy merges a custom template over the
+            # `smallbaselineApp.cfg` left in the work directory by any previous run, so a key
+            # that is simply omitted keeps whatever the last run set it to.
             "mintpy.load.incAngleFile": self.inc_angle_glob,
-            "mintpy.load.azAngleFile": self.az_angle_glob,
+            "mintpy.load.azAngleFile": "auto",
+            "mintpy.load.waterMaskFile": "auto",
+            "mintpy.load.metaFile": "auto",
+            "mintpy.load.baselineDir": "auto",
             "mintpy.compute.cluster": self.cluster,
             "mintpy.compute.numWorker": str(self.num_worker),
             "mintpy.network.coherenceBased": "yes" if self.network_coherence_based else "no",
@@ -205,24 +210,31 @@ def mintpy_dir(data_dir: Path, aoi_id: str, pass_name: str = "pass2") -> Path:
 def build_config(
     data_dir: Path, aoi_id: str, *, reference_yx: tuple[int, int] | None
 ) -> MintPyConfig:
-    """Point MintPy at the cropped products, using absolute globs so the cwd cannot matter."""
-    root = (data_dir / "raw" / "hyp3_burst_insar" / aoi_id).resolve()
-    pattern = f"{root}/S1_*"
+    """Point MintPy at the ROI_PAC binaries, using absolute globs so the cwd cannot matter."""
+    from serac.models.watch.mintpy_prep import GEOMETRY_SUBDIRS, mintpy_inputs_dir
+
+    root = mintpy_inputs_dir(data_dir, aoi_id).resolve()
     return MintPyConfig(
         aoi_id=aoi_id,
-        unw_glob=f"{pattern}/*_unw_phase.tif",
-        cor_glob=f"{pattern}/*_corr.tif",
-        dem_glob=f"{pattern}/*_dem.tif",
-        inc_angle_glob=f"{pattern}/*_lv_theta.tif",
-        az_angle_glob=f"{pattern}/*_lv_phi.tif",
+        unw_glob=f"{root}/*.unw",
+        cor_glob=f"{root}/*.cor",
+        dem_glob=f"{root}/{GEOMETRY_SUBDIRS['height']}/*.hgt",
+        inc_angle_glob=f"{root}/{GEOMETRY_SUBDIRS['incidence']}/*.hgt",
         reference_yx=reference_yx,
     )
 
 
 def _run_app(config: MintPyConfig, work_dir: Path, *, timeout_s: float) -> dict[str, Any]:
     """Run `smallbaselineApp.py` in `work_dir`, timing it and capturing its log."""
+    work_dir = work_dir.resolve()
+    # Start from a clean directory: MintPy merges the custom template over any
+    # `smallbaselineApp.cfg` already present, so stale keys from an earlier run survive.
+    if work_dir.exists():
+        shutil.rmtree(work_dir)
     work_dir.mkdir(parents=True, exist_ok=True)
-    cfg_path = work_dir / "serac_smallbaselineApp.cfg"
+    # Absolute, because the subprocess runs with cwd=work_dir and would otherwise resolve a
+    # repo-relative config path against the wrong directory.
+    cfg_path = (work_dir / "serac_smallbaselineApp.cfg").resolve()
     cfg_path.write_text(config.render(), encoding="utf-8")
     started = time.monotonic()
     completed = subprocess.run(
@@ -276,10 +288,12 @@ def run_smallbaseline(
 ) -> dict[str, Any]:
     """Two-pass `smallbaselineApp` with the pre-registered reference point. Writes the report."""
     from serac.models.watch.geometry import layover_shadow_masks, slope_aspect
+    from serac.models.watch.mintpy_prep import prepare_stack
     from serac.models.watch.plan import load_network_plan
 
     plan = load_network_plan(data_dir, aoi_id)
     started_at = datetime.now(tz=UTC)
+    prepared = prepare_stack(data_dir, aoi_id)
     pass1_dir = mintpy_dir(data_dir, aoi_id, "pass1")
     pass2_dir = mintpy_dir(data_dir, aoi_id, "pass2")
     bootstrap = build_config(data_dir, aoi_id, reference_yx=None)
@@ -292,6 +306,7 @@ def run_smallbaseline(
             "dry_run": True,
             "config_sha256": bootstrap.digest(),
             "config_path": (pass1_dir / "serac_smallbaselineApp.cfg").as_posix(),
+            "prepared_stack": prepared,
             "tropospheric_correction": TROPO_CAVEAT,
         }
 
@@ -308,6 +323,7 @@ def run_smallbaseline(
                 "status": "failed",
                 "failed_pass": 1,
                 "started_at": started_at.isoformat(),
+                "prepared_stack": prepared,
                 "pass1": pass1,
                 "tropospheric_correction": TROPO_CAVEAT,
             },
@@ -341,6 +357,7 @@ def run_smallbaseline(
         "failed_pass": None if pass2["returncode"] == 0 else 2,
         "started_at": started_at.isoformat(),
         "finished_at": datetime.now(tz=UTC).isoformat(),
+        "prepared_stack": prepared,
         "path_number": plan.path_number,
         "n_pairs_planned": len(plan.pairs),
         "grid": plan.crop_grid,

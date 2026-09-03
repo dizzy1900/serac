@@ -249,10 +249,29 @@ def run_backtest(
         ),
     }
     payload: dict[str, Any] = {"summary": summary, "steps": [r.as_dict() for r in rows]}
-    out = reports_dir / "watch" / f"backtest_{_slug(event_id)}.json"
+    slug = _slug(event_id)
+    out = reports_dir / "watch" / f"backtest_{slug}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
+
+    from serac.models.watch.writeup import (
+        backtest_markdown,
+        gather_context,
+        langtang_markdown,
+        write_markdown,
+    )
+
+    context = gather_context(data_dir, reports_dir, aoi_id)
+    if slug == "langtang":
+        observability = observability_breakdown(scored)
+        summary["observability"] = observability
+        out.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
+        text = langtang_markdown(payload, observability, context)
+    else:
+        text = backtest_markdown(payload, context)
+    markdown = write_markdown(text, reports_dir / "watch" / f"backtest_{slug}.md")
     payload["report_path"] = out.as_posix()
+    payload["markdown_path"] = markdown.as_posix()
     return payload
 
 

@@ -38,6 +38,17 @@ SCL_CLOUD_CLASSES: Final[frozenset[int]] = frozenset({3, 8, 9, 10})
 SCL_WATER_CLASS: Final[int] = 6
 MAX_AOI_CLOUD_FRACTION: Final[float] = 0.35
 
+SEASON_WINDOW: Final[tuple[tuple[int, int], tuple[int, int]]] = ((9, 15), (12, 15))
+"""Post-monsoon (15 September - 15 December), and one scene per year inside it.
+
+Season-matching the pairs is the whole point. High Mountain Asia is under cloud through the
+monsoon and under snow through the winter, and a summer/winter pair correlates on the snow
+line rather than on the terrain. Taking the least-cloudy scene from the same post-monsoon
+window each year makes every pair roughly annual and roughly snow-matched, which is the only
+configuration in which a slow slope displacement is separable from a seasonal surface change.
+The cost is a one-year sampling interval: this layer cannot see anything faster.
+"""
+
 FloatArray = NDArray[np.float64]
 
 
@@ -302,6 +313,18 @@ def _cloud_fraction(
     return float(cloudy.mean())
 
 
+def in_season(
+    when: datetime, season: tuple[tuple[int, int], tuple[int, int]] = SEASON_WINDOW
+) -> bool:
+    """Is `when` inside the post-monsoon window? Handles a window that wraps the new year."""
+    (m0, d0), (m1, d1) = season
+    start, end = (m0, d0), (m1, d1)
+    here = (when.month, when.day)
+    if start <= end:
+        return start <= here <= end
+    return here >= start or here <= end
+
+
 def _fetch_scenes(
     *,
     data_dir: Path,
@@ -309,6 +332,7 @@ def _fetch_scenes(
     aoi_id: str,
     window_start: datetime,
     window_end: datetime,
+    per_year: int = 1,
 ) -> None:
     """Fetch Sentinel-2 windows through the existing adapter, ledgering every byte."""
     from serac.adapters.eo.earthsearch_sentinel2 import (
@@ -334,9 +358,25 @@ def _fetch_scenes(
         time_end=window_end,
         params={"max_cloud": MAX_CLOUD_PERCENT},
     )
-    plan = adapter.plan(request)
-    if not plan.products:
+    found = adapter.search(request)
+    in_window = [p for p in found if p.time_start is not None and in_season(p.time_start)]
+    by_year: dict[int, list[Any]] = {}
+    for product in in_window:
+        assert product.time_start is not None
+        by_year.setdefault(product.time_start.year, []).append(product)
+    chosen: list[Any] = []
+    for year in sorted(by_year):
+        ranked = sorted(
+            by_year[year],
+            key=lambda p: (
+                float(p.properties.get("eo:cloud_cover", 100.0) or 100.0),
+                p.product_id,
+            ),
+        )
+        chosen.extend(ranked[:per_year])
+    if not chosen:
         return
+    plan = adapter.plan(request).model_copy(update={"products": chosen})
     adapter.fetch(
         plan,
         dest_root=data_dir,

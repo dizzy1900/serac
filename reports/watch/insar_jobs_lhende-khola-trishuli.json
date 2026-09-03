@@ -1,0 +1,22 @@
+{
+  "aoi_id": "lhende-khola-trishuli",
+  "path_number": 121,
+  "plan_sha256": "d08b04a3eb1fd03b4638a6a62c15841b920faf22d976e6f60c6df39402fb047e",
+  "pairs_planned": 257,
+  "jobs_submitted": 257,
+  "succeeded_harvested": 257,
+  "failed": 0,
+  "pending": 0,
+  "bytes_transient_total": 10936810715,
+  "credits_spent": 257,
+  "last_run": {
+    "aoi_id": "lhende-khola-trishuli",
+    "harvested": 257,
+    "failed": 0,
+    "pending": 0,
+    "bytes_transient": 10936810715,
+    "bytes_retained": 619844522,
+    "errors": [],
+    "submitted_total": 257
+  }
+}
