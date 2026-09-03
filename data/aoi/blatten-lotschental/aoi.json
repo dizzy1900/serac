@@ -1,0 +1,163 @@
+{
+  "id": "blatten-lotschental",
+  "name": "Kleines Nesthorn - Birchgletscher - Lonza corridor (Blatten 2025)",
+  "countries": [
+    "CH"
+  ],
+  "cube_epsg": 32632,
+  "cube_extent_bbox_4326": [
+    7.6845129,
+    46.2657737,
+    7.9090579,
+    46.477005
+  ],
+  "grid": {
+    "aoi_id": "blatten-lotschental",
+    "epsg": 32632,
+    "resolution_m": 30.0,
+    "x_min": 398610.0,
+    "y_min": 5124150.0,
+    "x_max": 416280.0,
+    "y_max": 5147910.0,
+    "width": 589,
+    "height": 792
+  },
+  "river_names": [
+    "Lonza"
+  ],
+  "source_refs": [
+    "osm-overpass-blatten-lotschental",
+    "vs-ch-2025-05-28-blatten",
+    "wsl-2025-06-02-birchgletscher",
+    "srf-2025-05-18-blatten"
+  ],
+  "sources": [
+    {
+      "id": "osm-overpass-blatten-lotschental",
+      "kind": "dataset",
+      "title": "OpenStreetMap hydrography, places and infrastructure via the Overpass API (osm_base 2026-09-03T10:04:30Z; query recorded in notes)",
+      "url": "https://overpass-api.de/api/interpreter",
+      "authors": [
+        "OpenStreetMap contributors"
+      ],
+      "year": 2026,
+      "publisher": "OpenStreetMap Foundation",
+      "accessed_utc": "2026-09-03T10:08:48Z",
+      "sha256": "572463e35ee4029410b4d7fdd5bddfa90503fb3608a271520b05fa44ea8ab798",
+      "content_type": "application/json",
+      "licence": "ODbL-1.0",
+      "stored_copy": "data/fixtures/osm/blatten-lotschental_overpass_2026-09-03.json",
+      "claims_supported": [
+        "river_centreline",
+        "corridor",
+        "cube_extent_bbox_4326",
+        "river_names",
+        "transects.blatten.point",
+        "transects.wiler.point",
+        "transects.gampel.point",
+        "exposed_assets.blatten.geometry"
+      ],
+      "excerpt": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+      "peer_reviewed": false
+    },
+    {
+      "id": "vs-ch-2025-05-28-blatten",
+      "kind": "agency_official",
+      "title": "Blatten - Ausserordentliche Mittelzusagen (Staatsrat, Kanton Wallis, 28.05.2025)",
+      "url": "https://www.vs.ch/de/web/communication/detail?groupId=529400&articleId=40208599",
+      "authors": [],
+      "year": 2025,
+      "publisher": "Staatsrat des Kantons Wallis / Conseil d'Etat du Valais",
+      "accessed_utc": "2026-09-03T10:20:31Z",
+      "sha256": "a20bc25e4d479646c96c42558279429286a3996e1fb3710f6af94c1046b8ad43",
+      "content_type": "text/html",
+      "licence": "No licence stated (Canton of Valais press release)",
+      "claims_supported": [
+        "exposed_assets.blatten.status",
+        "exposed_assets.blatten.population",
+        "source_zone.geometry"
+      ],
+      "excerpt": "Ein sehr grosser Teil des Dorfes Blatten wurde zerstört. Das Flussbett der Lonza ist verstopft. ... Die vollständige Evakuierung des Dorfes Blatten war am Montag, dem 19. Mai, vorsorglich angeordnet worden. Dreihundert Einwohner wurden evakuiert",
+      "peer_reviewed": false
+    },
+    {
+      "id": "vs-ch-polizeiklausel-loetschental",
+      "kind": "agency_official",
+      "title": "Allgemeine Polizeiklausel - Strassenzufahrten und provisorische Seilbahn im Lötschental (Staatsrat, Kanton Wallis)",
+      "url": "https://www.vs.ch/de/web/communication/w/clause-g%C3%A9n%C3%A9rale-de-police-acc%C3%A8s-routiers-et-t%C3%A9l%C3%A9phérique-provisoire-dans-le-l%C3%B6tschental",
+      "authors": [],
+      "year": 2025,
+      "publisher": "Staatsrat des Kantons Wallis / Conseil d'Etat du Valais",
+      "accessed_utc": "2026-09-03T10:20:32Z",
+      "sha256": "2b66ccbae19eed47b8b547ce8402a4cd4fb6c80ac188d2d2cded4ab2f843a6c2",
+      "content_type": "text/html",
+      "licence": "No licence stated (Canton of Valais press release)",
+      "claims_supported": [
+        "exposed_assets.blatten.status",
+        "corridor"
+      ],
+      "excerpt": "... begrub den grössten Teil des Dorfes Blatten sowie die weiter unterhalb gelegenen Weiler Ried, Oberried und Tännmatten unter sich. Das verheerende Ereignis zerstörte die Kantonsstrasse NG24 zwischen Wiler und Blatten (einschliesslich Schutzgalerie)",
+      "peer_reviewed": false
+    },
+    {
+      "id": "swissinfo-2025-05-19-blatten",
+      "kind": "press_report",
+      "title": "300 Menschen wegen grosser Felssturzgefahr in Blatten evakuiert (Keystone-SDA via SWI)",
+      "url": "https://www.swissinfo.ch/ger/300-menschen-wegen-grosser-felssturzgefahr-in-blatten-evakuiert/89344250",
+      "authors": [],
+      "year": 2025,
+      "publisher": "SWI swissinfo.ch (Keystone-SDA)",
+      "accessed_utc": "2026-09-03T10:23:06Z",
+      "sha256": "89ae44e013f35f529b27f49b2bdc4e27b9cc925c70d3e09af8d55c86498fae96",
+      "content_type": "text/html",
+      "licence": "Copyright SWI swissinfo.ch / Keystone-SDA; press report",
+      "claims_supported": [
+        "exposed_assets.blatten.population"
+      ],
+      "excerpt": "Rund 300 Menschen sind am Montag in Blatten VS wegen grosser Felssturzgefahr evakuiert worden ... Betroffen von der Evakuierung seien 300 Einwohnerinnen und Einwohner und rund hundert Gebäude, sagte Ebener. (19. Mai 2025)",
+      "peer_reviewed": false
+    },
+    {
+      "id": "srf-2025-05-18-blatten",
+      "kind": "press_report",
+      "title": "Blatten: konkrete Gefahr durch Bergstürze, 92 Personen evakuiert (SRF, 18.05.2025)",
+      "url": "https://www.srf.ch/news/schweiz/loetschental-im-wallis-blatten-konkrete-gefahr-durch-bergstuerze-92-personen-evakuiert",
+      "authors": [],
+      "year": 2025,
+      "publisher": "Schweizer Radio und Fernsehen (SRF)",
+      "accessed_utc": "2026-09-03T10:20:35Z",
+      "sha256": "3636f83c46f4477de191d380b2009c324936714097c6412ed097812c89bb29b1",
+      "content_type": "text/html",
+      "licence": "Copyright SRF; press report",
+      "claims_supported": [
+        "source_zone.geometry",
+        "exposed_assets.blatten.status"
+      ],
+      "excerpt": "... die anhaltende Instabilität im Bereich des Kleinen Nesthorns und des Birchgletscher an der Südflanke des Lötschentals «eine konkrete Gefahr durch mögliche Bergstürze» darstelle.",
+      "peer_reviewed": false
+    },
+    {
+      "id": "wsl-2025-06-02-birchgletscher",
+      "kind": "agency_official",
+      "title": "Was Gletscherforschende über den Abbruch des Birchgletschers wissen (ETH Zürich / WSL)",
+      "url": "https://www.wsl.ch/de/news/was-gletscherforschende-ueber-den-abbruch-des-birchgletschers-wissen/",
+      "authors": [],
+      "year": 2025,
+      "publisher": "Eidg. Forschungsanstalt für Wald, Schnee und Landschaft WSL / ETH Zürich",
+      "accessed_utc": "2026-09-03T10:20:37Z",
+      "sha256": "9ee7ea77dc99b9fa6d8efc09cb9e7a420cd32ace2d75f0d7c6fdd309ba179fb1",
+      "content_type": "text/html",
+      "licence": "No licence stated (WSL news page)",
+      "claims_supported": [
+        "source_zone.geometry"
+      ],
+      "excerpt": "Am Mittwoch 28. Mai 2025 ist der Birchgletscher unter der Last von Fels- und Schuttmassen eingebrochen, die von Felsstürzen am Kleinen Nesthorn stammten.",
+      "peer_reviewed": false
+    }
+  ],
+  "notes": "DESIGN CHOICES: the source zone is a rectangle 7.78-7.87 E, 46.39-46.45 N covering the Kleines Nesthorn (OSM peak 46.4 N, 7.8 E) and the Birchgletscher above Blatten, as named by the Canton, WSL/ETH and SRF; it is not the mapped scar or deposit. The corridor follows the OSM Lonza from Blatten past Wiler to Gampel (downstream target 7.735 E, 46.312 N near the Rhône confluence), clipped at 30 km. Chainage 0 is the Lonza node nearest the source-zone centroid, i.e. at Blatten, not the glacier. ASSETS: Blatten settlement only, as requested; status and evacuation count from the Canton. BUILD (from OSM data as of 2026-09-03T10:04:30Z, © OpenStreetMap contributors, ODbL-1.0): centreline chainage 0 is the OSM river-network node nearest the source-zone centroid that connects to the downstream target, 0.29 km from the centroid at (7.821312, 46.4204345); not clipped (16.5 km available); transect chainages: blatten=0.1 km, wiler=3.7 km, gampel=15.4 km. Corridor = centreline buffered 1500 m in EPSG:32632; cube extent = source zone union corridor buffered 3000 m, 30 m grid snapped to the resolution. OVERPASS QUERY: [out:json][timeout:180]; ( way[\"waterway\"][\"name\"~\"Lonza\",i](46.28,7.60,46.50,7.95); relation[\"waterway\"][\"name\"~\"Lonza\",i](46.28,7.60,46.50,7.95); node[\"place\"][\"name\"~\"^(Blatten|Wiler|Gampel|Kippel|Ferden|Goppenstein|Steg|Ried|Fafleralp)\",i](46.28,7.60,46.50,7.95); node[\"natural\"=\"peak\"][\"name\"~\"Nesthorn|Birch\",i](46.28,7.60,46.50,7.95); nwr[\"natural\"=\"glacier\"][\"name\"~\"Birch\",i](46.28,7.60,46.50,7.95); nwr[\"power\"=\"plant\"](46.28,7.60,46.50,7.95); ); out geom;",
+  "record": {
+    "created_utc": "2026-09-03T12:00:00Z",
+    "created_by": "aoi-build"
+  }
+}

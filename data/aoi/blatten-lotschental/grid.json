@@ -1,0 +1,11 @@
+{
+  "aoi_id": "blatten-lotschental",
+  "epsg": 32632,
+  "resolution_m": 30.0,
+  "x_min": 398610.0,
+  "y_min": 5124150.0,
+  "x_max": 416280.0,
+  "y_max": 5147910.0,
+  "width": 589,
+  "height": 792
+}

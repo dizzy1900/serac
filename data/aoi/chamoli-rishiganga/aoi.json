@@ -1,0 +1,165 @@
+{
+  "id": "chamoli-rishiganga",
+  "name": "Ronti Peak - Ronti Gad - Rishiganga - Dhauliganga corridor (Chamoli 2021)",
+  "countries": [
+    "IN"
+  ],
+  "cube_epsg": 32644,
+  "cube_extent_bbox_4326": [
+    79.5286652,
+    30.3029319,
+    79.8312323,
+    30.6030735
+  ],
+  "grid": {
+    "aoi_id": "chamoli-rishiganga",
+    "epsg": 32644,
+    "resolution_m": 30.0,
+    "x_min": 358500.0,
+    "y_min": 3352920.0,
+    "x_max": 387960.0,
+    "y_max": 3386550.0,
+    "width": 982,
+    "height": 1121
+  },
+  "river_names": [
+    "Raunthi Gadhera (Ronti Gad)",
+    "Rishi Ganga",
+    "Dhauli Ganga"
+  ],
+  "source_refs": [
+    "osm-overpass-chamoli-rishiganga",
+    "shugar-2021-abstract-europepmc"
+  ],
+  "sources": [
+    {
+      "id": "osm-overpass-chamoli-rishiganga",
+      "kind": "dataset",
+      "title": "OpenStreetMap hydrography, places and infrastructure via the Overpass API (osm_base 2026-09-03T10:20:36Z; query recorded in notes)",
+      "url": "https://overpass-api.de/api/interpreter",
+      "authors": [
+        "OpenStreetMap contributors"
+      ],
+      "year": 2026,
+      "publisher": "OpenStreetMap Foundation",
+      "accessed_utc": "2026-09-03T10:22:41Z",
+      "sha256": "cbbd382ca9bdd5b6f8aaf0135270ccca918dcf43f26eac71729ff79128bf2e25",
+      "content_type": "application/json",
+      "licence": "ODbL-1.0",
+      "stored_copy": "data/fixtures/osm/chamoli-rishiganga_overpass_2026-09-03.json",
+      "claims_supported": [
+        "river_centreline",
+        "corridor",
+        "cube_extent_bbox_4326",
+        "river_names",
+        "transects.raini.point",
+        "transects.tapovan.point",
+        "exposed_assets.tapovan-vishnugad-hep.geometry"
+      ],
+      "excerpt": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+      "peer_reviewed": false
+    },
+    {
+      "id": "shugar-2021-crossref",
+      "kind": "peer_reviewed",
+      "title": "A massive rock and ice avalanche caused the 2021 disaster at Chamoli, Indian Himalaya",
+      "url": "https://api.crossref.org/works/10.1126/science.abh4455",
+      "doi": "10.1126/science.abh4455",
+      "authors": [
+        "Shugar, D. H.",
+        "Jacquemart, M.",
+        "Shean, D.",
+        "Bhushan, S.",
+        "et al."
+      ],
+      "year": 2021,
+      "publisher": "Science (AAAS); Crossref metadata record",
+      "accessed_utc": "2026-09-03T10:17:50Z",
+      "sha256": "2b58e6743a6f3677421bc1af7491533ab487e564e1b2eb966742e874cf4949f1",
+      "content_type": "application/json",
+      "licence": "Crossref metadata; article copyright AAAS (paywalled; landing page not retrievable)",
+      "claims_supported": [
+        "source_zone.geometry",
+        "river_names"
+      ],
+      "excerpt": "Crossref: Science, issued 2021-07-16, DOI 10.1126/science.abh4455, authors Shugar, Jacquemart, Shean, Bhushan ...",
+      "peer_reviewed": true
+    },
+    {
+      "id": "shugar-2021-abstract-europepmc",
+      "kind": "peer_reviewed",
+      "title": "Shugar et al. 2021, abstract as indexed by Europe PMC (PMID 34112725)",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:%2210.1126/science.abh4455%22&format=json&resultType=core",
+      "doi": "10.1126/science.abh4455",
+      "authors": [
+        "Shugar, D. H.",
+        "et al."
+      ],
+      "year": 2021,
+      "publisher": "Europe PMC (abstract record)",
+      "accessed_utc": "2026-09-03T10:17:51Z",
+      "sha256": "277fac2f62ab2724e4ee88a9e277b9708b16e7617cb5a4d6e84b95c58b8b7bfc",
+      "content_type": "application/json",
+      "licence": "Europe PMC abstract record; article copyright AAAS",
+      "claims_supported": [
+        "source_zone.geometry",
+        "river_names",
+        "exposed_assets.rishiganga-hep.status",
+        "exposed_assets.tapovan-vishnugad-hep.status"
+      ],
+      "excerpt": "a catastrophic mass flow descended the Ronti Gad, Rishiganga, and Dhauliganga valleys in Chamoli ... severely damaging two hydropower projects ... ~27 x 10^6 cubic meters of rock and glacier ice collapsed from the steep north face of Ronti Peak.",
+      "peer_reviewed": true
+    },
+    {
+      "id": "cook-2021-crossref",
+      "kind": "peer_reviewed",
+      "title": "Detection and potential early warning of catastrophic flow events with regional seismic networks",
+      "url": "https://api.crossref.org/works/10.1126/science.abj1227",
+      "doi": "10.1126/science.abj1227",
+      "authors": [
+        "Cook, K. L.",
+        "Rekapalli, R.",
+        "Dietze, M.",
+        "et al."
+      ],
+      "year": 2021,
+      "publisher": "Science (AAAS); Crossref metadata record",
+      "accessed_utc": "2026-09-03T10:17:51Z",
+      "sha256": "eddf744afcf42cbed08e61a29c7682b40b471a135ff086954785fcb25eff3291",
+      "content_type": "application/json",
+      "licence": "Crossref metadata; article copyright AAAS (paywalled; landing page not retrievable)",
+      "claims_supported": [
+        "notes"
+      ],
+      "excerpt": "Crossref: Science, issued 2021-10, DOI 10.1126/science.abj1227, authors Cook, Rekapalli, Dietze ...",
+      "peer_reviewed": true
+    },
+    {
+      "id": "icimod-2021-chamoli-flood",
+      "kind": "agency_official",
+      "title": "Understanding the Chamoli flood: cause, process, impacts, and context of rapid infrastructure development (ICIMOD, 2021)",
+      "url": "https://www.icimod.org/article/understanding-the-chamoli-flood-cause-process-impacts-and-context-of-rapid-infrastructure-development/",
+      "authors": [],
+      "year": 2021,
+      "publisher": "International Centre for Integrated Mountain Development (ICIMOD)",
+      "accessed_utc": "2026-09-03T10:22:54Z",
+      "sha256": "c0a9985a1b041309b7933f5f2d6d29e333b1ae635e37b1585a6136190cff2c67",
+      "content_type": "text/html",
+      "licence": "No licence stated on the page (ICIMOD publication)",
+      "claims_supported": [
+        "exposed_assets.rishiganga-hep.capacity_mw",
+        "exposed_assets.rishiganga-hep.geometry",
+        "exposed_assets.rishiganga-hep.status",
+        "exposed_assets.tapovan-vishnugad-hep.capacity_mw",
+        "exposed_assets.tapovan-vishnugad-hep.status"
+      ],
+      "excerpt": "Table 1: Rishi Ganga Hydropower Project 30.478, 79.699 13.2 MW (Operational); Tapovan Vishnugad Hydropower Project 30.493, 79.628 520 MW (Under construction). The flood swept away the unfinished Tapovan Vishnugad HPP and inflicted substantial damage on Rishi Ganga.",
+      "peer_reviewed": false
+    }
+  ],
+  "notes": "DESIGN CHOICES: the source zone is a rectangle 79.68-79.80 E, 30.33-30.42 N around Ronti Peak (OSM 'Raunthi' peak 6063 m at 30.369 N, 79.719 E), consistent with the DEM fixture extent; it is not the mapped detachment scar. The corridor follows the OSM 'Raunthi Gadhera' (Ronti Gad) to the Rishi Ganga, then the Dhauli Ganga to its confluence with the Alaknanda at Vishnuprayag below Joshimath (downstream target 79.575 E, 30.562 N). Reference: Shugar et al. 2021 and Cook et al. 2021 (DOIs resolved via Crossref; paywalled, landing pages not retrievable from this host). ASSETS: the two hydropower projects are sourced to ICIMOD (2021) and the Shugar et al. abstract; the Vishnuprayag (400 MW, OSM) plant lies below the corridor and was not requested. BUILD (from OSM data as of 2026-09-03T10:20:36Z, © OpenStreetMap contributors, ODbL-1.0): centreline chainage 0 is the OSM river-network node nearest the source-zone centroid that connects to the downstream target, 1.42 km from the centroid at (79.7338986, 30.3866569); not clipped (31.6 km available); transect chainages: raini=15.3 km, tapovan=21.8 km. Corridor = centreline buffered 1500 m in EPSG:32644; cube extent = source zone union corridor buffered 3000 m, 30 m grid snapped to the resolution. OVERPASS QUERY: [out:json][timeout:180]; ( way[\"waterway\"][\"name\"~\"Rishi|Ronti|Dhauli\",i](30.30,79.45,30.62,79.92); way[\"waterway\"][\"name:en\"~\"Rishi|Ronti|Dhauli\",i](30.30,79.45,30.62,79.92); relation[\"waterway\"~\"^(river|stream)$\"][\"name\"~\"Rishi|Ronti|Dhauli\",i](30.30,79.45,30.62,79.92); way[\"waterway\"~\"^(river|stream)$\"](30.33,79.66,30.44,79.82); node[\"place\"][\"name\"~\"Raini|Reni|Tapovan|Joshimath|Jyotirmath|Vishnuprayag|Ronti|Lata|Nanda Devi\",i](30.30,79.45,30.62,79.92); node[\"place\"][\"name:en\"~\"Raini|Reni|Tapovan|Joshimath|Jyotirmath|Vishnuprayag|Ronti|Lata|Nanda Devi\",i](30.30,79.45,30.62,79.92); node[\"natural\"=\"peak\"](30.33,79.66,30.44,79.82); nwr[\"power\"=\"plant\"](30.30,79.45,30.62,79.92); nwr[\"name\"~\"Rishiganga|Rishi Ganga|Tapovan|Vishnugad|Hydro\",i](30.30,79.45,30.62,79.92); nwr[\"name:en\"~\"Rishiganga|Rishi Ganga|Tapovan|Vishnugad|Hydro\",i](30.30,79.45,30.62,79.92); ); out geom;",
+  "record": {
+    "created_utc": "2026-09-03T12:00:00Z",
+    "created_by": "aoi-build"
+  }
+}
