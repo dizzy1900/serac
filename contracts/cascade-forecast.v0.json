@@ -106,6 +106,13 @@
         },
         "probability": {
           "$ref": "#/$defs/Range"
+        },
+        "secondary_surges": {
+          "items": {
+            "$ref": "#/$defs/SecondarySurge"
+          },
+          "title": "Secondary Surges",
+          "type": "array"
         }
       },
       "required": [
@@ -405,6 +412,50 @@
       "title": "Range",
       "type": "object"
     },
+    "SecondarySurge": {
+      "additionalProperties": false,
+      "description": "A surge released by a landslide-dam breach, arriving after the primary flow.\n\nCascade rules v0: the breach model is parametric, so `label` must name the rule set that\nproduced the estimate and every number is a `Range`.",
+      "properties": {
+        "arrival_after_breach_min": {
+          "$ref": "#/$defs/Range"
+        },
+        "label": {
+          "description": "e.g. 'cascade rules v0'",
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "origin_chainage_km": {
+          "minimum": 0,
+          "title": "Origin Chainage Km",
+          "type": "number"
+        },
+        "peak_discharge_m3s": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "transect_id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Transect Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin_chainage_km",
+        "transect_id",
+        "arrival_after_breach_min",
+        "label"
+      ],
+      "title": "SecondarySurge",
+      "type": "object"
+    },
     "TransectArrival": {
       "additionalProperties": false,
       "description": "Forecast arrival at one transect. Times are minutes after `origin_time_utc`.",
@@ -481,7 +532,7 @@
       "$ref": "#/$defs/ConfidenceTier"
     },
     "contract_version": {
-      "default": "0.1.0",
+      "default": "0.2.0",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
       "title": "Contract Version",
       "type": "string"
