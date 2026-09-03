@@ -38,6 +38,11 @@
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
     },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "seismic.agency_range": {
       "notes": "No agency catalogue magnitude was retrieved; only a press-reported 3.1.",
       "public_estimates": [],
@@ -97,7 +102,7 @@
   ],
   "initially_reported_as": null,
   "name": "Kleines Nesthorn rock collapse and Birch Glacier avalanche onto Blatten, Lötschental, Switzerland",
-  "notes": "Evacuation counterfactual: a monitored slope evacuated nine days before failure. dammed_river is true per the Federal Council ('Ein aufgestauter See hinter dem Geröllkegel'), the Canton ('Das Flussbett der Lonza wurde verschüttet') and EGU26-6599 ('river damming in the main valley, lake formation up-valley'); secondary_surge is false because EGU26-6599 describes 'outflow of impounded water and formation of a new river bed' rather than an outburst surge. Islam et al. (2025, Geology Today, CC-BY) is cited from its Crossref record because the Wiley page is behind a bot challenge. Transect ids blatten/wiler/gampel are defined by the blatten-lotschental AOI; no arrival times were read. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "Evacuation counterfactual: a monitored slope evacuated nine days before failure. dammed_river is true per the Federal Council ('Ein aufgestauter See hinter dem Geröllkegel'), the Canton ('Das Flussbett der Lonza wurde verschüttet') and EGU26-6599 ('river damming in the main valley, lake formation up-valley'); secondary_surge is false because EGU26-6599 describes 'outflow of impounded water and formation of a new river bed' rather than an outburst surge. Islam et al. (2025, Geology Today, CC-BY) is cited from its Crossref record because the Wiley page is behind a bot challenge. Transect ids blatten/wiler/gampel are defined by the blatten-lotschental AOI; no arrival times were read.",
   "peak_velocity_ms": null,
   "precursors_observed": [
     {
@@ -165,7 +170,7 @@
   "role": "evacuation_counterfactual",
   "runout_km": null,
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": {
     "agency_range": null,
     "mag_type": null,

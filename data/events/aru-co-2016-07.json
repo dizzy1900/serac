@@ -1,7 +1,7 @@
 {
   "aoi_id": null,
   "bulked_volume_m3": null,
-  "dammed_river": false,
+  "dammed_river": null,
   "event_group": "aru-co-2016",
   "event_id": "aru-co-2016-07",
   "failure_type": "glacier_detachment",
@@ -36,10 +36,20 @@
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
     },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "rock_fraction": {
       "notes": "Kääb et al. (2018) and Gilbert et al. (2018) describe a glacier (ice) detachment; no rock fraction is stated.",
       "public_estimates": [],
       "reason": "not_applicable"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
     },
     "seismic": {
       "notes": "No seismic catalogue entry or seismic study for the Aru detachments was retrieved in this session.",
@@ -55,7 +65,7 @@
   "infrastructure_impacts": [],
   "initially_reported_as": null,
   "name": "Aru Co glacier detachment, Aru-1 (July 2016), western Tibet",
-  "notes": "First of the twin Aru Range detachments (event_group aru-co-2016); the avalanche reached lake Aru Co (Kääb et al. 2021). dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "First of the twin Aru Range detachments (event_group aru-co-2016); the avalanche reached lake Aru Co (Kääb et al. 2021).",
   "peak_velocity_ms": {
     "best": null,
     "disputed": false,
@@ -125,7 +135,7 @@
     "unit": "km"
   },
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": null,
   "source_elevation_m": null,
   "source_location": {

@@ -1,7 +1,7 @@
 {
   "aoi_id": null,
   "bulked_volume_m3": null,
-  "dammed_river": false,
+  "dammed_river": null,
   "event_group": "kolka-karmadon-2002",
   "event_id": "kolka-karmadon-2002",
   "failure_type": "glacier_detachment",
@@ -51,6 +51,11 @@
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
     },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "peak_velocity_ms": {
       "notes": "Huggel et al. (2005) mention 'the high flow velocity' in the abstract without a figure; no number was read.",
       "public_estimates": [],
@@ -60,6 +65,11 @@
       "notes": "Not stated in the retrieved text; Huggel et al. describe a slope failure that 'almost completely entrained Kolka glacier' without a rock/ice ratio.",
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
     },
     "seismic": {
       "notes": "No seismic catalogue entry or seismic study for the 2002 event was retrieved in this session.",
@@ -75,7 +85,7 @@
   "infrastructure_impacts": [],
   "initially_reported_as": null,
   "name": "Kolka–Karmadon rock/ice avalanche, Kazbek massif, North Ossetia, Russia",
-  "notes": "Huggel et al. (2005) characterise the event as a slope failure that entrained Kolka Glacier and describe two flow phases; Kääb et al. (2021) classify it as a low-angle glacier detachment, which is the failure_type used here. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "Huggel et al. (2005) characterise the event as a slope failure that entrained Kolka Glacier and describe two flow phases; Kääb et al. (2021) classify it as a low-angle glacier detachment, which is the failure_type used here.",
   "peak_velocity_ms": null,
   "precursors_observed": [],
   "record": {
@@ -123,7 +133,7 @@
     "unit": "km"
   },
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": null,
   "source_elevation_m": null,
   "source_location": {

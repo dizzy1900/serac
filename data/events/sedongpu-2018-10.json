@@ -39,6 +39,11 @@
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
     },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "seismic": {
       "notes": "Kääb et al. (2021) note that Wang et al. (2020) 'provide inversions of regional seismic signals caused by the event', but no magnitude or catalogue id was read.",
       "public_estimates": [],
@@ -53,7 +58,7 @@
   "infrastructure_impacts": [],
   "initially_reported_as": null,
   "name": "Sedongpu Glacier detachment, October 2018, south-eastern Tibet",
-  "notes": "The order-of-magnitude-class disagreement between published volume figures is recorded in source_volume_m3 (disputed=true) with each figure attributed. Kääb et al. (2021): ice blocked the Yarlung Tsangpo (dam 40–60×10^6 m3) and another mass flow followed on 29 October 2018. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "The order-of-magnitude-class disagreement between published volume figures is recorded in source_volume_m3 (disputed=true) with each figure attributed. Kääb et al. (2021): ice blocked the Yarlung Tsangpo (dam 40–60×10^6 m3) and another mass flow followed on 29 October 2018.",
   "peak_velocity_ms": null,
   "precursors_observed": [
     {
@@ -97,7 +102,7 @@
     "unit": "km"
   },
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": null,
   "source_elevation_m": null,
   "source_location": {

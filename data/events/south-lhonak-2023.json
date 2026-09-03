@@ -1,7 +1,7 @@
 {
   "aoi_id": null,
   "bulked_volume_m3": null,
-  "dammed_river": false,
+  "dammed_river": null,
   "event_group": "south-lhonak-2023",
   "event_id": "south-lhonak-2023",
   "failure_type": "moraine_collapse_glof",
@@ -62,6 +62,11 @@
       ],
       "reason": "no_peer_reviewed_estimate"
     },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "fall_height_m": {
       "notes": "A lateral-moraine collapse into a lake; the retrieved abstracts state an impact wave height (~20 m, Sattar et al. 2025; overtopping 16.11 m, Zhang et al. 2025), not a fall height.",
       "public_estimates": [],
@@ -84,6 +89,11 @@
       "notes": "Moraine (sediment) collapse; not a rock–ice avalanche.",
       "public_estimates": [],
       "reason": "not_applicable"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
     },
     "seismic": {
       "notes": "No seismic record of the moraine collapse was retrieved.",
@@ -122,7 +132,7 @@
   ],
   "initially_reported_as": null,
   "name": "South Lhonak Lake moraine collapse and outburst flood, Sikkim, India",
-  "notes": "Negative control: a moraine-dam / glacial-lake outburst cascade that serac must discriminate from bedrock rock–ice avalanches. dammed_river is false because the flood originated from an existing moraine-dammed lake rather than from a landslide dam; secondary_surge is false because the outburst was the primary flood, not a secondary surge behind a new blockage (both per the retrieved abstracts). Sattar et al. (2025) is a Science paper whose abstract was read via the Europe PMC API. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "Negative control: a moraine-dam / glacial-lake outburst cascade that serac must discriminate from bedrock rock–ice avalanches. dammed_river is false because the flood originated from an existing moraine-dammed lake rather than from a landslide dam; secondary_surge is false because the outburst was the primary flood, not a secondary surge behind a new blockage (both per the retrieved abstracts). Sattar et al. (2025) is a Science paper whose abstract was read via the Europe PMC API.",
   "peak_velocity_ms": null,
   "precursors_observed": [],
   "record": {
@@ -147,7 +157,7 @@
     "unit": "km"
   },
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": null,
   "source_elevation_m": null,
   "source_location": {

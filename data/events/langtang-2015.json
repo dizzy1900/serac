@@ -34,7 +34,7 @@
     ],
     "unit": "m3"
   },
-  "dammed_river": false,
+  "dammed_river": null,
   "event_group": "langtang-2015",
   "event_id": "langtang-2015",
   "failure_type": "co_seismic_avalanche",
@@ -79,6 +79,11 @@
     "unit": "persons"
   },
   "field_notes": {
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "peak_velocity_ms": {
       "notes": "No velocity was read in the retrieved text.",
       "public_estimates": [],
@@ -93,6 +98,11 @@
       "notes": "No runout distance was read in the retrieved text.",
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
     }
   },
   "infrastructure_impacts": [
@@ -110,7 +120,7 @@
   ],
   "initially_reported_as": null,
   "name": "Langtang village co-seismic avalanche (Gorkha earthquake), Nepal",
-  "notes": "Co-seismic reference: an avalanche triggered by the 2015 Gorkha earthquake, not a spontaneous detachment. The USGS figures come from the 'Regional Background' paragraph of the 2026 Nepal event page, which is preliminary. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "Co-seismic reference: an avalanche triggered by the 2015 Gorkha earthquake, not a spontaneous detachment. The USGS figures come from the 'Regional Background' paragraph of the 2026 Nepal event page, which is preliminary.",
   "peak_velocity_ms": null,
   "precursors_observed": [],
   "record": {
@@ -124,7 +134,7 @@
   "role": "co_seismic_reference",
   "runout_km": null,
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": {
     "agency_range": {
       "best": null,

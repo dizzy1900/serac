@@ -38,6 +38,11 @@
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
     },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "seismic.agency_range": {
       "notes": "Only the Chinese catalogue magnitude (via Kääb et al. 2021) was read; no other agency magnitude.",
       "public_estimates": [],
@@ -52,7 +57,7 @@
   "infrastructure_impacts": [],
   "initially_reported_as": null,
   "name": "Gyala Peri / Sedongpu rock–ice avalanche, October 2017, south-eastern Tibet",
-  "notes": "Kääb et al. (2021): the avalanche dammed the Yarlung Tsangpo, drastically changed Sedongpu Glacier and was followed by debris flows into 2018 that preceded the October 2018 glacier detachment (sedongpu-2018-10). The 18 November 2017 M 6.9 Milin earthquake nearby 'may have contributed to the triggering of the debris flows'. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "Kääb et al. (2021): the avalanche dammed the Yarlung Tsangpo, drastically changed Sedongpu Glacier and was followed by debris flows into 2018 that preceded the October 2018 glacier detachment (sedongpu-2018-10). The 18 November 2017 M 6.9 Milin earthquake nearby 'may have contributed to the triggering of the debris flows'.",
   "peak_velocity_ms": null,
   "precursors_observed": [],
   "record": {
@@ -66,7 +71,7 @@
   "role": "reference",
   "runout_km": null,
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": {
     "agency_range": null,
     "mag_type": null,

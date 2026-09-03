@@ -1,7 +1,7 @@
 {
   "aoi_id": "chamoli-rishiganga",
   "bulked_volume_m3": null,
-  "dammed_river": false,
+  "dammed_river": null,
   "event_group": "chamoli-2021",
   "event_id": "chamoli-2021",
   "failure_type": "bedrock_rock_ice_avalanche",
@@ -37,6 +37,11 @@
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
     },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "peak_velocity_ms": {
       "notes": "No flow velocity was read in the retrieved abstracts.",
       "public_estimates": [],
@@ -51,6 +56,11 @@
       "notes": "The flow descended the Ronti Gad, Rishiganga and Dhauliganga valleys; no total runout distance was read (the 13 and 19.7 km figures are distances to the two plants).",
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
     },
     "seismic.agency_range": {
       "notes": "No agency magnitudes were read.",
@@ -68,7 +78,7 @@
       "asset_id": null,
       "asset_name": "Rishiganga hydropower project (13.2 MW)",
       "asset_type": "hydropower_plant",
-      "description": "Shugar et al. (2021): the flow 'severely damaged two hydropower projects'; Kumar et al. (2023) name the Rishiganga Power Corporation 13.2 MW project 13 km from the source",
+      "description": "Shugar et al. (2021): the flow 'severely damaged two hydropower projects'; Rawat et al. (2024) name the Rishiganga Power Corporation 13.2 MW project 13 km from the source",
       "impact": "damaged",
       "source_refs": [
         "shugar-2021",
@@ -79,7 +89,7 @@
       "asset_id": null,
       "asset_name": "Tapovan Vishnugad hydropower project (NTPC, 512 MW)",
       "asset_type": "hydropower_plant",
-      "description": "Shugar et al. (2021): 'severely damaging two hydropower projects'; Kumar et al. (2023) name the NTPC Tapovan Vishnugad 512 MW project 19.7 km from the source",
+      "description": "Shugar et al. (2021): 'severely damaging two hydropower projects'; Rawat et al. (2024) name the NTPC Tapovan Vishnugad 512 MW project 19.7 km from the source",
       "impact": "damaged",
       "source_refs": [
         "shugar-2021",
@@ -89,11 +99,11 @@
   ],
   "initially_reported_as": null,
   "name": "Chamoli / Ronti Peak rock–ice avalanche and debris flow, Uttarakhand, India",
-  "notes": "Best-documented reference event and serac's replay/backtest event. Shugar et al. (2021) and Cook et al. (2021) are Science papers whose abstracts were read via the Europe PMC API (the science.org pages are behind a bot challenge); their DOIs resolved via Crossref. Transect ids raini/tapovan are defined by the chamoli-rishiganga AOI. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "Best-documented reference event and serac's replay/backtest event. Shugar et al. (2021) and Cook et al. (2021) are Science papers whose abstracts were read via the Europe PMC API (the science.org pages are behind a bot challenge); their DOIs resolved via Crossref. Transect ids raini/tapovan are defined by the chamoli-rishiganga AOI.",
   "peak_velocity_ms": null,
   "precursors_observed": [
     {
-      "description": "Tiwari et al. (2022) report a nucleation phase with precursory tremors for 2:30 h before detachment; Kumar et al. (2023) place the nucleation-phase onset at 04:51:18 UTC, after the arrival of surface waves from a M6 earthquake in Davao del Sur, Philippines (04:31:41 UTC)",
+      "description": "Tiwari et al. (2022) report a nucleation phase with precursory tremors for 2:30 h before detachment; Rawat et al. (2024) place the nucleation-phase onset at 04:51:18 UTC, after the arrival of surface waves from a M6 earthquake in Davao del Sur, Philippines (04:31:41 UTC)",
       "kind": "seismic_tremor_sequence",
       "lead_time_days": {
         "best": null,
@@ -125,12 +135,12 @@
   "role": "reference",
   "runout_km": null,
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": {
     "agency_range": null,
     "mag_type": null,
     "magnitude": null,
-    "notes": "Cook et al. (2021): signals recorded on a regional network in Uttarakhand up to 100 km away. Kumar et al. (2023): nucleation phase at 04:51:18 UTC. No catalogue magnitude was read and the event is not in USGS ComCat as far as retrieved.",
+    "notes": "Cook et al. (2021): signals recorded on a regional network in Uttarakhand up to 100 km away. Rawat et al. (2024): nucleation phase at 04:51:18 UTC. No catalogue magnitude was read and the event is not in USGS ComCat as far as retrieved.",
     "single_force": false,
     "source_refs": [
       "cook-2021",
@@ -472,7 +482,7 @@
   "transect_observations": [
     {
       "arrival_time_min": null,
-      "description": "No arrival time or stage was read. Kumar et al. (2023) estimate a seismic 'warning period of approximately 10 ... min at distances of 13 ... km' for the Rishiganga project site.",
+      "description": "No arrival time or stage was read. Rawat et al. (2024) estimate a seismic 'warning period of approximately 10 ... min at distances of 13 ... km' for the Rishiganga project site.",
       "source_refs": [
         "kumar-2023"
       ],
@@ -481,7 +491,7 @@
     },
     {
       "arrival_time_min": null,
-      "description": "No arrival time or stage was read. Kumar et al. (2023) estimate a seismic 'warning period of approximately ... 14 min at distances of ... 19.7 km' for the Tapovan Vishnugad project site.",
+      "description": "No arrival time or stage was read. Rawat et al. (2024) estimate a seismic 'warning period of approximately ... 14 min at distances of ... 19.7 km' for the Tapovan Vishnugad project site.",
       "source_refs": [
         "kumar-2023"
       ],

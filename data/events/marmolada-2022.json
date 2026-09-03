@@ -1,7 +1,7 @@
 {
   "aoi_id": null,
   "bulked_volume_m3": null,
-  "dammed_river": false,
+  "dammed_river": null,
   "event_group": "marmolada-2022",
   "event_id": "marmolada-2022",
   "failure_type": "hanging_glacier_collapse",
@@ -24,6 +24,11 @@
       "public_estimates": [],
       "reason": "no_peer_reviewed_estimate"
     },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "fall_height_m": {
       "notes": "Francese et al. (2025) state the path 'extended from 3213 to 2300 m a.s.l.' and that the avalanche ended 'at an elevation of 2330 m a.s.l.'; the vertical drop is not stated as a figure and is not computed here.",
       "public_estimates": [],
@@ -34,6 +39,11 @@
       "public_estimates": [],
       "reason": "not_applicable"
     },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
     "seismic": {
       "notes": "Francese et al. (2025): 'An earthquake triggering the failure was excluded based on the processing of the available seismological observations'; no seismic signal of the collapse itself was read.",
       "public_estimates": [],
@@ -43,7 +53,7 @@
   "infrastructure_impacts": [],
   "initially_reported_as": null,
   "name": "Marmolada glacier (Punta Rocca glacieret) collapse, Dolomites, Italy",
-  "notes": "Small-volume, high-consequence ice avalanche. Olivieri et al. (2022, Remote Sensing Letters) was Crossref-resolved but its landing page is behind a bot challenge, so it is not cited. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "notes": "Small-volume, high-consequence ice avalanche. Olivieri et al. (2022, Remote Sensing Letters) was Crossref-resolved but its landing page is behind a bot challenge, so it is not cited.",
   "peak_velocity_ms": {
     "best": null,
     "disputed": false,
@@ -89,7 +99,7 @@
     "unit": "km"
   },
   "schema_version": "0.1.0",
-  "secondary_surge": false,
+  "secondary_surge": null,
   "seismic": null,
   "source_elevation_m": {
     "best": 3200.0,
