@@ -250,3 +250,276 @@ def s2_earthsearch(
     )
     adapter = EarthSearchSentinel2Adapter(PystacSearchClient(stac_url))
     run(adapter, request, dry_run=dry_run, yes=yes, data_dir=root)
+
+
+# -- credentialed adapters: the real request/poll/download paths, refused without .env -----------
+
+
+def _window(from_: str, to: str) -> tuple[datetime, datetime]:
+    return parse_date(from_), parse_date(to, end=True)
+
+
+FromOpt = Annotated[str, typer.Option("--from", help="Start date (ISO).")]
+ToOpt = Annotated[str, typer.Option("--to", help="End date (ISO, inclusive).")]
+RelativeOrbitOpt = Annotated[
+    int | None, typer.Option("--relative-orbit", help="Keep one Sentinel-1 track (pathNumber).")
+]
+FlightDirectionOpt = Annotated[
+    str | None, typer.Option("--flight-direction", help="ASCENDING or DESCENDING.")
+]
+
+
+@app.command("s1")
+def s1(
+    aoi: AoiOpt,
+    from_: FromOpt,
+    to: ToOpt,
+    bbox: BboxOpt = None,
+    dry_run: DryRunOpt = False,
+    yes: YesOpt = False,
+    level: Annotated[str, typer.Option("--level", help="SLC or GRD_HD.")] = "SLC",
+    relative_orbit: RelativeOrbitOpt = None,
+    flight_direction: FlightDirectionOpt = None,
+    data_dir: DataDirOpt = None,
+) -> None:
+    """Sentinel-1 IW granules via ASF search; download needs Earthdata Login."""
+    from serac.adapters.eo.asf_sentinel1 import Sentinel1AsfAdapter
+
+    root = data_dir or get_settings().serac_data_dir
+    t0, t1 = _window(from_, to)
+    params: dict[str, object] = {"processing_level": level}
+    if relative_orbit is not None:
+        params["relative_orbit"] = relative_orbit
+    if flight_direction is not None:
+        params["flight_direction"] = flight_direction
+    request = IngestRequest(
+        aoi_id=aoi,
+        bbox_4326=resolve_bbox(aoi, bbox, root),
+        time_start=t0,
+        time_end=t1,
+        params=params,
+    )
+    run(Sentinel1AsfAdapter(), request, dry_run=dry_run, yes=yes, data_dir=root)
+
+
+@app.command("hyp3")
+def hyp3(
+    aoi: AoiOpt,
+    from_: FromOpt,
+    to: ToOpt,
+    bbox: BboxOpt = None,
+    dry_run: DryRunOpt = False,
+    yes: YesOpt = False,
+    poll: Annotated[
+        bool, typer.Option("--poll", help="Refresh submitted jobs and download finished ones.")
+    ] = False,
+    wait: Annotated[bool, typer.Option("--wait", help="Block until the jobs finish.")] = False,
+    max_days: Annotated[float, typer.Option("--max-days", help="Pair temporal baseline.")] = 12.0,
+    relative_orbit: RelativeOrbitOpt = None,
+    flight_direction: FlightDirectionOpt = None,
+    data_dir: DataDirOpt = None,
+) -> None:
+    """HyP3 INSAR_GAMMA jobs for same-track Sentinel-1 pairs (submit / --poll / --wait)."""
+    from serac.adapters.eo.hyp3_insar import Hyp3InsarAdapter
+
+    root = data_dir or get_settings().serac_data_dir
+    t0, t1 = _window(from_, to)
+    params: dict[str, object] = {"max_days": max_days, "wait": wait}
+    if relative_orbit is not None:
+        params["relative_orbit"] = relative_orbit
+    if flight_direction is not None:
+        params["flight_direction"] = flight_direction
+    request = IngestRequest(
+        aoi_id=aoi,
+        bbox_4326=resolve_bbox(aoi, bbox, root),
+        time_start=t0,
+        time_end=t1,
+        params=params,
+    )
+    adapter = Hyp3InsarAdapter()
+    if poll:
+        if dry_run:
+            err_console.print("[red]--poll cannot be combined with --dry-run[/red]")
+            raise typer.Exit(EXIT_USAGE)
+        plan = adapter.plan(request)
+        ledger = JsonlManifestLedger(root / "manifest.jsonl")
+        try:
+            entries = adapter.poll(plan, dest_root=root, ledger=ledger)
+        except CredentialsMissingError as exc:
+            err_console.print(f"[red]credentials missing:[/red] {exc}")
+            raise typer.Exit(EXIT_CREDENTIALS) from exc
+        print_entries(entries)
+        return
+    run(adapter, request, dry_run=dry_run, yes=yes, data_dir=root)
+
+
+@app.command("nisar")
+def nisar(
+    aoi: AoiOpt,
+    bbox: BboxOpt = None,
+    from_: Annotated[str | None, typer.Option("--from", help="Start date (ISO).")] = None,
+    to: Annotated[str | None, typer.Option("--to", help="End date (ISO, inclusive).")] = None,
+    dry_run: DryRunOpt = False,
+    yes: YesOpt = False,
+    level: Annotated[
+        str | None,
+        typer.Option("--level", help="beta or provisional; required when both match."),
+    ] = None,
+    processing_level: Annotated[
+        str, typer.Option("--processing-level", help="Science level, e.g. GCOV, GSLC, GUNW.")
+    ] = "GCOV",
+    flight_direction: FlightDirectionOpt = None,
+    data_dir: DataDirOpt = None,
+) -> None:
+    """NISAR science granules via ASF; refuses to mix BETA and PROVISIONAL."""
+    from serac.adapters.eo.nisar import NisarAdapter
+
+    root = data_dir or get_settings().serac_data_dir
+    params: dict[str, object] = {"processing_level": processing_level}
+    if level is not None:
+        params["level"] = level
+    if flight_direction is not None:
+        params["flight_direction"] = flight_direction
+    request = IngestRequest(
+        aoi_id=aoi,
+        bbox_4326=resolve_bbox(aoi, bbox, root),
+        time_start=parse_date(from_) if from_ else None,
+        time_end=parse_date(to, end=True) if to else None,
+        params=params,
+    )
+    run(NisarAdapter(), request, dry_run=dry_run, yes=yes, data_dir=root)
+
+
+@app.command("s2-cdse")
+def s2_cdse(
+    aoi: AoiOpt,
+    from_: FromOpt,
+    to: ToOpt,
+    bbox: BboxOpt = None,
+    dry_run: DryRunOpt = False,
+    yes: YesOpt = False,
+    max_cloud: Annotated[
+        float, typer.Option("--max-cloud", help="Tile-level eo:cloud_cover ceiling, percent.")
+    ] = DEFAULT_MAX_CLOUD_PERCENT,
+    max_scenes: Annotated[
+        int | None, typer.Option("--max-scenes", help="Keep the N least-cloudy scenes.")
+    ] = None,
+    stac_url: Annotated[
+        str, typer.Option("--stac-url")
+    ] = "https://stac.dataspace.copernicus.eu/v1",
+    data_dir: DataDirOpt = None,
+) -> None:
+    """Sentinel-2 L2A B03/B11/SCL windows from CDSE (OAuth client credentials)."""
+    from serac.adapters.eo.cdse_sentinel2 import CdseSentinel2Adapter
+
+    root = data_dir or get_settings().serac_data_dir
+    t0, t1 = _window(from_, to)
+    request = IngestRequest(
+        aoi_id=aoi,
+        bbox_4326=resolve_bbox(aoi, bbox, root),
+        time_start=t0,
+        time_end=t1,
+        params={"max_cloud": max_cloud, "max_scenes": max_scenes},
+    )
+    adapter = CdseSentinel2Adapter(PystacSearchClient(stac_url))
+    run(adapter, request, dry_run=dry_run, yes=yes, data_dir=root)
+
+
+@app.command("era5")
+def era5(
+    aoi: AoiOpt,
+    from_: FromOpt,
+    to: ToOpt,
+    bbox: BboxOpt = None,
+    dry_run: DryRunOpt = False,
+    yes: YesOpt = False,
+    variable: Annotated[
+        list[str] | None, typer.Option("--variable", help="CDS variable name (repeatable).")
+    ] = None,
+    data_dir: DataDirOpt = None,
+) -> None:
+    """ERA5 hourly single-level fields over the AOI cells via cdsapi (needs CDSAPI_KEY)."""
+    from serac.adapters.eo.era5_cds import Era5Adapter
+
+    root = data_dir or get_settings().serac_data_dir
+    t0, t1 = _window(from_, to)
+    params: dict[str, object] = {}
+    if variable:
+        params["variables"] = list(variable)
+    request = IngestRequest(
+        aoi_id=aoi,
+        bbox_4326=resolve_bbox(aoi, bbox, root),
+        time_start=t0,
+        time_end=t1,
+        params=params,
+    )
+    run(Era5Adapter(), request, dry_run=dry_run, yes=yes, data_dir=root)
+
+
+@app.command("gacos")
+def gacos(
+    aoi: AoiOpt,
+    bbox: BboxOpt = None,
+    dry_run: DryRunOpt = False,
+    yes: YesOpt = False,
+    date: Annotated[
+        list[str] | None, typer.Option("--date", help="SAR acquisition date YYYYMMDD (repeatable).")
+    ] = None,
+    time_utc: Annotated[
+        str, typer.Option("--time-utc", help="Acquisition time HH:MM UTC.")
+    ] = "00:00",
+    request_id: Annotated[
+        str | None,
+        typer.Option("--request-id", help="Your id for the request (or with --receive)."),
+    ] = None,
+    receive: Annotated[
+        str | None, typer.Option("--receive", help="Delivery URL from the GACOS e-mail.")
+    ] = None,
+    poll: Annotated[bool, typer.Option("--poll", help="Report the state of --request-id.")] = False,
+    data_dir: DataDirOpt = None,
+) -> None:
+    """GACOS corrections: record a request (--yes), poll it, or receive the e-mailed archive."""
+    from serac.adapters.eo.gacos import GacosAdapter
+
+    root = data_dir or get_settings().serac_data_dir
+    adapter = GacosAdapter()
+    ledger = JsonlManifestLedger(root / "manifest.jsonl")
+    if receive is not None or poll:
+        if request_id is None:
+            err_console.print("[red]--receive and --poll need --request-id[/red]")
+            raise typer.Exit(EXIT_USAGE)
+        if poll and receive is None:
+            console.print(json.dumps(adapter.poll(ledger, request_id), indent=1))
+            return
+        assert receive is not None
+        try:
+            entry = adapter.receive(ledger, request_id=request_id, url=receive, dest_root=root)
+        except ValueError as exc:
+            err_console.print(f"[red]{exc}[/red]")
+            raise typer.Exit(EXIT_USAGE) from exc
+        print_entries([entry])
+        return
+    request = IngestRequest(
+        aoi_id=aoi,
+        bbox_4326=resolve_bbox(aoi, bbox, root),
+        params={"dates": list(date or []), "time_utc": time_utc},
+    )
+    if dry_run == yes:
+        err_console.print("[red]pass exactly one of --dry-run or --yes[/red]")
+        raise typer.Exit(EXIT_USAGE)
+    try:
+        plan = adapter.plan(request)
+    except ValueError as exc:
+        err_console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(EXIT_USAGE) from exc
+    print_plan(plan)
+    if dry_run:
+        console.print("[dim]dry run: nothing written, no ledger entry.[/dim]")
+        return
+    try:
+        entry = adapter.request(plan, ledger=ledger, request_id=request_id)
+    except CredentialsMissingError as exc:
+        err_console.print(f"[red]credentials missing:[/red] {exc}")
+        raise typer.Exit(EXIT_CREDENTIALS) from exc
+    print_entries([entry])
+    console.print(f"request_id: [bold]{entry.params['request_id']}[/bold]")
