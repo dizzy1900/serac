@@ -472,7 +472,7 @@ class VoellmySolver:
 
         t = 0.0
         step = 0
-        initial_kinetic: float | None = None
+        peak_kinetic = 0.0
         while t < self.s.max_time_s and step < self.s.max_steps:
             if steps_since_refresh >= refresh:
                 window = _active_window(h_full, self.s.dry_depth_m, margin)
@@ -630,9 +630,14 @@ class VoellmySolver:
             newly = wet_now & np.isnan(arrival_view)
             arrival_view[newly] = t
 
+            # Measured against the PEAK kinetic energy, not the first non-zero value. The
+            # release is emplaced at rest, so the first non-zero value is whatever the flow had
+            # after one step -- essentially nothing -- and a threshold of 1e-3 of that never
+            # triggers. Every member of the first ensemble ran to the simulated-time limit
+            # because of it, which made runout distance a statement about the compute budget
+            # rather than about the rheology.
             kinetic = float((0.5 * h * speed * speed).sum())
-            if initial_kinetic is None and kinetic > 0.0:
-                initial_kinetic = kinetic
+            peak_kinetic = max(peak_kinetic, kinetic)
             if record_history and t >= next_output:
                 history.append(
                     {
@@ -657,8 +662,8 @@ class VoellmySolver:
             if self.s.stop_when_dry and not wet_now.any():
                 break
             if (
-                initial_kinetic
-                and kinetic < self.s.stop_kinetic_fraction * initial_kinetic
+                peak_kinetic > 0.0
+                and kinetic < self.s.stop_kinetic_fraction * peak_kinetic
                 and t > 60.0
             ):
                 break

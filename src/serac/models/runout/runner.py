@@ -260,7 +260,14 @@ class RunoutRunner:
         self.terrain_hash = terrain_fingerprint(terrain)
 
     def root(self) -> Path:
-        return self.data_dir / "interim" / "runout" / self.aoi_id
+        """Outputs are versioned by solver, so a version bump cannot orphan a ledger row.
+
+        Without the version segment, bumping `SOLVER_VERSION` changes every member's input hash
+        and the runner deletes the stale directory -- leaving `data/manifest.jsonl` pointing at
+        files that no longer exist, which `validate-ingest` would then fail on. The ledger is
+        append-only and must stay true.
+        """
+        return self.data_dir / "interim" / "runout" / self.aoi_id / f"v{SOLVER_VERSION}"
 
     def member_dir(self, run_id: str) -> Path:
         return self.root() / run_id
@@ -435,7 +442,7 @@ class RunoutRunner:
                 self.ledger.append(
                     ManifestEntry(
                         source=DataSource.simulation_output,
-                        product_id=f"runout/{self.aoi_id}/{run_id}/{path.name}",
+                        product_id=f"runout/{self.aoi_id}/v{SOLVER_VERSION}/{run_id}/{path.name}",
                         product_level=f"{SOLVER_NAME} v{SOLVER_VERSION}",
                         aoi_id=self.aoi_id,
                         path=rel,

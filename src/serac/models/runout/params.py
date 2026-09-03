@@ -14,7 +14,7 @@ from typing import Any, Self
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 SOLVER_NAME = "serac-swe-voellmy"
-SOLVER_VERSION = "0.1.0"
+SOLVER_VERSION = "0.2.0"
 """Bumping this invalidates every cached run and the frozen ensemble design."""
 
 RUNOUT_CONTRACT_VERSION = "0.1.0"
