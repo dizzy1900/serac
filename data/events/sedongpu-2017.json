@@ -1,0 +1,227 @@
+{
+  "aoi_id": null,
+  "bulked_volume_m3": null,
+  "dammed_river": true,
+  "event_group": "sedongpu-2017-2018",
+  "event_id": "sedongpu-2017",
+  "failure_type": "bedrock_rock_ice_avalanche",
+  "fall_height_m": null,
+  "fatalities": null,
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "No deposit volume for the 2017 event was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "fall_height_m": {
+      "notes": "Table 1 of Kääb et al. (2021) gives a drop of 1.3 km for the 2018 glacier detachment, not for the 2017 rock avalanche; nothing was read for 2017.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "fatalities": {
+      "notes": "No fatality count for the 2017 event was read in the retrieved text.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "peak_velocity_ms": {
+      "notes": "No velocity for the 2017 avalanche was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "Described as a rock avalanche that 'incorporated ice from the surface of the glaciers lower down'; no ratio stated.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "runout_km": {
+      "notes": "The avalanche 'ran over large parts of the Sedongpu basin and down to Yarlung Tsangpo' (Kääb et al. 2021); no distance was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "seismic.agency_range": {
+      "notes": "Only the Chinese catalogue magnitude (via Kääb et al. 2021) was read; no other agency magnitude.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "source_elevation_m": {
+      "notes": "Kääb et al. (2021) give the Gyala Peri summit as 7294 m a.s.l. but do not state the elevation of the 2017 detachment zone on its north ridge.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [],
+  "initially_reported_as": null,
+  "name": "Gyala Peri / Sedongpu rock–ice avalanche, October 2017, south-eastern Tibet",
+  "notes": "Kääb et al. (2021): the avalanche dammed the Yarlung Tsangpo, drastically changed Sedongpu Glacier and was followed by debris flows into 2018 that preceded the October 2018 glacier detachment (sedongpu-2018-10). The 18 November 2017 M 6.9 Milin earthquake nearby 'may have contributed to the triggering of the debris flows'. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "peak_velocity_ms": null,
+  "precursors_observed": [],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "reference",
+  "runout_km": null,
+  "schema_version": "0.1.0",
+  "secondary_surge": false,
+  "seismic": {
+    "agency_range": null,
+    "mag_type": null,
+    "magnitude": {
+      "best": 4.0,
+      "disputed": false,
+      "estimates": [],
+      "high": 4.0,
+      "low": 4.0,
+      "notes": "'a M 4.0 event at 06:22 directly at Sedongpu' in the Chinese seismic database, as reported by Kääb et al. (2021); magnitude type not stated",
+      "source_refs": [
+        "kaab-2021"
+      ],
+      "unit": "magnitude"
+    },
+    "notes": "A second 'landslide' signal (M 3.2 at 06:20 CST, about 16 km west of Sedongpu) is listed for the same morning; Kääb et al. (2021) confirm only the 06:22 signal as the Gyala Peri avalanche. Not in USGS ComCat as far as retrieved.",
+    "single_force": false,
+    "source_refs": [
+      "kaab-2021"
+    ],
+    "usgs_id": null
+  },
+  "source_elevation_m": null,
+  "source_location": {
+    "basis": "Sedongpu Glacier location from Table 1 of Kääb et al. (2021); the 2017 avalanche 'started high up from the north ridge of Gyala Peri' above the basin, which was not located more precisely in the retrieved text",
+    "lat": 29.8,
+    "lon": 94.92,
+    "source_refs": [
+      "kaab-2021-table1",
+      "kaab-2021"
+    ],
+    "uncertainty_radius_m": 5000.0
+  },
+  "source_volume_m3": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 17000000.0,
+        "low": 17000000.0,
+        "qualifier": "DEM differencing: material removed from the first of 'two close-by but separated areas'",
+        "source_ref": "kaab-2021",
+        "unit": "m3"
+      },
+      {
+        "high": 33000000.0,
+        "low": 33000000.0,
+        "qualifier": "DEM differencing: material removed from the second area",
+        "source_ref": "kaab-2021",
+        "unit": "m3"
+      },
+      {
+        "high": 50000000.0,
+        "low": 50000000.0,
+        "qualifier": "'If both failures happened as part of the same event, the total volume of 50 × 10^6 m3'",
+        "source_ref": "kaab-2021",
+        "unit": "m3"
+      }
+    ],
+    "high": 50000000.0,
+    "low": 17000000.0,
+    "notes": "Kääb et al. (2021) cannot tell whether the two source areas failed in one event; low is the smaller single area, high the combined total",
+    "source_refs": [
+      "kaab-2021"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:27:27.644613Z",
+      "authors": [
+        "Kääb, Andreas",
+        "Jacquemart, Mylène",
+        "Gilbert, Adrien",
+        "Leinss, Silvan",
+        "Girod, Luc",
+        "Huggel, Christian",
+        "Falaschi, Daniel",
+        "Ugalde, Felipe",
+        "Petrakov, Dmitry",
+        "Chernomorets, Sergey",
+        "Dokukin, Mikhail",
+        "Paul, Frank",
+        "Gascoin, Simon",
+        "Berthier, Etienne",
+        "Kargel, Jeffrey S."
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_location",
+        "source_volume_m3",
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range",
+        "dammed_river"
+      ],
+      "content_type": "text/html",
+      "doi": "10.5194/tc-15-1751-2021",
+      "excerpt": "The detachment of Kolka Glacier on 20 September 2002 released 130×10 6 m 3 of ice and rock that claimed ∼ 135 lives",
+      "id": "kaab-2021",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "d278073a19acd4ec41486f011489e5db666841182bb603c9155bc619ab3376f2",
+      "stored_copy": "data/raw/sources/kolka-karmadon-2002/kaab-2021.html",
+      "title": "Sudden large-volume detachments of low-angle mountain glaciers – more frequent than thought?",
+      "url": "https://tc.copernicus.org/articles/15/1751/2021/tc-15-1751-2021.html",
+      "year": 2021
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:30.701737Z",
+      "authors": [
+        "Kääb, Andreas",
+        "Jacquemart, Mylène",
+        "Gilbert, Adrien",
+        "Leinss, Silvan",
+        "Girod, Luc",
+        "Huggel, Christian",
+        "Falaschi, Daniel",
+        "Ugalde, Felipe",
+        "Petrakov, Dmitry",
+        "Chernomorets, Sergey",
+        "Dokukin, Mikhail",
+        "Paul, Frank",
+        "Gascoin, Simon",
+        "Berthier, Etienne",
+        "Kargel, Jeffrey S."
+      ],
+      "claims_supported": [
+        "source_location"
+      ],
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "doi": "10.5194/tc-15-1751-2021",
+      "excerpt": "Kolka | Caucasus | ~1835?, 1902, 2002 | 42.73 N, 44.44 E | Reach 19 km | Drop 2 km | Volume 130 x 10^6 m3 | slope 13",
+      "id": "kaab-2021-table1",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "dfbe47dae165ac403c274ba122e955e2fd780fef6e1ad3f4c5f3fe0c9952530c",
+      "stored_copy": "data/raw/sources/kolka-karmadon-2002/kaab-2021-table1.xlsx",
+      "title": "Table 1 of Kääb et al. (2021): parameters for the low-angle glacier detachments (XLSX)",
+      "url": "https://tc.copernicus.org/articles/15/1751/2021/tc-15-1751-2021-t01.xlsx",
+      "year": 2021
+    }
+  ],
+  "time": {
+    "basis": "Kääb et al. (2021): 'The Chinese seismic database registered ... a M 4.0 event at 06:22 (China standard time) [22 October 2017] directly at Sedongpu', which Chen et al. (2020) and Tong et al. (2018) attribute to the Gyala Peri ice–rock avalanche; satellite images bracket the event between 20 and 27 October 2017. CST = UTC+8.",
+    "datetime_utc": "2017-10-21T22:22:00Z",
+    "source_refs": [
+      "kaab-2021"
+    ],
+    "uncertainty_s": 60.0
+  },
+  "transect_observations": []
+}
