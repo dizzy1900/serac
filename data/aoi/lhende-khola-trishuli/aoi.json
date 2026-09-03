@@ -147,7 +147,7 @@
     },
     {
       "id": "rghpcl-about-project",
-      "kind": "agency_official",
+      "kind": "operator_statement",
       "title": "Rasuwagadhi Hydropower Company Limited (operator page): About the Project (111 MW)",
       "url": "https://rghpcl.com.np/about-the-project/",
       "authors": [],
@@ -166,7 +166,7 @@
     },
     {
       "id": "chilime-company-home",
-      "kind": "agency_official",
+      "kind": "operator_statement",
       "title": "Chilime Hydropower Company Limited (operator page): home, 22.1 MW plant",
       "url": "https://www.chilime.com.np/en/",
       "authors": [],
@@ -185,7 +185,7 @@
     },
     {
       "id": "sjcl-about",
-      "kind": "agency_official",
+      "kind": "operator_statement",
       "title": "Sanjen Jalavidhyut Company Limited (operator page): About (42.5 MW and 14.8 MW)",
       "url": "https://sjcl.com.np/about/",
       "authors": [],
@@ -204,7 +204,7 @@
     },
     {
       "id": "nwedc-home",
-      "kind": "agency_official",
+      "kind": "operator_statement",
       "title": "Nepal Water & Energy Development Company (developer page): Upper Trishuli-1, 216 MW",
       "url": "https://nwedcpl.com/",
       "authors": [],

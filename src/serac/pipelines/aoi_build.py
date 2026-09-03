@@ -44,6 +44,7 @@ from shapely.geometry import (
     box,
     mapping,
 )
+from shapely.geometry.base import BaseGeometry
 from shapely.geometry.polygon import orient
 from shapely.ops import substring, transform, unary_union
 
@@ -736,12 +737,16 @@ def build_aoi(
             raise AoiBuildError(f"asset {a.id!r} cites unknown sources {missing}")
         if a.stated_location is not None:
             lon, lat = a.stated_location.lon, a.stated_location.lat
-            quality = GeometryQuality.hand_digitised_approximate
+            quality = GeometryQuality.source_stated_location
             accuracy = a.stated_location.positional_accuracy_m
             basis = a.stated_location.basis
         else:
             lon, lat = _lonlat_of(data, a.osm_node_id, a.osm_way_id)
-            quality = GeometryQuality.osm_node
+            quality = (
+                GeometryQuality.osm_node
+                if a.osm_node_id is not None
+                else GeometryQuality.osm_way_centroid
+            )
             accuracy = a.positional_accuracy_m if a.positional_accuracy_m is not None else 50.0
             basis = (
                 f"OSM node {a.osm_node_id}"
@@ -1027,3 +1032,12 @@ def geometry_to_shapely(geom: Geometry | Mapping[str, Any]) -> Any:
         dict(geom) if isinstance(geom, Mapping) else json.loads(geom.model_dump_json())
     )
     return shape(doc)
+
+
+def project_to[G: BaseGeometry](geom: G, epsg: int) -> G:
+    """Reproject a lon/lat geometry to `epsg` (metres); the only shapely/pyproj hop callers need."""
+    from shapely.ops import transform as sh_transform
+
+    tr = Transformer.from_crs("EPSG:4326", f"EPSG:{epsg}", always_xy=True)
+    out: G = sh_transform(tr.transform, geom)
+    return out

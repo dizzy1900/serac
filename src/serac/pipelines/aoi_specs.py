@@ -9,8 +9,8 @@ rectangle or coordinate the source states.
 
 Source kinds: government and intergovernmental bodies (DoED, Nepal Customs/Immigration,
 Canton Valais, ICIMOD, WSL/ETH) are `agency_official`. Operator pages are the only public
-statement of a plant's owner; the domain has no `operator_statement` kind, so they are also
-recorded as `agency_official` and named as operator pages in their titles. Press is
+statement of a plant's owner and are recorded as `operator_statement`, which does not
+qualify a `best` value; every `best` here is backed by a DoED register or ICIMOD. Press is
 `press_report` and is only used for 2025 events (the Blatten evacuation, the Friendship
 Bridge rebuild).
 """
@@ -116,7 +116,7 @@ DOED_CONSTRUCTION = SourceRef(
 
 RGHPCL = SourceRef(
     id="rghpcl-about-project",
-    kind=SourceKind.agency_official,
+    kind=SourceKind.operator_statement,
     title="Rasuwagadhi Hydropower Company Limited (operator page): About the Project (111 MW)",
     url="https://rghpcl.com.np/about-the-project/",
     year=2026,
@@ -139,7 +139,7 @@ RGHPCL = SourceRef(
 
 CHILIME = SourceRef(
     id="chilime-company-home",
-    kind=SourceKind.agency_official,
+    kind=SourceKind.operator_statement,
     title="Chilime Hydropower Company Limited (operator page): home, 22.1 MW plant",
     url="https://www.chilime.com.np/en/",
     year=2026,
@@ -161,7 +161,7 @@ CHILIME = SourceRef(
 
 SJCL = SourceRef(
     id="sjcl-about",
-    kind=SourceKind.agency_official,
+    kind=SourceKind.operator_statement,
     title="Sanjen Jalavidhyut Company Limited (operator page): About (42.5 MW and 14.8 MW)",
     url="https://sjcl.com.np/about/",
     year=2026,
@@ -184,7 +184,7 @@ SJCL = SourceRef(
 
 NWEDC = SourceRef(
     id="nwedc-home",
-    kind=SourceKind.agency_official,
+    kind=SourceKind.operator_statement,
     title="Nepal Water & Energy Development Company (developer page): Upper Trishuli-1, 216 MW",
     url="https://nwedcpl.com/",
     year=2026,
@@ -997,7 +997,7 @@ BLATTEN_LOTSCHENTAL = AoiSpec(
         "Kleines Nesthorn (OSM peak 46.4 N, 7.8 E) and the Birchgletscher above Blatten, as "
         "named by the Canton, WSL/ETH and SRF; it is not the mapped scar or deposit. The "
         "corridor follows the OSM Lonza from Blatten past Wiler to Gampel (downstream target "
-        "7.735 E, 46.312 N near the Rhône confluence), clipped at 30 km. Chainage 0 is the "
+        "7.735 E, 46.312 N near the Rhône confluence); chainage cap 30 km (not reached: 16.5 km available). Chainage 0 is the "
         "Lonza node nearest the source-zone centroid, i.e. at Blatten, not the glacier. ASSETS: "
         "Blatten settlement only, as requested; status and evacuation count from the Canton."
     ),

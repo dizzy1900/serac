@@ -35,6 +35,7 @@ from serac.pipelines.aoi_build import (
     geometry_to_shapely,
     grid_from_bbox,
     iter_aoi_dirs,
+    project_to,
     read_aoi_dir,
     transformers,
 )
@@ -92,7 +93,10 @@ def _check_feature_props(
         quality = props.get("geometry_quality")
         if quality not in {q.value for q in GeometryQuality}:
             problems.append(f"{label}: geometry_quality={quality!r}")
-        elif quality == GeometryQuality.hand_digitised_approximate.value:
+        elif quality in {
+            GeometryQuality.hand_digitised_approximate.value,
+            GeometryQuality.source_stated_location.value,
+        }:
             hand.append(f"{label} ({props.get('id') or ftype})")
         acc = props.get("positional_accuracy_m")
         if not isinstance(acc, int | float) or not math.isfinite(acc) or acc < 0:
@@ -172,15 +176,13 @@ def _centreline_checks(suite: Suite, files: AoiFiles) -> None:
     suite.check(f"{aoi.id}:centreline:length_matches_chainage", ok_len, detail)
 
     line = geometry_to_shapely(geom)
-    from shapely.ops import transform as sh_transform
-
-    line_proj = sh_transform(to_proj.transform, line)
+    line_proj = project_to(line, aoi.cube_epsg)
     last = -1.0
     ordered = True
     on_line = True
     for t in sorted(files.transects, key=lambda t: t.chainage_km):
         pt = geometry_to_shapely(t.point)
-        pt_proj = sh_transform(to_proj.transform, pt)
+        pt_proj = project_to(pt, aoi.cube_epsg)
         if pt_proj.distance(line_proj) > TRANSECT_ON_LINE_TOLERANCE_M:
             on_line = False
         along = float(line_proj.project(pt_proj)) / 1000.0
