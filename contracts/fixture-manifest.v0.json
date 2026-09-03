@@ -1,0 +1,306 @@
+{
+  "$defs": {
+    "FixtureFile": {
+      "additionalProperties": false,
+      "description": "One committed file inside a fixture directory.",
+      "properties": {
+        "end_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Utc"
+        },
+        "kind": {
+          "enum": [
+            "miniseed",
+            "stationxml",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "npts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Npts"
+        },
+        "path": {
+          "description": "Path relative to the fixture directory.",
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sampling_rate_hz": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sampling Rate Hz"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "sncl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "`NET.STA.LOC.CHA` for waveform files.",
+          "title": "Sncl"
+        },
+        "start_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Utc"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Request URL the bytes were fetched from.",
+          "title": "Url"
+        }
+      },
+      "required": [
+        "path",
+        "kind",
+        "sha256",
+        "size_bytes"
+      ],
+      "title": "FixtureFile",
+      "type": "object"
+    },
+    "FixtureRequest": {
+      "additionalProperties": false,
+      "description": "How the fixture was requested, enough to reproduce it.",
+      "properties": {
+        "base_url": {
+          "description": "Resolved service base URL, never an alias.",
+          "minLength": 1,
+          "title": "Base Url",
+          "type": "string"
+        },
+        "bulk": {
+          "description": "fdsnws bulk rows: net sta loc cha start end.",
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Bulk",
+          "type": "array"
+        },
+        "client": {
+          "description": "FDSN client alias used, e.g. EARTHSCOPE.",
+          "minLength": 1,
+          "title": "Client",
+          "type": "string"
+        },
+        "station_level": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Station Level"
+        },
+        "tool": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. `obspy 1.5.1`.",
+          "title": "Tool"
+        }
+      },
+      "required": [
+        "client",
+        "base_url"
+      ],
+      "title": "FixtureRequest",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "end_utc": {
+          "format": "date-time",
+          "title": "End Utc",
+          "type": "string"
+        },
+        "start_utc": {
+          "format": "date-time",
+          "title": "Start Utc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start_utc",
+        "end_utc"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/fixture-manifest.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Sidecar manifest for a replay fixture directory.",
+  "properties": {
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "event_id": {
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/FixtureFile"
+      },
+      "title": "Files",
+      "type": "array"
+    },
+    "licence": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Licence statement as read at the data centre, else null.",
+      "title": "Licence"
+    },
+    "licence_source_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Licence Source Url"
+    },
+    "missing": {
+      "description": "SNCLs requested but not returned by the service.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing",
+      "type": "array"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "request": {
+      "$ref": "#/$defs/FixtureRequest"
+    },
+    "retrieved_at_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retrieved At Utc"
+    },
+    "status": {
+      "enum": [
+        "fetched",
+        "partial",
+        "not_fetched"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "window": {
+      "$ref": "#/$defs/TimeWindow"
+    }
+  },
+  "required": [
+    "event_id",
+    "window",
+    "request",
+    "status"
+  ],
+  "title": "FixtureManifest",
+  "type": "object"
+}

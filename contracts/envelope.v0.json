@@ -1,0 +1,95 @@
+{
+  "$defs": {
+    "BaseModel": {
+      "properties": {},
+      "title": "BaseModel",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/envelope.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Typed message wrapper. The wire form is JSON (see `serac.domain.codec`).",
+  "properties": {
+    "causation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "message_id of the message this one was derived from.",
+      "title": "Causation Id"
+    },
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "message_id": {
+      "title": "Message Id",
+      "type": "string"
+    },
+    "payload": {
+      "$ref": "#/$defs/BaseModel"
+    },
+    "produced_at_utc": {
+      "format": "date-time",
+      "title": "Produced At Utc",
+      "type": "string"
+    },
+    "producer": {
+      "description": "Stage or process name that published this.",
+      "minLength": 1,
+      "title": "Producer",
+      "type": "string"
+    },
+    "replay_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Set on every message produced by `serac replay`.",
+      "title": "Replay Run Id"
+    },
+    "schema_name": {
+      "description": "Key into `codec.SCHEMA_REGISTRY`.",
+      "minLength": 1,
+      "title": "Schema Name",
+      "type": "string"
+    },
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stream_time_utc": {
+      "format": "date-time",
+      "title": "Stream Time Utc",
+      "type": "string"
+    },
+    "topic": {
+      "minLength": 1,
+      "title": "Topic",
+      "type": "string"
+    }
+  },
+  "required": [
+    "topic",
+    "schema_name",
+    "schema_version",
+    "producer",
+    "stream_time_utc",
+    "payload"
+  ],
+  "title": "Envelope",
+  "type": "object"
+}

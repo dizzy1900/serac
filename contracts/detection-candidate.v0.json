@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "Sncl": {
+      "additionalProperties": false,
+      "description": "SEED network/station/location/channel identifier.",
+      "properties": {
+        "channel": {
+          "pattern": "^[A-Z0-9]{3}$",
+          "title": "Channel",
+          "type": "string"
+        },
+        "location": {
+          "default": "",
+          "pattern": "^[A-Z0-9]{0,2}$",
+          "title": "Location",
+          "type": "string"
+        },
+        "network": {
+          "pattern": "^[A-Z0-9]{1,2}$",
+          "title": "Network",
+          "type": "string"
+        },
+        "station": {
+          "pattern": "^[A-Z0-9]{1,5}$",
+          "title": "Station",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "station",
+        "channel"
+      ],
+      "title": "Sncl",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/detection-candidate.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A candidate long-period signal on one channel.",
+  "properties": {
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "detected_at_stream_utc": {
+      "description": "Stream time at which the detector fired (end of the triggering window).",
+      "format": "date-time",
+      "title": "Detected At Stream Utc",
+      "type": "string"
+    },
+    "detection_id": {
+      "minLength": 1,
+      "title": "Detection Id",
+      "type": "string"
+    },
+    "detector": {
+      "description": "Detector name, e.g. `lp-sp-ratio-stub`.",
+      "minLength": 1,
+      "title": "Detector",
+      "type": "string"
+    },
+    "detector_version": {
+      "minLength": 1,
+      "title": "Detector Version",
+      "type": "string"
+    },
+    "features": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Named intermediate quantities, for the report.",
+      "title": "Features",
+      "type": "object"
+    },
+    "input_trace_ids": {
+      "description": "`SeismicTrace.trace_id`s in the triggering window.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Input Trace Ids",
+      "type": "array"
+    },
+    "is_stub": {
+      "default": true,
+      "description": "True while the detector is the Prompt 1 placeholder.",
+      "title": "Is Stub",
+      "type": "boolean"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "score": {
+      "description": "Detector statistic, e.g. LP/SP energy ratio.",
+      "title": "Score",
+      "type": "number"
+    },
+    "sncl": {
+      "$ref": "#/$defs/Sncl"
+    },
+    "source_location": {
+      "default": null,
+      "description": "Always null in this prompt: no location is inferred from a single channel.",
+      "title": "Source Location",
+      "type": "null"
+    },
+    "threshold": {
+      "description": "Threshold the score exceeded.",
+      "title": "Threshold",
+      "type": "number"
+    },
+    "window_end_utc": {
+      "format": "date-time",
+      "title": "Window End Utc",
+      "type": "string"
+    },
+    "window_start_utc": {
+      "format": "date-time",
+      "title": "Window Start Utc",
+      "type": "string"
+    }
+  },
+  "required": [
+    "detection_id",
+    "sncl",
+    "detector",
+    "detector_version",
+    "window_start_utc",
+    "window_end_utc",
+    "detected_at_stream_utc",
+    "score",
+    "threshold"
+  ],
+  "title": "DetectionCandidate",
+  "type": "object"
+}

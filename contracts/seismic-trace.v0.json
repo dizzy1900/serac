@@ -1,0 +1,245 @@
+{
+  "$defs": {
+    "Sncl": {
+      "additionalProperties": false,
+      "description": "SEED network/station/location/channel identifier.",
+      "properties": {
+        "channel": {
+          "pattern": "^[A-Z0-9]{3}$",
+          "title": "Channel",
+          "type": "string"
+        },
+        "location": {
+          "default": "",
+          "pattern": "^[A-Z0-9]{0,2}$",
+          "title": "Location",
+          "type": "string"
+        },
+        "network": {
+          "pattern": "^[A-Z0-9]{1,2}$",
+          "title": "Network",
+          "type": "string"
+        },
+        "station": {
+          "pattern": "^[A-Z0-9]{1,5}$",
+          "title": "Station",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "station",
+        "channel"
+      ],
+      "title": "Sncl",
+      "type": "object"
+    },
+    "TraceEncoding": {
+      "description": "How `SeismicTrace.data` is laid out.",
+      "enum": [
+        "miniseed",
+        "float32le"
+      ],
+      "title": "TraceEncoding",
+      "type": "string"
+    },
+    "TraceProvenance": {
+      "additionalProperties": false,
+      "description": "Origin of a chunk's samples.",
+      "properties": {
+        "fixture_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Repo-relative path when `source` is `fixture`.",
+          "title": "Fixture Path"
+        },
+        "licence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Licence statement as read at the data centre, or null.",
+          "title": "Licence"
+        },
+        "licence_source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Licence Source Url"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "retrieved_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retrieved At"
+        },
+        "server": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Resolved base URL or host:port the bytes came from; never an alias.",
+          "title": "Server"
+        },
+        "source": {
+          "$ref": "#/$defs/TraceSource"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "TraceProvenance",
+      "type": "object"
+    },
+    "TraceSource": {
+      "description": "Where the samples came from.",
+      "enum": [
+        "seedlink",
+        "fdsn",
+        "fixture",
+        "synthetic"
+      ],
+      "title": "TraceSource",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/seismic-trace.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One chunk of one channel, as published on `serac.waveforms`.\n\nInvariants enforced here:\n\n* `end_time_utc` equals `start_time_utc + (npts - 1) / sampling_rate_hz` within one sample;\n* `data_sha256` is the SHA-256 of `data`;\n* `float32le` payloads are exactly `4 * npts` bytes.",
+  "properties": {
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "data": {
+      "format": "base64url",
+      "minLength": 1,
+      "title": "Data",
+      "type": "string"
+    },
+    "data_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Data Sha256",
+      "type": "string"
+    },
+    "encoding": {
+      "$ref": "#/$defs/TraceEncoding"
+    },
+    "end_time_utc": {
+      "format": "date-time",
+      "title": "End Time Utc",
+      "type": "string"
+    },
+    "npts": {
+      "minimum": 1,
+      "title": "Npts",
+      "type": "integer"
+    },
+    "provenance": {
+      "$ref": "#/$defs/TraceProvenance"
+    },
+    "quality": {
+      "anyOf": [
+        {
+          "pattern": "^[DRQM]$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "MiniSEED data quality indicator.",
+      "title": "Quality"
+    },
+    "sampling_rate_hz": {
+      "exclusiveMinimum": 0,
+      "title": "Sampling Rate Hz",
+      "type": "number"
+    },
+    "sequence": {
+      "description": "Chunk index within its stream, in stream-time order.",
+      "minimum": 0,
+      "title": "Sequence",
+      "type": "integer"
+    },
+    "sncl": {
+      "$ref": "#/$defs/Sncl"
+    },
+    "start_time_utc": {
+      "format": "date-time",
+      "title": "Start Time Utc",
+      "type": "string"
+    },
+    "trace_id": {
+      "minLength": 1,
+      "title": "Trace Id",
+      "type": "string"
+    },
+    "units": {
+      "const": "counts",
+      "default": "counts",
+      "title": "Units",
+      "type": "string"
+    }
+  },
+  "required": [
+    "trace_id",
+    "sncl",
+    "start_time_utc",
+    "end_time_utc",
+    "sampling_rate_hz",
+    "npts",
+    "encoding",
+    "data",
+    "data_sha256",
+    "sequence",
+    "provenance"
+  ],
+  "title": "SeismicTrace",
+  "type": "object"
+}

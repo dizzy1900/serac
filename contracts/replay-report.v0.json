@@ -1,0 +1,473 @@
+{
+  "$defs": {
+    "DetectorSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "is_stub": {
+          "default": true,
+          "title": "Is Stub",
+          "type": "boolean"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "title": "Params",
+          "type": "object"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "title": "DetectorSummary",
+      "type": "object"
+    },
+    "FixtureRef": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "provenance": {
+          "enum": [
+            "real",
+            "synthetic"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "provenance"
+      ],
+      "title": "FixtureRef",
+      "type": "object"
+    },
+    "MessageMark": {
+      "additionalProperties": false,
+      "description": "When and where a first-of-kind message appeared.",
+      "properties": {
+        "message_id": {
+          "title": "Message Id",
+          "type": "string"
+        },
+        "produced_at_utc": {
+          "format": "date-time",
+          "title": "Produced At Utc",
+          "type": "string"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "sncl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sncl"
+        },
+        "stream_time_utc": {
+          "format": "date-time",
+          "title": "Stream Time Utc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message_id",
+        "stream_time_utc",
+        "produced_at_utc"
+      ],
+      "title": "MessageMark",
+      "type": "object"
+    },
+    "ReplayCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "cap_messages_emitted": {
+          "minimum": 0,
+          "title": "Cap Messages Emitted",
+          "type": "integer"
+        },
+        "chunks_consumed": {
+          "minimum": 0,
+          "title": "Chunks Consumed",
+          "type": "integer"
+        },
+        "chunks_published": {
+          "minimum": 0,
+          "title": "Chunks Published",
+          "type": "integer"
+        },
+        "detections_emitted": {
+          "minimum": 0,
+          "title": "Detections Emitted",
+          "type": "integer"
+        },
+        "pending_after_drain": {
+          "minimum": 0,
+          "title": "Pending After Drain",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "chunks_published",
+        "chunks_consumed",
+        "detections_emitted",
+        "cap_messages_emitted",
+        "pending_after_drain"
+      ],
+      "title": "ReplayCounts",
+      "type": "object"
+    },
+    "StreamTimeLatencies": {
+      "additionalProperties": false,
+      "description": "Seconds between stream times; always meaningful.",
+      "properties": {
+        "first_detection_to_first_cap_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Detection To First Cap S"
+        },
+        "origin_to_first_cap_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Origin To First Cap S"
+        },
+        "origin_to_first_detection_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Origin To First Detection S"
+        }
+      },
+      "title": "StreamTimeLatencies",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "end_utc": {
+          "format": "date-time",
+          "title": "End Utc",
+          "type": "string"
+        },
+        "start_utc": {
+          "format": "date-time",
+          "title": "Start Utc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start_utc",
+        "end_utc"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    },
+    "WallClockLatencies": {
+      "additionalProperties": false,
+      "description": "Seconds between `produced_at_utc` values; only comparable to live at speed 1.0.",
+      "properties": {
+        "first_chunk_to_first_detection_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Chunk To First Detection S"
+        },
+        "first_detection_to_first_cap_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Detection To First Cap S"
+        },
+        "total_run_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Run S"
+        },
+        "valid": {
+          "description": "True only when the replay ran at speed 1.0.",
+          "title": "Valid",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "valid"
+      ],
+      "title": "WallClockLatencies",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/replay-report.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "`reports/replay/<event>.json`: what a replay run did and how long each hop took.",
+  "properties": {
+    "bus": {
+      "enum": [
+        "in_memory",
+        "redis"
+      ],
+      "title": "Bus",
+      "type": "string"
+    },
+    "caveats": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Caveats",
+      "type": "array"
+    },
+    "contains_synthetic": {
+      "default": false,
+      "title": "Contains Synthetic",
+      "type": "boolean"
+    },
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "counts": {
+      "$ref": "#/$defs/ReplayCounts"
+    },
+    "detector": {
+      "$ref": "#/$defs/DetectorSummary"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error"
+    },
+    "event_id": {
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "finished_at_utc": {
+      "format": "date-time",
+      "title": "Finished At Utc",
+      "type": "string"
+    },
+    "first_cap": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MessageMark"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "first_detection": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MessageMark"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "fixtures": {
+      "items": {
+        "$ref": "#/$defs/FixtureRef"
+      },
+      "title": "Fixtures",
+      "type": "array"
+    },
+    "is_stub": {
+      "const": true,
+      "default": true,
+      "title": "Is Stub",
+      "type": "boolean"
+    },
+    "origin_time_source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Event-library record id the origin time was read from.",
+      "title": "Origin Time Source"
+    },
+    "origin_time_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Origin Time Utc"
+    },
+    "replay_run_id": {
+      "minLength": 1,
+      "title": "Replay Run Id",
+      "type": "string"
+    },
+    "speed": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "const": "max",
+          "type": "string"
+        }
+      ],
+      "title": "Speed"
+    },
+    "started_at_utc": {
+      "format": "date-time",
+      "title": "Started At Utc",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "failed",
+        "no_fixture"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "stream_time_latencies": {
+      "$ref": "#/$defs/StreamTimeLatencies"
+    },
+    "wall_clock_latencies": {
+      "$ref": "#/$defs/WallClockLatencies"
+    },
+    "window": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "replay_run_id",
+    "event_id",
+    "bus",
+    "speed",
+    "status",
+    "counts",
+    "stream_time_latencies",
+    "wall_clock_latencies",
+    "detector",
+    "started_at_utc",
+    "finished_at_utc",
+    "caveats"
+  ],
+  "title": "ReplayReport",
+  "type": "object"
+}

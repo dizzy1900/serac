@@ -1,0 +1,574 @@
+{
+  "$defs": {
+    "CAPArea": {
+      "additionalProperties": false,
+      "description": "A CAP `area` block. Polygons are `lat,lon` pairs; circles `lat,lon radius_km`.",
+      "properties": {
+        "altitude": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Altitude"
+        },
+        "area_desc": {
+          "minLength": 1,
+          "title": "Area Desc",
+          "type": "string"
+        },
+        "ceiling": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ceiling"
+        },
+        "circle": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Circle",
+          "type": "array"
+        },
+        "geocode": {
+          "items": {
+            "$ref": "#/$defs/CAPKeyValue"
+          },
+          "title": "Geocode",
+          "type": "array"
+        },
+        "polygon": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Polygon",
+          "type": "array"
+        }
+      },
+      "required": [
+        "area_desc"
+      ],
+      "title": "CAPArea",
+      "type": "object"
+    },
+    "CAPInfo": {
+      "additionalProperties": false,
+      "description": "A CAP `info` block.",
+      "properties": {
+        "area": {
+          "description": "Empty unless a stage has a sourced footprint; the stub never fills it.",
+          "items": {
+            "$ref": "#/$defs/CAPArea"
+          },
+          "title": "Area",
+          "type": "array"
+        },
+        "audience": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Audience"
+        },
+        "category": {
+          "items": {
+            "enum": [
+              "Geo",
+              "Met",
+              "Safety",
+              "Security",
+              "Rescue",
+              "Fire",
+              "Health",
+              "Env",
+              "Transport",
+              "Infra",
+              "CBRNE",
+              "Other"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Category",
+          "type": "array"
+        },
+        "certainty": {
+          "enum": [
+            "Observed",
+            "Likely",
+            "Possible",
+            "Unlikely",
+            "Unknown"
+          ],
+          "title": "Certainty",
+          "type": "string"
+        },
+        "contact": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Contact"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "effective": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Effective"
+        },
+        "event": {
+          "minLength": 1,
+          "title": "Event",
+          "type": "string"
+        },
+        "event_code": {
+          "items": {
+            "$ref": "#/$defs/CAPKeyValue"
+          },
+          "title": "Event Code",
+          "type": "array"
+        },
+        "expires": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires"
+        },
+        "headline": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Headline"
+        },
+        "instruction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instruction"
+        },
+        "language": {
+          "default": "en-US",
+          "title": "Language",
+          "type": "string"
+        },
+        "onset": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Onset"
+        },
+        "parameter": {
+          "items": {
+            "$ref": "#/$defs/CAPKeyValue"
+          },
+          "title": "Parameter",
+          "type": "array"
+        },
+        "resource": {
+          "items": {
+            "$ref": "#/$defs/CAPResource"
+          },
+          "title": "Resource",
+          "type": "array"
+        },
+        "response_type": {
+          "items": {
+            "enum": [
+              "Shelter",
+              "Evacuate",
+              "Prepare",
+              "Execute",
+              "Avoid",
+              "Monitor",
+              "Assess",
+              "AllClear",
+              "None"
+            ],
+            "type": "string"
+          },
+          "title": "Response Type",
+          "type": "array"
+        },
+        "sender_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sender Name"
+        },
+        "severity": {
+          "enum": [
+            "Extreme",
+            "Severe",
+            "Moderate",
+            "Minor",
+            "Unknown"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "urgency": {
+          "enum": [
+            "Immediate",
+            "Expected",
+            "Future",
+            "Past",
+            "Unknown"
+          ],
+          "title": "Urgency",
+          "type": "string"
+        },
+        "web": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Web"
+        }
+      },
+      "required": [
+        "category",
+        "event",
+        "urgency",
+        "severity",
+        "certainty"
+      ],
+      "title": "CAPInfo",
+      "type": "object"
+    },
+    "CAPKeyValue": {
+      "additionalProperties": false,
+      "description": "`eventCode`, `parameter` and `geocode` share the valueName/value shape.",
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "value_name": {
+          "minLength": 1,
+          "title": "Value Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value_name",
+        "value"
+      ],
+      "title": "CAPKeyValue",
+      "type": "object"
+    },
+    "CAPResource": {
+      "additionalProperties": false,
+      "description": "A CAP `resource` block.",
+      "properties": {
+        "deref_uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deref Uri"
+        },
+        "digest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Digest"
+        },
+        "mime_type": {
+          "minLength": 1,
+          "title": "Mime Type",
+          "type": "string"
+        },
+        "resource_desc": {
+          "minLength": 1,
+          "title": "Resource Desc",
+          "type": "string"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size"
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uri"
+        }
+      },
+      "required": [
+        "resource_desc",
+        "mime_type"
+      ],
+      "title": "CAPResource",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/cap-message.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A CAP 1.2 `alert` element.",
+  "properties": {
+    "addresses": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Addresses"
+    },
+    "code": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Code",
+      "type": "array"
+    },
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "identifier": {
+      "pattern": "^[^\\s,<&]+$",
+      "title": "Identifier",
+      "type": "string"
+    },
+    "incidents": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Incidents"
+    },
+    "info": {
+      "items": {
+        "$ref": "#/$defs/CAPInfo"
+      },
+      "title": "Info",
+      "type": "array"
+    },
+    "msg_type": {
+      "enum": [
+        "Alert",
+        "Update",
+        "Cancel",
+        "Ack",
+        "Error"
+      ],
+      "title": "Msg Type",
+      "type": "string"
+    },
+    "note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Note"
+    },
+    "references": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "References"
+    },
+    "restriction": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Restriction"
+    },
+    "scope": {
+      "enum": [
+        "Public",
+        "Restricted",
+        "Private"
+      ],
+      "title": "Scope",
+      "type": "string"
+    },
+    "sender": {
+      "pattern": "^[^\\s,<&]+$",
+      "title": "Sender",
+      "type": "string"
+    },
+    "sent": {
+      "format": "date-time",
+      "title": "Sent",
+      "type": "string"
+    },
+    "source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source"
+    },
+    "status": {
+      "enum": [
+        "Actual",
+        "Exercise",
+        "System",
+        "Test",
+        "Draft"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "xml": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Rendered CAP XML when a renderer produced this message.",
+      "title": "Xml"
+    }
+  },
+  "required": [
+    "identifier",
+    "sender",
+    "sent",
+    "status",
+    "msg_type",
+    "scope"
+  ],
+  "title": "CAPMessage",
+  "type": "object"
+}

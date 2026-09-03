@@ -1,0 +1,146 @@
+{
+  "$defs": {
+    "Sncl": {
+      "additionalProperties": false,
+      "description": "SEED network/station/location/channel identifier.",
+      "properties": {
+        "channel": {
+          "pattern": "^[A-Z0-9]{3}$",
+          "title": "Channel",
+          "type": "string"
+        },
+        "location": {
+          "default": "",
+          "pattern": "^[A-Z0-9]{0,2}$",
+          "title": "Location",
+          "type": "string"
+        },
+        "network": {
+          "pattern": "^[A-Z0-9]{1,2}$",
+          "title": "Network",
+          "type": "string"
+        },
+        "station": {
+          "pattern": "^[A-Z0-9]{1,5}$",
+          "title": "Station",
+          "type": "string"
+        }
+      },
+      "required": [
+        "network",
+        "station",
+        "channel"
+      ],
+      "title": "Sncl",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/force-history.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Time series of the net force a mass movement exerts on the ground.\n\nSTUB (interface only, Prompt 1): every instance has `status == \"not_implemented\"` and no\nforce samples. Prompt 2 replaces the `status` literal with `computed` and fills the arrays.",
+  "properties": {
+    "contract_version": {
+      "default": "0.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "detection_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "`DetectionCandidate.detection_id` that triggered inversion.",
+      "title": "Detection Id"
+    },
+    "force_east_n": {
+      "default": null,
+      "description": "Reserved: east component samples.",
+      "title": "Force East N",
+      "type": "null"
+    },
+    "force_north_n": {
+      "default": null,
+      "description": "Reserved: north component samples.",
+      "title": "Force North N",
+      "type": "null"
+    },
+    "force_up_n": {
+      "default": null,
+      "description": "Reserved: vertical component samples.",
+      "title": "Force Up N",
+      "type": "null"
+    },
+    "inversion_method": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Inversion Method"
+    },
+    "notes": {
+      "default": "not implemented: single-force inversion is scheduled for Prompt 2",
+      "minLength": 1,
+      "title": "Notes",
+      "type": "string"
+    },
+    "sample_interval_s": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sample Interval S"
+    },
+    "sncls": {
+      "description": "Channels the inversion used.",
+      "items": {
+        "$ref": "#/$defs/Sncl"
+      },
+      "title": "Sncls",
+      "type": "array"
+    },
+    "status": {
+      "const": "not_implemented",
+      "default": "not_implemented",
+      "title": "Status",
+      "type": "string"
+    },
+    "time_start_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Time Start Utc"
+    },
+    "units": {
+      "const": "N",
+      "default": "N",
+      "title": "Units",
+      "type": "string"
+    }
+  },
+  "title": "ForceHistory",
+  "type": "object"
+}
