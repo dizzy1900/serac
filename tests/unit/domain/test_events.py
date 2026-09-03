@@ -371,3 +371,20 @@ def test_extra_fields_forbidden(make_event: EventFactory) -> None:
 
 def test_contracts_table() -> None:
     assert {"mass-movement-event": MassMovementEvent} == events.CONTRACTS
+
+
+def test_unknown_dam_or_surge_flag_needs_a_note(
+    make_event: EventFactory, event_kwargs: dict[str, Any], field_note: FieldNote
+) -> None:
+    with pytest.raises(ValidationError, match=r"dammed_river: is null but"):
+        make_event(dammed_river=None)
+    ev = make_event(
+        dammed_river=None,
+        secondary_surge=None,
+        field_notes={
+            **event_kwargs["field_notes"],
+            "dammed_river": field_note,
+            "secondary_surge": field_note,
+        },
+    )
+    assert ev.dammed_river is None and ev.secondary_surge is None

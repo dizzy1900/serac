@@ -45,6 +45,7 @@ class SourceKind(StrEnum):
     agency_official = "agency_official"
     dataset = "dataset"
     press_report = "press_report"
+    operator_statement = "operator_statement"  # an operator/owner page about its own asset
 
 
 BEST_QUALIFYING_KINDS: frozenset[SourceKind] = frozenset(
@@ -193,6 +194,8 @@ class GeometryQuality(StrEnum):
     osm_centreline = "osm_centreline"
     osm_node = "osm_node"
     hand_digitised_approximate = "hand_digitised_approximate"
+    osm_way_centroid = "osm_way_centroid"
+    source_stated_location = "source_stated_location"
 
 
 class RecordMeta(BaseModel):

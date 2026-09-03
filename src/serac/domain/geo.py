@@ -193,6 +193,7 @@ class ExposedAsset(BaseModel):
     population: Range | None = Field(default=None, description="Settlements only")
     transect_id: Slug | None = Field(default=None, description="Nearest transect, if any")
     geometry_quality: GeometryQuality
+    positional_accuracy_m: float | None = Field(default=None, ge=0, allow_inf_nan=False)
     source_refs: list[Slug] = Field(min_length=1)
     notes: str | None = None
 
