@@ -1,0 +1,633 @@
+{
+  "disclaimer": "NOT r.avaflow: flow depths, velocities and arrival times come from serac-swe-voellmy v0.2.0, a single-phase depth-averaged Voellmy-Salm solver implemented in this repository. r.avaflow could not be obtained (see infra/docker/ravaflow/README.md); cross-validation against r.avaflow is outstanding.",
+  "generated_utc": "2026-09-03T21:35:36.511486+00:00",
+  "label": "cascade rules v0",
+  "members_used": 48,
+  "note": "Deposit depths are the ensemble median and 95th percentile per chainage bin, not a single member. The index is evaluated at the median and the breach and surge at the 95th percentile, so the surge numbers are an upper case rather than a central one.",
+  "resolution_limitation": "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates.",
+  "sites": [
+    {
+      "assumptions": [
+        "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a stated value, not a survey -- wherever no measured cross-section is supplied.",
+        "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+      ],
+      "breach_at_p95_deposit": {
+        "assumptions": [
+          "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+          "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+        ],
+        "dam_height_m": 5.33,
+        "label": "cascade rules v0",
+        "lake_volume_m3": 85322.0,
+        "peak_discharge_m3s": 76.7,
+        "rise_time_s": 741.6,
+        "total_time_s": 2224.7
+      },
+      "chainage_m": 1624.8,
+      "channel_depth_m": 822.637,
+      "channel_width_m": 60.0,
+      "dam_height_m": 2.089,
+      "damming_index": 0.0025,
+      "damming_index_at_p95_deposit": 0.0065,
+      "damming_index_high": 0.0038,
+      "damming_index_low": 0.0013,
+      "deposit_depth_m": 2.089,
+      "deposit_depth_median_m": 2.089,
+      "deposit_depth_p95_m": 5.333,
+      "label": "cascade rules v0",
+      "lake_volume_m3": 13090.2,
+      "probability_uncalibrated_median": 0.0763,
+      "probability_uncalibrated_p95": 0.077,
+      "secondary_surges": [
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 10.848,
+          "from_chainage_m": 1624.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 76.7,
+          "to_chainage_m": 16875.1,
+          "transect_id": "rasuwagadhi-gyirong",
+          "travel_time_s": 1405.9
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 10.848,
+          "from_chainage_m": 1624.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 76.7,
+          "to_chainage_m": 31120.7,
+          "transect_id": "syabrubesi",
+          "travel_time_s": 2719.1
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 10.848,
+          "from_chainage_m": 1624.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 76.7,
+          "to_chainage_m": 62370.5,
+          "transect_id": "betrawati",
+          "travel_time_s": 5599.9
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 10.848,
+          "from_chainage_m": 1624.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 76.7,
+          "to_chainage_m": 96974.6,
+          "transect_id": "galchhi",
+          "travel_time_s": 8789.9
+        }
+      ]
+    },
+    {
+      "assumptions": [
+        "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a stated value, not a survey -- wherever no measured cross-section is supplied.",
+        "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+      ],
+      "breach_at_p95_deposit": {
+        "assumptions": [
+          "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+          "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+        ],
+        "dam_height_m": 44.08,
+        "label": "cascade rules v0",
+        "lake_volume_m3": 5828870.2,
+        "peak_discharge_m3s": 11448.0,
+        "rise_time_s": 339.4,
+        "total_time_s": 1018.3
+      },
+      "chainage_m": 3874.6,
+      "channel_depth_m": 284.695,
+      "channel_width_m": 60.0,
+      "dam_height_m": 44.074,
+      "damming_index": 0.1548,
+      "damming_index_at_p95_deposit": 0.1548,
+      "damming_index_high": 0.2322,
+      "damming_index_low": 0.0774,
+      "deposit_depth_m": 44.074,
+      "deposit_depth_median_m": 44.074,
+      "deposit_depth_p95_m": 44.079,
+      "label": "cascade rules v0",
+      "lake_volume_m3": 5827426.5,
+      "probability_uncalibrated_median": 0.1078,
+      "probability_uncalibrated_p95": 0.1078,
+      "secondary_surges": [
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 31.187,
+          "from_chainage_m": 3874.6,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 11448.0,
+          "to_chainage_m": 16875.1,
+          "transect_id": "rasuwagadhi-gyirong",
+          "travel_time_s": 416.9
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 31.187,
+          "from_chainage_m": 3874.6,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 11448.0,
+          "to_chainage_m": 31120.7,
+          "transect_id": "syabrubesi",
+          "travel_time_s": 873.6
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 31.187,
+          "from_chainage_m": 3874.6,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 11448.0,
+          "to_chainage_m": 62370.5,
+          "transect_id": "betrawati",
+          "travel_time_s": 1875.7
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 31.187,
+          "from_chainage_m": 3874.6,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 11448.0,
+          "to_chainage_m": 96974.6,
+          "transect_id": "galchhi",
+          "travel_time_s": 2985.3
+        }
+      ]
+    },
+    {
+      "assumptions": [
+        "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a stated value, not a survey -- wherever no measured cross-section is supplied.",
+        "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+      ],
+      "breach_at_p95_deposit": {
+        "assumptions": [
+          "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+          "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+        ],
+        "dam_height_m": 176.67,
+        "label": "cascade rules v0",
+        "lake_volume_m3": 93633122.0,
+        "peak_discharge_m3s": 307365.0,
+        "rise_time_s": 203.1,
+        "total_time_s": 609.3
+      },
+      "chainage_m": 7874.2,
+      "channel_depth_m": 469.834,
+      "channel_width_m": 60.0,
+      "dam_height_m": 69.19,
+      "damming_index": 0.1473,
+      "damming_index_at_p95_deposit": 0.376,
+      "damming_index_high": 0.2209,
+      "damming_index_low": 0.0736,
+      "deposit_depth_m": 69.19,
+      "deposit_depth_median_m": 69.19,
+      "deposit_depth_p95_m": 176.666,
+      "label": "cascade rules v0",
+      "lake_volume_m3": 14361930.4,
+      "probability_uncalibrated_median": 0.106,
+      "probability_uncalibrated_p95": 0.1737,
+      "secondary_surges": [
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 62.435,
+          "from_chainage_m": 7874.2,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 307365.0,
+          "to_chainage_m": 16875.1,
+          "transect_id": "rasuwagadhi-gyirong",
+          "travel_time_s": 144.2
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 62.435,
+          "from_chainage_m": 7874.2,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 307365.0,
+          "to_chainage_m": 31120.7,
+          "transect_id": "syabrubesi",
+          "travel_time_s": 372.3
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 62.435,
+          "from_chainage_m": 7874.2,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 307365.0,
+          "to_chainage_m": 62370.5,
+          "transect_id": "betrawati",
+          "travel_time_s": 872.8
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 62.435,
+          "from_chainage_m": 7874.2,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 307365.0,
+          "to_chainage_m": 96974.6,
+          "transect_id": "galchhi",
+          "travel_time_s": 1427.1
+        }
+      ]
+    },
+    {
+      "assumptions": [
+        "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a stated value, not a survey -- wherever no measured cross-section is supplied.",
+        "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+      ],
+      "breach_at_p95_deposit": {
+        "assumptions": [
+          "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+          "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+        ],
+        "dam_height_m": 68.76,
+        "label": "cascade rules v0",
+        "lake_volume_m3": 14183514.7,
+        "peak_discharge_m3s": 32837.8,
+        "rise_time_s": 288.0,
+        "total_time_s": 863.9
+      },
+      "chainage_m": 10124.0,
+      "channel_depth_m": 68.759,
+      "channel_width_m": 60.0,
+      "dam_height_m": 61.376,
+      "damming_index": 0.8926,
+      "damming_index_at_p95_deposit": 2.2057,
+      "damming_index_high": 1.3389,
+      "damming_index_low": 0.4463,
+      "deposit_depth_m": 61.376,
+      "deposit_depth_median_m": 61.376,
+      "deposit_depth_p95_m": 151.662,
+      "label": "cascade rules v0",
+      "lake_volume_m3": 11300954.6,
+      "probability_uncalibrated_median": 0.4333,
+      "probability_uncalibrated_p95": 0.9532,
+      "secondary_surges": [
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 38.951,
+          "from_chainage_m": 10124.0,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 32837.8,
+          "to_chainage_m": 16875.1,
+          "transect_id": "rasuwagadhi-gyirong",
+          "travel_time_s": 173.3
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 38.951,
+          "from_chainage_m": 10124.0,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 32837.8,
+          "to_chainage_m": 31120.7,
+          "transect_id": "syabrubesi",
+          "travel_time_s": 539.1
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 38.951,
+          "from_chainage_m": 10124.0,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 32837.8,
+          "to_chainage_m": 62370.5,
+          "transect_id": "betrawati",
+          "travel_time_s": 1341.3
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 38.951,
+          "from_chainage_m": 10124.0,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 32837.8,
+          "to_chainage_m": 96974.6,
+          "transect_id": "galchhi",
+          "travel_time_s": 2229.7
+        }
+      ]
+    },
+    {
+      "assumptions": [
+        "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a stated value, not a survey -- wherever no measured cross-section is supplied.",
+        "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+      ],
+      "breach_at_p95_deposit": {
+        "assumptions": [
+          "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+          "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+        ],
+        "dam_height_m": 83.42,
+        "label": "cascade rules v0",
+        "lake_volume_m3": 20874572.8,
+        "peak_discharge_m3s": 51910.8,
+        "rise_time_s": 268.1,
+        "total_time_s": 804.2
+      },
+      "chainage_m": 12373.8,
+      "channel_depth_m": 83.416,
+      "channel_width_m": 60.0,
+      "dam_height_m": 23.137,
+      "damming_index": 0.2774,
+      "damming_index_at_p95_deposit": 1.3821,
+      "damming_index_high": 0.4161,
+      "damming_index_low": 0.1387,
+      "deposit_depth_m": 23.137,
+      "deposit_depth_median_m": 23.137,
+      "deposit_depth_p95_m": 115.288,
+      "label": "cascade rules v0",
+      "lake_volume_m3": 1606018.2,
+      "probability_uncalibrated_median": 0.1411,
+      "probability_uncalibrated_p95": 0.7222,
+      "secondary_surges": [
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 42.902,
+          "from_chainage_m": 12373.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 51910.8,
+          "to_chainage_m": 16875.1,
+          "transect_id": "rasuwagadhi-gyirong",
+          "travel_time_s": 104.9
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 42.902,
+          "from_chainage_m": 12373.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 51910.8,
+          "to_chainage_m": 31120.7,
+          "transect_id": "syabrubesi",
+          "travel_time_s": 437.0
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 42.902,
+          "from_chainage_m": 12373.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 51910.8,
+          "to_chainage_m": 62370.5,
+          "transect_id": "betrawati",
+          "travel_time_s": 1165.4
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 42.902,
+          "from_chainage_m": 12373.8,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 51910.8,
+          "to_chainage_m": 96974.6,
+          "transect_id": "galchhi",
+          "travel_time_s": 1972.0
+        }
+      ]
+    },
+    {
+      "assumptions": [
+        "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a stated value, not a survey -- wherever no measured cross-section is supplied.",
+        "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+      ],
+      "breach_at_p95_deposit": {
+        "assumptions": [
+          "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+          "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+        ],
+        "dam_height_m": 31.59,
+        "label": "cascade rules v0",
+        "lake_volume_m3": 2994707.5,
+        "peak_discharge_m3s": 5199.8,
+        "rise_time_s": 383.9,
+        "total_time_s": 1151.8
+      },
+      "chainage_m": 15373.5,
+      "channel_depth_m": 161.79,
+      "channel_width_m": 60.0,
+      "dam_height_m": 31.595,
+      "damming_index": 0.1953,
+      "damming_index_at_p95_deposit": 0.1953,
+      "damming_index_high": 0.2929,
+      "damming_index_low": 0.0976,
+      "deposit_depth_m": 31.595,
+      "deposit_depth_median_m": 0.0,
+      "deposit_depth_p95_m": 31.595,
+      "label": "cascade rules v0",
+      "lake_volume_m3": 2994707.5,
+      "probability_uncalibrated_median": 0.118,
+      "probability_uncalibrated_p95": 0.118,
+      "secondary_surges": [
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 26.403,
+          "from_chainage_m": 15373.5,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 5199.8,
+          "to_chainage_m": 16875.1,
+          "transect_id": "rasuwagadhi-gyirong",
+          "travel_time_s": 56.9
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 26.403,
+          "from_chainage_m": 15373.5,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 5199.8,
+          "to_chainage_m": 31120.7,
+          "transect_id": "syabrubesi",
+          "travel_time_s": 596.4
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 26.403,
+          "from_chainage_m": 15373.5,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 5199.8,
+          "to_chainage_m": 62370.5,
+          "transect_id": "betrawati",
+          "travel_time_s": 1780.0
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 26.403,
+          "from_chainage_m": 15373.5,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 5199.8,
+          "to_chainage_m": 96974.6,
+          "transect_id": "galchhi",
+          "travel_time_s": 3090.6
+        }
+      ]
+    },
+    {
+      "assumptions": [
+        "Damming index v0 = deposit depth / channel depth at a constriction, both measured on the same 30 m DEM. It is a dimensionless indicator, not a probability derived from data: no inventory of landslide dams exists for this corridor. Channel width defaults to 60 m -- a stated value, not a survey -- wherever no measured cross-section is supplied.",
+        "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+      ],
+      "breach_at_p95_deposit": {
+        "assumptions": [
+          "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+          "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+        ],
+        "dam_height_m": 62.08,
+        "label": "cascade rules v0",
+        "lake_volume_m3": 11563214.1,
+        "peak_discharge_m3s": 25778.6,
+        "rise_time_s": 299.0,
+        "total_time_s": 897.1
+      },
+      "chainage_m": 19373.1,
+      "channel_depth_m": 70.78,
+      "channel_width_m": 60.0,
+      "dam_height_m": 62.084,
+      "damming_index": 0.8771,
+      "damming_index_at_p95_deposit": 0.8771,
+      "damming_index_high": 1.3157,
+      "damming_index_low": 0.4386,
+      "deposit_depth_m": 62.084,
+      "deposit_depth_median_m": 0.0,
+      "deposit_depth_p95_m": 62.084,
+      "label": "cascade rules v0",
+      "lake_volume_m3": 11563214.1,
+      "probability_uncalibrated_median": 0.4238,
+      "probability_uncalibrated_p95": 0.4238,
+      "secondary_surges": [
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 37.012,
+          "from_chainage_m": 19373.1,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 25778.6,
+          "to_chainage_m": 31120.7,
+          "transect_id": "syabrubesi",
+          "travel_time_s": 317.4
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 37.012,
+          "from_chainage_m": 19373.1,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 25778.6,
+          "to_chainage_m": 62370.5,
+          "transect_id": "betrawati",
+          "travel_time_s": 1161.7
+        },
+        {
+          "assumptions": [
+            "Secondary-surge arrival v0 translates the breach peak downstream at a constant wave celerity derived from the channel depth. It is not a solved flood routing and ignores attenuation, tributary inflow and channel storage.",
+            "Breach hydrograph v0 is a parametric triangular wave: peak discharge from a published-form regression Qp = k * (V_lake * H_dam)^a with k and a stated below, rise time one third of the total, no routing, no sediment, no progressive erosion. It is a shape, not a breach model.",
+            "30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates."
+          ],
+          "celerity_m_s": 37.012,
+          "from_chainage_m": 19373.1,
+          "label": "cascade rules v0",
+          "peak_discharge_m3s": 25778.6,
+          "to_chainage_m": 96974.6,
+          "transect_id": "galchhi",
+          "travel_time_s": 2096.7
+        }
+      ]
+    }
+  ]
+}
