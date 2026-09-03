@@ -10,8 +10,8 @@ import pytest
 
 from serac.errors import SeracError
 from serac.models.watch.aggregate import (
-    MIN_PIXELS_PER_UNIT,
     MIN_PIXEL_TEMPORAL_COHERENCE,
+    MIN_PIXELS_PER_UNIT,
     TIMESERIES_PREFERENCE,
     build_unit_cube,
     days_since_epoch,
