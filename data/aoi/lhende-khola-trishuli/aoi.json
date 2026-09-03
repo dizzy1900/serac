@@ -1,0 +1,285 @@
+{
+  "id": "lhende-khola-trishuli",
+  "name": "Langtang Lirung - Lhende Khola - Bhote Koshi - Trishuli corridor",
+  "countries": [
+    "NP",
+    "CN"
+  ],
+  "cube_epsg": 32645,
+  "cube_extent_bbox_4326": [
+    84.9280486,
+    27.7609171,
+    85.5605864,
+    28.3711058
+  ],
+  "grid": {
+    "aoi_id": "lhende-khola-trishuli",
+    "epsg": 32645,
+    "resolution_m": 30.0,
+    "x_min": 295800.0,
+    "y_min": 3071520.0,
+    "x_max": 358980.0,
+    "y_max": 3140070.0,
+    "width": 2106,
+    "height": 2285
+  },
+  "river_names": [
+    "Lhende Khola (Lende Khola / 东林藏布)",
+    "Bhote Koshi (Kyirong Tsangpo)",
+    "Trishuli"
+  ],
+  "source_refs": [
+    "osm-overpass-lhende-khola-trishuli",
+    "usgs-comcat-us7000tbwb"
+  ],
+  "sources": [
+    {
+      "id": "osm-overpass-lhende-khola-trishuli",
+      "kind": "dataset",
+      "title": "OpenStreetMap hydrography, places and infrastructure via the Overpass API (osm_base 2026-09-03T10:15:35Z; query recorded in notes)",
+      "url": "https://overpass-api.de/api/interpreter",
+      "authors": [
+        "OpenStreetMap contributors"
+      ],
+      "year": 2026,
+      "publisher": "OpenStreetMap Foundation",
+      "accessed_utc": "2026-09-03T10:17:27Z",
+      "sha256": "10962690511b1706db79bc9a9243b4216ff4d7066b14672204e254093c718c96",
+      "content_type": "application/json",
+      "licence": "ODbL-1.0",
+      "stored_copy": "data/fixtures/osm/lhende-khola-trishuli_overpass_2026-09-03.json",
+      "claims_supported": [
+        "river_centreline",
+        "corridor",
+        "cube_extent_bbox_4326",
+        "river_names",
+        "transects.rasuwagadhi-gyirong.point",
+        "transects.syabrubesi.point",
+        "transects.betrawati.point",
+        "transects.galchhi.point",
+        "exposed_assets.rasuwagadhi-hep.geometry",
+        "exposed_assets.upper-trishuli-3a.geometry",
+        "exposed_assets.chilime-hep.geometry",
+        "exposed_assets.trishuli-hep.geometry",
+        "exposed_assets.devighat-hep.geometry",
+        "exposed_assets.upper-trishuli-1.geometry",
+        "exposed_assets.rasuwagadhi-kerung-border-post.geometry",
+        "exposed_assets.miteri-bridge.geometry",
+        "exposed_assets.timure.geometry",
+        "exposed_assets.syabrubesi.geometry",
+        "exposed_assets.betrawati.geometry"
+      ],
+      "excerpt": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+      "peer_reviewed": false
+    },
+    {
+      "id": "usgs-comcat-us7000tbwb",
+      "kind": "usgs_comcat",
+      "title": "USGS ComCat event us7000tbwb: M 5.2 Landslide - 55 km NW of Kodari, Nepal",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000tbwb&format=geojson",
+      "authors": [],
+      "year": 2026,
+      "publisher": "U.S. Geological Survey",
+      "accessed_utc": "2026-09-03T09:45:08.458851Z",
+      "sha256": "1d8f20a0d4e183e02fdf2b09b3a2ff38ae0d8dc63da2ae602cd3fb599bfe2073",
+      "content_type": "application/json",
+      "licence": "US-PD",
+      "stored_copy": "data/fixtures/usgs_comcat/us7000tbwb.geojson",
+      "claims_supported": [
+        "source_zone.geometry",
+        "notes"
+      ],
+      "excerpt": "geometry: Point [85.515, 28.271, 0]; title: M 5.2 Landslide - 55 km NW of Kodari, Nepal",
+      "peer_reviewed": false
+    },
+    {
+      "id": "doed-powerplants-gt1mw",
+      "kind": "agency_official",
+      "title": "Department of Electricity Development (Nepal): power plants above 1 MW in operation (licence, capacity, river, promoter, licence rectangle, COD)",
+      "url": "https://www.doed.gov.np/pages/powerplantsmorethan1",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Government of Nepal, Ministry of Energy, Water Resources and Irrigation, DoED",
+      "accessed_utc": "2026-09-03T10:24:05Z",
+      "sha256": "266bd0f3b1d7ee62196540fcdbdcf63937cf6506f8fe6d572bbeceb3afcd0a7c",
+      "content_type": "text/html",
+      "licence": "No licence stated on the page (Government of Nepal publication)",
+      "claims_supported": [
+        "exposed_assets.rasuwagadhi-hep.capacity_mw",
+        "exposed_assets.rasuwagadhi-hep.status",
+        "exposed_assets.upper-trishuli-3a.capacity_mw",
+        "exposed_assets.upper-trishuli-3a.status",
+        "exposed_assets.chilime-hep.capacity_mw",
+        "exposed_assets.chilime-hep.status",
+        "exposed_assets.trishuli-hep.capacity_mw",
+        "exposed_assets.trishuli-hep.status",
+        "exposed_assets.devighat-hep.capacity_mw",
+        "exposed_assets.devighat-hep.status",
+        "exposed_assets.sanjen-hep.capacity_mw",
+        "exposed_assets.sanjen-hep.status",
+        "exposed_assets.sanjen-hep.geometry",
+        "exposed_assets.sanjen-upper-hep.capacity_mw",
+        "exposed_assets.sanjen-upper-hep.status",
+        "exposed_assets.sanjen-upper-hep.geometry"
+      ],
+      "excerpt": "Rasuwagadhi | 111.000 | Bhotekoshi (Rasuwa) | Thuman,Timure | COD 2081-09-16; Upper Trishuli 3A | 60.000 | NEA | COD 2076-05-13; Chilime | 22.000 | COD 2065-05-07; Trishuli | 24.000; Devighat | 14.100; Sanjen | 42.500 | COD 2081-09-01; Upper Sanjen | 14.800",
+      "peer_reviewed": false
+    },
+    {
+      "id": "doed-construction-licences-gt1mw",
+      "kind": "agency_official",
+      "title": "Department of Electricity Development (Nepal): generation licences above 1 MW (construction/generation licence register with licence rectangles)",
+      "url": "https://www.doed.gov.np/pages/clhydromorethan1",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Government of Nepal, Ministry of Energy, Water Resources and Irrigation, DoED",
+      "accessed_utc": "2026-09-03T10:17:48Z",
+      "sha256": "8cc0029f86b51daea16628d14bed85d6d9bd5148b2e4ccc82f75a6f15abcc797",
+      "content_type": "text/html",
+      "licence": "No licence stated on the page (Government of Nepal publication)",
+      "claims_supported": [
+        "exposed_assets.upper-trishuli-3b.capacity_mw",
+        "exposed_assets.upper-trishuli-3b.geometry",
+        "exposed_assets.upper-trishuli-1.capacity_mw"
+      ],
+      "excerpt": "Upper Trishuli 3B | 37.000 | Trishuli | Lic 104 | 2070-04-27 | NEA | 27°59'12\"-28°01'21\" N, 85°10'11\"-85°12'01\" E | Manakamana (Nuwakot); Upper Trishuli-1 | 216.000 | Trishuli | Lic 209 | 2074-07-23 | Nepal Water & Energy Development Co. | Dhunche,Haku (Rasuwa)",
+      "peer_reviewed": false
+    },
+    {
+      "id": "rghpcl-about-project",
+      "kind": "operator_statement",
+      "title": "Rasuwagadhi Hydropower Company Limited (operator page): About the Project (111 MW)",
+      "url": "https://rghpcl.com.np/about-the-project/",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Rasuwagadhi Hydropower Company Limited (Chilime Hydropower Company subsidiary)",
+      "accessed_utc": "2026-09-03T10:17:53Z",
+      "sha256": "e75eeee21be682e928cdd48a7f3c91543ba14d7714083a15d643bd3dadaf3c81",
+      "content_type": "text/html",
+      "licence": "No licence stated (operator web page)",
+      "claims_supported": [
+        "exposed_assets.rasuwagadhi-hep.capacity_mw",
+        "exposed_assets.rasuwagadhi-hep.status"
+      ],
+      "excerpt": "Rasuwagadhi Hydroelectric Project /Plant (111MW) ... located in Gosaikunda Rural Municipality, ward no. 1 and 2 (Thuman and Timure) of Rasuwa district. The Commercial Operation Date (COD) of the project is 16 Poush 2081 (31 December 2024).",
+      "peer_reviewed": false
+    },
+    {
+      "id": "chilime-company-home",
+      "kind": "operator_statement",
+      "title": "Chilime Hydropower Company Limited (operator page): home, 22.1 MW plant",
+      "url": "https://www.chilime.com.np/en/",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Chilime Hydropower Company Limited (NEA 51 %)",
+      "accessed_utc": "2026-09-03T10:17:54Z",
+      "sha256": "235b2a14b7f7dc5f0c457bc2647e6c40dcf2be2a7ac7efba2796080697d72f0b",
+      "content_type": "text/html",
+      "licence": "No licence stated (operator web page)",
+      "claims_supported": [
+        "exposed_assets.chilime-hep.capacity_mw",
+        "exposed_assets.chilime-hep.status"
+      ],
+      "excerpt": "Chilime owns and operates 22.1 MW power plant commissioned on August 25, 2003 and located in Rasuwa district, 133 km north of capital city Kathmandu.",
+      "peer_reviewed": false
+    },
+    {
+      "id": "sjcl-about",
+      "kind": "operator_statement",
+      "title": "Sanjen Jalavidhyut Company Limited (operator page): About (42.5 MW and 14.8 MW)",
+      "url": "https://sjcl.com.np/about/",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Sanjen Jalavidhyut Company Limited (Chilime Hydropower Company subsidiary)",
+      "accessed_utc": "2026-09-03T10:17:57Z",
+      "sha256": "92f8064fc179dbac58b2b9d1e95f5fc7cf0a745d362298c7ed07343a3466560f",
+      "content_type": "text/html",
+      "licence": "No licence stated (operator web page)",
+      "claims_supported": [
+        "exposed_assets.sanjen-hep.capacity_mw",
+        "exposed_assets.sanjen-upper-hep.capacity_mw"
+      ],
+      "excerpt": "Sanjen (Upper) Hydroelectric Project (SUHEP): This 14.8 MW project is located in Simbu Village at an elevation of 2,187 meters ... Sanjen Hydroelectric Project (SHEP): With a capacity of 42.5 MW, the powerhouse is situated in Chilime Village at 1,745 meters",
+      "peer_reviewed": false
+    },
+    {
+      "id": "nwedc-home",
+      "kind": "operator_statement",
+      "title": "Nepal Water & Energy Development Company (developer page): Upper Trishuli-1, 216 MW",
+      "url": "https://nwedcpl.com/",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Nepal Water & Energy Development Company Pvt. Ltd (private developer)",
+      "accessed_utc": "2026-09-03T10:17:55Z",
+      "sha256": "a0921bdfc08ae235909eb4739d51d426b2359ce9f7680bd790e5007175d61c07",
+      "content_type": "text/html",
+      "licence": "No licence stated (developer web page)",
+      "claims_supported": [
+        "exposed_assets.upper-trishuli-1.capacity_mw"
+      ],
+      "excerpt": "Upper Trishuli - 1 HEP, 216 MW. Upper Trishuli-1 Hydroelectric Project is a ROR scheme in Trishuli River with 216 MW installed.",
+      "peer_reviewed": false
+    },
+    {
+      "id": "customs-office-rasuwa-contact",
+      "kind": "agency_official",
+      "title": "Customs Office Rasuwa (Department of Customs, Nepal): contact page, Timure, Rasuwa",
+      "url": "https://rasuwa.customs.gov.np/contact-us/",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Government of Nepal, Ministry of Finance, Department of Customs",
+      "accessed_utc": "2026-09-03T10:24:10Z",
+      "sha256": "7d0db0e66db0f9dcb2be8f34e3101245a2afc727ff228e8cd103ecf69d0b1e16",
+      "content_type": "text/html",
+      "licence": "No licence stated on the page (Government of Nepal publication)",
+      "claims_supported": [
+        "exposed_assets.rasuwagadhi-kerung-border-post.status"
+      ],
+      "excerpt": "रसुवा भन्सार कार्यालय टिमुरे, रसुवा (Customs Office Rasuwa, Timure, Rasuwa)",
+      "peer_reviewed": false
+    },
+    {
+      "id": "immigration-office-rasuwagadhi",
+      "kind": "agency_official",
+      "title": "Immigration Office Rasuwagadhi (Department of Immigration, Nepal): home page",
+      "url": "https://rasuwagadhi.immigration.gov.np/",
+      "authors": [],
+      "year": 2026,
+      "publisher": "Government of Nepal, Ministry of Home Affairs, Department of Immigration",
+      "accessed_utc": "2026-09-03T10:24:12Z",
+      "sha256": "0866297ca0b20e2ebf7dedfa1a52b5966aea1527f4e87b6be7f9f44d76f900d9",
+      "content_type": "text/html",
+      "licence": "No licence stated on the page (Government of Nepal publication)",
+      "claims_supported": [
+        "exposed_assets.rasuwagadhi-kerung-border-post.status"
+      ],
+      "excerpt": "नेपाल सरकार गृह मन्त्रालय अध्यागमन विभाग अध्यागमन कार्यालय रसुवागढी, रसुवागढी, रसुवा",
+      "peer_reviewed": false
+    },
+    {
+      "id": "myrepublica-2025-12-friendship-bridge",
+      "kind": "press_report",
+      "title": "Friendship Bridge rebuilt, Rasuwagadhi border set to reopen (Republica, 26 Dec 2025)",
+      "url": "https://myrepublica.nagariknetwork.com/news/miteri-bridge-rebuilt-rasuwagadhi-border-set-to-reopen-60-25.html",
+      "authors": [
+        "Tapendra Karki"
+      ],
+      "year": 2025,
+      "publisher": "Republica (Nagarik Network)",
+      "accessed_utc": "2026-09-03T10:23:05Z",
+      "sha256": "2af6b744dccd587e78658f0348282d242a1d4a910362f2830daa0bc7812ef4b9",
+      "content_type": "text/html",
+      "licence": "Copyright Nagarik Network; press report",
+      "claims_supported": [
+        "exposed_assets.miteri-bridge.status"
+      ],
+      "excerpt": "The reconstruction of the Friendship Bridge at Rasuwagadhi border crossing - washed away by devastating floods in the Lhende river along the Nepal-China border - has been completed (Dec 26)",
+      "peer_reviewed": false
+    }
+  ],
+  "notes": "DESIGN CHOICES: the source zone is a rectangle 85.51-85.53 E, 28.27-28.29 N chosen so that the USGS ComCat epicentre of us7000tbwb (85.515 E, 28.271 N, fixture data/fixtures/usgs_comcat/us7000tbwb.geojson) lies inside it; it is not a mapped scar. The corridor follows the OSM Lhende Khola (Lende Khola / 东林藏布) to its confluence with the Bhote Koshi at Rasuwagadhi, then the Bhote Koshi and Trishuli past Galchhi; the downstream target (84.65 E, 27.86 N) is on the Trishuli west of Galchhi and the centreline is clipped to 100 km chainage. In OSM the Lhende Khola is a Tibetan tributary joining at Rasuwagadhi; the unnamed streams mapped inside the source zone are not connected to it in OSM, so chainage 0 is on the nearest connected reach (offset reported in BUILD). STATUS CAVEAT: asset statuses are as of the cited sources (pre-26 Aug 2026); impacts of the event belong to the event record, not here. ASSETS: every requested asset has a retrieved source; none was omitted as 'seen in press only'. Sanjen, Sanjen (Upper) and Upper Trishuli 3B have no OSM feature and are placed at the centre of their DoED licence rectangles (approximate, ±3 km). Settlement populations are null (no source retrieved). BUILD (from OSM data as of 2026-09-03T10:15:35Z, © OpenStreetMap contributors, ODbL-1.0): centreline chainage 0 is the OSM river-network node nearest the source-zone centroid that connects to the downstream target, 5.16 km from the centroid at (85.4674016, 28.2793443); clipped at 100 km of a 149.3 km path; transect chainages: rasuwagadhi-gyirong=16.9 km, syabrubesi=31.1 km, betrawati=62.4 km, galchhi=97.0 km. Corridor = centreline buffered 1500 m in EPSG:32645; cube extent = source zone union corridor buffered 3000 m, 30 m grid snapped to the resolution. OVERPASS QUERY: [out:json][timeout:180]; ( way[\"waterway\"][\"name\"~\"Trishuli|Trisuli|Bhote Koshi|Bhotekoshi|Lhende|Lende|Langtang Khola\",i](27.75,84.95,28.45,85.65); way[\"waterway\"][\"name:en\"~\"Trishuli|Trisuli|Bhote Koshi|Bhotekoshi|Lhende|Lende|Langtang Khola\",i](27.75,84.95,28.45,85.65); relation[\"waterway\"][\"name\"~\"Trishuli|Trisuli|Bhote Koshi|Bhotekoshi|Lhende|Lende|Langtang Khola\",i][\"name\"!~\"system\",i](27.75,84.95,28.45,85.65); relation[\"waterway\"][\"name:en\"~\"Trishuli|Trisuli|Bhote Koshi|Bhotekoshi|Lhende|Lende|Langtang Khola\",i][\"name\"!~\"system\",i](27.75,84.95,28.45,85.65); way[\"waterway\"~\"^(river|stream)$\"](28.24,85.44,28.33,85.56); node[\"place\"][\"name\"~\"Timure|Syabru|Syafru|Syaphru|Syapru|स्याफ्रु|स्याब्रु|Betrawati|Galchhi|Galchi|Rasuwagadhi|Rasuwa Gadhi|Kerung|Gyirong|Trishuli|Trisuli|Dhunche|Kyanjin|Langtang|Mailung|Devighat|Chilime\",i](27.75,84.95,28.45,85.65); node[\"place\"][\"name:en\"~\"Timure|Syabru|Syafru|Syaphru|Syapru|स्याफ्रु|स्याब्रु|Betrawati|Galchhi|Galchi|Rasuwagadhi|Rasuwa Gadhi|Kerung|Gyirong|Trishuli|Trisuli|Dhunche|Kyanjin|Langtang|Mailung|Devighat|Chilime\",i](27.75,84.95,28.45,85.65); nwr[\"power\"=\"plant\"][\"plant:source\"!=\"solar\"](27.75,84.95,28.45,85.65); nwr[\"man_made\"=\"dam\"](27.75,84.95,28.45,85.65); nwr[\"waterway\"=\"dam\"](27.75,84.95,28.45,85.65); nw[\"name\"~\"Miteri|Friendship Bridge|Rasuwagadhi|Rasuwa Gadhi|Kerung|Sanjen|Devighat\",i](27.75,84.95,28.45,85.65); nw[\"name:en\"~\"Miteri|Friendship Bridge|Rasuwagadhi|Rasuwa Gadhi|Kerung|Sanjen|Devighat\",i](27.75,84.95,28.45,85.65); nwr[\"barrier\"=\"border_control\"](27.75,84.95,28.45,85.65); nwr[\"amenity\"=\"customs\"](27.75,84.95,28.45,85.65); nwr[\"name\"~\"Hydropower|Hydro Power|Hydroelectric\",i](27.75,84.95,28.45,85.65); nwr[\"name:en\"~\"Hydropower|Hydro Power|Hydroelectric\",i](27.75,84.95,28.45,85.65); ); out geom;",
+  "record": {
+    "created_utc": "2026-09-03T12:00:00Z",
+    "created_by": "aoi-build"
+  }
+}
