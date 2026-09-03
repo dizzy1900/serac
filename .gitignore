@@ -22,6 +22,14 @@ htmlcov/
 data/raw/*
 data/interim/*
 data/features/*
+# The discriminator's window index and chunk-hash index are deliberately committed (1.5 MB
+# and 0.2 MB of metadata, no samples). They are what lets `validate-discriminator` prove
+# every leakage assertion on a fresh clone where the multi-gigabyte Zarr store is absent:
+# without them the gate would report green while proving almost nothing.
+!data/features/discriminator/
+data/features/discriminator/*
+!data/features/discriminator/windows.json
+!data/features/discriminator/chunk_hashes.tsv
 baselines/*
 # The discriminator's trained artifacts are deliberately committed: they are small (a text
 # lightgbm model, a two-number calibrator, a provenance record, and a 0.5 MB torch

@@ -64,6 +64,25 @@ FORCED_TEST_GROUPS: frozenset[str] = frozenset(
     {"chamoli-2021", "langtang-lhende-2026", "us7000tbwb", "us7000tc90"}
 )
 
+# `us7000tbwb` and `us7000tc90` are ComCat's ids for the Langtang 2026 pair; the serac event
+# library carries them under one group. They are listed as forced ids anyway so a rename or a
+# future ComCat-sourced join cannot let them into training under a name the splitter does not
+# recognise. This map is what lets the gate *resolve* them instead of shrugging at their
+# absence: an id that resolves to no group at all is an error, not a warning.
+FORCED_TEST_ALIASES: dict[str, str] = {
+    "us7000tbwb": "langtang-lhende-2026",
+    "us7000tc90": "langtang-lhende-2026",
+}
+
+
+def resolve_forced_group(forced_id: str, known_groups: frozenset[str] | set[str]) -> str | None:
+    """The group a forced id names, directly or through the alias map; None if it names none."""
+    if forced_id in known_groups:
+        return forced_id
+    alias = FORCED_TEST_ALIASES.get(forced_id)
+    return alias if alias in known_groups else None
+
+
 NEGATIVES_PER_POSITIVE = 5
 NEGATIVE_MAX_DISTANCE_KM = 400.0
 NEGATIVE_EPOCH_YEARS = 2.0
@@ -395,7 +414,10 @@ def match_negatives(
     for distance, event in candidates[:per_positive]:
         out.append(
             CatalogEntry(
-                entry_id=f"neg/{positive.event_group}/{event.event_id}",
+                # Keyed on the parent's entry_id, not its group: two positives may share a
+                # group (Sedongpu 2017 and 2018 are one slope) and match the same earthquake,
+                # which collided and silently produced duplicate rows in the first build.
+                entry_id=f"neg/{positive.entry_id.removeprefix('pos/')}/{event.event_id}",
                 event_group=positive.event_group,
                 class_label=ClassLabel.tectonic,
                 origin_utc=event.time_utc,
@@ -443,7 +465,7 @@ def make_noise_windows(
             continue
         out.append(
             CatalogEntry(
-                entry_id=f"noise/{positive.event_group}/{index}",
+                entry_id=f"noise/{positive.entry_id.removeprefix('pos/')}/{index}",
                 event_group=positive.event_group,
                 class_label=ClassLabel.noise,
                 origin_utc=origin,

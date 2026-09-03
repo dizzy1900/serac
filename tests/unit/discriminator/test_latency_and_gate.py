@@ -62,16 +62,19 @@ def test_a_run_that_never_fired_is_not_reported_as_a_budget_pass() -> None:
 
 
 def test_the_gate_runs_offline_and_always_checks_the_feature_names() -> None:
-    """On a tree with no built dataset the suite must still say something true."""
     result = run_suite(REPO_ROOT)
-    names = {c.name for c in result.checks}
-    assert "no_forbidden_feature_tokens" in names
     passed = {c.name for c in result.checks if c.ok}
     assert "no_forbidden_feature_tokens" in passed
 
 
-def test_the_gate_never_fails_merely_because_the_store_is_absent(tmp_path) -> None:
+def test_the_gate_refuses_to_go_green_on_a_tree_with_no_window_index(tmp_path) -> None:
+    """This test used to assert the opposite, and it was wrong.
+
+    An empty tree proves nothing about leakage, so reporting `passed` there was the suite
+    telling a comfortable lie. The window index is committed now, so the real fresh-clone
+    case does run the assertions; a tree without even the index must fail.
+    """
     result = run_suite(tmp_path)
-    assert result.passed, [c for c in result.checks if c.failed]
-    warnings = {c.name for c in result.checks if not c.ok}
-    assert "dataset_present" in warnings
+    assert not result.passed
+    failed = {c.name for c in result.checks if c.failed}
+    assert "leakage_criteria_provable" in failed

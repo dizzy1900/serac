@@ -30,8 +30,20 @@ Licence `null` means the data-centre page linked in the ledger's `licence_source
 | `data/fixtures/esec/esec_events_2026-09-03.xml` | https://ds.iris.edu/spudservice/esec (GET with `Accept: application/xml`) | 2026-09-03T12:19:00+00:00 | `e4d0ef527c9eabbc8de7b70d0d3a64eba74071045ebd916071ae31c34637104c` | 790780 | null |
 
 The IRIS/EarthScope SPUD ESEC data product: **319 events, 1977-2024**, the positive set for
-the M1 discriminator. Committed verbatim so `make validate-discriminator` and the dataset
-build parse offline exactly what the service returned.
+the M1 discriminator. Committed verbatim so the discriminator gate and the dataset build
+parse offline exactly what the service returned.
+
+The gate is `serac.validation.discriminator.run_suite`. At the time of writing it is **not**
+reachable as `make validate-discriminator` or as a `serac` sub-command: `src/serac/cli_data.py`
+and `src/serac/cli_models.py` are not yet wired into `src/serac/cli.py`, and the Makefile has
+no target. Wiring both is the orchestrator's change (those files are orchestrator-owned). Until
+it lands, run the suite directly:
+
+```python
+from pathlib import Path
+from serac.validation.discriminator import run_suite
+run_suite(Path("."))
+```
 
 **The `Accept` header is load-bearing.** With no `Accept` header the same URL returns the
 document HTML-escaped inside a `<pre>` block (1,075,875 bytes of `&lt;Results&gt;...`), which
