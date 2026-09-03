@@ -19,7 +19,15 @@ from pydantic import AwareDatetime, BaseModel
 from serac import __version__
 from serac.validation.result import SuiteResult, git_sha, load_report
 
-REQUIRED_SUITES: tuple[str, ...] = ("events", "aoi", "ingest", "cube", "stream", "contracts")
+REQUIRED_SUITES: tuple[str, ...] = (
+    "events",
+    "aoi",
+    "ingest",
+    "cube",
+    "stream",
+    "contracts",
+    "lfh",
+)
 
 
 class Stamp(BaseModel):
