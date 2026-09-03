@@ -33,24 +33,29 @@ spec:
       process. 8 workers x 0.4 GB plus the parent leaves headroom in 16 GiB.
 
   storage:
-    per_member_bytes: 8_400_000
+    per_member_bytes: 373_000
     basis: >-
-      Measured on 30 m members: four deflate COGs on a 2040 x 1751 grid plus corridor.parquet
-      and run.json. See reports/runout/ensemble_summary.json for the realised total.
-    total_gib: 79
-    total_basis: "10000 members x 8.4 MB, rounded up."
+      MEASURED on a 30 m member: four deflate COGs on a 2040 x 1751 grid plus corridor.parquet
+      and run.json = 364 KiB. The rasters compress hard because only ~9% of the grid is inside
+      the corridor mask and most of that is never wet. An earlier estimate of 8.4 MB assumed
+      uncompressed float32 and was 23x too high. See reports/runout/ensemble_summary.json for
+      the realised total of the 230-member local ensemble.
+    total_gib: 4
+    total_basis: "10000 members x 373 KB, rounded up."
     scratch_gib: 20
     scratch_basis: "One conditioned terrain per resolution plus the DEM crop (12.4 MiB)."
 
   compute:
-    core_hours: 1389
+    core_hours: 917
     basis: >-
-      MEASURED per-member wall clock at 30 m is in reports/runout/timing.json. The ensemble
-      mean is dominated by low-mu members, which run to the simulated-time limit. Core-hours =
-      10000 members x mean single-core seconds / 3600. Substitute the realised mean from
-      reports/runout/ensemble_summary.json (`wall_time_total_core_s`) before committing spend;
-      this figure is an extrapolation from a 200-member sample, not a measurement of 10^4.
-    wall_clock_hours_at_200_shards: 7
+      MEASURED per-member wall clock at 30 m (reports/runout/timing.json): 1077.6 s at mu=0.03
+      and 326.8 s at mu=0.10, i.e. cost ~ k/mu with k = 32.5 s. Over the log-uniform mu range
+      [0.02, 0.30] that gives a 560 s mean at a 7200 s simulated-time limit and about 330 s at
+      the 3600 s limit this design uses; the first two members actually run took 290 s and
+      376 s. Core-hours = 10000 x 330 / 3600. Substitute the realised mean from
+      reports/runout/ensemble_summary.json (`wall_time_total_core_s`) before committing spend:
+      this is an extrapolation from a 230-member sample, not a measurement of 10^4.
+    wall_clock_hours_at_200_shards: 5
     wall_clock_basis: "core_hours / (200 shards x 8 vCPU), plus ~10% scheduling overhead."
 
   aws:

@@ -1,0 +1,68 @@
+{
+  "critical_shear_pa": 500.0,
+  "dimensions": [
+    {
+      "high": 300000000.0,
+      "log": true,
+      "low": 5000000.0,
+      "name": "release_volume_m3"
+    },
+    {
+      "high": 0.8,
+      "log": false,
+      "low": 0.2,
+      "name": "ice_fraction"
+    },
+    {
+      "high": 4600.0,
+      "log": false,
+      "low": 3600.0,
+      "name": "release_band_base_m"
+    },
+    {
+      "high": 1200.0,
+      "log": false,
+      "low": 400.0,
+      "name": "release_band_width_m"
+    },
+    {
+      "high": 0.03,
+      "log": true,
+      "low": 0.0001,
+      "name": "entrainment_coefficient"
+    },
+    {
+      "high": 0.3,
+      "log": true,
+      "low": 0.02,
+      "name": "mu"
+    },
+    {
+      "high": 3000.0,
+      "log": true,
+      "low": 200.0,
+      "name": "xi_m_s2"
+    }
+  ],
+  "n_members": 230,
+  "resolutions": [
+    [
+      30.0,
+      30
+    ],
+    [
+      60.0,
+      200
+    ]
+  ],
+  "seed": 20260903,
+  "settings_template": {
+    "cfl": 0.45,
+    "dry_depth_m": 0.02,
+    "max_time_s": 3600.0,
+    "output_interval_s": 60.0,
+    "stop_kinetic_fraction": 0.001
+  },
+  "solver": "serac-swe-voellmy",
+  "solver_version": "0.1.0"
+}

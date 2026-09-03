@@ -63,12 +63,12 @@ replaced an approach that looked more standard on paper:
 
 | Test | Result |
 |---|---|
-| Mass conservation, closed domain | relative error < 1e-12 |
-| Lake at rest over random topography | free surface holds to < 1e-10 m; max speed < 1e-10 m/s |
+| Mass conservation, closed domain | relative error 1.8e-16 |
+| Lake at rest over random topography | surface deviation **0.0 m**, max speed **0.0 m/s**, over 137 steps |
 | Lake at rest with dry banks | dry cells stay dry to < 1e-10 m |
-| Ritter dam break, n=200 / n=400 | L1 relative error 7.3% / 4.6% |
-| Ritter under refinement (100→200→400) | error falls monotonically |
-| Voellmy terminal velocity | converges **first order in dt**: 7.59% low at CFL 0.4, 3.51% at 0.2, 1.67% at 0.1, 0.81% at 0.05 |
+| Ritter dam break, n=100 / 200 / 400 | L1 relative error 10.44% / 7.32% / 4.72% |
+| Ritter under refinement | L1 falls monotonically: 115.0 → 77.3 → 50.8 m² |
+| Voellmy terminal velocity | converges **first order in dt**: 7.591% low at CFL 0.4, 3.506% at 0.2, 1.666% at 0.1, 0.807% at 0.05 |
 | Entrainment | conserves mass exactly; cannot over-draw the bed; costs momentum |
 | Mask walls | no leakage; volume conserved to 1e-12 |
 | Outflow | mass balance closes to < 1e-10 |
