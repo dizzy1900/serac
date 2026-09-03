@@ -17,9 +17,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from obspy import Stream, read
-
-from serac.adapters.seismic.obspy_codec import slice_stream
+from serac.adapters.seismic.obspy_codec import chunks_from_miniseed
 from serac.adapters.storage.manifest_ledger import sha256_of_file
 from serac.domain.replay import FixtureManifest, FixtureRef, TimeWindow
 from serac.domain.seismic import SeismicTrace, TraceProvenance, TraceSource
@@ -140,23 +138,17 @@ class FixtureReplaySource(ReplaySource):
             fixture_path=self._rel((self.fixture_dir / file_path).as_posix()),
         )
 
-    def stream(self) -> Stream:
-        stream = Stream()
-        for file in self.manifest.files:
-            if file.kind == "miniseed":
-                stream += read(str(self.fixture_dir / file.path), format="MSEED")
-        return stream
-
     def chunks(self, *, chunk_seconds: float) -> Iterator[SeismicTrace]:
         # Provenance carries the directory-level licence; the per-file path is recorded on
         # each chunk so a consumer can trace bytes back to the manifest row.
         by_key = {f.sncl: f.path for f in self.manifest.files if f.kind == "miniseed" and f.sncl}
         pieces: list[SeismicTrace] = []
         for file_path in sorted(set(by_key.values())):
-            stream = read(str(self.fixture_dir / file_path), format="MSEED")
             pieces.extend(
-                slice_stream(
-                    stream, chunk_seconds=chunk_seconds, provenance=self._provenance(file_path)
+                chunks_from_miniseed(
+                    self.fixture_dir / file_path,
+                    chunk_seconds=chunk_seconds,
+                    provenance=self._provenance(file_path),
                 )
             )
         pieces.sort(key=lambda c: (c.start_time_utc, c.sncl.key, c.sequence))
