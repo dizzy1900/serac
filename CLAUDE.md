@@ -105,10 +105,9 @@ Run `make help` for the live list. As of this file:
 | `dvc-remote` | writes `$DVC_REMOTE_URL` into the gitignored `.dvc/config.local` |
 | `clean` | removes caches and generated reports |
 
-The `validate-*`, `promote`, `underwriting-check` and `replay` targets call `serac`
-sub-commands that are **planned** and land as the plan's phases merge; until then the target
-exists in the Makefile and the sub-command does not. `RELEASE_STATUS.md` is the ledger of what
-is real.
+All of these targets are wired to real `serac` sub-commands (`serac --help` lists them).
+`RELEASE_STATUS.md` remains the ledger of what each component actually does: a target that
+passes does not mean the component behind it is validated against events.
 
 ## Running tests
 
@@ -144,8 +143,9 @@ Pytest markers (declared in `pyproject.toml`, `--strict-markers` is on):
 Every domain module that defines a public contract exposes a module-level `CONTRACTS` dict
 mapping a schema name (kebab-case, e.g. `mass-movement-event`) to the pydantic model class.
 Each model carries a contract version constant (see `MANIFEST_CONTRACT_VERSION` in
-`src/serac/domain/manifest.py`). `serac schema export` (planned) walks the registries and
+`src/serac/domain/manifest.py`). `serac schema export` walks the registries and
 writes `contracts/<name>.v<major>.json`; a contract test in `tests/contract/` fails on drift.
+There are 18 published contracts.
 Changing a contract means bumping its version and regenerating the schema. ADR-0002.
 
 ## Provenance ledger
@@ -175,9 +175,10 @@ A change vetoed by `qa-reviewer` does not merge. The orchestrator runs `make tes
 
 1. That serac predicts, or will predict, the day or hour of a bedrock collapse from
    satellites. L1 is a probabilistic watch state only.
-2. That the detector is more than a stub. `src/serac/streaming/detector_stub.py` (planned)
-   is a placeholder energy-ratio filter; it has no discriminator, no location and no
-   validated detection performance. CAP messages it produces are `status: Test`.
+2. That the detector is more than a stub. `src/serac/streaming/detector_stub.py` is a
+   placeholder energy-ratio filter; it has no discriminator, no location and no validated
+   detection performance. On both real fixtures it fires on pre-event background noise
+   (`RELEASE_STATUS.md`, Known gaps 14). CAP messages it produces are `status: Test`.
 3. That the ≤ 180 s detachment-to-CAP latency is proven. It is a design budget
    (`docs/ARCHITECTURE.md`). Replay reports prove plumbing, not latency.
 4. That data are real where fixtures are synthetic. Any layer, file or fixture with
@@ -194,8 +195,8 @@ A change vetoed by `qa-reviewer` does not merge. The orchestrator runs `make tes
 - Conventional Commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:`, with an optional scope
   (`feat(domain):`, `chore(infra):`).
 - Small commits; the working tree is green (`make lint typecheck test`) at every commit.
-- Every commit authored by a Claude Code session ends with the trailer
-  `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+- Every commit authored by a Claude Code session ends with a `Co-Authored-By:` trailer
+  naming the model that wrote it, e.g. `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 - `TODO` comments must reference a GitHub issue or a numbered entry in the Known gaps
   section of `RELEASE_STATUS.md`.
 - Subagents do not push. The orchestrator merges and pushes `main`.
