@@ -332,3 +332,13 @@ def measure_latency(
     typer.secho(
         report.verdict, fg=typer.colors.YELLOW if not report.budget_met else typer.colors.GREEN
     )
+
+
+@app.command("write-model-card")
+def write_model_card(
+    repo: Annotated[Path, typer.Option(help="Repository root.")] = Path(),
+) -> None:
+    """Render `reports/MODEL_CARD_discriminator.md` from the committed JSON reports."""
+    from serac.models.discriminator.model_card import write
+
+    typer.echo(f"wrote {write(repo)}")
