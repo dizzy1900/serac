@@ -7,8 +7,8 @@ invalidates the ensemble rather than quietly redefining it.
 | Field | Value |
 |---|---|
 | Solver | `serac-swe-voellmy` |
-| `SOLVER_VERSION` | `0.1.0` |
-| Design hash | `84821dbcaaaf793cdf386f5fe61ae0f58c0c50567f140a93f22a51ee6f4a75c0` |
+| `SOLVER_VERSION` | `0.2.0` |
+| Design hash | `ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac4943777f28484dae183` |
 | Members | 230 |
 | Latin-hypercube seed | 20260903 |
 
@@ -16,8 +16,8 @@ invalidates the ensemble rather than quietly redefining it.
 
 | Resolution | Members |
 |---|---|
-| 30 m | 30 |
-| 60 m | 200 |
+| 60 m | 222 |
+| 30 m | 8 |
 
 ## Sampled dimensions
 
@@ -47,19 +47,21 @@ invalidates the ensemble rather than quietly redefining it.
 
 ## Notes
 
-Sized against MEASURED cost on the machine this actually ran on.
+Sized against MEASURED per-member cost on the machine this ran on, and re-frozen once for a solver fix.
 
-MEASUREMENTS (reports/runout/timing.json): one 30 m member costs 1077.6 s at mu=0.03 and 326.8 s at mu=0.10, so cost ~ k/mu with k = 32.5 s; a 60 m member costs 120.4 s and 29.8 s for the same two, i.e. 30 m is 9-11x the cost of 60 m. Over the log-uniform mu range that gives a 560 s mean per 30 m member at a 7200 s simulated-time limit and about 330 s at the 3600 s limit used here. The first two members actually run took 290 s and 376 s, confirming it.
+SOLVER FIX. The first freeze ran against serac-swe-voellmy v0.1.0, whose kinetic stopping criterion could never trigger: it compared against the first non-zero kinetic energy, and a release emplaced at rest has essentially none after one step. Every one of the first six members ran to the simulated-time limit, which made runout distance a statement about the compute budget rather than about the rheology. v0.2.0 measures against the peak instead. Re-measured at 60 m with the fix: mu=0.217 stops itself at 2698 s (10.83 km, 58.9 s of wall clock), mu=0.091 at 1262 s (13.91 km, 85.0 s), mu=0.023 runs to the 7200 s probe limit (21.19 km, 229.7 s). The version bump invalidates the earlier ensemble by design; mixing pre-fix and post-fix members would mix physics.
 
-CONTENTION: this machine is shared with sibling agents and another project. Measured while the ensemble was running, each of 9 workers held about 35% of a core (load average 26 on 10 cores), so a 30 m member costs about 950 s of wall clock rather than 330 s.
+COST. reports/runout/timing.json: a 30 m member costs 1077.6 s at mu=0.03 and 326.8 s at mu=0.10, so cost ~ 32.5/mu s; 30 m is 9-11x the cost of 60 m. This machine is shared with sibling agents and another project, and 9 workers were measured holding about 35% of a core each (load average 26-39 on 10 cores).
 
-DESIGN CHOICE: 200 members at 30 m would take 3.1 h uncontended and about 6.8 h at the observed contention. The brief's stated fallback is fewer at 30 m plus more at 60 m with the resolution effect quantified, so this design is 30 members at 30 m and 200 at 60 m: about 1.5 h at the observed contention, clearing the 200-valid floor. The resolution effect is quantified twice over: by the 3-point study in reports/runout/grid_convergence.json, and inside the ensemble by comparing the 30 m block against the 60 m block at matched parameters.
+RESOLUTION SPLIT. 200 members at 30 m would take 3.1 h uncontended and about 6.8 h at the observed contention. The brief's stated fallback is fewer at 30 m plus more at 60 m with the resolution effect quantified, so this design is 222 members at 60 m and 8 at 30 m. The resolution effect is quantified by the three-point study in reports/runout/grid_convergence.json (90 / 60 / 30 m at one parameter vector) rather than by the ensemble, because 8 members is too few to carry it.
 
-RE-SIZED ONCE. An earlier freeze of the same 230 members used 130 at 30 m and 100 at 60 m; it was replaced after measuring the contended throughput and before any member output was analysed. The Latin hypercube is unchanged (same seed, same member count, same bounds), so every member's parameter vector is identical between the two; only the resolution block boundary moved. The two members already run keep their identity and are reused from cache.
+BLOCK ORDER. The 60 m block runs first, so that stopping the driver early still leaves an ensemble above the 200-valid floor rather than a partial 30 m block and nothing else.
+
+SIMULATED-TIME LIMIT. 3600 s. Every public timing this ensemble is compared against is at most 45 min, and the re-measured runs above show that members above mu ~ 0.09 stop themselves well inside it. Members still in motion at the cap are flagged hit_time_limit and retained.
 
 ---
 
-> **NOT r.avaflow: flow depths, velocities and arrival times come from serac-swe-voellmy v0.1.0, a single-phase depth-averaged Voellmy-Salm solver implemented in this repository. r.avaflow could not be obtained (see infra/docker/ravaflow/README.md); cross-validation against r.avaflow is outstanding.**
+> **NOT r.avaflow: flow depths, velocities and arrival times come from serac-swe-voellmy v0.2.0, a single-phase depth-averaged Voellmy-Salm solver implemented in this repository. r.avaflow could not be obtained (see infra/docker/ravaflow/README.md); cross-validation against r.avaflow is outstanding.**
 
 > Single-phase: the solver cannot represent two- or three-phase physics or phase separation between rock, ice and fluid. Ice melt, pore-pressure evolution and fluidisation are subsumed into the Voellmy coefficients, not resolved.
 

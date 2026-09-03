@@ -47,12 +47,12 @@
   "n_members": 230,
   "resolutions": [
     [
-      30.0,
-      30
+      60.0,
+      222
     ],
     [
-      60.0,
-      200
+      30.0,
+      8
     ]
   ],
   "seed": 20260903,
@@ -64,5 +64,5 @@
     "stop_kinetic_fraction": 0.001
   },
   "solver": "serac-swe-voellmy",
-  "solver_version": "0.1.0"
+  "solver_version": "0.2.0"
 }
