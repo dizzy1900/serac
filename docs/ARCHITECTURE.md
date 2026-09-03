@@ -5,7 +5,7 @@ Date of record: 2026-09-03. Status legend used throughout:
 | Tag | Meaning |
 |---|---|
 | `present` | in the tree on `main` today |
-| `planned (P1)` | part of Prompt 1 (foundations), being built on parallel branches; not merged yet |
+| `planned (P1)` | part of Prompt 1 (foundations); no row still carries this tag |
 | `planned (P2)` | Prompt 2 (models): LFH inversion, runout surrogate, avoided-loss, GRASS |
 
 Numbers in this document are either quoted from the founding brief, from the recon of
@@ -33,7 +33,7 @@ Numbers in this document are either quoted from the founding brief, from the rec
   `data/manifest.jsonl`. No provider is trusted to be present: a missing dataset is
   `status: not_fetched` and the code fails loudly rather than substituting values.
 - Consumers see only the JSON Schemas in `contracts/` (`avoided-loss.v0.json`,
-  `cap-message.v0.json`, `cascade-forecast.v0.json`, `replay-report.v0.json`, …; `planned (P1)`
+  `cap-message.v0.json`, `cascade-forecast.v0.json`, `replay-report.v0.json`, …; `present` (18 contracts)
   by the domain-modeller). They never import `serac`.
 - serac owns no satellites and no seismic network. **The constellation is bought, not
   built.** Observation cadence is whatever the providers deliver (section 5).
@@ -42,13 +42,13 @@ Numbers in this document are either quoted from the founding brief, from the rec
 
 | Container | Role | Runs as | Status |
 |---|---|---|---|
-| CLI `serac` | single entrypoint (typer) for ingest, events, aoi, cube, stream, replay, validate, promote, underwriting-check, schema | `uv run serac …`, or the Docker image | `present` (skeleton: `--help`, `--version`); sub-apps `planned (P1)` |
-| Batch EO lane | STAC search → `data/raw` → `data/interim` → Zarr feature cube per AOI → STAC catalog | `make`/DVC stages locally; `infra/jobs/*.yaml` at scale | `planned (P1)` |
-| Real-time seismic lane | SeedLink → bus → detector → (inversion → cascade, P2) → CAP | long-running processes reading the bus | `planned (P1)` skeleton with stubs |
-| Message bus | Redis Streams behind a synchronous `MessageBus` port; in-memory adapter for tests | `infra/docker/compose.yaml` (`redis:7-alpine`) | `planned (P1)`; live Redis unverified |
-| Storage | Zarr v3 cubes, GeoParquet vectors, pystac catalogs under `data/`; DVC remote from env | filesystem + DVC | ledger `present`; stores `planned (P1)` |
+| CLI `serac` | single entrypoint (typer) for ingest, events, aoi, cube, stream, replay, validate, promote, underwriting-check, schema, sources | `uv run serac …`, or the Docker image | `present` |
+| Batch EO lane | STAC search → `data/raw` → `data/interim` → Zarr feature cube per AOI → STAC catalog | `make`/DVC stages locally; `infra/jobs/*.yaml` at scale | `present`; credentialed sources (S1/HyP3, ERA5, GACOS, NISAR) are `not_fetched` |
+| Real-time seismic lane | SeedLink → bus → detector → (inversion → cascade, P2) → CAP | long-running processes reading the bus | `present` as a skeleton with stubs; replay exercises it end to end on fixtures |
+| Message bus | Redis Streams behind a synchronous `MessageBus` port; in-memory adapter for tests | `infra/docker/compose.yaml` (`redis:7-alpine`) | `present`; live Redis still unverified (fakeredis only) |
+| Storage | Zarr v3 cubes, GeoParquet vectors, pystac catalogs under `data/`; DVC remote from env | filesystem + DVC | `present`; no DVC remote configured |
 | Provenance ledger | `data/manifest.jsonl`, append-only JSON Lines | file | `present` |
-| Validation harness | `validate-*` suites writing `reports/validation/<suite>.json`; `promote`; `underwriting-check` | `make` | `planned (P1)` |
+| Validation harness | `validate-*` suites writing `reports/validation/<suite>.json`; `promote`; `underwriting-check` | `make` | `present` (6 suites) |
 
 Deployment unit: one plain Docker image containing the `serac` package (ADR-0014). Local
 development uses Docker Compose (`infra/docker/`); scaled runs are job manifests in
@@ -65,13 +65,13 @@ development uses Docker Compose (`infra/docker/`); scaled runs are job manifests
 | Provenance contract | `src/serac/domain/manifest.py` (`ManifestEntry`, `DataSource`, `ManifestStatus`, `Provenance`) | `present` |
 | Ledger port | `src/serac/ports/ledger.py` (`ManifestLedger`: `append`, `entries`, `query`, `latest`) | `present` |
 | Ledger adapter | `src/serac/adapters/storage/manifest_ledger.py` (`JsonlManifestLedger`, `sha256_of_file`) | `present` |
-| Common contracts | `src/serac/domain/common.py` (`Range`, `SourceRef`, `FieldNote`, `AttributedEstimate`) | `planned (P1)` |
-| Event contract | `src/serac/domain/events.py` (`MassMovementEvent`, `EventTime`, `SeismicAttribution`, `Precursor`, …) | `planned (P1)` |
-| Geo contracts | `src/serac/domain/geo.py` (`AOI`, `GridSpec`, `SlopeUnit`, `Transect`, `ExposedAsset`) | `planned (P1)` |
-| Forecast contracts | `src/serac/domain/forecast.py` (`CascadeForecast`); `src/serac/domain/force_history.py` (`ForceHistory` with `status: not_implemented`) | `planned (P1)` interfaces only |
-| Avoided-loss contract | `src/serac/domain/avoided_loss.py` → `contracts/avoided-loss.v0.json` | `planned (P1)` schema; populated in P2 |
-| Schema export | `src/serac/domain/schema_export.py`, `serac schema export`, drift test in `tests/contract/` | `planned (P1)` |
-| Validation suites | `src/serac/validation/{result,events,ingest,cube,stream,cap,contracts,promote,underwriting}.py` | `planned (P1)` |
+| Common contracts | `src/serac/domain/common.py` (`Range`, `SourceRef`, `FieldNote`, `AttributedEstimate`) | `present` |
+| Event contract | `src/serac/domain/events.py` (`MassMovementEvent`, `EventTime`, `SeismicAttribution`, `Precursor`, …) | `present` |
+| Geo contracts | `src/serac/domain/geo.py` (`AOI`, `GridSpec`, `SlopeUnit`, `Transect`, `ExposedAsset`) | `present` |
+| Forecast contracts | `src/serac/domain/forecast.py` (`CascadeForecast`); `src/serac/domain/force_history.py` (`ForceHistory` with `status: not_implemented`) | `present` interfaces only |
+| Avoided-loss contract | `src/serac/domain/avoided_loss.py` → `contracts/avoided-loss.v0.json` | `present` schema; populated in P2 |
+| Schema export | `src/serac/domain/schema_export.py`, `serac schema export`, drift test in `tests/contract/` | `present` |
+| Validation suites | `src/serac/validation/{result,events,aoi,ingest,cube,stream,cap,contracts,promote,underwriting}.py` | `present` |
 
 ### 3.2 Batch EO lane
 
@@ -88,7 +88,7 @@ development uses Docker Compose (`infra/docker/`); scaled runs are job manifests
 | ERA5 | `src/serac/adapters/eo/era5_cds.py` (`Era5Adapter`, cdsapi) | `present`; needs CDS key; NetCDF-4 reads need `h5py` (not in the lock) |
 | GACOS | `src/serac/adapters/eo/gacos.py` (`GacosAdapter` request/poll/receive; `serac ingest gacos --receive`) | `present`; form endpoint unverified, manual submission by default |
 | Zarr store | `src/serac/adapters/storage/zarr_store.py` (Zarr v3, `ZARR_FORMAT` constant, 1×512×512 chunks, zstd; roundtrip test) | `present` |
-| GeoParquet store | `src/serac/adapters/storage/geoparquet_store.py` | `planned (P1)` |
+| GeoParquet index | `src/serac/pipelines/events_index.py` (writes `data/events/events.parquet`) | `present` |
 | STAC catalog | `src/serac/adapters/storage/stac_catalog.py` (pystac 1.1.0 Collection per AOI, Item per slice; schemas vendored under `tests/fixtures/stac_schemas/` for offline validation) | `present` |
 | Cube builder | `src/serac/pipelines/build_cube.py` + `pipelines/grid.py` + `pipelines/layers/{dem,s1,s2,nisar,era5}.py` (`LayerBuilder`, `build_empty()` for missing layers), `src/serac/cli_cube.py` (`serac cube build / describe`) | `present` |
 | DVC pipeline | `dvc.yaml`, `.dvc/config` (no URL), `.dvcignore`, `make dvc-remote` | `present`; no `dvc.lock` (needs a network run of the DEM stage) |
@@ -120,22 +120,22 @@ synthetic `s1_coherence_t/s1_los_velocity_t` (flagged, `contains_synthetic: true
 
 | Component | Path | Status |
 |---|---|---|
-| Bus port | `src/serac/ports/bus.py` (`MessageBus`: `publish`, `ensure_group`, `read`, `ack`, `pending`, `close`; `Envelope`) | `planned (P1)` |
-| In-memory bus | `src/serac/adapters/bus/in_memory.py` (`InMemoryBus`, deterministic `Pipeline.drain`) | `planned (P1)` |
-| Redis Streams bus | `src/serac/adapters/bus/redis_streams.py` (`RedisStreamsBus`: XADD/XREADGROUP/XACK/XPENDING) | `planned (P1)`; unit-tested with fakeredis only |
-| Clock port | `src/serac/ports/clock.py` (`WallClock`, `VirtualClock`) | `planned (P1)` |
-| Trace contracts | `src/serac/domain/seismic.py` (`Sncl`, `TraceProvenance`, `SeismicTrace`), `domain/envelope.py`, `domain/detection.py`, `domain/cap.py`, `domain/replay.py` | `planned (P1)` |
-| ObsPy codec | `src/serac/adapters/seismic/obspy_codec.py` (the only module importing obspy for MiniSEED encode/decode) | `planned (P1)` |
-| FDSN archive | `src/serac/adapters/seismic/fdsn.py` (`FdsnWaveformArchive`; default EarthScope + GEOFON; radius station search; `plan()` dry-run) | `planned (P1)` |
-| SeedLink feed | `src/serac/adapters/seismic/seedlink.py` (`SeedLinkFeed` over `EasySeedLinkClient`) | `planned (P1)`; endpoint unverified |
-| USGS ComCat | `src/serac/adapters/seismic/usgs_comcat.py` (`ComCatCatalog`, `eventtype=landslide`) | `planned (P1)` |
-| Hydrometric | `src/serac/ports/hydro.py`, `src/serac/adapters/hydro/icimod_reported.py` (fixture-only; no live feed) | `planned (P1)` |
-| SeedLink ingestor | `src/serac/streaming/seedlink_ingestor.py` → topic `serac.waveforms` | `planned (P1)` |
-| Detector stub | `src/serac/streaming/detector_stub.py` → topic `serac.detections` ("STUB — replaced in Prompt 2") | `planned (P1)` |
+| Bus port | `src/serac/ports/bus.py` (`MessageBus`: `publish`, `ensure_group`, `read`, `ack`, `pending`, `close`; `Envelope`) | `present` |
+| In-memory bus | `src/serac/adapters/bus/in_memory.py` (`InMemoryBus`, deterministic `Pipeline.drain`) | `present` |
+| Redis Streams bus | `src/serac/adapters/bus/redis_streams.py` (`RedisStreamsBus`: XADD/XREADGROUP/XACK/XPENDING) | `present`; unit-tested with fakeredis only |
+| Clock port | `src/serac/ports/clock.py` (`WallClock`, `VirtualClock`) | `present` |
+| Trace contracts | `src/serac/domain/seismic.py` (`Sncl`, `TraceProvenance`, `SeismicTrace`), `domain/envelope.py`, `domain/detection.py`, `domain/cap.py`, `domain/replay.py` | `present` |
+| ObsPy codec | `src/serac/adapters/seismic/obspy_codec.py` (the only module importing obspy for MiniSEED encode/decode) | `present` |
+| FDSN archive | `src/serac/adapters/seismic/fdsn.py` (`FdsnWaveformArchive`; default EarthScope + GEOFON; radius station search; `plan()` dry-run) | `present` |
+| SeedLink feed | `src/serac/adapters/seismic/seedlink.py` (`SeedLinkFeed` over `EasySeedLinkClient`) | `present`; endpoint unverified |
+| USGS ComCat | `src/serac/adapters/seismic/usgs_comcat.py` (`ComCatCatalog`, `eventtype=landslide`) | `present` |
+| Hydrometric | `HydrometricSource` in `src/serac/ports/seismic.py`, `src/serac/adapters/hydro/icimod_fixture.py` (fixture-only; no live feed) | `present` |
+| SeedLink ingestor | `src/serac/streaming/seedlink_ingestor.py` → topic `serac.waveforms` | `present` |
+| Detector stub | `src/serac/streaming/detector_stub.py` → topic `serac.detections` ("STUB — replaced in Prompt 2") | `present` |
 | LFH inversion | single-force inversion; module path decided in Prompt 2 (`seisbench` reserved for it, ADR-0005) | `planned (P2)` |
 | Cascade surrogate | neural runout surrogate → arrival hydrographs at transects; module path decided in Prompt 2 | `planned (P2)` |
-| CAP renderer + stub | `src/serac/adapters/cap/render.py`, `src/serac/streaming/cap_stub.py` → topic `serac.alerts` (CAP 1.2, `status: Test`) | `planned (P1)` |
-| Replay | `src/serac/pipelines/replay.py`, `serac replay --event <id> --speed 1.0|max`, `reports/replay/<event>.json` | `planned (P1)` |
+| CAP renderer + stub | `src/serac/adapters/cap/cap12.py`, `src/serac/streaming/cap_stub.py` → topic `serac.alerts` (CAP 1.2, `status: Test`) | `present` |
+| Replay | `src/serac/pipelines/replay.py`, `serac replay --event <id> --speed 1.0|max`, `reports/replay/<event>.json` | `present` |
 
 ## 4. The two lanes
 
