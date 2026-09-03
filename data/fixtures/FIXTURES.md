@@ -76,3 +76,19 @@ window; two pre-event and one post-event scene around 2021-02-07
 | `data/fixtures/hydro/icimod_trishuli_2026-08-26.json` | https://www.icimod.org/press-release/major-flash-flood-sweeps-through-nepals-rasuwa-district-raising-fears-of-further-downstream-flooding/ | 2026-09-03T10:09:30+00:00 | `d8e9945741f283e26ec4d007936437253efae15dafe7c128a9fea29ef8d80014` | 4159 | ICIMOD (c) 2026. All rights reserved; cited-only (page not stored) |
 
 The hydrometric fixture is a hand transcription of figures published on the linked ICIMOD page (page sha256 recorded inside the file and in the ledger `params`), not a gauge record; every observation carries the sentence it was read from. The page is all-rights-reserved and is not stored.
+
+## Green's-function convention fixtures (`data/fixtures/greens/convention/`)
+
+Modelled Syngine responses, recorded by `scripts/record_greens_convention.py`. They are
+**derived**, not observed (ADR-0016): physics evaluated from PREM by EarthScope's Syngine
+service. They exist so `tests/unit/adapters/test_greens_convention.py` can prove the force
+convention and the azimuthal rotation offline.
+
+| File | What it holds | Why |
+|---|---|---|
+| `az90_probe.npz` | ZNE responses at 5 deg to four unit forces: vertical, superposed horizontal, pure radial, pure transverse | Pins `sourceforce=Fr,Ft,Fp` with `Ft` southward, and proves the superposed request separates cleanly by component so two requests per distance suffice |
+| `rotation.npz` | The five elementary responses plus direct Syngine calls at force bearings 0, 35 and 200 deg | Proves `rotate_to_zne` reproduces what the service returns when asked directly, including the transverse sign |
+| `symmetry.npz` | Z response due north of the source, and its equatorial twin computed with and without the geocentric-latitude conversion | Records the trap: a naive great-circle station lookup is **36% off** in the 20-150 s band; the geocentric conversion drives it to 0.0000 |
+
+All three carry `source: iris_syngine`, `provenance: derived`, `params.modelled: true` rows in
+`data/manifest.jsonl`.
