@@ -36,6 +36,17 @@ dependencies = [
 
 [project.optional-dependencies]
 s3 = ["dvc-s3>=3"]
+ml = [
+    "lightgbm>=4.7",
+    "scikit-learn>=1.5",
+    "seisbench>=0.12.5",
+    "torch>=2.4",
+]
+lfh = ["scipy>=1.14"]
+insar = ["mintpy>=1.6"]
+surrogate = ["neuraloperator>=1.0", "torch>=2.4"]
+tracking = ["wandb>=0.18"]
+alerting = ["cryptography>=43"]
 
 [project.scripts]
 serac = "serac.cli:app"
@@ -104,6 +115,15 @@ module = [
     "pyproj", "pyproj.*",
     "affine", "affine.*",
     "dvc", "dvc.*",
+    "lightgbm", "lightgbm.*",
+    "sklearn", "sklearn.*",
+    "seisbench", "seisbench.*",
+    "torch", "torch.*",
+    "scipy", "scipy.*",
+    "mintpy", "mintpy.*",
+    "neuralop", "neuralop.*",
+    "wandb", "wandb.*",
+    "numba", "numba.*",
 ]
 ignore_missing_imports = true
 

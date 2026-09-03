@@ -18,6 +18,7 @@ class SeracSettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
+    earthdata_token: SecretStr | None = None
     earthdata_username: SecretStr | None = None
     earthdata_password: SecretStr | None = None
     cdse_client_id: SecretStr | None = None

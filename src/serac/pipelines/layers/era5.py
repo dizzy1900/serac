@@ -17,7 +17,7 @@ from typing import Any
 import numpy as np
 import xarray as xr
 from pyproj import Transformer
-from scipy.interpolate import RegularGridInterpolator  # type: ignore[import-untyped]
+from scipy.interpolate import RegularGridInterpolator
 
 from serac.domain.geo import GridSpec
 from serac.domain.manifest import DataSource, ManifestEntry

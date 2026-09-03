@@ -179,15 +179,27 @@ class Hyp3SdkClient:
         )
 
     def submit_insar_job(
-        self, reference: str, secondary: str, *, name: str, looks: str
+        self,
+        reference: str,
+        secondary: str,
+        *,
+        name: str,
+        looks: str,
+        include_dem: bool = True,
     ) -> Hyp3JobInfo:
+        """Submit one interferogram.
+
+        `include_dem` defaults to True because MintPy's HyP3 loader needs the DEM and the
+        look-vector rasters to build a time series; without them a stack cannot be inverted.
+        It costs one extra raster per pair.
+        """
         batch = self._open().submit_insar_job(
             reference,
             secondary,
             name=name,
             include_los_displacement=True,
             include_look_vectors=True,
-            include_dem=False,
+            include_dem=include_dem,
             looks=looks,
         )
         return self._info(batch.jobs[0])
