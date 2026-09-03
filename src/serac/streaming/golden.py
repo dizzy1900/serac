@@ -11,6 +11,7 @@ the commit message.
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -102,9 +103,29 @@ def diff_golden(expected: dict[str, Any], actual: dict[str, Any]) -> list[str]:
     if len(exp_samples) != len(act_samples):
         problems.append(f"sample count: expected {len(exp_samples)}, got {len(act_samples)}")
     for index, (e, a) in enumerate(zip(exp_samples, act_samples, strict=False)):
-        if e != a:
-            problems.append(f"sample {index}: expected {e}, got {a}")
-            if len(problems) > 10:
-                problems.append("... further differences omitted")
-                break
+        for problem in _sample_diff(index, e, a):
+            problems.append(problem)
+        if len(problems) > 10:
+            problems.append("... further differences omitted")
+            break
+    return problems
+
+
+# The ratio is an FFT-derived float. Different BLAS/FFT builds (macOS arm64 vs Linux x86_64)
+# agree only to within rounding, so the golden pins the value to a relative tolerance rather
+# than bit-for-bit. Anything that actually changes the algorithm moves the ratio far more
+# than this, and every non-float field is still compared exactly.
+RATIO_REL_TOL = 1e-6
+
+
+def _sample_diff(index: int, expected: dict[str, Any], actual: dict[str, Any]) -> list[str]:
+    problems: list[str] = []
+    keys = set(expected) | set(actual)
+    for key in sorted(keys):
+        e, a = expected.get(key), actual.get(key)
+        if key == "ratio" and isinstance(e, int | float) and isinstance(a, int | float):
+            if not math.isclose(float(e), float(a), rel_tol=RATIO_REL_TOL, abs_tol=1e-12):
+                problems.append(f"sample {index}.ratio: expected {e}, got {a}")
+        elif e != a:
+            problems.append(f"sample {index}.{key}: expected {e!r}, got {a!r}")
     return problems
