@@ -145,8 +145,17 @@ def test_select_entries_respects_raw_root_and_synthetic(repo_root: Path) -> None
         ledger, "chamoli-rishiganga", raw_root_rel="data/fixtures", include_synthetic=False
     )
     assert all(e.status is ManifestStatus.fetched for e in real_only)
+    # Every non-synthetic entry selected under `data/raw` really is stored there. This used to
+    # assert that nothing had been fetched under `data/raw` at all, which stopped being true
+    # the moment anyone ran a real ingest into the working tree — the invariant that matters
+    # is the root filter, not the emptiness of the ledger.
     raw = select_entries(ledger, "chamoli-rishiganga", raw_root_rel="data/raw")
-    assert all(e.status is ManifestStatus.synthetic for e in raw)  # nothing fetched under raw
+    for entry in raw:
+        if entry.status is ManifestStatus.synthetic:
+            assert entry.path and entry.path.startswith("tests/fixtures/synthetic/")
+        else:
+            assert entry.status is ManifestStatus.fetched
+            assert entry.path and entry.path.startswith("data/raw/")
 
 
 def test_no_synthetic_makes_s1_not_fetched(repo_root: Path, tmp_path: Path) -> None:
