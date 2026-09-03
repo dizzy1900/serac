@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -73,5 +74,8 @@ def test_fdsn_requires_sncl_or_coordinates(tmp_path: Path) -> None:
             str(tmp_path),
         ],
     )
-    assert result.exit_code != 0
-    assert "--sncl" in result.output
+    assert result.exit_code == 2
+    # Match on bare tokens: rich colours and may wrap the message at a hyphen, so asserting
+    # on the literal "--sncl" is a test of the renderer, not of the error we raise.
+    plain = re.sub(r"\x1b\[[0-9;]*m", "", result.output)
+    assert "sncl" in plain and "lat" in plain and "lon" in plain
