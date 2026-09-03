@@ -1,0 +1,360 @@
+{
+  "aoi_id": null,
+  "bulked_volume_m3": null,
+  "dammed_river": null,
+  "event_group": "aru-co-2016",
+  "event_id": "aru-co-2016-07",
+  "failure_type": "glacier_detachment",
+  "fall_height_m": {
+    "best": 800.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 800.0,
+    "low": 800.0,
+    "notes": "'Drop H' = 0.8 km in Table 1 of Kääb et al. (2021)",
+    "source_refs": [
+      "kaab-2021-table1"
+    ],
+    "unit": "m"
+  },
+  "fatalities": {
+    "best": 9.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 9.0,
+    "low": 9.0,
+    "notes": "'killed nine herders and hundreds of their animals' (Gilbert et al. 2018; Kääb et al. 2021)",
+    "source_refs": [
+      "gilbert-2018",
+      "kaab-2021"
+    ],
+    "unit": "persons"
+  },
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "Deposit area (8–9 km2 for Aru-1, 6–7 km2 for Aru-2) is stated by Kääb et al. (2021) but no deposit volume was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "dammed_river": {
+      "notes": "Not established in any source retrieved on 2026-09-03; dammed_river was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "rock_fraction": {
+      "notes": "Kääb et al. (2018) and Gilbert et al. (2018) describe a glacier (ice) detachment; no rock fraction is stated.",
+      "public_estimates": [],
+      "reason": "not_applicable"
+    },
+    "secondary_surge": {
+      "notes": "Not established in any source retrieved on 2026-09-03; secondary_surge was previously recorded as false with that caveat in notes. Null until a fetched source states it either way.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "seismic": {
+      "notes": "No seismic catalogue entry or seismic study for the Aru detachments was retrieved in this session.",
+      "public_estimates": [],
+      "reason": "not_yet_researched"
+    },
+    "source_elevation_m": {
+      "notes": "The retrieved abstracts and Table 1 of Kääb et al. (2021) give slope and reach but no detachment elevation.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [],
+  "initially_reported_as": null,
+  "name": "Aru Co glacier detachment, Aru-1 (July 2016), western Tibet",
+  "notes": "First of the twin Aru Range detachments (event_group aru-co-2016); the avalanche reached lake Aru Co (Kääb et al. 2021).",
+  "peak_velocity_ms": {
+    "best": null,
+    "disputed": false,
+    "estimates": [],
+    "high": 55.6,
+    "low": 55.6,
+    "notes": "Gilbert et al. (2018): 'an ice avalanche with speeds exceeding 200 km h−1' — a lower bound, converted from km/h; no upper bound stated",
+    "source_refs": [
+      "gilbert-2018"
+    ],
+    "unit": "m/s"
+  },
+  "precursors_observed": [
+    {
+      "description": "Gilbert et al. (2018): the instability was 'more visible for the Aru-1 glacier through enhanced crevassing and terminus advance over a longer period' during a stress transfer that developed over the 5–6 years before the collapse; no dated observation or lead time is stated",
+      "kind": "crevassing_and_terminus_advance",
+      "lead_time_days": null,
+      "observed_utc": null,
+      "source_refs": [
+        "gilbert-2018"
+      ]
+    }
+  ],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "reference",
+  "runout_km": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 7.0,
+        "low": 7.0,
+        "qualifier": "'ran out up to 7 km in horizontal distance' (both events)",
+        "source_ref": "gilbert-2018",
+        "unit": "km"
+      },
+      {
+        "high": 6.0,
+        "low": 6.0,
+        "qualifier": "'ran out 6 km beyond the glacier terminus'",
+        "source_ref": "kaab-2021",
+        "unit": "km"
+      },
+      {
+        "high": 8.2,
+        "low": 8.2,
+        "qualifier": "Table 1 'Reach L' (from the uppermost scarp)",
+        "source_ref": "kaab-2021-table1",
+        "unit": "km"
+      }
+    ],
+    "high": 8.2,
+    "low": 6.0,
+    "notes": "The figures use different reference points (glacier terminus vs uppermost scarp)",
+    "source_refs": [
+      "gilbert-2018",
+      "kaab-2021",
+      "kaab-2021-table1"
+    ],
+    "unit": "km"
+  },
+  "schema_version": "0.1.0",
+  "secondary_surge": null,
+  "seismic": null,
+  "source_elevation_m": null,
+  "source_location": {
+    "basis": "Aru-1 glacier location from Table 1 of Kääb et al. (2021); Gilbert et al. (2018) give the site as 34.0° N, 82.2° E",
+    "lat": 34.02,
+    "lon": 82.25,
+    "source_refs": [
+      "kaab-2021-table1",
+      "gilbert-2018"
+    ],
+    "uncertainty_radius_m": 2000.0
+  },
+  "source_volume_m3": {
+    "best": 68000000.0,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 70000000.0,
+        "low": 66000000.0,
+        "qualifier": "'68 ± 2 × 10^6 m3'",
+        "source_ref": "kaab-2018",
+        "unit": "m3"
+      },
+      {
+        "high": 68000000.0,
+        "low": 68000000.0,
+        "qualifier": "'volumes of 68 and 83×10^6 m3'",
+        "source_ref": "gilbert-2018",
+        "unit": "m3"
+      },
+      {
+        "high": 68000000.0,
+        "low": 68000000.0,
+        "qualifier": "'a volume of 68 × 10^6 m3 was calculated for the detached glacier part'",
+        "source_ref": "kaab-2021",
+        "unit": "m3"
+      }
+    ],
+    "high": 70000000.0,
+    "low": 66000000.0,
+    "notes": null,
+    "source_refs": [
+      "kaab-2018",
+      "gilbert-2018",
+      "kaab-2021",
+      "kaab-2021-table1"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:27:33.302580Z",
+      "authors": [
+        "Kääb, Andreas",
+        "Leinss, Silvan",
+        "Gilbert, Adrien",
+        "Bühler, Yves",
+        "Gascoin, Simon",
+        "Evans, Stephen G.",
+        "Bartelt, Perry",
+        "Berthier, Etienne",
+        "Brun, Fanny",
+        "Chao, Wei-An",
+        "Farinotti, Daniel",
+        "Gimbert, Florent",
+        "Guo, Wanqin",
+        "Huggel, Christian",
+        "Kargel, Jeffrey S.",
+        "Leonard, Gregory J.",
+        "Tian, Lide",
+        "Treichler, Désirée",
+        "Yao, Tandong"
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_volume_m3"
+      ],
+      "content_type": "text/html; charset=utf-8",
+      "doi": "10.1038/s41561-017-0039-7",
+      "excerpt": "detachment of the entire lower parts of two adjacent glaciers in western Tibet in July and September 2016, leading to an unprecedented pair of giant low-angle ice avalanches with volumes of 68 ± 2 × 106 m3 and 83 ± 2 × 106 m3",
+      "id": "kaab-2018",
+      "kind": "peer_reviewed",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": true,
+      "publisher": "Springer Science and Business Media LLC",
+      "sha256": "1d067870d4546c1f33c2136886cbda1c79a9cf358b05c7e102a992e94f96585f",
+      "stored_copy": null,
+      "title": "Massive collapse of two glaciers in western Tibet in 2016 after surge-like instability",
+      "url": "https://www.nature.com/articles/s41561-017-0039-7",
+      "year": 2018
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:36.905089Z",
+      "authors": [
+        "Gilbert, Adrien",
+        "Leinss, Silvan",
+        "Kargel, Jeffrey",
+        "Kääb, Andreas",
+        "Gascoin, Simon",
+        "Leonard, Gregory",
+        "Berthier, Etienne",
+        "Karki, Alina",
+        "Yao, Tandong"
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_location",
+        "source_volume_m3",
+        "runout_km",
+        "peak_velocity_ms",
+        "fatalities",
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days"
+      ],
+      "content_type": "text/html",
+      "doi": "10.5194/tc-12-2883-2018",
+      "excerpt": "suddenly collapsed on 17 July and 21 September 2016. The masses transformed into ice avalanches with volumes of 68 and 83×106 m3 and ran out up to 7 km in horizontal distance, killing nine people.",
+      "id": "gilbert-2018",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "8a25d5fe1af129edc8f84b8240857b24a1669cff16b891eae11a2f2bcdd7eae6",
+      "stored_copy": "data/raw/sources/aru-co-2016-07/gilbert-2018.html",
+      "title": "Mechanisms leading to the 2016 giant twin glacier collapses, Aru Range, Tibet",
+      "url": "https://tc.copernicus.org/articles/12/2883/2018/tc-12-2883-2018.html",
+      "year": 2018
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:27.644613Z",
+      "authors": [
+        "Kääb, Andreas",
+        "Jacquemart, Mylène",
+        "Gilbert, Adrien",
+        "Leinss, Silvan",
+        "Girod, Luc",
+        "Huggel, Christian",
+        "Falaschi, Daniel",
+        "Ugalde, Felipe",
+        "Petrakov, Dmitry",
+        "Chernomorets, Sergey",
+        "Dokukin, Mikhail",
+        "Paul, Frank",
+        "Gascoin, Simon",
+        "Berthier, Etienne",
+        "Kargel, Jeffrey S."
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_volume_m3",
+        "runout_km",
+        "fatalities"
+      ],
+      "content_type": "text/html",
+      "doi": "10.5194/tc-15-1751-2021",
+      "excerpt": "The detachment of Kolka Glacier on 20 September 2002 released 130×10 6 m 3 of ice and rock that claimed ∼ 135 lives",
+      "id": "kaab-2021",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "d278073a19acd4ec41486f011489e5db666841182bb603c9155bc619ab3376f2",
+      "stored_copy": "data/raw/sources/kolka-karmadon-2002/kaab-2021.html",
+      "title": "Sudden large-volume detachments of low-angle mountain glaciers – more frequent than thought?",
+      "url": "https://tc.copernicus.org/articles/15/1751/2021/tc-15-1751-2021.html",
+      "year": 2021
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:30.701737Z",
+      "authors": [
+        "Kääb, Andreas",
+        "Jacquemart, Mylène",
+        "Gilbert, Adrien",
+        "Leinss, Silvan",
+        "Girod, Luc",
+        "Huggel, Christian",
+        "Falaschi, Daniel",
+        "Ugalde, Felipe",
+        "Petrakov, Dmitry",
+        "Chernomorets, Sergey",
+        "Dokukin, Mikhail",
+        "Paul, Frank",
+        "Gascoin, Simon",
+        "Berthier, Etienne",
+        "Kargel, Jeffrey S."
+      ],
+      "claims_supported": [
+        "source_location",
+        "fall_height_m",
+        "source_volume_m3",
+        "runout_km"
+      ],
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "doi": "10.5194/tc-15-1751-2021",
+      "excerpt": "Kolka | Caucasus | ~1835?, 1902, 2002 | 42.73 N, 44.44 E | Reach 19 km | Drop 2 km | Volume 130 x 10^6 m3 | slope 13",
+      "id": "kaab-2021-table1",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "dfbe47dae165ac403c274ba122e955e2fd780fef6e1ad3f4c5f3fe0c9952530c",
+      "stored_copy": "data/raw/sources/kolka-karmadon-2002/kaab-2021-table1.xlsx",
+      "title": "Table 1 of Kääb et al. (2021): parameters for the low-angle glacier detachments (XLSX)",
+      "url": "https://tc.copernicus.org/articles/15/1751/2021/tc-15-1751-2021-t01.xlsx",
+      "year": 2021
+    }
+  ],
+  "time": {
+    "basis": "calendar date (17 July 2016) stated by Gilbert et al. (2018) and Kääb et al. (2021); no clock time read",
+    "datetime_utc": "2016-07-17T00:00:00Z",
+    "source_refs": [
+      "gilbert-2018",
+      "kaab-2021",
+      "kaab-2018"
+    ],
+    "uncertainty_s": 86400.0
+  },
+  "transect_observations": []
+}
