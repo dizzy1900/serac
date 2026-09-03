@@ -15,16 +15,28 @@ from __future__ import annotations
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime
 from pathlib import Path
 
 import typer
 
 from serac.adapters.seismic.syngine import (
+    LICENCE as GREENS_LICENCE,
+)
+from serac.adapters.seismic.syngine import (
+    LICENCE_NOTE as GREENS_LICENCE_NOTE,
+)
+from serac.adapters.seismic.syngine import (
+    LICENCE_SOURCE_URL as GREENS_LICENCE_URL,
+)
+from serac.adapters.seismic.syngine import (
+    PROVIDER_URL,
     SyngineGreensLibrary,
     distance_library,
     nearest_request,
 )
-from serac.adapters.storage.manifest_ledger import JsonlManifestLedger
+from serac.adapters.storage.manifest_ledger import JsonlManifestLedger, sha256_of_file
+from serac.domain.manifest import DataSource, ManifestEntry, ManifestStatus, Provenance
 from serac.models.lfh.config import LfhConfig, read_seal, seal_config, write_seal
 from serac.models.lfh.gsf import build_grid
 from serac.models.lfh.pipeline import invert_event
@@ -327,23 +339,81 @@ def targets(repo: Path = REPO_OPTION) -> None:
         typer.echo(f"  {target.role:13s} {target.target_id:26s} {mass}")
 
 
+def best_node_requests(
+    target: LfhTarget, config: LfhConfig, repo: Path, reports_dir: Path
+) -> list[GreensRequest]:
+    """The Green's sets needed to re-invert this target at its *recorded* best location.
+
+    The full grid-plus-bootstrap requirement is one to two megabytes per event, far too much
+    to commit. Re-inverting at the location the grid search already found needs one distance
+    per station at one depth -- a couple of hundred kilobytes -- and that is enough to prove
+    the physics path runs offline from committed bytes and still returns the number in the
+    committed report.
+    """
+    from serac.adapters.seismic.syngine import geocentric_distance_azimuth
+    from serac.models.lfh.waveforms import prepare_channels, read_event_waveforms, select_channels
+
+    payload = json.loads(
+        (repo / reports_dir / f"{target.target_id}.json").read_text(encoding="utf-8")
+    )
+    location = payload["force_history"].get("source_location")
+    if location is None:
+        return []
+    stream, inventory = read_event_waveforms(repo / target.fixture_dir)
+    prepared, _ = prepare_channels(
+        stream,
+        inventory,
+        origin_utc=target.origin_utc,
+        source_lat=target.source_latitude,
+        source_lon=target.source_longitude,
+        config=config,
+    )
+    channels, _ = select_channels(prepared, config)
+    depth_m = float(location["depth_km"]) * 1000.0
+    seen: dict[str, GreensRequest] = {}
+    for channel in channels:
+        distance, _ = geocentric_distance_azimuth(
+            float(location["latitude"]),
+            float(location["longitude"]),
+            channel.latitude,
+            channel.longitude,
+        )
+        request = nearest_request(
+            distance,
+            model=config.earth_model,
+            source_depth_m=depth_m,
+            dt_s=config.dt_s,
+            duration_s=config.greens_duration_s,
+            step_deg=config.greens_step_deg,
+            min_deg=config.stations.min_distance_deg,
+            max_deg=config.stations.max_distance_deg,
+        )
+        seen.setdefault(request.cache_key(), request)
+    return list(seen.values())
+
+
 @app.command("fixtures")
 def fixtures(
     repo: Path = REPO_OPTION,
     cache: Path | None = CACHE_OPTION,
     out: Path = OUT_OPTION,
+    target: str | None = TARGET_OPTION,
+    reports_dir: Path = REPORTS_OPTION,
 ) -> None:
-    """Copy the Green's sets the committed events need into the fixture cache."""
+    """Copy the Green's sets needed to re-invert committed events at their recorded location."""
     import shutil
 
     config = LfhConfig()
     references = load_references(repo)
+    targets = [references.target(target)] if target else references.reproductions
     source_root = cache or (repo / INTERIM_CACHE)
     library = SyngineGreensLibrary(source_root, repo_root=repo, allow_network=False)
+    ledger = JsonlManifestLedger(repo / "data" / "manifest.jsonl")
+    recorded = {e.path for e in ledger.entries() if e.path}
     copied = 0
     missing: list[str] = []
-    for target in references.targets:
-        for request in _requests_for_target(target, config, repo):
+    for item in targets:
+        for request in best_node_requests(item, config, repo, reports_dir):
             path = library.cache_path(request)
             if not path.exists():
                 missing.append(request.cache_key())
@@ -352,10 +422,45 @@ def fixtures(
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, destination)
             copied += 1
-    for model_dir in sorted(source_root.glob("*/index.json")):
-        destination = repo / out / model_dir.parent.name / "index.json"
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(model_dir, destination)
+            relative = destination.resolve().relative_to(repo.resolve()).as_posix()
+            if relative in recorded:
+                continue
+            # A copy into the committed fixture tree is a new stored artefact and needs its
+            # own ledger row: nothing may live under data/ without one, and validate-lfh
+            # re-hashes each of these against the checksum recorded here.
+            source_entry = library.read_index(config.earth_model).get(request.cache_key(), {})
+            ledger.append(
+                ManifestEntry(
+                    source=DataSource.iris_syngine,
+                    product_id=f"greens/fixture/{item.target_id}/{request.cache_key()}",
+                    product_level="greens_function",
+                    event_id=item.event_id or item.target_id,
+                    path=relative,
+                    url=PROVIDER_URL,
+                    params={
+                        "modelled": True,
+                        "earth_model": config.earth_model.value,
+                        "distance_deg": request.distance_deg,
+                        "source_depth_m": request.source_depth_m,
+                        "copied_from": str(source_entry.get("path", library.cache_path(request))),
+                        "purpose": (
+                            "offline re-inversion of "
+                            f"{item.target_id} at its recorded best-fitting location"
+                        ),
+                    },
+                    sha256=sha256_of_file(destination),
+                    size_bytes=destination.stat().st_size,
+                    retrieved_at=datetime.now(tz=UTC),
+                    licence=GREENS_LICENCE,
+                    licence_source_url=GREENS_LICENCE_URL,
+                    provenance=Provenance.derived,
+                    status=ManifestStatus.fetched,
+                    adapter="serac lfh fixtures",
+                    adapter_version="0.1.0",
+                    notes=GREENS_LICENCE_NOTE,
+                )
+            )
+            recorded.add(relative)
     total = sum(p.stat().st_size for p in (repo / out).rglob("*") if p.is_file())
     typer.echo(f"copied {copied} Green's sets ({total / 1024:.0f} kB) into {out}")
     if missing:

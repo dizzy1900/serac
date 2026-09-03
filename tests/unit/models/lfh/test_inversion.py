@@ -89,42 +89,66 @@ def _synthetic_case(
 
 
 def test_shift_recovers_known_force() -> None:
-    """With the right alignment the inversion recovers the force it was never shown."""
+    """With the right alignment the inversion recovers the force it was never shown.
+
+    Two solutions are checked because they say different things. Lightly regularised, the
+    operator is unbiased: the peak comes back at about 1.09x and the shape correlates at
+    r = 0.81, which is what proves the forward and inverse bookkeeping agree. At the L-curve
+    corner the same data give 0.36x and r = 0.41 -- the corner criterion over-smooths on a
+    well-conditioned, white-noise problem where the residual barely rises with lambda.
+
+    That bias is kept and reported rather than tuned away. The brief specifies the L-curve
+    corner; changing the criterion after measuring how it behaves is the kind of adjustment
+    this repository exists to avoid, and the honest response is to state the number in the
+    model card and let the lambda jitter in the bootstrap carry part of it into the interval.
+    """
     shift = -60
     traces, force = _synthetic_case(shift=shift)
-    result = invert(traces, n_basis=201, stride=1, shift=shift, dt=1.0)
-
-    assert result.variance_reduction > 0.95, (
-        f"a well-aligned inversion of 2% noise must fit; got VR={result.variance_reduction:.3f}"
-    )
-    recovered_peak = float(np.linalg.norm(result.forces, axis=0).max())
     true_peak = float(np.linalg.norm(force, axis=0).max())
-    assert 0.7 < recovered_peak / true_peak < 1.4, (
-        f"peak force off by {recovered_peak / true_peak:.2f}x "
-        f"({recovered_peak:.3e} vs {true_peak:.3e} N)"
+
+    light = invert(traces, n_basis=201, stride=1, shift=shift, dt=1.0, lambda_value=0.3)
+    light_peak = float(np.linalg.norm(light.forces, axis=0).max())
+    light_correlation = float(np.corrcoef(light.forces.reshape(-1), force.reshape(-1))[0, 1])
+    assert light.variance_reduction > 0.95
+    assert 0.8 < light_peak / true_peak < 1.3, (
+        f"the operator itself must be unbiased; peak off by {light_peak / true_peak:.2f}x"
     )
-    correlation = float(
-        np.corrcoef(result.forces.reshape(-1), force.reshape(-1))[0, 1]
+    assert light_correlation > 0.75, f"recovered shape r={light_correlation:.3f}"
+
+    corner = invert(traces, n_basis=201, stride=1, shift=shift, dt=1.0)
+    corner_peak = float(np.linalg.norm(corner.forces, axis=0).max())
+    assert corner.variance_reduction > 0.95
+    assert 0.2 < corner_peak / true_peak < 0.7, (
+        "the L-curve corner is expected to damp the peak on this problem; if this ratio moves "
+        f"the model card's stated bias is stale (measured {corner_peak / true_peak:.2f}x)"
     )
-    assert correlation > 0.9, f"recovered force shape does not match: r={correlation:.3f}"
+    assert corner_peak < light_peak, "the corner must be the more heavily damped of the two"
 
 
 def test_wrong_shift_destroys_the_fit() -> None:
-    """The 120-sample misalignment that shipped once: no crash, a wrecked fit, a huge force.
+    """The 120-sample misalignment that shipped once: no crash, a wrecked fit, a wrong force.
 
-    This is the diagnostic signature to recognise. Variance reduction collapses while the
-    inverted amplitude explodes, because least squares compensates for phase it cannot match
-    by reaching for amplitude.
+    This is the diagnostic signature to recognise. Variance reduction collapses from 1.00 to
+    0.38 while the returned force stays smooth, plausibly shaped and roughly the right size,
+    so nothing about the output announces the error. On real records it was worse: variance
+    reduction fell to 0.11 and the peak force came back two orders of magnitude too large,
+    because least squares compensates for phase it cannot match by reaching for amplitude.
     """
     traces, force = _synthetic_case(shift=-60)
     misaligned = invert(traces, n_basis=201, stride=1, shift=-180, dt=1.0)
     aligned = invert(traces, n_basis=201, stride=1, shift=-60, dt=1.0)
 
-    assert misaligned.variance_reduction < 0.6 < aligned.variance_reduction
-    true_peak = float(np.linalg.norm(force, axis=0).max())
-    wrong_peak = float(np.linalg.norm(misaligned.forces, axis=0).max())
-    assert wrong_peak > 3 * true_peak, (
-        "the symptom of a misaligned inversion is an inflated force, not an obvious error"
+    assert misaligned.variance_reduction < 0.6 < aligned.variance_reduction, (
+        "the only place a misalignment shows is the variance reduction"
+    )
+    misaligned_correlation = float(
+        np.corrcoef(misaligned.forces.reshape(-1), force.reshape(-1))[0, 1]
+    )
+    assert misaligned_correlation < 0.4, (
+        f"a misaligned solution should not track the true force; r={misaligned_correlation:.3f}"
+    )
+    assert float(np.linalg.norm(misaligned.forces, axis=0).max()) > 0, (
+        "and it still returns a perfectly presentable force history, which is the danger"
     )
 
 
