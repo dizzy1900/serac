@@ -77,21 +77,21 @@ development uses Docker Compose (`infra/docker/`); scaled runs are job manifests
 
 | Component | Path | Status |
 |---|---|---|
-| Ingest port | `src/serac/ports/ingest.py` (`IngestAdapter.search / plan / fetch`, `DryRunPlan`) | `planned (P1)` |
-| Base adapter | `src/serac/adapters/eo/base.py` (streaming download + sha256, `data/raw/<source>/<aoi>/<product>/` layout, > 5 GB confirmation gate, credentials-missing → `not_fetched` + raise) | `planned (P1)` |
-| Sentinel-1 search | `src/serac/adapters/eo/asf.py` (`Sentinel1AsfAdapter`, asf_search geo_search, IW SLC/GRD) | `planned (P1)` |
-| HyP3 InSAR | `src/serac/adapters/eo/hyp3.py` (`Hyp3InsarAdapter`, `InSARPairPlanner`; jobs ledgered `status: requested`) | `planned (P1)` |
-| Sentinel-2 L2A (production) | `src/serac/adapters/eo/cdse.py` (`CdseSentinel2Adapter`, CDSE STAC + OAuth) | `planned (P1)`; fetch path exercised only with fakes |
-| Sentinel-2 L2A (fixtures) | `src/serac/adapters/eo/earthsearch.py` (`EarthSearchSentinel2Adapter`, public COGs) + shared `s2_cloud.py` | `planned (P1)` |
-| NISAR | `src/serac/adapters/eo/nisar.py` + `nisar_constraints.py` (BETA/PROVISIONAL windows, instrument gap, `MixedProductLevelError`) | `planned (P1)`; data `not_fetched` |
-| DEM | `src/serac/adapters/eo/dem.py` (`Glo30DemAdapter`, windowed reads of public COGs; `ports/dem.py` hook for licensed DEMs) | `planned (P1)` |
-| ERA5 | `src/serac/adapters/eo/era5.py` (`Era5Adapter`, cdsapi) | `planned (P1)`; needs CDS key |
-| GACOS | `src/serac/adapters/eo/gacos.py` (`GacosAdapter` request/poll; `serac ingest gacos --receive`) | `planned (P1)` |
-| Zarr store | `src/serac/adapters/storage/zarr_store.py` (Zarr v3, 1×512×512 chunks, zstd) | `planned (P1)` |
+| Ingest port | `src/serac/ports/ingest.py` (`IngestAdapter.search / plan / fetch`, `DryRunPlan`) | `present` |
+| Base adapter | `src/serac/adapters/eo/_base.py` (streaming download + sha256, `data/raw/<source>/<aoi>/<product>/` layout, > 5 GB confirmation gate, credentials-missing → `not_fetched` + raise) | `present` |
+| Sentinel-1 search | `src/serac/adapters/eo/asf_sentinel1.py` (`Sentinel1AsfAdapter`, asf_search geo_search, IW SLC/GRD; `_asf.py` shared Protocols) | `present`; download path exercised with fakes only (no Earthdata Login) |
+| HyP3 InSAR | `src/serac/adapters/eo/hyp3_insar.py` (`Hyp3InsarAdapter`, `InSARPairPlanner`; jobs ledgered `status: requested`) | `present`; job lifecycle exercised with a fake HyP3 only |
+| Sentinel-2 L2A (production) | `src/serac/adapters/eo/cdse_sentinel2.py` (`CdseSentinel2Adapter`, CDSE STAC + OAuth) | `present`; fetch path exercised only with fakes |
+| Sentinel-2 L2A (fixtures) | `src/serac/adapters/eo/earthsearch_sentinel2.py` (`EarthSearchSentinel2Adapter`, public COGs) + shared `s2_cloud.py` | `present` |
+| NISAR | `src/serac/adapters/eo/nisar.py` + `nisar_constraints.py` (BETA/PROVISIONAL by `collectionName`, instrument gap, `MixedProductLevelError`) | `present`; data `not_fetched` |
+| DEM | `src/serac/adapters/eo/dem_glo30.py` (`Glo30DemAdapter`, windowed reads of public COGs; `ports/dem.py` hook for licensed DEMs) | `present` |
+| ERA5 | `src/serac/adapters/eo/era5_cds.py` (`Era5Adapter`, cdsapi) | `present`; needs CDS key; NetCDF-4 reads need `h5py` (not in the lock) |
+| GACOS | `src/serac/adapters/eo/gacos.py` (`GacosAdapter` request/poll/receive; `serac ingest gacos --receive`) | `present`; form endpoint unverified, manual submission by default |
+| Zarr store | `src/serac/adapters/storage/zarr_store.py` (Zarr v3, `ZARR_FORMAT` constant, 1×512×512 chunks, zstd; roundtrip test) | `present` |
 | GeoParquet store | `src/serac/adapters/storage/geoparquet_store.py` | `planned (P1)` |
-| STAC catalog | `src/serac/adapters/storage/stac_catalog.py` (pystac; vendored schemas for offline validation) | `planned (P1)` |
-| Cube builder | `src/serac/pipelines/build_cube.py` (uses `GridSpec` from `domain/geo.py`; `LayerBuilder`, `build_empty()` for missing layers), `serac cube build / describe` | `planned (P1)` |
-| DVC pipeline | `dvc.yaml`, `.dvc/config` (no URL), `make dvc-remote` | `planned (P1)` |
+| STAC catalog | `src/serac/adapters/storage/stac_catalog.py` (pystac 1.1.0 Collection per AOI, Item per slice; schemas vendored under `tests/fixtures/stac_schemas/` for offline validation) | `present` |
+| Cube builder | `src/serac/pipelines/build_cube.py` + `pipelines/grid.py` + `pipelines/layers/{dem,s1,s2,nisar,era5}.py` (`LayerBuilder`, `build_empty()` for missing layers), `src/serac/cli_cube.py` (`serac cube build / describe`) | `present` |
+| DVC pipeline | `dvc.yaml`, `.dvc/config` (no URL), `.dvcignore`, `make dvc-remote` | `present`; no `dvc.lock` (needs a network run of the DEM stage) |
 
 Cube layers per AOI on a fixed 30 m grid (UTM 45N for Lhende): static `dem`, `slope`,
 `aspect`; temporal `s1_coherence_t`, `s1_los_velocity_t`, `s2_ndsi_t`, `s2_cloud_t`,
@@ -99,6 +99,22 @@ Cube layers per AOI on a fixed 30 m grid (UTM 45N for Lhende): static `dem`, `sl
 per-layer provenance attrs (`source`, `product_ids`, `manifest_entry_ids`, `retrieved_at`,
 `provenance ∈ {real, synthetic, none}`, `status`, `licence`, `units`, `processing`,
 `native_resolution_m`); global attr `contains_synthetic`.
+
+#### Feature cube (present)
+
+`serac cube build --aoi ID --from --to [--raw-root data/fixtures] [--out] [--bbox] [--epsg]
+[--dry-run]` reads `data/aoi/<id>/{aoi.json,grid.json}` when present (CLI overrides win) and
+builds `data/features/<aoi>/cube.zarr` (Zarr v3), `data/features/<aoi>/stac/` (STAC 1.1.0,
+one Item per time slice, validated offline) and `reports/cube/<aoi>.json` (`CubeBuildReport`).
+Only ledger rows with `status: fetched` under `--raw-root`, or `status: synthetic` under
+`tests/fixtures/synthetic/`, contribute pixels; every other layer is `build_empty()`: all-NaN,
+`status: not_fetched`. The cube time axis is the union of the imaging layers' acquisition
+instants; ERA5 is sampled at those steps. The Chamoli acceptance build from `data/fixtures`
+gives real `dem/slope/aspect` (GLO-30 crop), real `s2_ndsi_t/s2_cloud_t` for three dates,
+synthetic `s1_coherence_t/s1_los_velocity_t` (flagged, `contains_synthetic: true`) and
+`not_fetched` `nisar_hh_t/era5_t2m_t`; `serac cube describe` prints the layer table.
+`validate-cube` (`src/serac/validation/cube.py`) and `validate-ingest`
+(`src/serac/validation/ingest.py`) are the suites behind the Makefile targets.
 
 ### 3.3 Real-time seismic lane
 

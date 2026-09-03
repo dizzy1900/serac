@@ -1,0 +1,7 @@
+# DVC-tracked, never committed to git (ADR-0004); the ledger data/manifest.jsonl stays in git
+/raw/*
+/interim/*
+/features/*
+!/raw/.gitkeep
+!/interim/.gitkeep
+!/features/.gitkeep

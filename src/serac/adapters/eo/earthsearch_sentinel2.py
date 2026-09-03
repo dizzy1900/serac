@@ -347,7 +347,7 @@ class EarthSearchSentinel2Adapter(BaseIngestAdapter):
             if stem == "SCL":
                 aoi_fraction = cloud_fraction(arr)
                 histogram = class_histogram(arr)
-            _write_band_cog(out, arr, transform, crs, BAND_DTYPE[stem])
+            write_band_cog(out, arr, transform, crs, BAND_DTYPE[stem])
             sha, size = sha256_and_size(out)
             rows, cols = arr.shape
             files.append(
@@ -414,7 +414,7 @@ class EarthSearchSentinel2Adapter(BaseIngestAdapter):
         return None if scl is None else cloud_fraction(scl)
 
 
-def _write_band_cog(path: Path, arr: Any, transform: Any, crs: Any, dtype: str) -> None:
+def write_band_cog(path: Path, arr: Any, transform: Any, crs: Any, dtype: str) -> None:
     data = np.asarray(arr).astype(dtype, copy=False)
     with rasterio.open(
         path,

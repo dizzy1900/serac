@@ -165,6 +165,48 @@ class BaseIngestAdapter(IngestAdapter):
         """Where a product's files go; fixture builders override this."""
         return product_dir(dest_root, self.source, aoi_id, product_id)
 
+    def refuse_without_credentials(self, plan: DryRunPlan, ledger: ManifestLedger) -> None:
+        """Record `not_fetched` for every product and raise when a credential is missing."""
+        missing = self.missing_credentials()
+        if not missing:
+            return
+        names = ", ".join(f"{m.name} ({', '.join(m.env_vars)})" for m in missing)
+        for product in plan.products:
+            ledger.append(
+                self._record(
+                    product,
+                    plan.request,
+                    status=ManifestStatus.not_fetched,
+                    notes=f"credentials missing: {names}; see {missing[0].docs}",
+                )
+            )
+        raise CredentialsMissingError(
+            f"{self.adapter_name} needs {names}; recorded not_fetched for "
+            f"{len(plan.products)} product(s). See {missing[0].docs}."
+        )
+
+    def confirm_gate(self, plan: DryRunPlan, ledger: ManifestLedger, confirm: ConfirmFn) -> None:
+        """Ask before an unestimated or over-gate fetch; record `not_fetched` and raise on no."""
+        if plan.estimated_bytes is not None and plan.estimated_bytes <= self.size_gate_bytes:
+            return
+        size = "unknown size" if plan.estimated_bytes is None else f"{plan.estimated_bytes:,} B"
+        question = (
+            f"{self.adapter_name}: fetch {len(plan.products)} product(s), {size} "
+            f"(gate {self.size_gate_bytes:,} B). Proceed?"
+        )
+        if confirm(question):
+            return
+        for product in plan.products:
+            ledger.append(
+                self._record(
+                    product,
+                    plan.request,
+                    status=ManifestStatus.not_fetched,
+                    notes=f"declined at the confirmation gate ({size})",
+                )
+            )
+        raise FetchDeclinedError(question)
+
     def fetch(
         self,
         plan: DryRunPlan,
@@ -176,39 +218,8 @@ class BaseIngestAdapter(IngestAdapter):
         if plan.refusals:
             raise IngestRefusedError("; ".join(plan.refusals))
         request = plan.request
-        missing = self.missing_credentials()
-        if missing:
-            names = ", ".join(f"{m.name} ({', '.join(m.env_vars)})" for m in missing)
-            for product in plan.products:
-                ledger.append(
-                    self._record(
-                        product,
-                        request,
-                        status=ManifestStatus.not_fetched,
-                        notes=f"credentials missing: {names}; see {missing[0].docs}",
-                    )
-                )
-            raise CredentialsMissingError(
-                f"{self.adapter_name} needs {names}; recorded not_fetched for "
-                f"{len(plan.products)} product(s). See {missing[0].docs}."
-            )
-        if plan.estimated_bytes is None or plan.estimated_bytes > self.size_gate_bytes:
-            size = "unknown size" if plan.estimated_bytes is None else f"{plan.estimated_bytes:,} B"
-            question = (
-                f"{self.adapter_name}: fetch {len(plan.products)} product(s), {size} "
-                f"(gate {self.size_gate_bytes:,} B). Proceed?"
-            )
-            if not confirm(question):
-                for product in plan.products:
-                    ledger.append(
-                        self._record(
-                            product,
-                            request,
-                            status=ManifestStatus.not_fetched,
-                            notes=f"declined at the confirmation gate ({size})",
-                        )
-                    )
-                raise FetchDeclinedError(question)
+        self.refuse_without_credentials(plan, ledger)
+        self.confirm_gate(plan, ledger, confirm)
         entries: list[ManifestEntry] = []
         for product in plan.products:
             dest = self.product_dir(dest_root, request.aoi_id, product.product_id)
@@ -225,23 +236,35 @@ class BaseIngestAdapter(IngestAdapter):
                     )
                 )
                 raise
-            for f in files:
-                entries.append(
-                    ledger.append(
-                        self._record(
-                            product,
-                            request,
-                            status=ManifestStatus.fetched,
-                            path=f.path,
-                            sha256=f.sha256,
-                            size_bytes=f.size_bytes,
-                            url=f.url if f.url is not None else product.url,
-                            params=f.params,
-                            notes=f.notes,
-                            product_level=f.product_level,
-                        )
+            entries.extend(self.record_files(product, request, files, ledger))
+        return entries
+
+    def record_files(
+        self,
+        product: ProductRecord,
+        request: IngestRequest,
+        files: Sequence[FetchedFile],
+        ledger: ManifestLedger,
+    ) -> list[ManifestEntry]:
+        """Append one `fetched` entry per file and return them."""
+        entries: list[ManifestEntry] = []
+        for f in files:
+            entries.append(
+                ledger.append(
+                    self._record(
+                        product,
+                        request,
+                        status=ManifestStatus.fetched,
+                        path=f.path,
+                        sha256=f.sha256,
+                        size_bytes=f.size_bytes,
+                        url=f.url if f.url is not None else product.url,
+                        params=f.params,
+                        notes=f.notes,
+                        product_level=f.product_level,
                     )
                 )
+            )
         return entries
 
     # -- ledger -----------------------------------------------------------------------------

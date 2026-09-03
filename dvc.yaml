@@ -1,0 +1,128 @@
+# serac DVC pipeline (ADR-0004). `data/manifest.jsonl` is deliberately NOT an output of any
+# stage: every adapter appends to it. Credentialed ingests are `frozen: true` so `dvc repro`
+# never triggers a network fetch by accident; run them by hand once `.env` has the keys.
+# AOI bounding boxes come from data/aoi/<id>/aoi.json (domain lane); the `--bbox/--epsg`
+# values below are the fixture design choices from data/fixtures/FIXTURES.md and only apply
+# until those files exist. CI runs `uv run dvc stage list` to prove this file parses.
+stages:
+  ingest_dem_lhende-khola-trishuli:
+    cmd: uv run serac ingest dem --aoi lhende-khola-trishuli --bbox 85.51,28.27,85.53,28.29 --buffer-m 2000 --yes
+    deps:
+      - src/serac/adapters/eo/dem_glo30.py
+      - src/serac/cli_ingest.py
+    outs:
+      - data/raw/dem_glo30/lhende-khola-trishuli
+  ingest_dem_chamoli-rishiganga:
+    cmd: uv run serac ingest dem --aoi chamoli-rishiganga --bbox 79.68,30.33,79.80,30.42 --buffer-m 0 --yes
+    deps:
+      - src/serac/adapters/eo/dem_glo30.py
+      - src/serac/cli_ingest.py
+    outs:
+      - data/raw/dem_glo30/chamoli-rishiganga
+  ingest_dem_blatten-lotschental:
+    cmd: uv run serac ingest dem --aoi blatten-lotschental --bbox 7.78,46.39,7.87,46.45 --buffer-m 0 --yes
+    deps:
+      - src/serac/adapters/eo/dem_glo30.py
+      - src/serac/cli_ingest.py
+    outs:
+      - data/raw/dem_glo30/blatten-lotschental
+
+  # Public Sentinel-2 via Earth Search (fixture/secondary source, ADR-0006): no credentials.
+  ingest_s2_chamoli-rishiganga:
+    cmd: uv run serac ingest s2-earthsearch --aoi chamoli-rishiganga --bbox 79.68,30.33,79.80,30.42 --from 2021-01-15 --to 2021-02-20 --max-scenes 3 --yes
+    deps:
+      - src/serac/adapters/eo/earthsearch_sentinel2.py
+      - src/serac/adapters/eo/s2_cloud.py
+    outs:
+      - data/raw/sentinel2_earthsearch/chamoli-rishiganga
+
+  # Credentialed ingests: frozen (Earthdata Login for HyP3, CDS key for ERA5).
+  ingest_hyp3_lhende-khola-trishuli:
+    frozen: true
+    cmd: uv run serac ingest hyp3 --aoi lhende-khola-trishuli --bbox 85.51,28.27,85.53,28.29 --from 2026-07-01 --to 2026-09-03 --wait --yes
+    deps:
+      - src/serac/adapters/eo/hyp3_insar.py
+    outs:
+      - data/raw/hyp3_insar/lhende-khola-trishuli
+  ingest_hyp3_chamoli-rishiganga:
+    frozen: true
+    cmd: uv run serac ingest hyp3 --aoi chamoli-rishiganga --bbox 79.68,30.33,79.80,30.42 --from 2021-01-01 --to 2021-02-28 --relative-orbit 63 --wait --yes
+    deps:
+      - src/serac/adapters/eo/hyp3_insar.py
+    outs:
+      - data/raw/hyp3_insar/chamoli-rishiganga
+  ingest_hyp3_blatten-lotschental:
+    frozen: true
+    cmd: uv run serac ingest hyp3 --aoi blatten-lotschental --bbox 7.78,46.39,7.87,46.45 --from 2025-04-01 --to 2025-06-15 --wait --yes
+    deps:
+      - src/serac/adapters/eo/hyp3_insar.py
+    outs:
+      - data/raw/hyp3_insar/blatten-lotschental
+  ingest_era5_lhende-khola-trishuli:
+    frozen: true
+    cmd: uv run serac ingest era5 --aoi lhende-khola-trishuli --bbox 85.51,28.27,85.53,28.29 --from 2026-08-01 --to 2026-09-03 --yes
+    deps:
+      - src/serac/adapters/eo/era5_cds.py
+    outs:
+      - data/raw/era5_cds/lhende-khola-trishuli
+  ingest_era5_chamoli-rishiganga:
+    frozen: true
+    cmd: uv run serac ingest era5 --aoi chamoli-rishiganga --bbox 79.68,30.33,79.80,30.42 --from 2021-01-01 --to 2021-02-15 --yes
+    deps:
+      - src/serac/adapters/eo/era5_cds.py
+    outs:
+      - data/raw/era5_cds/chamoli-rishiganga
+  ingest_era5_blatten-lotschental:
+    frozen: true
+    cmd: uv run serac ingest era5 --aoi blatten-lotschental --bbox 7.78,46.39,7.87,46.45 --from 2025-05-01 --to 2025-06-15 --yes
+    deps:
+      - src/serac/adapters/eo/era5_cds.py
+    outs:
+      - data/raw/era5_cds/blatten-lotschental
+  ingest_nisar_lhende-khola-trishuli:
+    frozen: true
+    cmd: uv run serac ingest nisar --aoi lhende-khola-trishuli --bbox 85.51,28.27,85.53,28.29 --from 2026-06-17 --to 2026-09-03 --level provisional --yes
+    deps:
+      - src/serac/adapters/eo/nisar.py
+      - src/serac/adapters/eo/nisar_constraints.py
+    outs:
+      - data/raw/nisar_asf/lhende-khola-trishuli
+
+  # Feature cubes: reports/cube/<aoi>.json is an uncached metric (small, git-diffable).
+  build_cube_lhende-khola-trishuli:
+    cmd: uv run serac cube build --aoi lhende-khola-trishuli --from 2026-06-01 --to 2026-09-03 --bbox 85.51,28.27,85.53,28.29 --epsg 32645
+    deps:
+      - src/serac/pipelines
+      - src/serac/adapters/storage/zarr_store.py
+      - src/serac/adapters/storage/stac_catalog.py
+      - data/raw/dem_glo30/lhende-khola-trishuli
+    outs:
+      - data/features/lhende-khola-trishuli
+    metrics:
+      - reports/cube/lhende-khola-trishuli.json:
+          cache: false
+  build_cube_chamoli-rishiganga:
+    cmd: uv run serac cube build --aoi chamoli-rishiganga --from 2021-01-01 --to 2021-02-15 --bbox 79.68,30.33,79.80,30.42 --epsg 32644
+    deps:
+      - src/serac/pipelines
+      - src/serac/adapters/storage/zarr_store.py
+      - src/serac/adapters/storage/stac_catalog.py
+      - data/raw/dem_glo30/chamoli-rishiganga
+      - data/raw/sentinel2_earthsearch/chamoli-rishiganga
+    outs:
+      - data/features/chamoli-rishiganga
+    metrics:
+      - reports/cube/chamoli-rishiganga.json:
+          cache: false
+  build_cube_blatten-lotschental:
+    cmd: uv run serac cube build --aoi blatten-lotschental --from 2025-04-01 --to 2025-06-15 --bbox 7.78,46.39,7.87,46.45 --epsg 32632
+    deps:
+      - src/serac/pipelines
+      - src/serac/adapters/storage/zarr_store.py
+      - src/serac/adapters/storage/stac_catalog.py
+      - data/raw/dem_glo30/blatten-lotschental
+    outs:
+      - data/features/blatten-lotschental
+    metrics:
+      - reports/cube/blatten-lotschental.json:
+          cache: false
