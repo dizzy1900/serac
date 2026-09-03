@@ -144,7 +144,7 @@ def test_assets_are_located_and_linked(lhende: BuiltAoi) -> None:
     by_id = {a.id: a for a in lhende.assets}
     assert by_id["rasuwagadhi-hep"].geometry_quality is GeometryQuality.osm_way_centroid
     assert by_id["rasuwagadhi-hep"].transect_id == "rasuwagadhi-gyirong"
-    assert by_id["sanjen-hep"].geometry_quality is GeometryQuality.hand_digitised_approximate
+    assert by_id["sanjen-hep"].geometry_quality is GeometryQuality.source_stated_location
     assert by_id["sanjen-hep"].transect_id is None  # tributary, > 5 km from the centreline
     assert lhende.asset_accuracy_m["sanjen-hep"] == 3000.0
     # settlements cite the OSM dataset automatically
