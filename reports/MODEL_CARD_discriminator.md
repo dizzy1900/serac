@@ -1,6 +1,8 @@
 # Model card — M1 seismic mass-movement discriminator
 
-Separates long-period single-force mass-movement signals from double-couple tectonic earthquakes and from noise, on regional broadband records. This is the component that would have kept the 26 August 2026 Langtang / Lhende Khola event from being announced as an M4.4 earthquake.
+Separates long-period single-force mass-movement signals from double-couple tectonic earthquakes and from noise, on regional broadband records. It is the component built to catch the failure that produced the "M4.4 earthquake" misreport of 26 August 2026.
+
+**It does not yet catch that failure.** On the Langtang window as the open archives actually hold it, this model puts `tectonic` marginally above `mass_movement`. The case study below gives the numbers and the reason. Chamoli 2021, which had twelve receivers rather than two, is classified correctly in the held-out fold. Read the metrics below as what a v0 baseline achieves on the events that had coverage, not as a claim about the event this project exists for.
 
 ## Intended use
 
@@ -242,7 +244,7 @@ By contrast Chamoli 2021, which had twelve receivers, is classified correctly in
 
 ## Failure modes
 
-1. **High Mountain Asia is thinly represented.** ESEC holds only five HMA events; with the event library the held-out fold has of order ten positives. Every HMA number in this card has an interval wide enough to contain a great deal, and the point estimates should not be quoted without them.
+1. **High Mountain Asia is thinly represented.** ESEC holds five HMA events; with the serac event library the held-out fold has **nine positives**. Every HMA number in this card has an interval wide enough to contain a great deal, and no point estimate should be quoted without its interval.
 2. **The time-forward test fold is tiny.** ESEC's last event is 2024, so a 2024-2026 test window has a handful of events. Leave-one-region-out is the headline for that reason.
 3. **Negatives are not magnitude-matched.** ESEC publishes no magnitude, so negatives are matched on receiver set, epicentral proximity and epoch inside a fixed M4.0-6.5 band. If mass movements systematically differ in size from that band, some of what the model separates may be amplitude rather than mechanism.
 4. **The noise class means 'no catalogued source', not 'quiet'.** Uncatalogued sources, small teleseisms and cultural noise are all in it.

@@ -1,7 +1,10 @@
 """`DiscriminatorDetector` — the trained baseline behind the `Detector` port.
 
-This is the component that would have kept the 26 August 2026 event from being announced as an
-M4.4 earthquake. It accumulates `SeismicTrace` chunks per channel, and when a window is ready
+This is the component built to catch the failure that produced the "M4.4 earthquake" misreport
+of 26 August 2026. On the Langtang window as the open archives hold it — two receivers, not the
+three this detector requires — it does not yet catch it; `reports/MODEL_CARD_discriminator.md`
+carries that case study and its numbers. It accumulates `SeismicTrace` chunks per channel, and
+when a window is ready
 it removes the instrument response, computes the same 80 features the model was trained on, and
 emits a `DetectionCandidate` with a calibrated probability and the contributing channels.
 

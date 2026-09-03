@@ -91,9 +91,17 @@ def render(repo: Path) -> str:
     add("")
     add(
         "Separates long-period single-force mass-movement signals from double-couple tectonic "
-        "earthquakes and from noise, on regional broadband records. This is the component that "
-        "would have kept the 26 August 2026 Langtang / Lhende Khola event from being announced "
-        "as an M4.4 earthquake."
+        "earthquakes and from noise, on regional broadband records. It is the component built "
+        'to catch the failure that produced the "M4.4 earthquake" misreport of 26 August 2026.'
+    )
+    add("")
+    add(
+        "**It does not yet catch that failure.** On the Langtang window as the open archives "
+        "actually hold it, this model puts `tectonic` marginally above `mass_movement`. The "
+        "case study below gives the numbers and the reason. Chamoli 2021, which had twelve "
+        "receivers rather than two, is classified correctly in the held-out fold. Read the "
+        "metrics below as what a v0 baseline achieves on the events that had coverage, not as "
+        "a claim about the event this project exists for."
     )
     add("")
     add("## Intended use")
@@ -384,10 +392,10 @@ def render(repo: Path) -> str:
     add("## Failure modes")
     add("")
     add(
-        "1. **High Mountain Asia is thinly represented.** ESEC holds only five HMA events; with "
-        "the event library the held-out fold has of order ten positives. Every HMA number in "
-        "this card has an interval wide enough to contain a great deal, and the point estimates "
-        "should not be quoted without them.\n"
+        "1. **High Mountain Asia is thinly represented.** ESEC holds five HMA events; with the "
+        "serac event library the held-out fold has **nine positives**. Every HMA number in this "
+        "card has an interval wide enough to contain a great deal, and no point estimate should "
+        "be quoted without its interval.\n"
         "2. **The time-forward test fold is tiny.** ESEC's last event is 2024, so a 2024-2026 "
         "test window has a handful of events. Leave-one-region-out is the headline for that "
         "reason.\n"
