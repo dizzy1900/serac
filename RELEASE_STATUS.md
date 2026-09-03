@@ -16,22 +16,22 @@ and operated; nothing is).
 | Provenance ledger (`ManifestEntry`, `JsonlManifestLedger`) | yes | yes | yes | n/a | no | no |
 | Settings / `.env` (`SeracSettings`) | yes | yes | yes (import) | no | n/a | no |
 | CLI skeleton (`serac --help`, `--version`) | yes | yes | yes | n/a | n/a | no |
-| Domain contracts (`Range`, `SourceRef`, `FieldNote`, `MassMovementEvent`, geo, forecast, avoided-loss) | yes | no | no | n/a | no | no |
-| `serac schema export` + `contracts/*.v0.json` + drift test | yes | no | no | n/a | n/a | no |
+| Domain contracts (`Range`, `SourceRef`, `FieldNote`, `MassMovementEvent`, geo, forecast, avoided-loss) | yes | yes | yes (validators, both paths) | n/a | no | no |
+| `serac schema export` + `contracts/*.v0.json` + drift test | yes | yes (18 contracts) | yes | n/a | n/a | no |
 | Event library (11 records / 9 items) + `serac events add/report/build-index` | yes | no | no | no | no | no |
 | AOIs (lhende-khola-trishuli, chamoli-rishiganga, blatten-lotschental) | yes | no | no | no | no | no |
 | Sentinel-1 ASF adapter | yes | no | no | no | no | no |
 | HyP3 InSAR adapter + pair planner | yes | no | no | no | no | no |
 | Sentinel-2 CDSE adapter | yes | no | no | no | no | no |
-| Sentinel-2 Earth Search adapter (fixture source) | yes | no | no | no | no | no |
+| Sentinel-2 Earth Search adapter (fixture source) | yes | yes | yes (fake STAC, real crops) | yes (smoke 2026-09-03) | no | no |
 | NISAR adapter + level constraints | yes | no | no | no | no | no |
-| Copernicus GLO-30 DEM adapter | yes | no | no | no | no | no |
+| Copernicus GLO-30 DEM adapter | yes | yes | yes (real crops) | yes (smoke 2026-09-03) | no | no |
 | ERA5 adapter | yes | no | no | no | no | no |
 | GACOS request/poll adapter | yes | no | no | no | no | no |
 | Feature cube (`build_cube`, Zarr v3, STAC) + `serac cube build/describe` | yes | no | no | n/a | no | no |
 | DVC pipeline (`dvc.yaml`, `make dvc-remote`) | yes | no | no | no | n/a | no |
-| Message bus port + `InMemoryBus` | yes | no | no | n/a | n/a | no |
-| `RedisStreamsBus` | yes | no | no | no | n/a | no |
+| Message bus port + `InMemoryBus` | yes | yes | yes (contract test) | n/a | n/a | no |
+| `RedisStreamsBus` | yes | yes | yes (fakeredis) | no (no Redis on dev machine; `redis`-marked test skips) | n/a | no |
 | FDSN waveform adapter (EarthScope, GEOFON) | yes | no | no | no | no | no |
 | SeedLink feed + ingestor | yes | no | no | no | no | no |
 | USGS ComCat adapter | yes | no | no | no | no | no |
@@ -40,7 +40,11 @@ and operated; nothing is).
 | CAP 1.2 renderer + **stub** + XSD validation | yes | no | no | n/a | no | no |
 | Replay + latency report | yes | no | no | no | no | no |
 | Validation harness (`validate-*`, `validate-serac`, `promote`) | yes | no | no | n/a | no | no |
-| `underwriting-check` (exits 2 "not implemented: Prompt 2") | yes | no | no | n/a | n/a | no |
+| `underwriting-check` (exits 2 "not implemented: Prompt 2") | yes | yes | yes | n/a | n/a | no |
+| Ingest port + `BaseIngestAdapter` (dry-run, 5 GiB gate, credentials path, ledger) | yes | yes | yes | n/a | n/a | no |
+| Seismic contracts (`SeismicTrace`, `Envelope`+codec, `DetectionCandidate`, `ForceHistory`=not_implemented, `CAPMessage`, `ReplayReport`) | yes | yes | yes | n/a | no | no |
+| ObsPy MiniSEED codec + `Stage`/`Pipeline`/`Clock` skeleton | yes | yes | yes (round-trips the 4 real fixtures) | n/a | no | no |
+| Fixtures: seismic (chamoli-2021, langtang-2026), ComCat, CAP XSDs, DEM crops ×3, S2 crops ×3 dates, S1/NISAR/CDSE listings | fetched 2026-09-03, sha256 in ledger | real | integrity tests | n/a | n/a | n/a |
 | Docker Compose (`infra/docker/compose.yaml`) | yes | yes (file) | no | no | n/a | no |
 | Job manifests (`infra/jobs/*.yaml`) | yes | yes (files) | n/a | no | n/a | no |
 | Governance docs (CLAUDE.md, ARCHITECTURE, ADRs, CREDENTIALS, DATA_SOURCES, EVENT_LIBRARY) | yes | yes | n/a | n/a | n/a | n/a |
