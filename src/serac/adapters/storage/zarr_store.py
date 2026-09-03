@@ -61,7 +61,9 @@ def _clean(value: Any) -> Any:
 def chunks_for(da: xr.DataArray) -> tuple[int, ...]:
     """1 x 512 x 512 (or 512 x 512) clipped to the array's own shape."""
     targets = {"time": CHUNK_TIME, "y": CHUNK_Y, "x": CHUNK_X}
-    return tuple(min(int(da.sizes[d]), targets.get(str(d), int(da.sizes[d]))) for d in da.dims)
+    return tuple(
+        max(1, min(int(da.sizes[d]), targets.get(str(d), int(da.sizes[d])))) for d in da.dims
+    )
 
 
 def encoding_for(ds: xr.Dataset) -> dict[str, dict[str, Any]]:
