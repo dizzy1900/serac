@@ -103,7 +103,7 @@ two detachments each under an `event_group`:
 |---|---|---|---|---|
 | 1 | Kolka–Karmadon, Russia | 20 Sep 2002 | `kolka-karmadon-2002` | reference |
 | 2 | Aru Co twin glacier detachments, Tibet | 17 Jul and 21 Sep 2016 | `aru-co-2016-07`, `aru-co-2016-09` | reference |
-| 3 | Sedongpu, Tibet | 2017 and Oct 2018 | `sedongpu-2017-10`, `sedongpu-2018-10` | reference; volume recorded as `disputed` with each published figure attributed |
+| 3 | Sedongpu, Tibet | 2017 and Oct 2018 | `sedongpu-2017`, `sedongpu-2018-10` (the 2017 record id carries no month until a fetched source dates it) | reference; volume recorded as `disputed` with each published figure attributed |
 | 4 | Chamoli / Ronti Peak, India | 7 Feb 2021 | `chamoli-2021` | reference (best-documented; replay/backtest event) |
 | 5 | Marmolada, Italy | 3 Jul 2022 | `marmolada-2022` | reference |
 | 6 | South Lhonak, Sikkim | 3 Oct 2023 | `south-lhonak-2023` | **negative control** (`moraine_collapse_glof`) |

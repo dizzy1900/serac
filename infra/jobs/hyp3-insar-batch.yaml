@@ -1,3 +1,4 @@
+# NOTE: the CLI flags below are PROPOSED; reconcile with `serac ingest` when the adapters land.
 # serac job manifest — HyP3 InSAR batch for one AOI.
 # Generic container-host description; the aws: block is annotation only. See infra/jobs/README.md.
 # Status: designed, never executed. Every estimate states its basis.

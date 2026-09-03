@@ -23,7 +23,7 @@ Four operational layers, built in order:
 | L2 Detect | seconds → 3 min | real-time seismic single-force detection + force-history inversion |
 | L3 Cascade | seconds → hours | runout surrogate → arrival hydrographs → CAP alerts → avoided-loss accounting |
 
-This repository currently contains the **foundations** (contracts, event library, ingestion
+This repository is the **foundations** phase (contracts, event library, ingestion
 adapters, feature cube, streaming skeleton with replay, validation harness). Models come later.
 See `RELEASE_STATUS.md` for what is real, what is stubbed and what is missing.
 
@@ -31,7 +31,7 @@ See `RELEASE_STATUS.md` for what is real, what is stubbed and what is missing.
 
 - serac does **not** predict the day or hour of a bedrock collapse from satellites. That is not a
   goal and it is not a claim anywhere in this code, documentation or output.
-- The detector in this repository is a **stub**. It emits test-status CAP messages only.
+- The planned detector is a **stub**. It emits test-status CAP messages only; see `RELEASE_STATUS.md` for what exists.
 - Numbers in the event library that have no reliable published estimate are `null`.
 - The ≤ 180 s detachment-to-alert figure is a design budget, not a measured result.
 - serac owns no satellites and no seismic network: the constellation is bought, not built.
@@ -61,7 +61,7 @@ Make targets:
 The `validate-*`, `promote`, `underwriting-check` and `replay` targets depend on `serac`
 sub-commands that land as the foundation phases merge; `RELEASE_STATUS.md` says which exist.
 
-Credentials (none needed for `make test`, none cost money): copy `.env.example` to `.env`
+Credentials (none needed for `make test`; all believed free, verify on registration): copy `.env.example` to `.env`
 and see `docs/CREDENTIALS.md`. Local Redis for the streaming lane:
 `docker compose -f infra/docker/compose.yaml up -d` (see `infra/docker/README.md`).
 

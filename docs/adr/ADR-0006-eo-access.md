@@ -26,7 +26,7 @@ only ancillary SCLKSCET files. No credentials were available in the session.
 - Sentinel-2 L2A in production: CDSE STAC + OAuth client credentials
   (`CdseSentinel2Adapter`). Earth Search (`EarthSearchSentinel2Adapter`) is a documented
   **fixture and secondary source** sharing the same cloud-selection logic (`s2_cloud.py`);
-  it is what produced the committed Chamoli fixtures.
+  it is what will produce the committed Chamoli fixtures.
 - DEM: Copernicus GLO-30 public COGs with windowed reads; a `DemProvider` port hook for
   licensed higher-resolution DEMs.
 

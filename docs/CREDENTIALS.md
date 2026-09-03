@@ -6,7 +6,7 @@ you have, and never commit `.env` (`.gitignore` excludes `.env` and `.env.*` exc
 pydantic-settings); secrets are `SecretStr` so they never print.
 
 **None of the credentials below are required for the offline test suite (`make test`).**
-**None of them cost money.** Every account listed is free to register.
+**Assumed free (as of 2026-09-03; verify on registration).** None of these accounts is known to cost money, but this has not been verified in-session; non-negotiable 7 (ask before any paid API call) still applies.
 
 ## Ask-first rules
 

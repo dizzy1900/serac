@@ -42,7 +42,7 @@ Numbers in this document are either quoted from the founding brief, from the rec
 
 | Container | Role | Runs as | Status |
 |---|---|---|---|
-| CLI `serac` | single entrypoint (typer) for ingest, events, aoi, cube, stream, replay, validate, promote, schema | `uv run serac …`, or the Docker image | `present` (skeleton: `--help`, `--version`); sub-apps `planned (P1)` |
+| CLI `serac` | single entrypoint (typer) for ingest, events, aoi, cube, stream, replay, validate, promote, underwriting-check, schema | `uv run serac …`, or the Docker image | `present` (skeleton: `--help`, `--version`); sub-apps `planned (P1)` |
 | Batch EO lane | STAC search → `data/raw` → `data/interim` → Zarr feature cube per AOI → STAC catalog | `make`/DVC stages locally; `infra/jobs/*.yaml` at scale | `planned (P1)` |
 | Real-time seismic lane | SeedLink → bus → detector → (inversion → cascade, P2) → CAP | long-running processes reading the bus | `planned (P1)` skeleton with stubs |
 | Message bus | Redis Streams behind a synchronous `MessageBus` port; in-memory adapter for tests | `infra/docker/compose.yaml` (`redis:7-alpine`) | `planned (P1)`; live Redis unverified |
@@ -68,7 +68,7 @@ development uses Docker Compose (`infra/docker/`); scaled runs are job manifests
 | Common contracts | `src/serac/domain/common.py` (`Range`, `SourceRef`, `FieldNote`, `AttributedEstimate`) | `planned (P1)` |
 | Event contract | `src/serac/domain/events.py` (`MassMovementEvent`, `EventTime`, `SeismicAttribution`, `Precursor`, …) | `planned (P1)` |
 | Geo contracts | `src/serac/domain/geo.py` (`AOI`, `GridSpec`, `SlopeUnit`, `Transect`, `ExposedAsset`) | `planned (P1)` |
-| Forecast contracts | `src/serac/domain/forecast.py` (`CascadeForecast`, `ForceHistory` with `status: not_implemented`) | `planned (P1)` interfaces only |
+| Forecast contracts | `src/serac/domain/forecast.py` (`CascadeForecast`); `src/serac/domain/force_history.py` (`ForceHistory` with `status: not_implemented`) | `planned (P1)` interfaces only |
 | Avoided-loss contract | `src/serac/domain/avoided_loss.py` → `contracts/avoided-loss.v0.json` | `planned (P1)` schema; populated in P2 |
 | Schema export | `src/serac/domain/schema_export.py`, `serac schema export`, drift test in `tests/contract/` | `planned (P1)` |
 | Validation suites | `src/serac/validation/{result,events,ingest,cube,stream,cap,contracts,promote,underwriting}.py` | `planned (P1)` |
@@ -90,7 +90,7 @@ development uses Docker Compose (`infra/docker/`); scaled runs are job manifests
 | Zarr store | `src/serac/adapters/storage/zarr_store.py` (Zarr v3, 1×512×512 chunks, zstd) | `planned (P1)` |
 | GeoParquet store | `src/serac/adapters/storage/geoparquet_store.py` | `planned (P1)` |
 | STAC catalog | `src/serac/adapters/storage/stac_catalog.py` (pystac; vendored schemas for offline validation) | `planned (P1)` |
-| Cube builder | `src/serac/pipelines/build_cube.py` (`GridSpec`, `LayerBuilder`, `build_empty()` for missing layers), `serac cube build / describe` | `planned (P1)` |
+| Cube builder | `src/serac/pipelines/build_cube.py` (uses `GridSpec` from `domain/geo.py`; `LayerBuilder`, `build_empty()` for missing layers), `serac cube build / describe` | `planned (P1)` |
 | DVC pipeline | `dvc.yaml`, `.dvc/config` (no URL), `make dvc-remote` | `planned (P1)` |
 
 Cube layers per AOI on a fixed 30 m grid (UTM 45N for Lhende): static `dem`, `slope`,
@@ -168,7 +168,7 @@ messages traverse the plumbing, and wall-clock latencies in them are only meanin
 
 | Stage | Budget (s) | Basis |
 |---|---|---|
-| Seismic travel to nearest usable station + SeedLink transport to serac | 20 | design allocation; depends on station geometry (nearest verified open broadband station to the Lhende source zone, `NK.KKN`, is ~55 km away) and on the SeedLink server's buffering |
+| Seismic travel to nearest usable station + SeedLink transport to serac | 20 | design allocation; depends on station geometry (a verified open broadband station, `NK.KKN`, lies ~55 km from the Lhende source zone) and on the SeedLink server's buffering |
 | Chunking + bus publish/consume | 5 | design allocation |
 | Detection window (long-period energy accumulation before a candidate can be emitted) | 60 | design allocation; the P2 discriminator sets the real window |
 | LFH single-force inversion (P2) | 40 | design allocation |
