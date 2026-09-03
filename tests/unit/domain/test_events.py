@@ -168,17 +168,22 @@ def test_nested_null_range_needs_note(
 def test_list_item_null_range_needs_note(
     make_event: EventFactory, event_kwargs: dict[str, Any], field_note: FieldNote
 ) -> None:
-    obs = TransectObservation(transect_id="test-t", source_refs=["test-src-1"])
+    bare = TransectObservation(transect_id="test-t", source_refs=["test-src-1"])
     with pytest.raises(
-        ValidationError, match=r"transect_observations\[0\].arrival_time_min: is null"
+        ValidationError,
+        match=r"transect_observations\[0\].arrival_time_min: is null; give",
     ):
-        make_event(transect_observations=[obs])
+        make_event(transect_observations=[bare])
+    explained = TransectObservation(
+        transect_id="test-t", source_refs=["test-src-1"], description="no timing published"
+    )
+    assert make_event(transect_observations=[explained]).transect_observations
     notes = {
         **event_kwargs["field_notes"],
         "transect_observations[0].arrival_time_min": field_note,
         "transect_observations[0].stage_rise_m": field_note,
     }
-    assert make_event(transect_observations=[obs], field_notes=notes).transect_observations
+    assert make_event(transect_observations=[bare], field_notes=notes).transect_observations
 
 
 def test_orphan_field_note_is_rejected(

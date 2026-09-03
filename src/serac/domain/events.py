@@ -25,6 +25,7 @@ from serac.domain.common import (
     SourceRef,
     annotation_accepts,
     iter_field_paths,
+    iter_models,
     iter_none_fields,
     iter_ranges,
     iter_source_ref_ids,
@@ -249,13 +250,33 @@ class MassMovementEvent(BaseModel):
         return problems
 
     def _check_field_notes(self) -> list[str]:
+        """Every null numeric must be explained, never silently absent.
+
+        Non-indexed paths (top-level fields and `seismic.*`) need `field_notes[path]`.
+        Indexed paths (a null `Range` inside a list item such as
+        `precursors_observed[2].lead_time_days`) are explained either by
+        `field_notes[path]` or by a non-empty `description`/`notes` on that list item,
+        which keeps index bookkeeping out of `field_notes` (qa review, 2026-09-03).
+        """
         problems: list[str] = []
         none_paths = dict(iter_none_fields(self))
-        needing = {p for p, ann in none_paths.items() if annotation_accepts(ann, Range)}
+        range_nulls = {p for p, ann in none_paths.items() if annotation_accepts(ann, Range)}
+        needing = {p for p in range_nulls if "[" not in p}
         if self.seismic is None:
             needing.add("seismic")
         for path in sorted(needing - set(self.field_notes)):
             problems.append(f"{path}: is null but field_notes[{path!r}] is missing")
+        items = {path: sub for path, sub in iter_models(self) if path.endswith("]")}
+        for path in sorted(p for p in range_nulls if "[" in p and p not in self.field_notes):
+            prefix = path.rsplit(".", 1)[0]
+            item = items.get(prefix)
+            explanation = None
+            if item is not None:
+                explanation = getattr(item, "description", None) or getattr(item, "notes", None)
+            if not explanation:
+                problems.append(
+                    f"{path}: is null; give {prefix} a description/notes or field_notes[{path!r}]"
+                )
         for key in sorted(set(self.field_notes) - set(none_paths)):
             problems.append(f"field_notes[{key!r}]: does not name a null field")
         return problems

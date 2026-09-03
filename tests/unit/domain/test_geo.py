@@ -20,7 +20,7 @@ RangeFactory = Callable[..., Range]
 def _grid(**overrides: Any) -> GridSpec:
     data: dict[str, Any] = {
         "aoi_id": "test-aoi",
-        "epsg": 32645,
+        "epsg": 32633,
         "x_min": 300000.0,
         "y_min": 3120000.0,
         "x_max": 300300.0,
@@ -62,9 +62,9 @@ def _aoi(make_source: SourceFactory, **overrides: Any) -> AOI:
     data: dict[str, Any] = {
         "id": "test-aoi",
         "name": "Fictional AOI",
-        "countries": ["NP"],
-        "cube_epsg": 32645,
-        "cube_extent_bbox_4326": (85.0, 28.0, 86.0, 29.0),
+        "countries": ["ZZ"],
+        "cube_epsg": 32633,
+        "cube_extent_bbox_4326": (10.0, 20.0, 11.0, 21.0),
         "source_refs": ["test-src-1"],
         "sources": [make_source(claims=["cube_extent_bbox_4326"])],
         "record": RecordMeta(created_utc=make_source().accessed_utc, created_by="test"),
@@ -81,14 +81,14 @@ def test_aoi_valid_with_grid(make_source: SourceFactory) -> None:
 @pytest.mark.parametrize(
     ("overrides", "match"),
     [
-        ({"countries": ["Nepal"]}, r"countries\[0\]='Nepal' is not an ISO 3166-1"),
+        ({"countries": ["Atlantis"]}, r"countries\[0\]='Atlantis' is not an ISO 3166-1"),
         ({"countries": ["np"]}, r"countries\[0\]='np'"),
         ({"countries": []}, "countries"),
-        ({"cube_extent_bbox_4326": (86.0, 28.0, 85.0, 29.0)}, "cube_extent_bbox_4326: must be"),
-        ({"cube_extent_bbox_4326": (85.0, 29.0, 86.0, 28.0)}, "cube_extent_bbox_4326: must be"),
-        ({"cube_extent_bbox_4326": (float("nan"), 28.0, 86.0, 29.0)}, "finite"),
+        ({"cube_extent_bbox_4326": (11.0, 20.0, 10.0, 21.0)}, "cube_extent_bbox_4326: must be"),
+        ({"cube_extent_bbox_4326": (10.0, 21.0, 11.0, 20.0)}, "cube_extent_bbox_4326: must be"),
+        ({"cube_extent_bbox_4326": (float("nan"), 20.0, 11.0, 21.0)}, "finite"),
         ({"grid": _grid(aoi_id="test-other")}, "grid.aoi_id='test-other' != id='test-aoi'"),
-        ({"grid": _grid(epsg=32644)}, "grid.epsg=32644 != cube_epsg=32645"),
+        ({"grid": _grid(epsg=32632)}, "grid.epsg=32632 != cube_epsg=32633"),
         ({"source_refs": ["test-missing"]}, r"source_refs\[0\]: source 'test-missing'"),
     ],
 )
@@ -134,8 +134,8 @@ def test_transect() -> None:
         aoi_id="test-aoi",
         name="Fictional transect",
         chainage_km=12.5,
-        point=Point(coordinates=(85.5, 28.2)),
-        cross_section=LineString(coordinates=[(85.49, 28.2), (85.51, 28.2)]),
+        point=Point(coordinates=(10.5, 20.5)),
+        cross_section=LineString(coordinates=[(10.49, 20.5), (10.51, 20.5)]),
         geometry_quality=GeometryQuality.snapped_to_osm_centreline,
         positional_accuracy_m=50.0,
         source_refs=["test-src-1"],
@@ -147,7 +147,7 @@ def test_transect() -> None:
             aoi_id="test-aoi",
             name="x",
             chainage_km=-1.0,
-            point=Point(coordinates=(85.5, 28.2)),
+            point=Point(coordinates=(10.5, 20.5)),
             geometry_quality=GeometryQuality.osm_node,
             source_refs=["test-src-1"],
         )
@@ -160,7 +160,7 @@ def _asset(make_range: RangeFactory, **overrides: Any) -> ExposedAsset:
         "name": "Fictional plant",
         "asset_type": AssetType.hydropower_plant,
         "status": AssetStatus.operational,
-        "geometry": Point(coordinates=(85.5, 28.2)),
+        "geometry": Point(coordinates=(10.5, 20.5)),
         "capacity_mw": make_range(unit="MW"),
         "geometry_quality": GeometryQuality.osm_node,
         "source_refs": ["test-src-1"],
@@ -197,10 +197,10 @@ def test_exposed_asset_settlement(make_range: RangeFactory) -> None:
 
 
 def test_exposed_asset_geometry_discriminator(make_range: RangeFactory) -> None:
-    asset = _asset(make_range, geometry={"type": "Point", "coordinates": [85.5, 28.2]})
+    asset = _asset(make_range, geometry={"type": "Point", "coordinates": [10.5, 20.5]})
     assert isinstance(asset.geometry, Point)
     with pytest.raises(ValidationError, match="type"):
-        _asset(make_range, geometry={"type": "Nope", "coordinates": [85.5, 28.2]})
+        _asset(make_range, geometry={"type": "Nope", "coordinates": [10.5, 20.5]})
 
 
 def test_contracts_table() -> None:

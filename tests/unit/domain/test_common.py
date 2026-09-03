@@ -86,7 +86,7 @@ def test_source_ref_forbids_extra_and_is_frozen() -> None:
         _source(bogus=1)
     src = _source()
     with pytest.raises(ValidationError):
-        src.title = "changed"  # type: ignore[misc]  # frozen model: assignment must fail
+        src.title = "changed"  # frozen model: assignment must fail at runtime
 
 
 # --- AttributedEstimate / Range -------------------------------------------------------------

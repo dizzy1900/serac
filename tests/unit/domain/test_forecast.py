@@ -83,7 +83,7 @@ def test_damming_probability_bounds(make_range: RangeFactory) -> None:
         DammingEstimate(probability=make_range(low=-0.1, high=0.5, unit="probability"))
     dam = DammingEstimate(
         probability=make_range(low=0.1, high=0.5, unit="probability"),
-        dam_location=Point(coordinates=(85.5, 28.2)),
+        dam_location=Point(coordinates=(10.5, 20.5)),
     )
     fc = _forecast(make_range, damming=dam)
     assert fc.damming is not None and fc.damming.dam_height_m is None
