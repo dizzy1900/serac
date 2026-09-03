@@ -267,6 +267,9 @@ def langtang_markdown(
 ) -> str:
     """The Langtang write-up, with the two negatives forced apart."""
     summary = payload["summary"]
+    cube = context.get("watch_cube") or {}
+    archive_start = str(cube.get("first_epoch") or "unknown")[:10]
+    archive_end = str(cube.get("last_epoch") or "unknown")[:10]
     reasons = observability.get("final_step_insufficient_by_reason", {})
     n_units = observability.get("n_units", 0)
     never = observability.get("units_never_observable", 0)
@@ -279,12 +282,14 @@ protocol as the Chamoli backtest; only the AOI and the window differ.
 
 > {NOT_A_PREDICTION}
 
-**Window truncation.** The archive processed here runs
-{summary.get("first_step")} to {summary.get("last_step")}, not back to the start of the
-Sentinel-1 record. This is a deliberate budget choice, disclosed rather than hidden: the same
-`n_conn = 2`, `Bt <= 36 d` network over a decade would not have fitted the disk or the session.
-A slow precursor that began before {summary.get("first_step")} is therefore outside what this
-run could have detected, independently of everything below.
+**Window truncation.** The interferogram archive processed here spans
+{archive_start} to {archive_end}, not back to the start of the Sentinel-1
+record in 2014. This is a deliberate budget choice, disclosed rather than hidden: the same
+`n_conn = 2`, `Bt <= 36 d` network over a decade would not have fitted the disk or the
+session. The walk-forward itself steps from {summary.get("first_step")} to
+{summary.get("last_step")}, so its early steps precede the archive and are
+`insufficient_data` by construction. A slow precursor that began before {archive_start} is
+outside what this run could have detected, independently of everything below.
 
 ## What was processed
 

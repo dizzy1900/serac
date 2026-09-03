@@ -175,7 +175,13 @@ def build_unit_cube(
         if totals[i] == 0:
             continue
         usable = mask & good_pixel
-        inside[i] = bool(np.isfinite(temporal_coherence[mask]).any())
+        # Outside the processed burst footprint the crops are NaN, and MintPy turns that into
+        # an exact 0.0 rather than a NaN — 74% of the Langtang grid. Testing `isfinite` alone
+        # would call every one of those pixels "inside the footprint" and then report the unit
+        # as having too few samples, which mislabels an out-of-swath unit as a decorrelated one.
+        inside[i] = bool(
+            (np.isfinite(temporal_coherence[mask]) & (temporal_coherence[mask] > 0.0)).any()
+        )
         n_usable = int(usable.sum())
         unit_spatial = spatial[mask]
         unit_spatial = unit_spatial[np.isfinite(unit_spatial)]

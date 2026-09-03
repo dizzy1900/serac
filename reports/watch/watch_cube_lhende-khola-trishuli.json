@@ -1,0 +1,22 @@
+{
+  "aoi_id": "lhende-khola-trishuli",
+  "cube_path": "data/features/watch/lhende-khola-trishuli/watch_cube.zarr",
+  "n_units": 26935,
+  "n_epochs": 130,
+  "first_epoch": "2022-01-05T00:00:00+00:00",
+  "last_epoch": "2026-08-19T00:00:00+00:00",
+  "units_with_any_measurement": 6407,
+  "units_inside_footprint": 7550,
+  "median_coherence_loss": 1.0,
+  "tropospheric_correction": "Tropospheric correction is MintPy height_correlation, not GACOS and not ERA5: GACOS needs an email workflow and ERA5 needs a CDS key, neither of which was available. It removes only the elevation-correlated part of the delay, so turbulent monsoon-season wet delay survives it. This is the largest known error source in these velocities.",
+  "timeseries_file": "timeseries_tropHgt_ramp_demErr.h5",
+  "corrections_applied": "height-correlation troposphere, linear ramp, DEM error",
+  "mintpy_reference_point": {
+    "row": 414,
+    "col": 608,
+    "temporal_coherence": 1.0,
+    "slope_deg": 7.603,
+    "n_candidates": 2675,
+    "rule": "highest temporal coherence among pixels with temporal coherence >= 0.85, slope < 15 deg, and no layover or shadow on the selected track; ties broken by lowest row then lowest column"
+  }
+}

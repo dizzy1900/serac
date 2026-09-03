@@ -1,6 +1,6 @@
 # Chamoli 2021 — pseudo-prospective backtest of the slope-watch tier
 
-Generated 2026-09-03T22:38:35.152287+00:00 from `reports/watch/backtest_chamoli.json`.
+Generated 2026-09-03T23:05:48.085368+00:00 from `reports/watch/backtest_chamoli.json`.
 Thresholds and protocol were fixed in `reports/watch/PREREGISTRATION.md`, committed before any
 interferogram had been delivered. `make validate-watch` checks that ancestry against git.
 

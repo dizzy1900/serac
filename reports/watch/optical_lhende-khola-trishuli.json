@@ -1,0 +1,25 @@
+{
+  "aoi_id": "lhende-khola-trishuli",
+  "tracker_id": "serac-orientation-correlation-v1",
+  "not_autorift": "NOT autoRIFT and NOT comparable with ITS_LIVE: autoRIFT is unavailable on PyPI and vendoring it requires ISCE2. This is a single-pass, fixed-chip orientation-correlation NCC tracker written for serac.",
+  "generated_at": "2026-09-03T22:59:08.555038+00:00",
+  "window": [
+    "2022-01-01",
+    "2026-08-26"
+  ],
+  "chip_px": 32,
+  "step_px": 16,
+  "pixel_m": 10.0,
+  "n_scenes": 1,
+  "scenes": [
+    {
+      "product_id": "S2C_45RUM_20251215_0_L2A",
+      "acquired_at": "2025-12-15T05:10:57.130000+00:00",
+      "cloud_fraction": 0.0,
+      "path": "data/raw/sentinel2_earthsearch/lhende-khola-trishuli/S2C_45RUM_20251215_0_L2A/B03.tif"
+    }
+  ],
+  "pairs": [],
+  "status": "insufficient_scenes",
+  "note": "1 usable Sentinel-2 scene(s) in the window; feature tracking needs at least two. This is an observability result, not a deformation result."
+}
