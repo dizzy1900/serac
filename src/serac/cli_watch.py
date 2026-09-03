@@ -331,5 +331,130 @@ def slope_units_cmd(
     console.print(json.dumps(result, indent=2, default=str))
 
 
+# -- mintpy ---------------------------------------------------------------------------------
+
+
+@app.command("mintpy")
+def mintpy_cmd(
+    aoi: AOI_OPT,
+    data_dir: DATA_DIR_OPT = None,
+    reports_dir: REPORTS_DIR_OPT = None,
+    dry_run: Annotated[
+        bool, typer.Option("--dry-run", help="Write the config; do not run.")
+    ] = False,
+) -> None:
+    """Run MintPy `smallbaselineApp` from a typed config with a deterministic reference point."""
+    from serac.models.watch.mintpy_run import run_smallbaseline
+
+    data = _data_dir(data_dir)
+    result = run_smallbaseline(
+        data_dir=data, reports_dir=_reports_dir(reports_dir), aoi_id=aoi, dry_run=dry_run
+    )
+    console.print(json.dumps(result, indent=2, default=str))
+
+
+# -- aggregation ----------------------------------------------------------------------------
+
+
+@app.command("aggregate")
+def aggregate_cmd(
+    aoi: AOI_OPT,
+    data_dir: DATA_DIR_OPT = None,
+    reports_dir: REPORTS_DIR_OPT = None,
+) -> None:
+    """Aggregate the MintPy time series onto slope units and write `watch_cube.zarr`."""
+    from serac.models.watch.aggregate import build_watch_cube
+
+    data = _data_dir(data_dir)
+    result = build_watch_cube(data_dir=data, reports_dir=_reports_dir(reports_dir), aoi_id=aoi)
+    console.print(json.dumps(result, indent=2, default=str))
+
+
+# -- optical --------------------------------------------------------------------------------
+
+
+@app.command("optical")
+def optical_cmd(
+    aoi: AOI_OPT,
+    start: Annotated[str, typer.Option("--from")],
+    end: Annotated[str, typer.Option("--to")],
+    data_dir: DATA_DIR_OPT = None,
+    reports_dir: REPORTS_DIR_OPT = None,
+    max_pairs: Annotated[int, typer.Option("--max-pairs")] = 12,
+    online: Annotated[bool, typer.Option("--online")] = False,
+) -> None:
+    """Orientation-correlation feature tracking on Sentinel-2 pairs (NOT autoRIFT)."""
+    from serac.models.watch.optical import run_optical_tracking
+
+    data = _data_dir(data_dir)
+    result = run_optical_tracking(
+        data_dir=data,
+        reports_dir=_reports_dir(reports_dir),
+        aoi_dir=_aoi_dir(data, aoi),
+        aoi_id=aoi,
+        window_start=_parse_day(start),
+        window_end=_parse_day(end),
+        max_pairs=max_pairs,
+        online=online,
+    )
+    console.print(
+        json.dumps({k: v for k, v in result.items() if k != "scenes"}, indent=2, default=str)
+    )
+
+
+# -- backtest -------------------------------------------------------------------------------
+
+
+@app.command("backtest")
+def backtest_cmd(
+    aoi: AOI_OPT,
+    event: Annotated[str, typer.Option("--event", help="Event id for the write-up.")],
+    data_dir: DATA_DIR_OPT = None,
+    reports_dir: REPORTS_DIR_OPT = None,
+) -> None:
+    """Monthly pseudo-prospective walk-forward using the pre-registered thresholds."""
+    from serac.models.watch.backtest import run_backtest
+
+    data = _data_dir(data_dir)
+    result = run_backtest(
+        data_dir=data, reports_dir=_reports_dir(reports_dir), aoi_id=aoi, event_id=event
+    )
+    console.print(json.dumps(result["summary"], indent=2, default=str))
+
+
+@app.command("tiers")
+def tiers_cmd(
+    aoi: AOI_OPT,
+    data_dir: DATA_DIR_OPT = None,
+    as_of: Annotated[
+        str | None, typer.Option("--as-of", help="YYYY-MM-DD; defaults to the latest epoch.")
+    ] = None,
+    limit: Annotated[int, typer.Option("--limit")] = 25,
+) -> None:
+    """Print the watch tier of every slope unit at a date, highest score first."""
+    from serac.models.watch.backtest import tier_table
+
+    data = _data_dir(data_dir)
+    rows = tier_table(data_dir=data, aoi_id=aoi, as_of=_parse_day(as_of) if as_of else None)
+    table = Table(title=f"watch tiers — {aoi}")
+    for column in ("unit", "tier", "score", "los_velocity_mm_yr", "n_samples", "reason"):
+        table.add_column(column)
+    for row in rows[:limit]:
+        score = float(row["score"])
+        table.add_row(
+            str(row["unit_id"]),
+            str(row["tier"]),
+            "n/a" if score == float("-inf") else f"{score:.2f}",
+            "n/a" if row["velocity"] is None else f"{float(row['velocity']):.1f}",
+            str(row["n_samples"]),
+            str(row["reason"] or ""),
+        )
+    console.print(table)
+    console.print(
+        "[dim]Tiers are ordinal. They are not calibrated probabilities and they are never a "
+        "prediction of when a slope will fail.[/dim]"
+    )
+
+
 if __name__ == "__main__":  # pragma: no cover - convenience for `python -m serac.cli_watch`
     app()
