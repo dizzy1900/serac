@@ -9,6 +9,7 @@ disk against the 3 GB cap.
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,12 @@ from serac.models.runout.params import SOLVER_NAME, SOLVER_VERSION
 
 SUMMARY_FILENAME = "ensemble_summary.json"
 BYTES_CAP = 3 * 1024**3
+
+
+def _normalise_reason(reason: str) -> str:
+    """Strip the per-member counts so flags group into kinds rather than one bucket each."""
+    without_counts = re.sub(r"\d[\d.eE+-]*", "N", reason)
+    return without_counts.split("(")[0].strip()
 
 
 def directory_bytes(root: Path) -> int:
@@ -39,7 +46,7 @@ def summarise_ensemble(repo: Path, reports_dir: Path, *, write: bool = True) -> 
     reasons: Counter[str] = Counter()
     for member in flagged:
         for reason in member["flag_reasons"]:
-            reasons[reason.split("(")[0].strip()] += 1
+            reasons[_normalise_reason(reason)] += 1
 
     reach = np.array(
         [float(m["results"]["reach_m"]) for m in valid if "results" in m], dtype=np.float64

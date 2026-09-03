@@ -1,0 +1,455 @@
+{
+  "all_members": [
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.011264258397545256,
+        "ice_fraction": 0.6239130434782609,
+        "mu": 0.21702094370544606,
+        "release_elevation_band_m": [
+          3902.173913043478,
+          4373.478260869565
+        ],
+        "release_volume_m3": 10100622.819575634,
+        "xi_m_s2": 345.7840587017764
+      },
+      "run_id": "m0008-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0021921814843012537,
+        "ice_fraction": 0.6317391304347826,
+        "mu": 0.07610364621138048,
+        "release_elevation_band_m": [
+          3858.695652173913,
+          4681.304347826087
+        ],
+        "release_volume_m3": 8605345.710387954,
+        "xi_m_s2": 260.66480789226466
+      },
+      "run_id": "m0005-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0023036510285681907,
+        "ice_fraction": 0.3473913043478261,
+        "mu": 0.09080443670273884,
+        "release_elevation_band_m": [
+          4306.521739130435,
+          5174.347826086957
+        ],
+        "release_volume_m3": 69072652.24114174,
+        "xi_m_s2": 668.586529015018
+      },
+      "run_id": "m0000-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0012089108833677213,
+        "ice_fraction": 0.20652173913043478,
+        "mu": 0.048651331995007846,
+        "release_elevation_band_m": [
+          4241.304347826087,
+          5345.652173913044
+        ],
+        "release_volume_m3": 12506081.730288794,
+        "xi_m_s2": 480.8186389857886
+      },
+      "run_id": "m0007-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0014741953150239802,
+        "ice_fraction": 0.5352173913043479,
+        "mu": 0.1579205910361139,
+        "release_elevation_band_m": [
+          3789.1304347826085,
+          4670.869565217391
+        ],
+        "release_volume_m3": 66656721.249379985,
+        "xi_m_s2": 226.3190535997921
+      },
+      "run_id": "m0003-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.003975197614836497,
+        "ice_fraction": 0.7986956521739133,
+        "mu": 0.027647101231591552,
+        "release_elevation_band_m": [
+          4132.608695652174,
+          4551.739130434783
+        ],
+        "release_volume_m3": 14942806.97679012,
+        "xi_m_s2": 2441.3837537689756
+      },
+      "run_id": "m0006-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0028091661680676666,
+        "ice_fraction": 0.7673913043478262,
+        "mu": 0.07791702198765565,
+        "release_elevation_band_m": [
+          3706.521739130435,
+          4525.652173913044
+        ],
+        "release_volume_m3": 135858759.00520772,
+        "xi_m_s2": 2651.124553838939
+      },
+      "run_id": "m0001-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.000700571158908757,
+        "ice_fraction": 0.6865217391304348,
+        "mu": 0.17557380575085546,
+        "release_elevation_band_m": [
+          3845.6521739130435,
+          4393.478260869565
+        ],
+        "release_volume_m3": 60980149.611491114,
+        "xi_m_s2": 2589.424492373787
+      },
+      "run_id": "m0004-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0012703824112468526,
+        "ice_fraction": 0.7647826086956522,
+        "mu": 0.06229841255969363,
+        "release_elevation_band_m": [
+          4006.521739130435,
+          5030.869565217392
+        ],
+        "release_volume_m3": 50135629.14656957,
+        "xi_m_s2": 283.05868401804963
+      },
+      "run_id": "m0011-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.00011749127065572746,
+        "ice_fraction": 0.49086956521739133,
+        "mu": 0.023445604740763543,
+        "release_elevation_band_m": [
+          4323.913043478261,
+          4990.0
+        ],
+        "release_volume_m3": 10466713.549040342,
+        "xi_m_s2": 254.59831258352287
+      },
+      "run_id": "m0010-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0008129667973681721,
+        "ice_fraction": 0.36043478260869566,
+        "mu": 0.06685865290150185,
+        "release_elevation_band_m": [
+          4554.347826086957,
+          5126.521739130435
+        ],
+        "release_volume_m3": 244463312.50335175,
+        "xi_m_s2": 522.126067968939
+      },
+      "run_id": "m0009-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.029630310907972683,
+        "ice_fraction": 0.7830434782608697,
+        "mu": 0.07433247343031862,
+        "release_elevation_band_m": [
+          3758.695652173913,
+          4494.347826086956
+        ],
+        "release_volume_m3": 5417013.527312022,
+        "xi_m_s2": 223.66996928176547
+      },
+      "run_id": "m0014-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0010679325538309483,
+        "ice_fraction": 0.592608695652174,
+        "mu": 0.049810581930000764,
+        "release_elevation_band_m": [
+          4445.652173913044,
+          5476.956521739131
+        ],
+        "release_volume_m3": 26413572.409567885,
+        "xi_m_s2": 329.8763697635885
+      },
+      "run_id": "m0012-r060",
+      "transects_reached": 0
+    },
+    {
+      "mean_abs_mismatch_min": null,
+      "mismatch_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "modelled_arrival_min": {
+        "betrawati": null,
+        "galchhi": null,
+        "rasuwagadhi-gyirong": null,
+        "syabrubesi": null
+      },
+      "parameters": {
+        "critical_shear_pa": 500.0,
+        "entrainment_coefficient": 0.0021384860071327182,
+        "ice_fraction": 0.5482608695652175,
+        "mu": 0.1862202581338076,
+        "release_elevation_band_m": [
+          3693.478260869565,
+          4248.260869565217
+        ],
+        "release_volume_m3": 51036109.62458983,
+        "xi_m_s2": 540.8984007195419
+      },
+      "run_id": "m0013-r060",
+      "transects_reached": 0
+    }
+  ],
+  "closest_member": null,
+  "frozen_design_hash": "ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac4943777f28484dae183",
+  "frozen_solver_version": "0.2.0",
+  "generated_utc": "2026-09-03T21:25:18.657703+00:00",
+  "n_members": 14,
+  "per_transect": {
+    "betrawati": {
+      "fraction_reaching": 0.0,
+      "members_reaching": 0,
+      "members_total": 14,
+      "mismatch_min": null,
+      "public_timing_min": 45.0
+    },
+    "galchhi": {
+      "fraction_reaching": 0.0,
+      "members_reaching": 0,
+      "members_total": 14,
+      "mismatch_min": null,
+      "public_timing_min": 30.0
+    },
+    "rasuwagadhi-gyirong": {
+      "fraction_reaching": 0.0,
+      "members_reaching": 0,
+      "members_total": 14,
+      "mismatch_min": null,
+      "public_timing_min": 7.5
+    },
+    "syabrubesi": {
+      "fraction_reaching": 0.0,
+      "members_reaching": 0,
+      "members_total": 14,
+      "mismatch_min": null,
+      "public_timing_min": 13.5
+    }
+  },
+  "public_timings_min": {
+    "betrawati": 45.0,
+    "galchhi": 30.0,
+    "rasuwagadhi-gyirong": 7.5,
+    "syabrubesi": 13.5
+  },
+  "solver": {
+    "name": "serac-swe-voellmy",
+    "version": "0.2.0"
+  }
+}

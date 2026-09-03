@@ -345,7 +345,14 @@ def evaluate(model: TrainedSurrogate, data: Dataset, *, device: str = "cpu") -> 
         }
 
     # --- 5-95% coverage ----------------------------------------------------------------------
-    depth_cover = float(((test.max_depth >= depth[:, 0]) & (test.max_depth <= depth[:, 2])).mean())
+    # Over ALL bins this is dominated by dry ones: most of the corridor has max depth 0, the
+    # 5th-percentile head can output exactly 0 there, and those bins are covered trivially. The
+    # gated number is therefore coverage over the **wet** bins, where the interval has to do
+    # some work; the all-bins figure is reported beside it so the difference stays visible.
+    inside = (test.max_depth >= depth[:, 0]) & (test.max_depth <= depth[:, 2])
+    depth_cover_all = float(inside.mean())
+    wet_truth = test.max_depth > DEPTH_THRESHOLD_M
+    depth_cover = float(inside[wet_truth].mean()) if wet_truth.any() else float("nan")
     reached_mask = test.reached > 0.5
     if reached_mask.any():
         arrival_cover = float(
@@ -394,9 +401,18 @@ def evaluate(model: TrainedSurrogate, data: Dataset, *, device: str = "cpu") -> 
         "arrival_gate_pass": bool(arrival_maes and max(arrival_maes) <= ARRIVAL_MAE_GATE_S),
         "coverage": {
             "target": list(COVERAGE_TARGET),
-            "max_depth_5_95": round(depth_cover, 4),
+            "note": (
+                "The gated depth figure is over bins whose true max depth exceeds "
+                f"{DEPTH_THRESHOLD_M:g} m. Over all bins the number is dominated by dry ones, "
+                "which the 5th-percentile head covers trivially by outputting zero."
+            ),
+            "max_depth_5_95": round(depth_cover, 4) if np.isfinite(depth_cover) else None,
+            "max_depth_5_95_all_bins": round(depth_cover_all, 4),
+            "wet_bins_scored": int(wet_truth.sum()),
             "arrival_5_95": round(arrival_cover, 4) if np.isfinite(arrival_cover) else None,
-            "depth_gate_pass": bool(COVERAGE_TARGET[0] <= depth_cover <= COVERAGE_TARGET[1]),
+            "depth_gate_pass": bool(
+                np.isfinite(depth_cover) and COVERAGE_TARGET[0] <= depth_cover <= COVERAGE_TARGET[1]
+            ),
             "arrival_gate_pass": bool(
                 np.isfinite(arrival_cover)
                 and COVERAGE_TARGET[0] <= arrival_cover <= COVERAGE_TARGET[1]

@@ -204,6 +204,26 @@ def split_by_run(
 # -- models -------------------------------------------------------------------------------------
 
 
+def _monotone_quantiles(raw: Tensor, dim: int) -> Tensor:
+    """Non-negative, non-crossing quantiles whose **lowest** one can be exactly zero.
+
+    The obvious construction, `cumsum(softplus(raw))`, makes every quantile strictly positive.
+    That is fatal for a field that is zero over most of its domain: max depth is 0 at every dry
+    chainage bin, and a 5th percentile that can never reach 0 leaves those bins outside the
+    5-95% interval by construction. Measured before this fix, depth interval coverage was 0.12
+    against a 0.85-0.95 target, and no amount of training could have moved it.
+
+    So the lowest quantile is a ReLU -- it can be exactly zero -- and the rest are non-negative
+    increments on top of it.
+    """
+    index: list[slice | int] = [slice(None)] * raw.ndim
+    index[dim] = slice(0, 1)
+    lowest = torch.nn.functional.relu(raw[tuple(index)])
+    index[dim] = slice(1, None)
+    increments = torch.nn.functional.softplus(raw[tuple(index)])
+    return torch.cat([lowest, lowest + torch.cumsum(increments, dim=dim)], dim=dim)
+
+
 class CorridorFNO(nn.Module):
     """1-D FNO over the corridor with quantile heads for depth and arrival, plus a reach logit."""
 
@@ -237,12 +257,9 @@ class CorridorFNO(nn.Module):
         static_b = static[None].expand(batch, self.n_static, bins)
         out = self.body(torch.cat([broadcast, static_b], dim=1))
         nq = len(QUANTILES)
-        depth = out[:, :nq]
-        arrival = out[:, nq : 2 * nq]
+        depth = _monotone_quantiles(out[:, :nq], dim=1)
+        arrival = _monotone_quantiles(out[:, nq : 2 * nq], dim=1)
         reach = out[:, 2 * nq]
-        # depth is non-negative and the quantiles must not cross: predict increments
-        depth = torch.cumsum(torch.nn.functional.softplus(depth), dim=1)
-        arrival = torch.cumsum(torch.nn.functional.softplus(arrival), dim=1)
         return depth, arrival, reach
 
 
@@ -264,8 +281,8 @@ class TransectRegressor(nn.Module):
         nq = len(QUANTILES)
         raw = self.head(self.trunk(parameters))
         raw = raw.view(parameters.shape[0], self.n_transects, 2 * nq + 1)
-        arrival = torch.cumsum(torch.nn.functional.softplus(raw[..., :nq]), dim=-1)
-        stage = torch.cumsum(torch.nn.functional.softplus(raw[..., nq : 2 * nq]), dim=-1)
+        arrival = _monotone_quantiles(raw[..., :nq], dim=-1)
+        stage = _monotone_quantiles(raw[..., nq : 2 * nq], dim=-1)
         reach = raw[..., 2 * nq]
         return arrival, stage, reach
 
