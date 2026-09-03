@@ -54,6 +54,7 @@ DATA_DIR = REPO_ROOT / "data"
 FIXTURES_DIR = DATA_DIR / "fixtures"
 LEDGER_PATH = DATA_DIR / "manifest.jsonl"
 FIXTURES_MD = FIXTURES_DIR / "FIXTURES.md"
+EO_SECTION_HEADING = "## EO fixtures"
 ADAPTER_NAME = "fixture-fetch"
 ADAPTER_VERSION = "0.1.0"
 
@@ -627,13 +628,13 @@ def fetch_cdse(ledger: ManifestLedger, known: dict[str, ManifestEntry], force: b
 def write_fixtures_md(ledger: ManifestLedger) -> None:
     latest = latest_fixture_entries(ledger)
     lines = [
-        "# EO fixtures",
+        EO_SECTION_HEADING,
         "",
         "Real bytes read from public services by `scripts/fetch_eo_fixtures.py`; every row has a",
         "matching `data/manifest.jsonl` entry (`adapter: fixture-fetch`) whose sha256 is verified",
         "offline by `tests/unit/test_eo_fixture_integrity.py`. Nothing here is synthetic.",
         "",
-        "## Design choices (not observations)",
+        "### Design choices (not observations)",
         "",
         "Source-zone bounding boxes used for the crops, chosen for this project (W, S, E, N):",
         "",
@@ -656,7 +657,7 @@ def write_fixtures_md(ledger: ManifestLedger) -> None:
         f"window; two pre-event and one post-event scene around {S2_EVENT_DATE.date()}",
         f"(see `sentinel2/{S2_AOI}/candidates.json`).",
         "",
-        "## Files",
+        "### Files",
         "",
         "| path | source URL | retrieved_at | sha256 | size (B) | licence |",
         "|---|---|---|---|---|---|",
@@ -679,20 +680,33 @@ def write_fixtures_md(ledger: ManifestLedger) -> None:
         if e.adapter == ADAPTER_NAME and e.status == ManifestStatus.not_fetched
     ]
     if missing:
-        lines += ["", "## Not fetched", ""]
+        lines += ["", "### Not fetched", ""]
         for e in missing:
             lines.append(f"- `{e.source.value}` `{e.product_id}`: {e.notes}")
     lines += [
         "",
-        "## Licences",
+        "### Licences",
         "",
         f"- Copernicus DEM GLO-30: {GLO30_LICENCE}. Terms: {GLO30_LICENCE_URL}",
         f"- Copernicus Sentinel data: {SENTINEL_LICENCE}. Legal notice: {SENTINEL_LICENCE_URL}",
         f"- NASA NISAR listing metadata: {NASA_LICENCE}. Policy: {NASA_DATA_POLICY_URL}",
         "",
     ]
-    FIXTURES_MD.write_text("\n".join(lines), encoding="utf-8")
-    log(f"[md] wrote {rel(FIXTURES_MD)} ({sum(1 for _ in latest)} files)")
+    replace_eo_section(FIXTURES_MD, "\n".join(lines))
+    log(f"[md] rewrote the EO section of {rel(FIXTURES_MD)} ({sum(1 for _ in latest)} files)")
+
+
+def replace_eo_section(path: Path, section: str) -> None:
+    """Rewrite only the `## EO fixtures` section; other lanes own the rest of FIXTURES.md."""
+    existing = path.read_text(encoding="utf-8") if path.exists() else ""
+    start = existing.find(EO_SECTION_HEADING)
+    if start < 0:
+        merged = existing.rstrip("\n") + ("\n\n" if existing.strip() else "") + section
+    else:
+        after = existing.find("\n## ", start + len(EO_SECTION_HEADING))
+        tail = existing[after + 1 :] if after >= 0 else ""
+        merged = existing[:start] + section.rstrip("\n") + "\n" + ("\n" + tail if tail else "")
+    path.write_text(merged.rstrip("\n") + "\n", encoding="utf-8")
 
 
 # --- main --------------------------------------------------------------------------------------
