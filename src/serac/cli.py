@@ -16,6 +16,7 @@ from serac import (
     cli_ingest,
     cli_lfh,
     cli_models,
+    cli_runout,
     cli_schema,
     cli_seismic,
     cli_sources,
@@ -42,6 +43,7 @@ app.add_typer(cli_sources.app, name="sources", help="Fetch, hash and ledger sour
 app.add_typer(cli_aoi.app, name="aoi", help="AOI library: build, validate, describe.")
 app.add_typer(cli_data.app, name="data", help="Assemble model training sets.")
 app.add_typer(cli_models.app, name="models", help="Train and evaluate model components.")
+app.add_typer(cli_runout.app, name="runout", help="M4: runout ensemble and neural surrogate.")
 app.add_typer(cli_lfh.app, name="lfh", help="Landslide force-history inversion (M2).")
 app.add_typer(cli_validate.app, name="validate")
 app.command("promote")(cli_validate.promote_command)

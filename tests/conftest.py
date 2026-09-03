@@ -13,6 +13,14 @@ from pathlib import Path
 
 import pytest
 
+# torch and lightgbm each ship their own OpenMP runtime. On macOS arm64 loading both into
+# one process segfaults, which surfaced as 17 intermittent failures that depended on how
+# xdist happened to distribute the modules. Capping the thread count before either import
+# makes the runtimes coexist. This has to be set here, in the root conftest, because pytest
+# loads it before any test module: a directory-level conftest works only by luck of ordering.
+for _threads_var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS"):
+    os.environ.setdefault(_threads_var, "1")
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURES_DIR = REPO_ROOT / "data" / "fixtures"
 SYNTHETIC_DIR = REPO_ROOT / "tests" / "fixtures" / "synthetic"
