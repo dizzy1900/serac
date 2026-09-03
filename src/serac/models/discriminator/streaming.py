@@ -5,7 +5,7 @@ of 26 August 2026. On the Langtang window as the open archives hold it — two r
 three this detector requires — it does not yet catch it; `reports/MODEL_CARD_discriminator.md`
 carries that case study and its numbers. It accumulates `SeismicTrace` chunks per channel, and
 when a window is ready
-it removes the instrument response, computes the same 80 features the model was trained on, and
+it removes the instrument response, computes the same 79 features the model was trained on, and
 emits a `DetectionCandidate` with a calibrated probability and the contributing channels.
 
 **It refuses to score counts.** `require_response=True` is the default and raises when a

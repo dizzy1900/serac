@@ -3,9 +3,9 @@
 **Bootstrap over event groups, not windows.** A group contributes one positive and up to six
 matched windows cut at the same stations, so resampling windows would treat six views of one
 event as six independent observations and shrink every interval by roughly the square root of
-that. The intervals here are wide, and they are wide honestly: with ten held-out positives, a
-95% interval on F1 that spans half the unit interval is the correct answer, not a failure of
-the method.
+that. The intervals here are wide, and they are wide honestly: with the nine positives the
+held-out High Mountain Asia fold actually contains, a 95% interval on F1 that spans half the
+unit interval is the correct answer, not a failure of the method.
 
 **The seal.** `reports/m1/seal.json` records the hash of every configuration constant the
 moment the test set is first scored. `check_seal` refuses a later test evaluation whose config

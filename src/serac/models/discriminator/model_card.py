@@ -141,9 +141,11 @@ def render(repo: Path) -> str:
         )
     if plan is not None:
         add(
-            f"- Requested: {plan['n_positives']:,} positives, {plan['n_negatives']:,} tectonic "
-            f"negatives, {plan['n_noise']:,} noise windows across "
-            f"{plan['n_unique_stations']:,} unique receivers."
+            f"- Requested by the build: {plan['n_positives']:,} positives, "
+            f"{plan['n_negatives']:,} tectonic negatives, {plan['n_noise']:,} noise windows "
+            f"across {plan['n_unique_stations']:,} unique receivers. That positive count is "
+            "what the join actually produced, and the join was incomplete: see the source "
+            "table below."
         )
     if build is not None:
         add(
@@ -159,11 +161,35 @@ def render(repo: Path) -> str:
             f"{build['n_chunk_files']:,} files."
         )
     add("")
+    add("### Where the windows actually came from")
+    add("")
+    if index is not None:
+        by_source = Counter(w.source for w in index.windows)
+        positives_by_source = Counter(
+            w.source for w in index.windows if w.class_label is ClassLabel.mass_movement
+        )
+        add("| source | windows | of which positives |")
+        add("|---|---|---|")
+        for source, total in sorted(by_source.items()):
+            add(f"| `{source}` | {total:,} | {positives_by_source.get(source, 0):,} |")
+        add("")
     add(
-        "Sources: ESEC (IRIS/EarthScope SPUD, 319 events 1977-2024, committed verbatim as a "
-        "fixture), USGS ComCat `eventtype=landslide`, and the serac event library. ComCat's "
-        "landslide set is **57 events since 2000, only 6 with M>=4, mostly Alaska ml 1-2, and "
-        "Chamoli 2021 is absent from it** — it could not have carried this component alone."
+        "**USGS ComCat `eventtype=landslide` contributed nothing, and that is a defect, not a "
+        "design choice.** The brief names it as a positive source and `catalog.assemble` "
+        "supports it, but the CLI never passed the committed fixture into the join, so "
+        "**zero** of its 57 events are in this dataset. The bug is fixed in `cli_data.py`; the "
+        "built store predates the fix and was **deliberately not rebuilt**, because those 57 "
+        "events are mostly Alaska ml 1-2, Chamoli 2021 is absent from them, and a rebuild "
+        "would cost an hour of compute and force a third scoring of the test set. It is "
+        "recorded here and in the failure modes as a known gap rather than quietly corrected."
+    )
+    add("")
+    add(
+        "The positives in this dataset therefore come from ESEC (IRIS/EarthScope SPUD, 319 "
+        "events 1977-2024, committed verbatim as a fixture) and the serac event library, and "
+        "from nothing else. For the record of what was missed: ComCat's landslide set is 57 "
+        "events since 2000, only 6 with M>=4, mostly Alaska ml 1-2, and Chamoli 2021 is absent "
+        "from it, so it could not have carried this component alone."
     )
     add("")
 
@@ -196,6 +222,60 @@ def render(repo: Path) -> str:
 
     add("## Metrics")
     add("")
+    superseded = _load(reports / "superseded" / "eval_loro_hma_baseline_seal1.json")
+    if superseded is not None and loro is not None:
+        add("### The test set was scored twice, and why")
+        add("")
+        add(
+            "The first scoring is superseded and is kept at "
+            "`reports/m1/superseded/eval_loro_hma_baseline_seal1.json`. It was discarded "
+            "because the finiteness check in `windows.py` ran on the float64 array before the "
+            "cast to float32, so a value above float32 max became `inf` and one window in "
+            "1,925 entered the store as a poisoned trace. Fixing it changed the trained model, "
+            "which changed the test predictions. `seal_version` was bumped from 1 to 2 to "
+            "record the re-scoring as a deliberate act."
+        )
+        add("")
+        add("| metric | first scoring (superseded) | second scoring (reported) | moved |")
+        add("|---|---|---|---|")
+        rows = [
+            (
+                "mass_movement F1",
+                superseded["mass_movement_f1"]["point"],
+                loro["mass_movement_f1"]["point"],
+                "higher is better",
+            ),
+            (
+                "ROC-AUC",
+                superseded["roc_auc"]["point"],
+                loro["roc_auc"]["point"],
+                "higher is better",
+            ),
+            (
+                "Brier",
+                superseded["reliability"]["brier"],
+                loro["reliability"]["brier"],
+                "lower is better",
+            ),
+            (
+                "ECE",
+                superseded["reliability"]["ece"],
+                loro["reliability"]["ece"],
+                "lower is better",
+            ),
+        ]
+        for label, before, after, sense in rows:
+            improved = (after > before) if sense == "higher is better" else (after < before)
+            verdict = "better" if improved else "worse"
+            add(f"| {label} ({sense}) | {before:.4f} | {after:.4f} | **{verdict}** |")
+        add("")
+        add(
+            "**Every metric moved in the unfavourable direction.** That is the point of "
+            "disclosing it: a second scoring is only defensible if a reader can see it did not "
+            "buy a better number, and here it did not. Every figure reported in this card is "
+            "from the second, worse scoring."
+        )
+        add("")
     add(
         "Intervals are 95% percentile bootstrap over **test event groups** (2000 resamples), "
         "not over windows: a group contributes one positive plus its matched negatives and "
@@ -399,25 +479,46 @@ def render(repo: Path) -> str:
         "2. **The time-forward test fold is tiny.** ESEC's last event is 2024, so a 2024-2026 "
         "test window has a handful of events. Leave-one-region-out is the headline for that "
         "reason.\n"
-        "3. **Negatives are not magnitude-matched.** ESEC publishes no magnitude, so negatives "
+        "3. **The receiver-count residual is live, not closed.** Positives realise on average "
+        "**+1.01** more receivers than their own negatives. No feature counts receivers "
+        "directly (`valid_channel_fraction` was removed for that reason), but the "
+        "cross-receiver aggregates `*_mad`, `*_p90` and `lp_envelope_coherence` are all "
+        "functions of how many traces contributed, so the information is not fully excluded. "
+        "Measured on the built store: corr(`n_stations`, positive) = +0.110 over all windows "
+        "and +0.145 over positives and tectonics only, and **`n_stations` alone gives ROC-AUC "
+        "0.587**, better than chance. Some of the reported skill may therefore be archive "
+        "density rather than source physics, and this card does not claim otherwise.\n"
+        "4. **Four windows are duplicated, and they are in the held-out fold.** "
+        "`neg/sedongpu-2017-2018/*` appear twice because two positives share an event group "
+        "(Sedongpu 2017 and 2018 are one slope) and matched the same earthquakes, while the "
+        "negative id did not include the parent. Sedongpu is in High Mountain Asia, so the "
+        "duplicates land in the LORO **test** fold and double-count four tectonic windows. "
+        "Scoring the same predictions on a de-duplicated fold gives mass_movement F1 **0.533 "
+        "(n=52)** against the **0.516 (n=56)** reported throughout this card. **The reported "
+        "number is the lower, conservative one**; no model, threshold or split was changed to "
+        "obtain either. The id collision is fixed in `catalog.py` for future builds and the "
+        "store was not rebuilt.\n"
+        "5. **ComCat's 57 landslide events are missing** through the CLI bug described under "
+        "Data. The positive set is ESEC plus the serac event library and nothing else.\n"
+        "6. **Negatives are not magnitude-matched.** ESEC publishes no magnitude, so negatives "
         "are matched on receiver set, epicentral proximity and epoch inside a fixed M4.0-6.5 "
         "band. If mass movements systematically differ in size from that band, some of what the "
         "model separates may be amplitude rather than mechanism.\n"
-        "4. **The noise class means 'no catalogued source', not 'quiet'.** Uncatalogued sources, "
+        "7. **The noise class means 'no catalogued source', not 'quiet'.** Uncatalogued sources, "
         "small teleseisms and cultural noise are all in it.\n"
-        "5. **A truncated window is out of distribution.** `sliding_180s` asks the model about "
+        "8. **A truncated window is out of distribution.** `sliding_180s` asks the model about "
         "180 s of record zero-padded to 600 s, which it never saw in training. Its scores are "
         "reported next to the batch scores, not instead of them.\n"
-        "6. **Regional coverage is what the open archives hold.** Alaska, the European Alps and "
+        "9. **Regional coverage is what the open archives hold.** Alaska, the European Alps and "
         "the North American Cordillera dominate the positives because that is where open "
         "broadband networks and the ESEC compilers' attention are, not because mass movements "
         "are commonest there.\n"
-        "7. **Events with no open coverage are absent, and their absence is recorded.** They are "
+        "10. **Events with no open coverage are absent, and their absence is recorded.** They are "
         "counted above and appear in `data/manifest.jsonl` as `not_fetched` rows with reasons.\n"
-        "8. **Thin coverage on a recent event is the binding constraint, not model skill.** "
+        "11. **Thin coverage on a recent event is the binding constraint, not model skill.** "
         "Langtang 2026 had two usable open receivers eight days after the event. Whatever the "
         "classifier can do, it cannot do it without records.\n"
-        "9. **A response gap silently narrows a window.** Receivers whose response could not be "
+        "12. **A response gap silently narrows a window.** Receivers whose response could not be "
         "read are dropped; a window below three usable receivers is excluded entirely."
     )
     add("")
@@ -447,6 +548,15 @@ def render(repo: Path) -> str:
             f"- Anti-tuning seal `{seal['config_sha256']}` sealed at {seal['sealed_at_utc']}; "
             f"schemes evaluated under it: {seal['schemes_evaluated']}. A test evaluation under "
             "a changed configuration is refused."
+        )
+        add(
+            "- **What the seal does not cover.** The fingerprint hashes named constants "
+            "(feature names, window and catalogue parameters, split rules, LightGBM "
+            "hyperparameters, bootstrap settings) and **not the code**. The float32 fix above "
+            "changed behaviour without moving any constant, so `config_hash()` was unchanged "
+            "and the seal did not trip; the re-seal was a manual version bump, not an "
+            "automatic detection. Read the seal as protection against hyperparameter tuning "
+            "between scorings, not against all behavioural change."
         )
     add("")
     add(

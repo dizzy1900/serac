@@ -36,7 +36,16 @@ The physics being measured, in order:
 the 12x3 slots holding usable data. It looks like a harmless quality flag and it is not one:
 how many receivers a window has tracks network density, which tracks region and epoch, so a
 model could use it to infer where and when an event happened. It was dropped before the test
-set was scored. The same reasoning is why no receiver count reaches the model in any form.
+set was scored.
+
+**Removing it does not fully close the channel, and this docstring will not pretend it does.**
+The cross-trace aggregates below (`*_mad`, `*_p90`) and `lp_envelope_coherence` are computed
+over however many traces contributed, so their sampling behaviour still carries a trace of the
+count. Measured on the built store: corr(`n_stations`, positive) = +0.110 over all windows,
+and `n_stations` alone separates the classes at ROC-AUC 0.587 -- better than chance. What was
+removed was the direct, explicit feature; the residual is measured, reported by
+`validate-discriminator` as `receiver_count_symmetry_between_classes`, and written up in the
+model card's failure modes.
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 """LightGBM three-class baseline: mass_movement / tectonic / noise.
 
 This is the bar the deep model has to clear. It is deliberately small and boring — gradient
-boosted trees on 80 hand-designed features — because a baseline whose behaviour can be read
+boosted trees on 79 hand-designed features — because a baseline whose behaviour can be read
 off its feature importances is worth more here than an unexplainable model that scores a
 little higher on twenty test positives.
 

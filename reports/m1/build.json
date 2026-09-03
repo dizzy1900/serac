@@ -275,5 +275,10 @@
   "bytes_fetched": 2624616829,
   "chunk_index_sha256": "9564bc6e36b4354bb0ade99512fe957ab7623cf2e41e46776a491c437ed6d4ff",
   "n_chunk_files": 1929,
-  "notes": []
+  "notes": [
+    "POSITIVE JOIN INCOMPLETE: USGS ComCat `eventtype=landslide` contributed 0 of its 57 events. `catalog.assemble` supports the join but `cli_data.py` never passed the committed fixture into it. Sources actually present in this store: esec 291 positives, event_library 6 positives, comcat_tectonic 1332 negatives, noise_window 296. The bug is fixed in cli_data.py; this store predates the fix and was deliberately NOT rebuilt (57 mostly Alaska ml 1-2 events, Chamoli absent, ~1 h of compute and a third scoring of the test set). Recorded as a known gap in reports/MODEL_CARD_discriminator.md.",
+    "TEST SET SCORED TWICE: the finiteness check in windows.py ran on the float64 array before the float32 cast, so one window in 1925 entered the store with an inf. Fixing it changed the trained model and therefore the test predictions. seal_version was bumped 1 -> 2 and the first scoring is kept at reports/m1/superseded/eval_loro_hma_baseline_seal1.json. Every metric moved in the unfavourable direction: mass_movement F1 0.5517 -> 0.5161, ROC-AUC 0.8889 -> 0.8676, Brier 0.1221 -> 0.1294, ECE 0.1565 -> 0.1932. The reported figures are the second, worse set.",
+    "SEAL SCOPE: config_hash() covers named constants, not code, so the float32 fix did not trip the seal; the re-seal was a manual version bump.",
+    "DUPLICATE WINDOWS: 4 windows (neg/sedongpu-2017-2018/*) appear twice because two positives share an event_group and matched the same earthquakes. They fall in the LORO test fold. De-duplicating the same predictions gives F1 0.5333 (n=52) against the reported 0.5161 (n=56); the reported number is the conservative one. The id collision is fixed in catalog.py for future builds."
+  ]
 }
