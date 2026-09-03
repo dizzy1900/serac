@@ -1,0 +1,603 @@
+{
+  "aoi_id": "lhende-khola-trishuli",
+  "bulked_volume_m3": null,
+  "dammed_river": true,
+  "event_group": "langtang-lhende-2026",
+  "event_id": "langtang-lhende-2026",
+  "failure_type": "bedrock_rock_ice_avalanche",
+  "fall_height_m": null,
+  "fatalities": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 289.0,
+        "low": 289.0,
+        "qualifier": "'the government had confirmed 289 deaths' (as of 27 August 2026)",
+        "source_ref": "kp-2026-08-27-what-happened",
+        "unit": "persons"
+      },
+      {
+        "high": 900.0,
+        "low": 900.0,
+        "qualifier": "'has killed more than 900 people in Nepal, with over 4,200 still missing' (as of 31 August 2026)",
+        "source_ref": "kp-2026-08-31-floods-keep-coming",
+        "unit": "persons"
+      }
+    ],
+    "high": 900.0,
+    "low": 289.0,
+    "notes": "Press-only, rising toll for Nepal alone; no best. Thousands were still missing at the time of writing",
+    "source_refs": [
+      "kp-2026-08-27-what-happened",
+      "kp-2026-08-31-floods-keep-coming"
+    ],
+    "unit": "persons"
+  },
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "No bulked or deposit volume has been published as far as retrieved.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "fall_height_m": {
+      "notes": "No peer-reviewed estimate exists as of September 2026. Public figures read in this session: 1,200 m (Kathmandu Post, 28 Aug 2026, reporting Planet Labs imagery analysis: 'falling 1,200 metres into the valley') and 1,000 m (Mohd. Farooq Azam, ICIMOD, quoted by the Kathmandu Post: 'hit the valley 1000 meters below'). A 2,100 m figure also circulates publicly but no retrievable source stating it was found, so the range is not recorded as a disputed Range.",
+      "public_estimates": [
+        {
+          "high": 1200.0,
+          "low": 1200.0,
+          "qualifier": "Planet Labs imagery analysis as reported by the Kathmandu Post",
+          "source_ref": "kp-2026-08-28-what-triggered",
+          "unit": "m"
+        },
+        {
+          "high": 1000.0,
+          "low": 1000.0,
+          "qualifier": "Mohd. Farooq Azam (ICIMOD) as quoted by the Kathmandu Post",
+          "source_ref": "kp-2026-08-28-what-triggered",
+          "unit": "m"
+        }
+      ],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "peak_velocity_ms": {
+      "notes": "No velocity figure was read in the retrieved agency or press pages.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "USGS: 'it is unclear if the initial slope failure was a landslide incorporating part of a glacier or a glacial collapse'; no fraction has been published.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "seismic.agency_range": {
+      "notes": "Only the USGS ComCat magnitude (5.2 ms_vx) was read; the initial 4.4 was a preliminary USGS value, not another agency.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "source_volume_m3": {
+      "notes": "No peer-reviewed estimate exists as of September 2026. The only figure read in this session is the range quoted from Mohd. Farooq Azam (ICIMOD) by the Kathmandu Post on 28 Aug 2026: 'The glacier collapse was 100 to 200 million cubic meters in size'. ICIMOD's own press release speaks only of 'a large volume of ice and rock debris'; USGS gives no volume.",
+      "public_estimates": [
+        {
+          "high": 200000000.0,
+          "low": 100000000.0,
+          "qualifier": "Mohd. Farooq Azam (ICIMOD) as quoted by the Kathmandu Post; preliminary",
+          "source_ref": "kp-2026-08-28-what-triggered",
+          "unit": "m3"
+        }
+      ],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [
+    {
+      "asset_id": null,
+      "asset_name": "Rasuwagadhi border post (Nepal–China)",
+      "asset_type": "border_post",
+      "description": "USGS: the debris flow and flood 'impacted populated areas downstream along the Lende Kholā and Trishuli̇̄ Kholā rivers, including the Rasuwāgaḍhi̇̄ border post'; 'a vital highway connecting China and Nepal' likely buried or destroyed",
+      "impact": "damaged",
+      "source_refs": [
+        "usgs-2026-nepal-event-page"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Rasuwagadhi Hydropower Project (111 MW)",
+      "asset_type": "hydropower_plant",
+      "description": "Kathmandu Post (30 Aug 2026) quoting the Nepal Electricity Authority spokesperson: 'The Rasuwagadhi Hydropower Project has been completely washed away'",
+      "impact": "destroyed",
+      "source_refs": [
+        "kp-2026-08-30-hydropower"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Chilime Hydropower Project (22 MW)",
+      "asset_type": "hydropower_plant",
+      "description": "Kathmandu Post (30 Aug 2026) quoting the NEA: 'the Chilime project has been buried'; Kathmandu Post (26 Aug 2026): a resident reported the Chilime project damaged",
+      "impact": "damaged",
+      "source_refs": [
+        "kp-2026-08-30-hydropower",
+        "kp-2026-08-26-rasuwa"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Upper Trishuli 3A Hydropower Project (60 MW)",
+      "asset_type": "hydropower_plant",
+      "description": "Kathmandu Post (30 Aug 2026): among 'at least 13 hydropower projects ... damaged in Rasuwa and Nuwakot districts' the affected operational projects include '60MW Upper Trishuli A'",
+      "impact": "damaged",
+      "source_refs": [
+        "kp-2026-08-30-hydropower"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Timure (settlement and customs/market area)",
+      "asset_type": "settlement",
+      "description": "Kathmandu Post (26 Aug 2026): 'A sudden surge in the Bhotekoshi river has damaged settlements and infrastructure in Timure and Syabrubesi'; the Timure helipad was swept away. Kathmandu Post (31 Aug 2026): the Gosaikunda rural municipality building in Timure was 'swept away'",
+      "impact": "damaged",
+      "source_refs": [
+        "kp-2026-08-26-rasuwa",
+        "kp-2026-08-31-floods-keep-coming"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Syabrubesi (settlement)",
+      "asset_type": "settlement",
+      "description": "Kathmandu Post (26 Aug 2026): settlements and infrastructure in Timure and Syabrubesi damaged; the Syabrubesi hydrological station gauge was swept away (Kathmandu Post, 2 Sep 2026)",
+      "impact": "damaged",
+      "source_refs": [
+        "kp-2026-08-26-rasuwa",
+        "kp-2026-09-02-alert"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "41 bridges and 42 km of road (Bhote Koshi–Trishuli corridor)",
+      "asset_type": "bridge",
+      "description": "Kathmandu Post (31 Aug 2026): 'Forty-one bridges and 42 kilometres of road were gone in a single morning'",
+      "impact": "destroyed",
+      "source_refs": [
+        "kp-2026-08-31-floods-keep-coming"
+      ]
+    }
+  ],
+  "initially_reported_as": "magnitude 4.4 earthquake (USGS ComCat general text for us7000tbwb; Kathmandu Post 27 Aug and 2 Sep 2026)",
+  "name": "Langtang Lirung / Lhende Khola / Bhote Koshi / Trishuli rock–ice avalanche cascade, Nepal–Tibet",
+  "notes": "Target event. Figures from USGS ComCat and the USGS event page are agency values; everything else is press (Kathmandu Post) or ICIMOD and carries no best. failure_type follows the Kathmandu Post quoting Azam (ICIMOD): 'the flood was triggered by a bedrock failure. When the bedrock gave way, the glacier on top also got swept', while USGS states the mechanism is unclear. dammed_river / secondary_surge are true on the Kathmandu Post's account (debris blocked the Lhende Khola, a temporary lake formed and the blockage failed; ICIMOD said it was investigating a landslide dam) — press-reported, not yet peer-reviewed. Transect ids are those of the lhende-khola-trishuli AOI; the public arrival figures of ~7.5 min (Rasuwagadhi) and ~45 min (Betrawati) are recorded only as unattributed public figures in the transect descriptions. Fatalities cover Nepal only; Chinese casualties were not read from a citable source.",
+  "peak_velocity_ms": null,
+  "precursors_observed": [],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [
+    {
+      "agency_range": null,
+      "mag_type": "ms_vx",
+      "magnitude": {
+        "best": 4.2,
+        "disputed": false,
+        "estimates": [],
+        "high": 4.2,
+        "low": 4.2,
+        "notes": "ComCat preferred magnitude 4.2 ms_vx (magnitude-error 0.148), event type landslide, reviewed",
+        "source_refs": [
+          "usgs-comcat-us7000tc90"
+        ],
+        "unit": "magnitude"
+      },
+      "notes": "Second signal at 06:00:35 UTC, 'about three hours after' the first (ComCat; USGS event page). ComCat: 'identified during post-processing of low-frequency seismic records ... Due to the lack of high-frequency energy, a precise location could not be determined, so we fixed this event's location to that of the initial landslide.' agency_range not read.",
+      "single_force": false,
+      "source_refs": [
+        "usgs-comcat-us7000tc90",
+        "usgs-2026-nepal-event-page"
+      ],
+      "usgs_id": "us7000tc90"
+    }
+  ],
+  "rock_fraction": null,
+  "role": "target",
+  "runout_km": {
+    "best": 100.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 100.0,
+    "low": 100.0,
+    "notes": "USGS: 'The debris flow and flood travelled approximately 100 kilometers (approximately 62 miles)'; 'nearly 100 km' elsewhere on the page. Preliminary",
+    "source_refs": [
+      "usgs-2026-nepal-event-page"
+    ],
+    "unit": "km"
+  },
+  "schema_version": "0.1.0",
+  "secondary_surge": true,
+  "seismic": {
+    "agency_range": null,
+    "mag_type": "ms_vx",
+    "magnitude": {
+      "best": 5.2,
+      "disputed": false,
+      "estimates": [],
+      "high": 5.2,
+      "low": 5.2,
+      "notes": "ComCat preferred magnitude 5.2 ms_vx (magnitude-error 0.09), event type landslide, reviewed",
+      "source_refs": [
+        "usgs-comcat-us7000tbwb"
+      ],
+      "unit": "magnitude"
+    },
+    "notes": "ComCat general text: initially reported as a magnitude 4.4 earthquake; 'Additional analysis of nearby seismic stations, long period seismic waves, and satellite imagery led to the determination that the seismic event was instead a glacial collapse and debris flow, and that no earthquake had occurred.' No single-force inversion was read, so single_force stays false.",
+    "single_force": false,
+    "source_refs": [
+      "usgs-comcat-us7000tbwb",
+      "usgs-2026-nepal-event-page"
+    ],
+    "usgs_id": "us7000tbwb"
+  },
+  "source_elevation_m": {
+    "best": null,
+    "disputed": false,
+    "estimates": [],
+    "high": 5200.0,
+    "low": 5200.0,
+    "notes": "Kathmandu Post (28 Aug 2026), reporting Planet Labs imagery analysis: 'a large section — about 600 metres (2,000 feet) wide — of glacier and rock had collapsed from an altitude of 5,200 metres'. Press-only, no best",
+    "source_refs": [
+      "kp-2026-08-28-what-triggered"
+    ],
+    "unit": "m"
+  },
+  "source_location": {
+    "basis": "usgs_comcat_epicentre of us7000tbwb; ComCat states 'The location of this event was estimated from satellite images' and reports a horizontal error of 0",
+    "lat": 28.271,
+    "lon": 85.515,
+    "source_refs": [
+      "usgs-comcat-us7000tbwb"
+    ],
+    "uncertainty_radius_m": null
+  },
+  "source_volume_m3": null,
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T09:45:08.458851Z",
+      "authors": [
+        "U.S. Geological Survey"
+      ],
+      "claims_supported": [
+        "time",
+        "source_location",
+        "failure_type",
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range",
+        "initially_reported_as"
+      ],
+      "content_type": "application/json; charset=utf-8",
+      "doi": null,
+      "excerpt": null,
+      "id": "usgs-comcat-us7000tbwb",
+      "kind": "usgs_comcat",
+      "licence": "US-PD",
+      "peer_reviewed": false,
+      "publisher": "U.S. Geological Survey",
+      "sha256": "1d8f20a0d4e183e02fdf2b09b3a2ff38ae0d8dc63da2ae602cd3fb599bfe2073",
+      "stored_copy": "data/fixtures/usgs_comcat/us7000tbwb.geojson",
+      "title": "M 5.2 Landslide - 55 km NW of Kodāri̇̄, Nepal (USGS ComCat event us7000tbwb)",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000tbwb&format=geojson",
+      "year": 2026
+    },
+    {
+      "accessed_utc": "2026-09-03T09:45:08.562849Z",
+      "authors": [
+        "U.S. Geological Survey"
+      ],
+      "claims_supported": [
+        "related_seismic[0].usgs_id",
+        "related_seismic[0].magnitude",
+        "related_seismic[0].agency_range",
+        "related_seismic[0].notes"
+      ],
+      "content_type": "application/json; charset=utf-8",
+      "doi": null,
+      "excerpt": null,
+      "id": "usgs-comcat-us7000tc90",
+      "kind": "usgs_comcat",
+      "licence": "US-PD",
+      "peer_reviewed": false,
+      "publisher": "U.S. Geological Survey",
+      "sha256": "4d66ec1021ed007eae976cf6864c45359e6038a91237dc68f0a460fdfe596c04",
+      "stored_copy": "data/fixtures/usgs_comcat/us7000tc90.geojson",
+      "title": "M 4.2 Landslide - 55 km NW of Kodāri̇̄, Nepal (USGS ComCat event us7000tc90)",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000tc90&format=geojson",
+      "year": 2026
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:04.923327Z",
+      "authors": [],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "runout_km",
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range",
+        "related_seismic[0].usgs_id",
+        "related_seismic[0].magnitude",
+        "related_seismic[0].agency_range",
+        "related_seismic[0].notes",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description",
+        "transect_observations[0].description",
+        "transect_observations[0].arrival_time_min",
+        "transect_observations[0].stage_rise_m"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "The slope failure involving a glacier generated energy equivalent to a M5.2 earthquake . The debris flow and flood travelled approximately 100 kilometers (approximately 62 miles). A second seismic event was recorded approximately 3-hours later, generating energy equivalent to a M4.2 earthquake .",
+      "id": "usgs-2026-nepal-event-page",
+      "kind": "agency_official",
+      "licence": "US-PD",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "1a063f071df90427e79ac0a4b8ef7f8d9e46119f7c17ef42286dcb5edbc72969",
+      "stored_copy": null,
+      "title": "2026 Nepal Debris Avalanche and Flash Flood",
+      "url": "https://www.usgs.gov/programs/landslide-hazards/science/2026-nepal-debris-avalanche-and-flash-flood",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:06.634388Z",
+      "authors": [],
+      "claims_supported": [
+        "transect_observations[3].description",
+        "transect_observations[3].arrival_time_min",
+        "transect_observations[3].stage_rise_m",
+        "dammed_river"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "Water levels on the Trishuli River at Galchchi reportedly rose by as much as nine metres within 30 minutes, while levels at Malekhu increased by seven metres over a similar period.",
+      "id": "icimod-2026-08-26-press-release",
+      "kind": "agency_official",
+      "licence": "© ICIMOD; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "48588c77e4fc08c2ded3cd769aa9c99cf88b5b3df65d0a615f31abfe2582e5e2",
+      "stored_copy": null,
+      "title": "Major flash flood sweeps through Nepal’s Rasuwa district, raising fears of further downstream flooding - ICIMOD",
+      "url": "https://www.icimod.org/press-release/major-flash-flood-sweeps-through-nepals-rasuwa-district-raising-fears-of-further-downstream-flooding/",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:09.806841Z",
+      "authors": [],
+      "claims_supported": [
+        "fatalities",
+        "dammed_river",
+        "secondary_surge",
+        "transect_observations[0].description",
+        "transect_observations[0].arrival_time_min",
+        "transect_observations[0].stage_rise_m",
+        "transect_observations[2].description",
+        "transect_observations[2].arrival_time_min",
+        "transect_observations[2].stage_rise_m",
+        "transect_observations[3].description",
+        "transect_observations[3].arrival_time_min",
+        "transect_observations[3].stage_rise_m",
+        "initially_reported_as"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "At Galchhi, the Trishuli river rose by as much as nine metres in just 30 minutes, while the water level at Malekhu climbed by about seven metres over the same period, according to ICIMOD.",
+      "id": "kp-2026-08-27-what-happened",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "6d13e07a8575d600b22d30eda16421fe2d6f5b526d74a7765cf9f720cf83d3b8",
+      "stored_copy": null,
+      "title": "Bhotekoshi flood: What happened in Himalayas and what comes next?",
+      "url": "https://kathmandupost.com/national/2026/08/27/bhotekoshi-flood-what-happened-in-nepal-s-himalayas-and-what-comes-next",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:12.713611Z",
+      "authors": [],
+      "claims_supported": [
+        "source_elevation_m",
+        "failure_type",
+        "dammed_river",
+        "secondary_surge"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "a large section — about 600 metres (2,000 feet) wide — of glacier and rock had collapsed from an altitude of 5,200 metres , falling 1,200 metres into the valley.",
+      "id": "kp-2026-08-28-what-triggered",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "9c62c8832d1a98e6ab9203e16dbd9ed9a8a389db0c3d8e88cc6df297acdae65c",
+      "stored_copy": null,
+      "title": "What triggered the Rasuwa flood? Scientists piece together a complex chain of events",
+      "url": "https://kathmandupost.com/national/2026/08/28/what-triggered-the-rasuwa-flood-scientists-piece-together-a-complex-chain-of-events",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:15.257949Z",
+      "authors": [],
+      "claims_supported": [
+        "time",
+        "transect_observations[1].description",
+        "transect_observations[1].arrival_time_min",
+        "transect_observations[1].stage_rise_m",
+        "infrastructure_impacts[5].impact",
+        "infrastructure_impacts[5].description",
+        "initially_reported_as"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "But at 8:50 AM, the flash flood swept away the gauge in the Bhotekoshi river in Rasuwa, at the Syabrubesi hydrological station.",
+      "id": "kp-2026-09-02-alert",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "ed6f8c0b589662fbdd3004d87e692b09c588811c443a2100a900de225309c4d7",
+      "stored_copy": null,
+      "title": "Nepal sent its disaster alert 38 minutes after the glacier collapse. It wasn’t enough",
+      "url": "https://kathmandupost.com/national/2026/09/02/nepal-sent-its-disaster-alert-38-minutes-after-the-glacier-collapse-it-wasn-t-enough",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:18.127764Z",
+      "authors": [],
+      "claims_supported": [
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description",
+        "infrastructure_impacts[2].impact",
+        "infrastructure_impacts[2].description",
+        "infrastructure_impacts[3].impact",
+        "infrastructure_impacts[3].description"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "The Rasuwagadhi Hydropower Project has been completely washed away, while the Chilime project has been buried.",
+      "id": "kp-2026-08-30-hydropower",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "0e3a5d6a6f0bf385958a3c4f7c735727a4196f25998041395014e380d5faddc8",
+      "stored_copy": null,
+      "title": "Flood damage to Nepal’s hydropower sector could run into billions",
+      "url": "https://kathmandupost.com/national/2026/08/30/flood-damage-to-nepal-s-hydropower-sector-could-run-into-billions",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:20.701069Z",
+      "authors": [],
+      "claims_supported": [
+        "fatalities",
+        "infrastructure_impacts[4].impact",
+        "infrastructure_impacts[4].description",
+        "infrastructure_impacts[6].impact",
+        "infrastructure_impacts[6].description"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "The 2026 flood has killed more than 900 people in Nepal, with over 4,200 still missing. Forty-one bridges and 42 kilometres of road were gone in a single morning.",
+      "id": "kp-2026-08-31-floods-keep-coming",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "ce72873eda3345b9e9c5e7a46978bba2d15cdde3511b2076d5d99daa98391569",
+      "stored_copy": null,
+      "title": "The floods keep coming. Nepal keeps starting over",
+      "url": "https://kathmandupost.com/national/2026/08/31/the-floods-keep-coming-nepal-keeps-starting-over",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:23.238546Z",
+      "authors": [],
+      "claims_supported": [
+        "infrastructure_impacts[2].impact",
+        "infrastructure_impacts[2].description",
+        "infrastructure_impacts[4].impact",
+        "infrastructure_impacts[4].description",
+        "infrastructure_impacts[5].impact",
+        "infrastructure_impacts[5].description"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "A flash flood has swept through the Timure and Syabrubesi areas of Rasuwa, damaging markets and hydropower projects",
+      "id": "kp-2026-08-26-rasuwa",
+      "kind": "press_report",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "42746fca8f5b6bfcff538dd0356bf613cfd0452dbc5077d585d374dc040fd97e",
+      "stored_copy": null,
+      "title": "Flash flood hits Rasuwa, damages hydropower projects and markets",
+      "url": "https://kathmandupost.com/national/2026/08/26/major-flood-damages-syabrubesi-hydropower-projects-in-rasuwa",
+      "year": null
+    }
+  ],
+  "time": {
+    "basis": "usgs_comcat_origin of us7000tbwb (event type landslide, reviewed); the Kathmandu Post gives the same instant as 08:37 local time",
+    "datetime_utc": "2026-08-26T02:52:10Z",
+    "source_refs": [
+      "usgs-comcat-us7000tbwb",
+      "kp-2026-09-02-alert"
+    ],
+    "uncertainty_s": null
+  },
+  "transect_observations": [
+    {
+      "arrival_time_min": null,
+      "description": "USGS: the Rasuwagadhi border post was impacted; Kathmandu Post (27 Aug 2026): 'The Bhotekoshi rose with extraordinary speed at the Rasuwagadhi border crossing on Wednesday morning'. An arrival time of about 7.5 minutes after the ComCat origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null.",
+      "source_refs": [
+        "usgs-2026-nepal-event-page",
+        "kp-2026-08-27-what-happened"
+      ],
+      "stage_rise_m": null,
+      "transect_id": "rasuwagadhi-gyirong"
+    },
+    {
+      "arrival_time_min": {
+        "best": null,
+        "disputed": false,
+        "estimates": [],
+        "high": 13.0,
+        "low": 13.0,
+        "notes": "Kathmandu Post (2 Sep 2026): 'the glacier collapsed at 8:37 AM on August 26' and 'at 8:50 AM, the flash flood swept away the gauge in the Bhotekoshi river in Rasuwa, at the Syabrubesi hydrological station' — the 13 minutes are the difference of the two stated clock times (Nepal time); press-only, no best",
+        "source_refs": [
+          "kp-2026-09-02-alert"
+        ],
+        "unit": "min"
+      },
+      "description": "Gauge of the DHM Syabrubesi hydrological station destroyed at 08:50 local time; no stage figure was read. A public figure of 13–14 minutes is consistent with the stated clock times.",
+      "source_refs": [
+        "kp-2026-09-02-alert"
+      ],
+      "stage_rise_m": null,
+      "transect_id": "syabrubesi"
+    },
+    {
+      "arrival_time_min": null,
+      "description": "Kathmandu Post (27 Aug 2026): 'Bridges and other infrastructure between Rasuwa and Dhading were swept away'. An arrival time of about 45 minutes after the origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null.",
+      "source_refs": [
+        "kp-2026-08-27-what-happened"
+      ],
+      "stage_rise_m": null,
+      "transect_id": "betrawati"
+    },
+    {
+      "arrival_time_min": null,
+      "description": "Stage rise of up to 9 m within 30 minutes at the DHM Galchhi station (ICIMOD; Kathmandu Post); Malekhu downstream rose about 7 m over a similar period. The arrival clock time at Galchhi was not read, so arrival_time_min is null.",
+      "source_refs": [
+        "icimod-2026-08-26-press-release",
+        "kp-2026-08-27-what-happened"
+      ],
+      "stage_rise_m": {
+        "best": null,
+        "disputed": false,
+        "estimates": [],
+        "high": 9.0,
+        "low": 9.0,
+        "notes": "ICIMOD press release (26 Aug 2026, citing DHM): 'Water levels on the Trishuli River at Galchchi reportedly rose by as much as nine metres within 30 minutes'; Kathmandu Post (27 Aug 2026): 'At Galchhi, the Trishuli river rose by as much as nine metres in just 30 minutes ... according to ICIMOD'. 'As much as' and 'reportedly', so no best",
+        "source_refs": [
+          "icimod-2026-08-26-press-release",
+          "kp-2026-08-27-what-happened"
+        ],
+        "unit": "m"
+      },
+      "transect_id": "galchhi"
+    }
+  ]
+}
