@@ -16,6 +16,7 @@ from __future__ import annotations
 import io
 from collections.abc import Iterator
 from datetime import UTC, datetime
+from pathlib import Path
 
 import numpy as np
 from obspy import Stream, Trace, UTCDateTime, read
@@ -180,3 +181,11 @@ def slice_stream(
     pieces.sort(key=lambda item: (item[0], item[1], item[2]))
     for _start, _key, sequence, piece in pieces:
         yield trace_to_chunk(piece, provenance=provenance, sequence=sequence)
+
+
+def chunks_from_miniseed(
+    path: Path, *, chunk_seconds: float, provenance: TraceProvenance
+) -> list[SeismicTrace]:
+    """Read one MiniSEED file and slice it into chunks (the only file→chunk path serac uses)."""
+    stream = read(str(path), format="MSEED")
+    return list(slice_stream(stream, chunk_seconds=chunk_seconds, provenance=provenance))

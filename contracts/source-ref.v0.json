@@ -9,7 +9,8 @@
         "usgs_comcat",
         "agency_official",
         "dataset",
-        "press_report"
+        "press_report",
+        "operator_statement"
       ],
       "title": "SourceKind",
       "type": "string"

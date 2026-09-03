@@ -3,7 +3,7 @@ UV ?= uv
 EVENT ?= chamoli-2021
 SPEED ?= max
 
-.PHONY: help sync lint typecheck test smoke-online validate-events validate-ingest validate-cube validate-stream validate-serac promote underwriting-check replay dvc-remote clean
+.PHONY: help sync lint typecheck test smoke-online validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-serac promote underwriting-check replay dvc-remote clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -36,7 +36,13 @@ validate-cube: ## Grid/CRS consistency, time monotonic, provenance attrs
 validate-stream: ## Replay end-to-end on fixtures; CAP validates against CAP 1.2 XSD
 	$(UV) run serac validate stream
 
-validate-serac: validate-events validate-ingest validate-cube validate-stream ## All validation suites
+validate-aoi: ## AOI geometry, grid and sources
+	$(UV) run serac validate aoi
+
+validate-contracts: ## contracts/*.v0.json match the models
+	$(UV) run serac validate contracts
+
+validate-serac: validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts ## All validation suites
 	$(UV) run serac validate stamp
 
 promote: validate-serac ## Refuses unless validate-serac passed on a clean tree at HEAD

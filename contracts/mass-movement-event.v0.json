@@ -511,7 +511,8 @@
         "usgs_comcat",
         "agency_official",
         "dataset",
-        "press_report"
+        "press_report",
+        "operator_statement"
       ],
       "title": "SourceKind",
       "type": "string"
@@ -806,8 +807,17 @@
       "default": null
     },
     "dammed_river": {
-      "title": "Dammed River",
-      "type": "boolean"
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "None = not established in any retrieved source (needs a FieldNote)",
+      "title": "Dammed River"
     },
     "event_group": {
       "description": "Groups multi-episode events (e.g. twin detachments)",
@@ -949,8 +959,17 @@
       "type": "string"
     },
     "secondary_surge": {
-      "title": "Secondary Surge",
-      "type": "boolean"
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "None = not established in any retrieved source (needs a FieldNote)",
+      "title": "Secondary Surge"
     },
     "seismic": {
       "anyOf": [
@@ -1015,8 +1034,6 @@
     "failure_type",
     "time",
     "source_location",
-    "dammed_river",
-    "secondary_surge",
     "sources",
     "record"
   ],

@@ -16,7 +16,7 @@ from typing import Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
-REPLAY_CONTRACT_VERSION = "0.1.0"
+REPLAY_CONTRACT_VERSION = "0.2.0"
 FIXTURE_MANIFEST_CONTRACT_VERSION = "0.1.0"
 
 SHA256_PATTERN = r"^[0-9a-f]{64}$"
@@ -160,6 +160,24 @@ class FixtureRef(BaseModel):
     provenance: Literal["real", "synthetic"]
 
 
+class ReplayStation(BaseModel):
+    """A channel that was replayed, with its distance from the event source when known."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    sncl: str = Field(min_length=1)
+    latitude: float | None = None
+    longitude: float | None = None
+    elevation_m: float | None = None
+    distance_from_source_km: float | None = Field(
+        default=None,
+        ge=0,
+        description="Great-circle distance to the event record's source location; null when "
+        "the record or the station coordinates are unavailable.",
+    )
+    chunks_published: int = Field(ge=0)
+
+
 class ReplayReport(BaseModel):
     """`reports/replay/<event>.json`: what a replay run did and how long each hop took."""
 
@@ -178,6 +196,8 @@ class ReplayReport(BaseModel):
         default=None, description="Event-library record id the origin time was read from."
     )
     window: TimeWindow | None = None
+    chunk_seconds: float | None = Field(default=None, gt=0)
+    stations: list[ReplayStation] = Field(default_factory=list)
     counts: ReplayCounts
     first_detection: MessageMark | None = None
     first_cap: MessageMark | None = None
