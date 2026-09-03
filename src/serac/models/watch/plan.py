@@ -38,6 +38,15 @@ Below it, requiring the burst would throw away most of the archive; the alternat
 the burst set vary per pair — would make the product extent depend on delivery order.
 """
 
+PROCESSED_POLARIZATION = "VV"
+"""Co-polarised VV only.
+
+Dual-polarisation Sentinel-1 acquisitions deliver each burst twice, and HyP3 refuses a job
+whose granules mix polarisations. VV is the co-polarised channel with the higher backscatter
+and the better coherence over rock and ice, and it is the channel acquired on every pass here,
+whereas VH is not.
+"""
+
 RETAINED_RASTERS_PER_PAIR = 2
 """`_unw_phase` and `_corr` per pair; the geometry rasters are kept once for the whole stack."""
 
@@ -147,7 +156,9 @@ def build_network_plan(
         )
     listing_path = Path(selection["burst_listing"])
     bursts = [
-        b for b in bursts_from_features(read_listing(listing_path)) if b.path_number == int(chosen)
+        b
+        for b in bursts_from_features(read_listing(listing_path))
+        if b.path_number == int(chosen) and b.polarization.upper() == PROCESSED_POLARIZATION
     ]
     if not bursts:
         raise SeracError(f"the burst listing holds no granules for path {chosen}")

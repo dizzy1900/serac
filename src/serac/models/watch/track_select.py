@@ -143,6 +143,7 @@ class BurstScene:
     full_burst_id: str
     acquisition: datetime
     footprint: list[tuple[float, float]]
+    polarization: str = ""
     size_bytes: int | None = None
     scene_name: str = ""
 
@@ -169,6 +170,7 @@ def bursts_from_features(features: Sequence[dict[str, Any]]) -> list[BurstScene]
                 full_burst_id=str(burst.get("fullBurstID", "")),
                 acquisition=datetime.fromisoformat(str(start).replace("Z", "+00:00")),
                 footprint=[(float(c[0]), float(c[1])) for c in ring],
+                polarization=str(props.get("polarization", "")),
                 size_bytes=int(size) if size not in (None, "") else None,
                 scene_name=str(props.get("sceneName", "")),
             )

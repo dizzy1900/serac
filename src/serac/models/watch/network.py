@@ -258,7 +258,13 @@ def acquisitions_from_bursts(
     out: list[Acquisition] = []
     for _key, rows in sorted(grouped.items()):
         rows.sort(key=lambda r: r[1])
-        granules = tuple(g for _t, g in rows)
+        # Exactly one granule per burst id. A dual-polarisation acquisition delivers the same
+        # burst twice (VV and VH) and HyP3 rejects a job whose granules mix polarisations, so
+        # the caller filters by polarisation and this keeps the first survivor per burst.
+        first_per_burst: dict[str, str] = {}
+        for _t, g in rows:
+            first_per_burst.setdefault(_burst_id_of(g), g)
+        granules = tuple(first_per_burst[k] for k in sorted(first_per_burst))
         if required_burst_ids is not None:
             present = {_burst_id_of(g) for g in granules}
             if not set(required_burst_ids) <= present:

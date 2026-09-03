@@ -296,3 +296,7 @@ def poll_insar_cmd(
         timeout_s=timeout_s,
     )
     console.print(json.dumps(summary, indent=2, default=str))
+
+
+if __name__ == "__main__":  # pragma: no cover - convenience for `python -m serac.cli_watch`
+    app()
