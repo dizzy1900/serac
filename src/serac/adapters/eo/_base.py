@@ -161,6 +161,10 @@ class BaseIngestAdapter(IngestAdapter):
     ) -> list[FetchedFile]:
         """Write the product's files under `dest` and describe each one."""
 
+    def product_dir(self, dest_root: Path, aoi_id: str, product_id: str) -> Path:
+        """Where a product's files go; fixture builders override this."""
+        return product_dir(dest_root, self.source, aoi_id, product_id)
+
     def fetch(
         self,
         plan: DryRunPlan,
@@ -207,7 +211,7 @@ class BaseIngestAdapter(IngestAdapter):
                 raise FetchDeclinedError(question)
         entries: list[ManifestEntry] = []
         for product in plan.products:
-            dest = product_dir(dest_root, self.source, request.aoi_id, product.product_id)
+            dest = self.product_dir(dest_root, request.aoi_id, product.product_id)
             dest.mkdir(parents=True, exist_ok=True)
             try:
                 files = self._fetch_product(product, dest, request)

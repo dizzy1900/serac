@@ -188,6 +188,19 @@ class EarthSearchSentinel2Adapter(BaseIngestAdapter):
         return None if value is None else float(value)
 
     @staticmethod
+    def _window_override(request: IngestRequest) -> tuple[float, float, float, float] | None:
+        """`params["window_bounds"]`: explicit (w, s, e, n) in the item CRS, metres.
+
+        Used when an exactly reproducible window matters more than the bbox (fixtures).
+        The bounds are still snapped outward to the 20 m grid of the SCL raster.
+        """
+        raw = request.params.get("window_bounds")
+        if raw is None:
+            return None
+        w, s, e, n = (float(v) for v in raw)
+        return (w, s, e, n)
+
+    @staticmethod
     def _max_scenes(request: IngestRequest) -> int | None:
         value = request.params.get("max_scenes")
         return None if value is None else int(value)
@@ -250,11 +263,17 @@ class EarthSearchSentinel2Adapter(BaseIngestAdapter):
     def _bands_for(self, product: ProductRecord) -> list[str]:
         return [stem for stem in BAND_ASSETS if stem in product.assets]
 
-    def estimate_product_bytes(self, product: ProductRecord, bbox: Bbox4326) -> int | None:
+    def estimate_product_bytes(
+        self,
+        product: ProductRecord,
+        bbox: Bbox4326,
+        window_override: tuple[float, float, float, float] | None = None,
+    ) -> int | None:
         epsg = product.properties.get("proj:epsg")
         if epsg is None:
             return None
-        bounds = snap_bounds(utm_bounds(bbox, int(epsg)), origin=(0.0, 0.0))
+        raw_bounds = window_override or utm_bounds(bbox, int(epsg))
+        bounds = snap_bounds(raw_bounds, origin=(0.0, 0.0))
         total = 0
         for stem in self._bands_for(product):
             rows, cols = window_pixels(bounds, BAND_RESOLUTION_M[stem])
@@ -267,7 +286,7 @@ class EarthSearchSentinel2Adapter(BaseIngestAdapter):
         products: list[ProductRecord] = []
         warnings: list[str] = []
         for p in found:
-            est = self.estimate_product_bytes(p, request.bbox_4326)
+            est = self.estimate_product_bytes(p, request.bbox_4326, self._window_override(request))
             if est is None:
                 warnings.append(f"{p.product_id}: no proj:epsg in item; size unknown")
             products.append(p.model_copy(update={"estimated_bytes": est}))
@@ -317,7 +336,8 @@ class EarthSearchSentinel2Adapter(BaseIngestAdapter):
         with self._open(scl_href) as scl_ds:
             epsg = int(scl_ds.crs.to_epsg())
             origin = (float(scl_ds.transform.c), float(scl_ds.transform.f))
-            bounds = snap_bounds(utm_bounds(request.bbox_4326, epsg), origin)
+            raw_bounds = self._window_override(request) or utm_bounds(request.bbox_4326, epsg)
+            bounds = snap_bounds(raw_bounds, origin)
         aoi_fraction: float | None = None
         histogram: dict[str, int] = {}
         for stem in ("SCL", *[b for b in bands if b != "SCL"]):
@@ -364,18 +384,34 @@ class EarthSearchSentinel2Adapter(BaseIngestAdapter):
             arr = ds.read(1, window=win)
             return arr, ds.window_transform(win), ds.crs
 
-    def aoi_cloud_fraction(self, product: ProductRecord, bbox: Bbox4326) -> float | None:
-        """Fraction of flagged SCL pixels over `bbox` (network: one windowed read)."""
+    def read_scl_window(
+        self,
+        product: ProductRecord,
+        bbox: Bbox4326,
+        *,
+        window_bounds: tuple[float, float, float, float] | None = None,
+    ) -> Any:
+        """The SCL array over `bbox` (or explicit `window_bounds` in the item CRS); one read."""
         href = product.assets.get("SCL")
         if href is None:
             return None
         with self._open(href) as ds:
             epsg = int(ds.crs.to_epsg())
-            bounds = snap_bounds(
-                utm_bounds(bbox, epsg), (float(ds.transform.c), float(ds.transform.f))
-            )
+            origin = (float(ds.transform.c), float(ds.transform.f))
+            bounds = snap_bounds(window_bounds or utm_bounds(bbox, epsg), origin)
             win = from_bounds(*bounds, transform=ds.transform).round_offsets().round_lengths()
-            return cloud_fraction(ds.read(1, window=win))
+            return ds.read(1, window=win)
+
+    def aoi_cloud_fraction(
+        self,
+        product: ProductRecord,
+        bbox: Bbox4326,
+        *,
+        window_bounds: tuple[float, float, float, float] | None = None,
+    ) -> float | None:
+        """Fraction of flagged SCL pixels over the AOI window (network: one windowed read)."""
+        scl = self.read_scl_window(product, bbox, window_bounds=window_bounds)
+        return None if scl is None else cloud_fraction(scl)
 
 
 def _write_band_cog(path: Path, arr: Any, transform: Any, crs: Any, dtype: str) -> None:
