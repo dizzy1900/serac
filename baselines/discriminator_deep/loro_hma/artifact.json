@@ -1,0 +1,33 @@
+{
+  "deep_version": "0.1.0",
+  "name": "cnn-station-transformer",
+  "trained_at_utc": "2026-09-03T21:26:49.382386Z",
+  "split_scheme": "loro_hma",
+  "n_parameters": 120091,
+  "epochs_run": 13,
+  "best_epoch": 5,
+  "best_val_macro_f1": 0.682092022509103,
+  "n_train_windows": 1504,
+  "n_val_windows": 365,
+  "train_event_groups_sha256": "222b8b6be979121eb88867355217c09e58643eb54a7b8db9ab2e3696830c572f",
+  "device": "mps",
+  "hyperparameters": {
+    "embed_dim": 64,
+    "n_heads": 4,
+    "n_layers": 2,
+    "dropout": 0.2,
+    "batch_size": 16,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "patience": 8,
+    "seed": 20260903,
+    "positional_encoding": false,
+    "max_stations": 12
+  },
+  "promotion_rule": "The deep model becomes the default only if the paired-bootstrap 95% lower bound on delta F1 against the lightgbm baseline, resampled over test event groups, exceeds 0. Fixed before either model was trained.",
+  "notes": [
+    "no positional encoding on the station axis: the encoder is permutation-invariant so it cannot key on slot order, which would be epicentral distance by proxy",
+    "per-trace peak normalisation discards absolute amplitude, which is dominated by source size and distance",
+    "seisbench.models is never imported; those are phase pickers, not classifiers"
+  ]
+}

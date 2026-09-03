@@ -42,6 +42,7 @@ class DataSource(StrEnum):
     iris_syngine = "iris_syngine"
     rgi_glaciers = "rgi_glaciers"
     simulation_output = "simulation_output"
+    serac_artefact = "serac_artefact"
     synthetic = "synthetic"
 
 

@@ -23,6 +23,43 @@ Licence `null` means the data-centre page linked in the ledger's `licence_source
 | `data/fixtures/osm/blatten-lotschental_overpass_2026-09-03.json` | https://overpass-api.de/api/interpreter (POST, query in ledger params) | 2026-09-03T10:08:48+00:00 | `572463e35ee4029410b4d7fdd5bddfa90503fb3608a271520b05fa44ea8ab798` | 85044 | ODbL-1.0 (© OpenStreetMap contributors) |
 | `data/fixtures/osm/chamoli-rishiganga_overpass_2026-09-03.json` | https://overpass-api.de/api/interpreter (POST, query in ledger params) | 2026-09-03T10:22:41+00:00 | `cbbd382ca9bdd5b6f8aaf0135270ccca918dcf43f26eac71729ff79128bf2e25` | 138783 | ODbL-1.0 (© OpenStreetMap contributors) |
 | `data/fixtures/osm/lhende-khola-trishuli_overpass_2026-09-03.json` | https://overpass-api.de/api/interpreter (POST, query in ledger params) | 2026-09-03T10:17:27+00:00 | `10962690511b1706db79bc9a9243b4216ff4d7066b14672204e254093c718c96` | 846118 | ODbL-1.0 (© OpenStreetMap contributors) |
+## ESEC (Exotic Seismic Events Catalog)
+
+| path | source URL | retrieved_at | sha256 | size | licence |
+|---|---|---|---|---|---|
+| `data/fixtures/esec/esec_events_2026-09-03.xml` | https://ds.iris.edu/spudservice/esec (GET with `Accept: application/xml`) | 2026-09-03T12:19:00+00:00 | `e4d0ef527c9eabbc8de7b70d0d3a64eba74071045ebd916071ae31c34637104c` | 790780 | null |
+
+The IRIS/EarthScope SPUD ESEC data product: **319 events, 1977-2024**, the positive set for
+the M1 discriminator. Committed verbatim so the discriminator gate and the dataset build
+parse offline exactly what the service returned.
+
+The gate is `serac.validation.discriminator.run_suite`. At the time of writing it is **not**
+reachable as `make validate-discriminator` or as a `serac` sub-command: `src/serac/cli_data.py`
+and `src/serac/cli_models.py` are not yet wired into `src/serac/cli.py`, and the Makefile has
+no target. Wiring both is the orchestrator's change (those files are orchestrator-owned). Until
+it lands, run the suite directly:
+
+```python
+from pathlib import Path
+
+from serac.validation.discriminator import run_suite
+
+run_suite(Path("."))
+```
+
+**The `Accept` header is load-bearing.** With no `Accept` header the same URL returns the
+document HTML-escaped inside a `<pre>` block (1,075,875 bytes of `&lt;Results&gt;...`), which
+is not parseable XML. `Accept: application/xml` returns the real document (790,780 bytes).
+`serac.adapters.seismic.esec.parse_esec_xml` refuses the escaped form and says so.
+
+**Units.** ESEC names a unit only in a handful of tag names (`MaxdisthfKm`, `LocuncertKm`).
+`H`, `L`, `Volume`, `Mass`, `AreaTotal`, `PeakDischarge` carry none, and the service publishes
+no machine-readable schema, so the parser stores them with `unit: null` rather than assuming
+metres and cubic metres. Nothing in M1 consumes them as physical quantities.
+
+Licence: EarthScope Terms of Service state no licence; users must acknowledge EarthScope
+Consortium (NSF award 2435260). Product page: https://ds.iris.edu/ds/products/esec/
+
 ## EO fixtures
 
 Real bytes read from public services by `scripts/fetch_eo_fixtures.py`; every row has a
@@ -76,3 +113,44 @@ window; two pre-event and one post-event scene around 2021-02-07
 | `data/fixtures/hydro/icimod_trishuli_2026-08-26.json` | https://www.icimod.org/press-release/major-flash-flood-sweeps-through-nepals-rasuwa-district-raising-fears-of-further-downstream-flooding/ | 2026-09-03T10:09:30+00:00 | `d8e9945741f283e26ec4d007936437253efae15dafe7c128a9fea29ef8d80014` | 4159 | ICIMOD (c) 2026. All rights reserved; cited-only (page not stored) |
 
 The hydrometric fixture is a hand transcription of figures published on the linked ICIMOD page (page sha256 recorded inside the file and in the ledger `params`), not a gauge record; every observation carries the sentence it was read from. The page is all-rights-reserved and is not stored.
+
+## Green's-function convention fixtures (`data/fixtures/greens/convention/`)
+
+Modelled Syngine responses, recorded by `scripts/record_greens_convention.py`. They are
+**derived**, not observed (ADR-0016): physics evaluated from PREM by EarthScope's Syngine
+service. They exist so `tests/unit/adapters/test_greens_convention.py` can prove the force
+convention and the azimuthal rotation offline.
+
+| File | What it holds | Why |
+|---|---|---|
+| `az90_probe.npz` | ZNE responses at 5 deg to four unit forces: vertical, superposed horizontal, pure radial, pure transverse | Pins `sourceforce=Fr,Ft,Fp` with `Ft` southward, and proves the superposed request separates cleanly by component so two requests per distance suffice |
+| `rotation.npz` | The five elementary responses plus direct Syngine calls at force bearings 0, 35 and 200 deg | Proves `rotate_to_zne` reproduces what the service returns when asked directly, including the transverse sign |
+| `symmetry.npz` | Z response due north of the source, and its equatorial twin computed with and without the geocentric-latitude conversion | Records the trap: a naive great-circle station lookup is **36% off** in the 20-150 s band; the geocentric conversion drives it to 0.0000 |
+
+All three carry `source: iris_syngine`, `provenance: derived`, `params.modelled: true` rows in
+`data/manifest.jsonl`.
+
+## M2 force-history fixtures
+
+Everything the force-history gate needs to run with no network. The 20-150 s working band is
+why 1 sps LH? channels suffice, and that is what keeps the whole set under a megabyte.
+
+| Path | Bytes | What | Provenance |
+|---|---|---|---|
+| `lfh/<target>/*.mseed` | ~700 kB total | Real 1 sps LH? records, 9-10 open stations per event, -180 s to +840 s about origin, six events | `real`, `fdsn_waveforms` |
+| `lfh/<target>/stations.xml.gz` | ~45 kB each | Response-level StationXML, gzipped (ObsPy reads it transparently; uncompressed it is 20x larger and 90% of the fixture bytes) | `real`, `fdsn_waveforms` |
+| `lfh/<target>/manifest.json` | small | Window, station geometry, azimuthal gap, per-file checksums | — |
+| `greens/lfh/prem_a_20s/*.json.gz` | 144 kB | The eight modelled Green's sets needed to re-invert Taan Fiord at its recorded best-fitting location, so `validate-lfh` can re-run the physics offline | **`derived`**, `iris_syngine`, `modelled: true` |
+| `greens/convention/*.npz` | 106 kB | Syngine responses pinning the force convention, the azimuthal rotation and the geocentric-latitude correction | **`derived`**, `iris_syngine` |
+| `esec/esec_catalogue.xml.gz` | 52 kB | The full 319-entry EarthScope Exotic Seismic Events Catalog, which carries the published Bingham, Taan and Lamplugh masses | `real`, `esec_spud` |
+
+Two notes worth keeping:
+
+- The **full** Green's requirement for a run is 0.8-2.5 MB per event (grid nodes x stations x
+  bootstrap depths), which is far too much to commit. Only the single-location subset for one
+  event is committed; the rest lives under the gitignored, DVC-tracked `data/interim/greens/`
+  and is rebuilt in about 40 s by `serac lfh greens build`.
+- The ESEC endpoint is intermittent. It served 1.05 MB and began returning 404 on its own
+  trailing-slash redirect within the hour, which is exactly why the bytes are committed here
+  and why `scripts/build_lfh_references.py` falls back to this copy while keeping the
+  timestamp of the retrieval that actually happened.

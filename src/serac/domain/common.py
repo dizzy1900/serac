@@ -77,7 +77,18 @@ class SourceRef(BaseModel):
     id: Slug
     kind: SourceKind
     title: str = Field(min_length=1)
-    url: str = Field(pattern=URL_PATTERN)
+    url: str = Field(
+        pattern=URL_PATTERN,
+        description=(
+            "The URL whose bytes produced `sha256`. A reader who fetches this and hashes it "
+            "must get `sha256`; put a human-facing landing page in `related_url` instead."
+        ),
+    )
+    related_url: str | None = Field(
+        default=None,
+        pattern=URL_PATTERN,
+        description="Landing page for a reader, when it differs from the bytes that were hashed.",
+    )
     doi: str | None = Field(default=None, pattern=DOI_PATTERN)
     authors: list[str] = Field(default_factory=list)
     year: int | None = Field(default=None, ge=1800, le=2100)

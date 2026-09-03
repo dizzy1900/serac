@@ -35,6 +35,9 @@ REPLAY_DIR_OPTION = typer.Option(
     Path("reports/replay"), "--report-dir", help="Where replay reports are written."
 )
 PROMOTIONS_OPTION = typer.Option(Path("reports/promotion"), "--promotions-dir")
+M2_REPORTS_OPTION = typer.Option(
+    Path("reports/m2"), "--m2-dir", help="Where `serac lfh invert` wrote its run artefacts."
+)
 
 
 def _load_runner(name: str) -> Callable[..., SuiteResult]:
@@ -99,6 +102,16 @@ def stream(
 def runout(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
     """M4 gates: frozen hashes, no calibration language, the disclaimer, and the metrics."""
     _run("runout", repo, reports_dir)
+
+
+@app.command()
+def lfh(
+    repo: Path = REPO_OPTION,
+    reports_dir: Path = REPORTS_OPTION,
+    m2_dir: Path = M2_REPORTS_OPTION,
+) -> None:
+    """Force-history inversion: published reproductions, refusals, fixtures and the seal."""
+    _run("lfh", repo, reports_dir, m2_dir=m2_dir)
 
 
 @app.command()

@@ -24,9 +24,17 @@ def names(result: SuiteResult) -> set[str]:
 def copy_tree(repo_root: Path, tmp_path: Path) -> Path:
     fake = tmp_path / "repo"
     shutil.copytree(repo_root / "data" / "fixtures", fake / "data" / "fixtures")
+    # Every committed, non-DVC path the ledger references has to exist in the fake tree, or
+    # `ingest.committed_files_present` fails for a reason the test is not about. `data/regions`
+    # holds the discriminator's stratification artefact.
+    shutil.copytree(repo_root / "data" / "regions", fake / "data" / "regions")
     shutil.copy(repo_root / "data" / "manifest.jsonl", fake / "data" / "manifest.jsonl")
     shutil.copytree(repo_root / "tests" / "fixtures", fake / "tests" / "fixtures")
     shutil.copytree(repo_root / "contracts", fake / "contracts")  # vendored CAP schemas
+    # The published-reference file for the force-history gate is ledgered like any other
+    # artefact under data/, so the copied tree needs it or `committed_files_present` fails on
+    # a path the real repository has.
+    shutil.copytree(repo_root / "data" / "references", fake / "data" / "references")
     return fake
 
 

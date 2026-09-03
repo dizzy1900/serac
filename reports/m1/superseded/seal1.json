@@ -1,0 +1,172 @@
+{
+  "sealed_at_utc": "2026-09-03T20:35:19.128243Z",
+  "config_sha256": "5950add7554b0b6968d5d817acc8fa817f03f91ebd636c410c755ecaf8b3d28d",
+  "config": {
+    "seal_version": 1,
+    "features": {
+      "names": [
+        "vert_log_lp_sp_ratio_med",
+        "vert_log_lp_sp_ratio_mad",
+        "vert_log_lp_sp_ratio_p90",
+        "vert_log_vlp_sp_ratio_med",
+        "vert_log_vlp_sp_ratio_mad",
+        "vert_log_vlp_sp_ratio_p90",
+        "vert_log_lp_mid_ratio_med",
+        "vert_log_lp_mid_ratio_mad",
+        "vert_log_lp_mid_ratio_p90",
+        "vert_energy_fraction_lp_med",
+        "vert_energy_fraction_lp_mad",
+        "vert_energy_fraction_lp_p90",
+        "vert_energy_fraction_sp_med",
+        "vert_energy_fraction_sp_mad",
+        "vert_energy_fraction_sp_p90",
+        "vert_spectral_centroid_hz_med",
+        "vert_spectral_centroid_hz_mad",
+        "vert_spectral_centroid_hz_p90",
+        "vert_centroid_drift_hz_per_s_med",
+        "vert_centroid_drift_hz_per_s_mad",
+        "vert_centroid_drift_hz_per_s_p90",
+        "vert_spectral_spread_hz_med",
+        "vert_spectral_spread_hz_mad",
+        "vert_spectral_spread_hz_p90",
+        "vert_envelope_duration_50pc_s_med",
+        "vert_envelope_duration_50pc_s_mad",
+        "vert_envelope_duration_50pc_s_p90",
+        "vert_envelope_duration_20pc_s_med",
+        "vert_envelope_duration_20pc_s_mad",
+        "vert_envelope_duration_20pc_s_p90",
+        "vert_envelope_rise_10_50_s_med",
+        "vert_envelope_rise_10_50_s_mad",
+        "vert_envelope_rise_10_50_s_p90",
+        "vert_envelope_peak_over_mean_med",
+        "vert_envelope_peak_over_mean_mad",
+        "vert_envelope_peak_over_mean_p90",
+        "horiz_log_lp_sp_ratio_med",
+        "horiz_log_lp_sp_ratio_mad",
+        "horiz_log_lp_sp_ratio_p90",
+        "horiz_log_vlp_sp_ratio_med",
+        "horiz_log_vlp_sp_ratio_mad",
+        "horiz_log_vlp_sp_ratio_p90",
+        "horiz_log_lp_mid_ratio_med",
+        "horiz_log_lp_mid_ratio_mad",
+        "horiz_log_lp_mid_ratio_p90",
+        "horiz_energy_fraction_lp_med",
+        "horiz_energy_fraction_lp_mad",
+        "horiz_energy_fraction_lp_p90",
+        "horiz_energy_fraction_sp_med",
+        "horiz_energy_fraction_sp_mad",
+        "horiz_energy_fraction_sp_p90",
+        "horiz_spectral_centroid_hz_med",
+        "horiz_spectral_centroid_hz_mad",
+        "horiz_spectral_centroid_hz_p90",
+        "horiz_centroid_drift_hz_per_s_med",
+        "horiz_centroid_drift_hz_per_s_mad",
+        "horiz_centroid_drift_hz_per_s_p90",
+        "horiz_spectral_spread_hz_med",
+        "horiz_spectral_spread_hz_mad",
+        "horiz_spectral_spread_hz_p90",
+        "horiz_envelope_duration_50pc_s_med",
+        "horiz_envelope_duration_50pc_s_mad",
+        "horiz_envelope_duration_50pc_s_p90",
+        "horiz_envelope_duration_20pc_s_med",
+        "horiz_envelope_duration_20pc_s_mad",
+        "horiz_envelope_duration_20pc_s_p90",
+        "horiz_envelope_rise_10_50_s_med",
+        "horiz_envelope_rise_10_50_s_mad",
+        "horiz_envelope_rise_10_50_s_p90",
+        "horiz_envelope_peak_over_mean_med",
+        "horiz_envelope_peak_over_mean_mad",
+        "horiz_envelope_peak_over_mean_p90",
+        "log_hv_energy_ratio_med",
+        "log_hv_energy_ratio_mad",
+        "log_hv_energy_ratio_p90",
+        "lp_rectilinearity_med",
+        "lp_rectilinearity_mad",
+        "lp_rectilinearity_p90",
+        "lp_envelope_coherence"
+      ],
+      "version": "0.1.0"
+    },
+    "windows": {
+      "min_distance_km": 100.0,
+      "max_distance_km": 1500.0,
+      "max_stations": 12,
+      "azimuth_bins": 6,
+      "sampling_rate_hz": 20.0,
+      "bandpass_hz": [
+        0.005,
+        5.0
+      ],
+      "pre_filt": [
+        0.002,
+        0.004,
+        6.0,
+        8.0
+      ],
+      "min_valid_fraction": 0.8,
+      "min_stations_per_window": 3
+    },
+    "catalog": {
+      "dedupe_seconds": 180.0,
+      "dedupe_km": 100.0,
+      "negatives_per_positive": 5,
+      "negative_max_distance_km": 400.0,
+      "negative_epoch_years": 2.0,
+      "negative_magnitude_band": [
+        4.0,
+        6.5
+      ],
+      "noise_offset_s": 21600.0,
+      "window_pre_origin_s": 60.0,
+      "window_length_s": 600.0,
+      "forced_test_groups": [
+        "chamoli-2021",
+        "langtang-lhende-2026",
+        "us7000tbwb",
+        "us7000tc90"
+      ],
+      "positive_sources": [
+        "comcat_landslide",
+        "comcat_tectonic",
+        "esec",
+        "event_library",
+        "noise_window"
+      ]
+    },
+    "splits": {
+      "time_forward_train_before": 2020,
+      "time_forward_val_through": 2023,
+      "loro_val_fraction": 0.2
+    },
+    "baseline": {
+      "params": {
+        "objective": "multiclass",
+        "num_class": 3,
+        "learning_rate": 0.05,
+        "num_leaves": 15,
+        "max_depth": 5,
+        "min_data_in_leaf": 30,
+        "feature_fraction": 0.7,
+        "bagging_fraction": 0.8,
+        "bagging_freq": 1,
+        "lambda_l2": 1.0,
+        "verbosity": -1,
+        "seed": 20260903,
+        "deterministic": true,
+        "force_row_wise": true
+      },
+      "rounds": 600
+    },
+    "bootstrap": {
+      "iterations": 2000,
+      "seed": 20260903
+    }
+  },
+  "schemes_evaluated": [
+    "loro_hma"
+  ],
+  "notes": [
+    "Sealed at the first test evaluation. Any later test evaluation under a different configuration is refused: this is what makes 'evaluated once per configuration' a mechanical fact rather than an intention.",
+    "To evaluate a genuinely new configuration, bump `seal_version` in `config_fingerprint`, delete this file, and say in the report that the test set was scored more than once and why."
+  ]
+}
