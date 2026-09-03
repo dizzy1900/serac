@@ -13,7 +13,8 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
-from shapely.geometry import Polygon, box
+from shapely.geometry import Polygon, box, shape
+from shapely.ops import unary_union
 
 from serac.adapters.eo.asf_bursts import read_listing
 from serac.domain.geo import GridSpec
@@ -69,6 +70,17 @@ class NetworkPlan(BaseModel):
     max_bt_days: float
     annual_anchors: bool = True
     crop_grid: dict[str, Any]
+    aoi_coverage_fraction: float = Field(
+        ge=0.0,
+        le=1.0,
+        description="Fraction of the AOI bbox inside the union of the processed burst footprints",
+    )
+    source_zone_covered: bool | None = Field(
+        default=None,
+        description="Whether the AOI's source zone lies inside the processed footprints; null "
+        "when the AOI has no source_zone.geojson",
+    )
+    coverage_notes: list[str] = Field(default_factory=list)
     pairs: list[NetworkPair]
     budget: NetworkBudget
     plan_sha256: str = ""
@@ -184,6 +196,10 @@ def build_network_plan(
     )
     pairs = plan_pairs(acquisitions, n_conn=n_conn, max_bt_days=max_bt_days, annual_anchors=True)
 
+    coverage, source_covered, coverage_notes = _footprint_coverage(
+        bursts, burst_ids, aoi_bbox=aoi_bbox, aoi_dir=data_dir / "aoi" / aoi_id
+    )
+
     grid: GridSpec = load_grid_spec(data_dir / "aoi" / aoi_id)
     crop_grid = watch_grid(grid, LOOKS_PIXEL_M[looks])
     measured = _measured_product_bytes(data_dir, aoi_id)
@@ -200,6 +216,9 @@ def build_network_plan(
         n_conn=n_conn,
         max_bt_days=max_bt_days,
         crop_grid=crop_grid.as_dict(),
+        aoi_coverage_fraction=coverage,
+        source_zone_covered=source_covered,
+        coverage_notes=coverage_notes,
         pairs=pairs,
         budget=budget(
             pairs,
@@ -234,3 +253,46 @@ def _measured_product_bytes(data_dir: Path, aoi_id: str) -> int | None:
         return None
     sizes.sort()
     return sizes[len(sizes) // 2]
+
+
+def _footprint_coverage(
+    bursts: list[BurstScene],
+    burst_ids: list[str],
+    *,
+    aoi_bbox: tuple[float, float, float, float],
+    aoi_dir: Path,
+) -> tuple[float, bool | None, list[str]]:
+    """How much of the AOI the processed burst set actually images.
+
+    A Sentinel-1 subswath is roughly 85 km wide, so a long downstream corridor AOI is mostly
+    outside any single track's footprint. Recording the covered fraction — and separately
+    whether the source zone is inside it — keeps that from turning into a silent truncation:
+    slope units outside the footprint get no InSAR at all and must be reported as
+    insufficient-data rather than quiet.
+    """
+    wanted = set(burst_ids)
+    shapes = {b.full_burst_id: Polygon(b.footprint) for b in bursts if b.full_burst_id in wanted}
+    if not shapes:
+        return 0.0, None, ["no processed burst footprint could be reconstructed"]
+    union = unary_union(list(shapes.values()))
+    aoi = box(*aoi_bbox)
+    coverage = float(union.intersection(aoi).area / aoi.area) if aoi.area else 0.0
+    notes: list[str] = []
+    if coverage < 0.9:
+        notes.append(
+            f"the processed burst set images {coverage:.1%} of the AOI bounding box; the rest is "
+            "outside this track's subswath and has no InSAR coverage at all"
+        )
+    source_covered: bool | None = None
+    source_path = aoi_dir / "source_zone.geojson"
+    if source_path.exists():
+        features = json.loads(source_path.read_text(encoding="utf-8")).get("features") or []
+        if features:
+            zone = unary_union([shape(f["geometry"]) for f in features])
+            source_covered = bool(union.contains(zone))
+            notes.append(
+                "source zone "
+                + ("is" if source_covered else "is NOT")
+                + " inside the processed footprints"
+            )
+    return coverage, source_covered, notes
