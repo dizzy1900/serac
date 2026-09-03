@@ -298,5 +298,38 @@ def poll_insar_cmd(
     console.print(json.dumps(summary, indent=2, default=str))
 
 
+# -- slope units ----------------------------------------------------------------------------
+
+
+@app.command("slope-units")
+def slope_units_cmd(
+    aoi: AOI_OPT,
+    data_dir: DATA_DIR_OPT = None,
+    reports_dir: REPORTS_DIR_OPT = None,
+    min_area_m2: Annotated[float, typer.Option("--min-area-m2")] = 40_000.0,
+    online: Annotated[
+        bool, typer.Option("--online", help="Fetch RGI 7.0 glacier outlines if not cached.")
+    ] = False,
+) -> None:
+    """Delineate slope units from the GLO-30 DEM and write the parquet index.
+
+    `SlopeUnit.glacier_cover` is a non-nullable bool, so `SlopeUnit` records are emitted only
+    when glacier outlines were actually fetched. Without them the parquet is still written,
+    `glacier_cover` is null there, and the missing records are reported as a Known gap.
+    """
+    from serac.models.watch.slope_units import build_slope_units
+
+    data = _data_dir(data_dir)
+    result = build_slope_units(
+        data_dir=data,
+        reports_dir=_reports_dir(reports_dir),
+        aoi_dir=_aoi_dir(data, aoi),
+        aoi_id=aoi,
+        min_area_m2=min_area_m2,
+        online=online,
+    )
+    console.print(json.dumps(result, indent=2, default=str))
+
+
 if __name__ == "__main__":  # pragma: no cover - convenience for `python -m serac.cli_watch`
     app()
