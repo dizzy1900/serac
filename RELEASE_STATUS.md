@@ -113,3 +113,16 @@ Numbered so `TODO` comments can reference them (`TODO(RELEASE_STATUS#n)`).
 17. **No `dvc.lock`**: producing one requires running an ingest stage over the network.
 18. **The seismic and ComCat fixture ledger rows carry no `event_id`/`aoi_id`**, so those
     columns show `-` in `serac events report`; the ledger is append-only and was not rewritten.
+
+19. **`SourceRef` exists twice** — `domain/common.py` for the event library and
+    `models/lfh/references.py` for the force-history references. The LFH copy carries extra
+    resolution provenance, so they are not redundant, but the duplication let a review fix
+    land on one copy and silently miss the other, leaving wrong citation metadata live in the
+    committed data while the script looked corrected.
+    `tests/contract/test_source_ref_copies_agree.py` now fails loudly on divergence; merging
+    the two properly is outstanding.
+20. **M1 `validate-discriminator` fails by design.** The brief requires Langtang and Chamoli
+    both detected; Langtang is not detected, so the criterion is unmet and M1 stays
+    unvalidated. `make validate-serac` is therefore red and `make promote` is blocked, which
+    is the intended behaviour. CI remains green because it checks code health (lint, types,
+    tests), not model targets.
