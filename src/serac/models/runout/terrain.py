@@ -53,6 +53,15 @@ CORRIDOR_FILENAME = "corridor.geojson"
 FILL_EPSILON_M = 1e-3
 """Gradient imposed while filling, small enough not to perturb 30 m terrain measurably."""
 
+THALWEG_THRESHOLD_MU = 0.08
+"""The Voellmy Coulomb coefficient the thalweg-slope statistic is stated against.
+
+Every write-up that says "most of this corridor cannot sustain motion" is quoting
+`thalweg_fraction_below_mu_threshold` from `reports/runout/terrain.json` at this value, and the
+matching slope angle is `atan(0.08) = 4.574 degrees`. It lives here so the claim, the threshold
+and the measurement cannot drift apart.
+"""
+
 EROSION_MAX_DEPTH_M = 5.0
 EROSION_SLOPE_CUTOFF_DEG = 35.0
 EROSION_OFFSET_SCALE_M = 150.0
@@ -437,4 +446,47 @@ def corridor_terrain(
         grid=grid,
         corridor_geoms_4326=geoms,
         frame=frame,
+    )
+
+
+TERRAIN_REPORT_FILENAME = "terrain.json"
+
+
+def thalweg_statistics(reports_dir: Path, resolution_m: float = 30.0) -> dict[str, Any]:
+    """The committed thalweg statistics at `resolution_m`, from `reports/runout/terrain.json`.
+
+    Raises rather than defaulting: a write-up that cannot find the measurement must fail loudly
+    instead of quoting a number nobody measured. An earlier draft hardcoded "92% below 6.8
+    degrees" -- a real figure, but at the mu=0.12 threshold, attached to a claim about mu=0.08,
+    and never committed anywhere. The committed value is 87.4% below 4.574 degrees.
+    """
+    path = reports_dir / TERRAIN_REPORT_FILENAME
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} does not exist; run scripts/runout_terrain_report.py before quoting "
+            "thalweg statistics"
+        )
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    for row in doc["resolutions"]:
+        if abs(float(row["resolution_m"]) - resolution_m) < 1e-9:
+            return {
+                "resolution_m": float(row["resolution_m"]),
+                "threshold_mu": float(doc["thalweg_threshold_mu"]),
+                "threshold_deg": float(doc["thalweg_threshold_deg"]),
+                "fraction_below_threshold": float(row["thalweg_fraction_below_mu_threshold"]),
+                "median_slope_deg": float(row["thalweg_slope_deg_p50"]),
+                "fraction_below_1_deg": float(row["thalweg_fraction_below_1_deg"]),
+                "segments": int(row["thalweg_segments"]),
+            }
+    raise KeyError(f"{path} has no entry for resolution {resolution_m} m")
+
+
+def thalweg_sentence(reports_dir: Path, resolution_m: float = 30.0) -> str:
+    """The one sentence every M4 write-up leans on, rendered from the measurement."""
+    s = thalweg_statistics(reports_dir, resolution_m)
+    return (
+        f"{s['fraction_below_threshold']:.1%} of this corridor's thalweg is below "
+        f"{s['threshold_deg']:.2f} degrees (median {s['median_slope_deg']:.2f} degrees, "
+        f"{s['segments']} binned segments at {s['resolution_m']:.0f} m), so a Voellmy Coulomb "
+        f"coefficient above {s['threshold_mu']:g} cannot sustain motion over most of it"
     )

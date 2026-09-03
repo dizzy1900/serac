@@ -1,7 +1,7 @@
 # Model card — M4 runout: `serac-swe-voellmy` v0 and its neural surrogate
 
 > **NOT r.avaflow.** Flow depths, velocities and arrival times come from `serac-swe-voellmy`
-> v0.1.0, a single-phase depth-averaged Voellmy-Salm shallow-water solver implemented in this
+> v0.2.0, a single-phase depth-averaged Voellmy-Salm shallow-water solver implemented in this
 > repository. r.avaflow could not be obtained — no official GRASS addon (404), no canonical
 > public repository, and avaflow.org's download behind a registration wall. The acquisition
 > attempt is recorded with dates and URLs in `infra/docker/ravaflow/README.md`.
@@ -11,11 +11,18 @@
 | | |
 |---|---|
 | Component | M4 — L3 cascade runout |
-| Simulator | `serac-swe-voellmy` v0.1.0 (`src/serac/models/runout/solver.py`) |
+| Simulator | `serac-swe-voellmy` **v0.2.0** (`src/serac/models/runout/solver.py`) |
 | Surrogate | 1-D corridor FNO with 5/50/95 quantile heads + transect regressor, v0.1.0 |
 | AOI | `lhende-khola-trishuli` (Langtang Lirung → Lhende Khola → Bhote Koshi → Trishuli, 100 km) |
-| Terrain | Copernicus GLO-30, reprojected to EPSG:32645 at 30 m |
-| Contract | `CascadeForecast` (`contracts/cascade-forecast.v0.json`) |
+| Terrain | Copernicus GLO-30, reprojected to EPSG:32645; solver grids at 30 m and 60 m |
+| Ensemble | 230 valid members: **222 at 60 m, 8 at 30 m** (design hash `ce679a8f`) |
+| Contract | `CascadeForecast` (`contracts/cascade-forecast.v0.json`), forecast contract 0.2.0 |
+
+**The ensemble is not 230 equivalent 30 m runs.** 222 of the 230 members ran on the 60 m grid,
+because a 30 m member costs 9-11x a 60 m one and this machine was shared. The convergence study
+below is what justifies that: at one parameter vector, 60 m and 30 m agree to **13 m of reach
+(0.09%)** with inundation IoU **1.0** at 1 m. The split, the measured costs and the reasoning are
+in `reports/runout/ENSEMBLE_FROZEN.md`.
 
 ## Intended use
 
@@ -29,7 +36,8 @@ model's own 5th-to-95th percentile spread over the frozen ensemble.
 
 * **Not an engineering design tool.** Nothing here sizes a structure, a spillway or a levee.
 * **Not a damming prediction.** The damming index is a dimensionless deposit-to-channel-depth
-  ratio mapped through a stated, uncalibrated logistic. It is not a probability estimated from
+  ratio mapped through a stated logistic whose midpoint and scale were chosen, not estimated
+  from data. It is not a probability derived from
   an inventory, because no inventory of landslide dams exists for this corridor.
 * **Not a substitute for r.avaflow or any validated multi-phase code.**
 * **Not transferable off this corridor** without rebuilding the terrain and re-running the
@@ -68,15 +76,19 @@ replaced an approach that looked more standard on paper:
 | Lake at rest with dry banks | dry cells stay dry to < 1e-10 m |
 | Ritter dam break, n=100 / 200 / 400 | L1 relative error 10.44% / 7.32% / 4.72% |
 | Ritter under refinement | L1 falls monotonically: 115.0 → 77.3 → 50.8 m² |
-| Voellmy terminal velocity | converges **first order in dt**: 7.591% low at CFL 0.4, 3.506% at 0.2, 1.666% at 0.1, 0.807% at 0.05 |
+| Voellmy terminal velocity | **8.657% low at the production CFL of 0.45**; converges first order in dt: 7.591% at 0.4, 3.506% at 0.2, 1.666% at 0.1, 0.807% at 0.05 |
 | Entrainment | conserves mass exactly; cannot over-draw the bed; costs momentum |
 | Mask walls | no leakage; volume conserved to 1e-12 |
 | Outflow | mass balance closes to < 1e-10 |
 
-**Known bias:** at the production CFL of 0.45 the modelled terminal velocity sits about **7.6%
-below** the analytic Voellmy value, because gravity and friction are applied as separate
+**Known bias:** at the production CFL of 0.45 the modelled terminal velocity sits **8.7% below**
+the analytic Voellmy value, because gravity and friction are applied as separate
 operators within a step. That is a first-order splitting error, it halves whenever the step
-does, and it makes every modelled arrival time *late*. It was not tuned away.
+does, and it makes every modelled arrival time *late*. Earlier drafts of this card quoted 7.6%
+here, which is the **CFL 0.4** entry — understating the model's own late-arrival bias by more
+than a percentage point. 0.45 is now measured directly and asserted in
+`test_voellmy_terminal_velocity_converges_first_order_in_dt`. It is reported as measured; no
+parameter was changed to reduce it.
 
 ## What this model cannot represent
 
@@ -142,9 +154,18 @@ ensemble runs at 60 m and 30 m only and 90 m appears solely in the convergence s
 
 ## The result that matters most
 
-**92% of this corridor's thalweg is below 6.8 degrees** (median 0.42 degrees). A Voellmy Coulomb
-coefficient above roughly 0.08 therefore cannot sustain motion over most of it, whatever else is
-varied — and 0.08 is well inside the published range for rock-ice avalanches and debris flows.
+**87.4% of this corridor's thalweg is below 4.57 degrees** — the slope at which a Voellmy
+Coulomb coefficient of 0.08 stops being able to drive the flow — with a median slope of 0.42
+degrees over 499 binned segments at 30 m. A coefficient above 0.08 therefore cannot sustain
+motion over most of the corridor, whatever else is varied — and 0.08 is well inside the
+published range for rock-ice avalanches and debris flows. The figure and its threshold come
+from `reports/runout/terrain.json` (`thalweg_fraction_below_mu_threshold`, generator
+`scripts/runout_terrain_report.py`); at 60 m it is 88.0% and at 90 m 87.0%.
+
+An earlier draft of this card said "92% below 6.8 degrees". That figure was real but was
+measured at the **mu = 0.12** threshold, was never committed anywhere, and was attached to a
+sentence arguing about mu = 0.08 — so it overstated in the direction that strengthens the
+card's own conclusion. Every write-up now renders the number from the committed measurement.
 A single-phase Voellmy rheology stops far short of the ~100 km the 26 August 2026 cascade is
 reported to have travelled. That is a finding about the rheology, reported in
 `reports/runout/langtang_sanity.md` as a comparison against public timings and **not** used to

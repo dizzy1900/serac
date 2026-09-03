@@ -1,6 +1,6 @@
 {
   "disclaimer": "NOT r.avaflow: flow depths, velocities and arrival times come from serac-swe-voellmy v0.2.0, a single-phase depth-averaged Voellmy-Salm solver implemented in this repository. r.avaflow could not be obtained (see infra/docker/ravaflow/README.md); cross-validation against r.avaflow is outstanding.",
-  "generated_utc": "2026-09-03T22:32:11.460124+00:00",
+  "generated_utc": "2026-09-03T23:26:53.567870+00:00",
   "label": "cascade rules v0",
   "members_used": 230,
   "note": "Deposit depths are the ensemble median and 95th percentile per chainage bin, not a single member. The index is evaluated at the median and the breach and surge at the 95th percentile, so the surge numbers are an upper case rather than a central one.",

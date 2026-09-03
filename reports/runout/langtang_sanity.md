@@ -70,13 +70,12 @@ known before the comparison ran:
 1. **The release is emplaced at rest on the corridor cells inside the release elevation band. The detachment scar, the free fall from the Langtang Lirung flank and the fragmentation that precede entry into the Lhende Khola are outside the model domain, so roughly 1,300 m of drop contributes no initial kinetic energy and modelled arrival times are biased late.** Arrival times are therefore biased late at every transect.
 2. **Single-phase: the solver cannot represent two- or three-phase physics or phase separation between rock, ice and fluid. Ice melt, pore-pressure evolution and fluidisation are subsumed into the Voellmy coefficients, not resolved.** The observed cascade travelled roughly 100 km, which a
    water-dominated flood wave does readily and a Coulomb-plus-turbulent avalanche rheology does
-   not: 92% of this corridor's thalweg is below 6.8 degrees, so a Voellmy `mu` above about 0.08
-   cannot sustain motion there at all, whatever else is varied.
+   not: 87.4% of this corridor's thalweg is below 4.57 degrees (median 0.42 degrees, 499 binned segments at 30 m), so a Voellmy Coulomb coefficient above 0.08 cannot sustain motion over most of it, whatever else is varied (measured, reports/runout/terrain.json).
 3. **30 m DEM: the Bhote Koshi gorge is under 60 m wide in places, so it spans fewer than two cells. Superelevation, run-up on valley walls and channel blocking are unresolved; damming numbers derived from deposit depth against channel geometry are order-of-magnitude indicators, not engineering estimates.**
 
 The operator-splitting error measured in `reports/runout/verification.json` adds a further
-known bias: at the production CFL the modelled terminal velocity sits about 7.6% below the
-analytic Voellmy value, which makes arrivals later still.
+known bias: at the production CFL of 0.45 the modelled terminal velocity sits
+8.7% below the analytic Voellmy value, which makes arrivals later still.
 
 r.avaflow cross-validation remains outstanding, so there is no independent simulator against
 which to separate these structural biases from implementation error.

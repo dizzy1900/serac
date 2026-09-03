@@ -21,6 +21,9 @@ from serac.models.runout.solver import (
     terminal_velocity,
 )
 
+PRODUCTION_CFL = 0.45
+"""The CFL the frozen ensemble ran at. Quoted figures must be measured here, not at 0.4."""
+
 
 def make_parameters(**overrides: float | tuple[float, float]) -> VoellmyParameters:
     base: dict[str, object] = {
@@ -119,7 +122,7 @@ def test_lake_at_rest_with_dry_banks_stays_dry() -> None:
 # -- Ritter dam break ----------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(("n_cells", "tolerance"), [(200, 0.10), (400, 0.07)])
+@pytest.mark.parametrize(("n_cells", "tolerance"), [(100, 0.13), (200, 0.10), (400, 0.07)])
 def test_ritter_dam_break_matches_the_analytic_solution(n_cells: int, tolerance: float) -> None:
     """Frictionless dry-bed dam break against Ritter (1892)."""
     length = 1000.0
@@ -267,14 +270,20 @@ def _terminal_velocity_error(cfl: float) -> float:
 def test_voellmy_terminal_velocity_converges_first_order_in_dt() -> None:
     """A sheet launched at the analytic terminal velocity holds it, to first order in `dt`.
 
-    Gravity and friction are applied as separate operators inside a step, so the balance is
-    only recovered to O(dt): at the production CFL of 0.45 the settled speed sits **7.6% below**
-    the analytic value, and the error halves every time the step does. That is a real bias in
-    the ensemble's arrival times, not a rounding detail, and it is recorded in the model card
-    and in `reports/runout/verification.json` rather than tuned away.
+    Gravity and friction are applied as separate operators inside a step, so the balance is only
+    recovered to O(dt), and the error halves every time the step does. **0.45 is the production
+    CFL** and is measured here rather than inferred from the 0.4 entry: an earlier draft quoted
+    the 0.4 error (7.59%) as though it were the production figure, understating the model's own
+    late-arrival bias. The measured value at 0.45 is about 8.7%. That is a real bias in the
+    ensemble's arrival times, not a rounding detail, and it is recorded in the model card and in
+    `reports/runout/verification.json` rather than tuned away.
     """
-    errors = {cfl: _terminal_velocity_error(cfl) for cfl in (0.4, 0.2, 0.1, 0.05)}
+    errors = {cfl: _terminal_velocity_error(cfl) for cfl in (PRODUCTION_CFL, 0.4, 0.2, 0.1, 0.05)}
 
+    assert errors[PRODUCTION_CFL] > errors[0.4], "the coarser production step must be the worse one"
+    assert 0.07 < errors[PRODUCTION_CFL] < 0.10, (
+        f"production-CFL error {errors[PRODUCTION_CFL]:.3%} is outside the recorded 8.7% band"
+    )
     ordered = [errors[c] for c in (0.4, 0.2, 0.1, 0.05)]
     for coarse, fine in itertools.pairwise(ordered):
         assert fine < coarse, f"terminal velocity error did not fall with dt: {errors}"
@@ -469,3 +478,91 @@ def test_outflow_removes_mass_and_the_balance_still_closes() -> None:
     assert result.outflow_volume_m3 > 0.0
     assert abs(result.mass_balance["relative_error"]) < 1e-10
     assert result.initial_volume_m3 == pytest.approx(initial, rel=1e-12)
+
+
+# -- regressions on the two disclosed defects -------------------------------------------------
+
+
+def test_kinetic_stop_is_keyed_to_the_peak_not_the_first_step() -> None:
+    """Stopping must be measured against the PEAK kinetic energy, not the first non-zero one.
+
+    Regression on the v0.1.0 defect. `stop_kinetic_fraction` compared against the first non-zero
+    value; a release emplaced at rest has almost none after one step, so the threshold sat far
+    below anything the flow would return to and the run burned its whole time budget. Every
+    member of the first ensemble stopped at `max_time_s`, which made runout distance a statement
+    about the compute budget rather than about the rheology.
+
+    Asserting only "it stopped early" does not catch it -- on an idealised ramp the collapse of
+    the release column puts real energy into the very first step, so both versions stop. The
+    discriminating fact is *where* it stops: against the peak the run ends while kinetic energy
+    is still above `fraction x first`, and against the first value it would have to fall below
+    that. This test is deliberately run with the criterion enabled, unlike the verification cases
+    above which disable it.
+    """
+    # A continuous gentle slope, so the flow thins and decays asymptotically the way the real
+    # corridor does. On a steep ramp onto a flat runout the Coulomb term halts the flow dead,
+    # kinetic energy reaches exactly zero, and both the correct and the defective criterion look
+    # identical -- which is how the first version of this test passed against the defect.
+    shape = (12, 200)
+    dx = 20.0
+    x = np.arange(shape[1]) * dx
+    bed = (x.max() - x) * math.tan(math.radians(12.0))
+    fraction = 1e-3
+    solver = VoellmySolver(
+        bed=bed[None, :] * np.ones((shape[0], 1)),
+        domain_mask=np.ones(shape, dtype=bool),
+        outflow_mask=np.zeros(shape, dtype=bool),
+        erodible_depth=np.zeros(shape),
+        parameters=make_parameters(mu=0.15, xi_m_s2=600.0),
+        settings=SolverSettings(
+            resolution_m=dx,
+            cfl=PRODUCTION_CFL,
+            max_time_s=3600.0,
+            stop_when_dry=False,
+            stop_kinetic_fraction=fraction,
+        ),
+    )
+    h0 = np.zeros(shape)
+    h0[4:8, 1:6] = 6.0
+    energies: list[float] = []
+
+    def observe(t: float, dt: float, h: np.ndarray, u: np.ndarray, v: np.ndarray) -> None:
+        energies.append(float((0.5 * h * (u * u + v * v)).sum()))
+
+    result = solver.run(h0, observers=[observe])
+
+    first = next(e for e in energies if e > 0.0)
+    peak = max(energies)
+    at_stop = energies[-1]
+    assert peak > 5.0 * first, "the fixture must actually accelerate, or the test proves nothing"
+    assert not result.flags.hit_time_limit, f"burned the whole budget, stopping at {result.time_s}"
+    assert at_stop <= 1.5 * fraction * peak, (
+        f"stopped at {at_stop:.3e} J, above the peak-keyed threshold {fraction * peak:.3e}"
+    )
+    assert at_stop > fraction * first, (
+        f"stopped at {at_stop:.3e} J, at or below the first-step-keyed threshold "
+        f"{fraction * first:.3e} -- the criterion is keyed to the wrong reference"
+    )
+
+
+def test_kinetic_criterion_does_not_fire_while_the_flow_is_still_accelerating() -> None:
+    """The other half of the regression: stopping early would truncate a live flow."""
+    speeds: list[float] = []
+    solver, shape = _uniform_slope_solver(25.0, mu=0.05, xi=2000.0, max_time_s=120.0)
+    solver.s = SolverSettings(
+        resolution_m=solver.s.resolution_m,
+        cfl=PRODUCTION_CFL,
+        max_time_s=120.0,
+        stop_when_dry=False,
+        stop_kinetic_fraction=1e-3,
+    )
+
+    def observe(t: float, dt: float, h: np.ndarray, u: np.ndarray, v: np.ndarray) -> None:
+        speeds.append(float(np.hypot(u, v).max()))
+
+    result = solver.run(np.full(shape, 2.0), observers=[observe])
+
+    assert result.time_s == pytest.approx(120.0, rel=1e-6), (
+        "a sheet still accelerating on a 25 degree slope must run to the time limit"
+    )
+    assert speeds[-1] > speeds[0]

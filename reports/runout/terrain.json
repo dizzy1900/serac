@@ -6,8 +6,9 @@
     "spacing_m": 30.0
   },
   "disclaimer": "NOT r.avaflow: flow depths, velocities and arrival times come from serac-swe-voellmy v0.2.0, a single-phase depth-averaged Voellmy-Salm solver implemented in this repository. r.avaflow could not be obtained (see infra/docker/ravaflow/README.md); cross-validation against r.avaflow is outstanding.",
-  "generated_utc": "2026-09-03T21:38:56.098700+00:00",
-  "note": "The round trip is exact where the closest-point projection is interior and undefined where it snaps to a vertex -- the corridor buffer's end-caps and outer bends, beyond the centreline's medial axis, where the map is genuinely many-to-one. Both sets are reported.",
+  "generated_utc": "2026-09-03T23:15:21.414324+00:00",
+  "generator": "scripts/runout_terrain_report.py",
+  "note": "The round trip is exact where the closest-point projection is interior and undefined where it snaps to a vertex -- the corridor buffer's end-caps and outer bends, beyond the centreline's medial axis, where the map is genuinely many-to-one. Both sets are reported. `thalweg_fraction_below_mu_threshold` is the share of binned thalweg segments whose slope cannot sustain motion at a Voellmy Coulomb coefficient of 0.08, i.e. below 4.574 degrees.",
   "resolutions": [
     {
       "active_fraction": 0.0919,
@@ -34,7 +35,8 @@
       ],
       "thalweg_draining": false,
       "thalweg_fraction_below_1_deg": 0.6092184368737475,
-      "thalweg_fraction_below_mu_0p08": 0.8697394789579158,
+      "thalweg_fraction_below_mu_threshold": 0.8697394789579158,
+      "thalweg_segments": 499,
       "thalweg_slope_deg_p10": 0.00031476659361037723,
       "thalweg_slope_deg_p50": 0.5054932900751727,
       "thalweg_slope_deg_p90": 5.456327350393298,
@@ -66,7 +68,8 @@
       ],
       "thalweg_draining": true,
       "thalweg_fraction_below_1_deg": 0.625250501002004,
-      "thalweg_fraction_below_mu_0p08": 0.8797595190380761,
+      "thalweg_fraction_below_mu_threshold": 0.8797595190380761,
+      "thalweg_segments": 499,
       "thalweg_slope_deg_p10": 0.0005945591212487077,
       "thalweg_slope_deg_p50": 0.49903232791582014,
       "thalweg_slope_deg_p90": 5.545391649562662,
@@ -98,12 +101,16 @@
       ],
       "thalweg_draining": true,
       "thalweg_fraction_below_1_deg": 0.6332665330661322,
-      "thalweg_fraction_below_mu_0p08": 0.87374749498998,
+      "thalweg_fraction_below_mu_threshold": 0.87374749498998,
+      "thalweg_segments": 499,
       "thalweg_slope_deg_p10": 0.0014339367039401495,
       "thalweg_slope_deg_p50": 0.41887692516303515,
       "thalweg_slope_deg_p90": 5.674321146959048,
       "thalweg_worst_rise_m": -0.0029296875,
       "unreachable_cells_dropped": 0
     }
-  ]
+  ],
+  "thalweg_bins": 500,
+  "thalweg_threshold_deg": 4.574,
+  "thalweg_threshold_mu": 0.08
 }

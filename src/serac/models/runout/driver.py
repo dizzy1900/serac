@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any
 
 from serac.models.runout.ensemble import EnsembleDesign
-from serac.models.runout.params import SolverSettings, VoellmyParameters
+from serac.models.runout.params import SOLVER_VERSION, SolverSettings, VoellmyParameters
 from serac.models.runout.runner import MemberOutcome, RunoutRunner
 from serac.models.runout.terrain import CorridorTerrain, corridor_terrain
 
@@ -54,6 +54,7 @@ class MemberTask:
     resolution_m: float
     parameters: VoellmyParameters
     settings: SolverSettings
+    design_hash: str = ""
 
 
 def _run_member(repo_str: str, aoi_id: str, task: MemberTask) -> tuple[int, dict[str, Any]]:
@@ -65,14 +66,22 @@ def _run_member(repo_str: str, aoi_id: str, task: MemberTask) -> tuple[int, dict
     return task.index, summarise(task, outcome)
 
 
-def summarise(task: MemberTask, outcome: MemberOutcome) -> dict[str, Any]:
-    """The row that goes into `ensemble_index.jsonl`."""
+def summarise(task: MemberTask, outcome: MemberOutcome, design_hash: str = "") -> dict[str, Any]:
+    """The row that goes into `ensemble_index.jsonl`.
+
+    `solver_version` and `design_hash` are carried explicitly. The 230-member ensemble committed
+    here predates those fields: for those rows the solver version survives only in the output
+    path (`.../v0.2.0/<run_id>/`) and the design hash only in `ensemble_summary.json`, which is
+    recoverable but not self-describing.
+    """
     run_json = outcome.run_json
     results = run_json["results"]
     return {
         "index": task.index,
         "run_id": outcome.run_id,
         "input_hash": outcome.input_hash,
+        "solver_version": run_json["solver"]["version"],
+        "design_hash": task.design_hash,
         "resolution_m": task.resolution_m,
         "cached": outcome.cached,
         "valid": outcome.valid,
@@ -86,18 +95,18 @@ def summarise(task: MemberTask, outcome: MemberOutcome) -> dict[str, Any]:
 
 
 def tasks_for(design: EnsembleDesign) -> list[MemberTask]:
-    out: list[MemberTask] = []
-    for index, (run_id, parameters, settings) in enumerate(design.all_members()):
-        out.append(
-            MemberTask(
-                index=index,
-                run_id=run_id,
-                resolution_m=settings.resolution_m,
-                parameters=parameters,
-                settings=settings,
-            )
+    design_hash = design.design_hash
+    return [
+        MemberTask(
+            index=index,
+            run_id=run_id,
+            resolution_m=settings.resolution_m,
+            parameters=parameters,
+            settings=settings,
+            design_hash=design_hash,
         )
-    return out
+        for index, (run_id, parameters, settings) in enumerate(design.all_members())
+    ]
 
 
 def read_index(path: Path) -> dict[int, dict[str, Any]]:
@@ -153,6 +162,8 @@ def run_ensemble(
                 row = {
                     "index": task.index,
                     "run_id": task.run_id,
+                    "solver_version": SOLVER_VERSION,
+                    "design_hash": task.design_hash,
                     "resolution_m": task.resolution_m,
                     "cached": False,
                     "valid": False,

@@ -6702,7 +6702,7 @@
   },
   "frozen_design_hash": "ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac4943777f28484dae183",
   "frozen_solver_version": "0.2.0",
-  "generated_utc": "2026-09-03T23:00:41.374761+00:00",
+  "generated_utc": "2026-09-03T23:26:52.497720+00:00",
   "n_members": 230,
   "per_transect": {
     "betrawati": {
@@ -6741,6 +6741,7 @@
       "public_timing_min": 13.5
     }
   },
+  "production_cfl": 0.45,
   "public_timings_min": {
     "betrawati": 45.0,
     "galchhi": 30.0,
@@ -6750,5 +6751,17 @@
   "solver": {
     "name": "serac-swe-voellmy",
     "version": "0.2.0"
+  },
+  "terminal_velocity_bias_at_production_cfl": 0.08657,
+  "thalweg_sentence": "87.4% of this corridor's thalweg is below 4.57 degrees (median 0.42 degrees, 499 binned segments at 30 m), so a Voellmy Coulomb coefficient above 0.08 cannot sustain motion over most of it",
+  "thalweg_source": "measured, reports/runout/terrain.json",
+  "thalweg_statistics": {
+    "fraction_below_1_deg": 0.6332665330661322,
+    "fraction_below_threshold": 0.87374749498998,
+    "median_slope_deg": 0.41887692516303515,
+    "resolution_m": 30.0,
+    "segments": 499,
+    "threshold_deg": 4.574,
+    "threshold_mu": 0.08
   }
 }

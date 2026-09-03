@@ -10,6 +10,7 @@ from datetime import UTC, datetime, timedelta
 
 import numpy as np
 import pytest
+import torch
 
 from serac.domain.common import iter_ranges
 from serac.domain.forecast import CascadeForecast, ConfidenceTier, ModelProvenance
@@ -160,3 +161,32 @@ def test_inference_is_far_inside_the_latency_gate(surrogate: RunoutSurrogate) ->
     surrogate.infer(_parameters())  # warm up
     prediction = surrogate.infer(_parameters())
     assert prediction.latency_s < 2.0
+
+
+# -- regression on the quantile-head defect ----------------------------------------------------
+
+
+def test_lowest_quantile_can_emit_exactly_zero() -> None:
+    """The 5th-percentile head must be able to say "dry", or dry bins can never be covered.
+
+    Regression on the defect that put depth interval coverage at 0.1208 against a 0.85-0.95
+    target: `cumsum(softplus(raw))` makes every quantile strictly positive, and max depth is zero
+    over most of the corridor, so no amount of training could have covered a dry bin. The lowest
+    quantile is a ReLU precisely so that it can reach zero.
+    """
+    from serac.models.runout.surrogate import QUANTILES, _monotone_quantiles
+
+    raw = torch.tensor([[[-5.0, -5.0], [0.0, 3.0], [1.0, -2.0]]])  # (batch, quantile, bin)
+    assert raw.shape[1] == len(QUANTILES)
+
+    out = _monotone_quantiles(raw, dim=1)
+
+    assert float(out[0, 0, 0]) == 0.0, "a strongly negative logit must give exactly zero"
+    assert (out >= 0.0).all(), "quantiles are depths and cannot be negative"
+    assert (out[:, 1:] >= out[:, :-1]).all(), "quantiles must not cross"
+
+
+def test_trained_heads_actually_emit_zero_somewhere(surrogate: RunoutSurrogate) -> None:
+    """Not just representable in principle: the trained model must use it."""
+    prediction = surrogate.infer(_parameters(mu=0.29))
+    assert float(prediction.max_depth_q[0].min()) == 0.0

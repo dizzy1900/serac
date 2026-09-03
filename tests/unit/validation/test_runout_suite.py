@@ -70,7 +70,8 @@ def repo(tmp_path: Path) -> Path:
         encoding="utf-8",
     )
     (tmp_path / "reports" / "MODEL_CARD_runout.md").write_text(
-        "NOT r.avaflow; cross-validation outstanding.\n", encoding="utf-8"
+        f"NOT r.avaflow; cross-validation outstanding. serac-swe-voellmy v{SOLVER_VERSION}.\n",
+        encoding="utf-8",
     )
     return tmp_path
 
@@ -205,3 +206,57 @@ def test_missing_inputs_warn_rather_than_pass_silently(tmp_path: Path) -> None:
     assert names["langtang_sanity_present"].failed, (
         "a missing comparison is an error, not a warning"
     )
+
+
+def test_a_model_card_naming_a_stale_solver_version_fails_the_gate(repo: Path) -> None:
+    """The card credited v0.1.0 through the bump to v0.2.0, and the gate passed anyway.
+
+    It only ever grepped for the disclaimer, so a card describing a different solver satisfied
+    it. A model card that names the wrong version is documenting a different model.
+    """
+    (repo / "reports" / "MODEL_CARD_runout.md").write_text(
+        "NOT r.avaflow. Simulator: serac-swe-voellmy v0.1.0.\n", encoding="utf-8"
+    )
+
+    result = run_suite(repo, reports_dir=repo / "reports" / "runout")
+
+    assert _check(result, "model_card_names_the_current_solver_version").failed
+
+
+def test_calibration_language_in_the_model_card_fails_the_gate(repo: Path) -> None:
+    """The vocabulary grep covers the model card, not only `reports/runout/*.md`."""
+    card = repo / "reports" / "MODEL_CARD_runout.md"
+    card.write_text(
+        card.read_text(encoding="utf-8") + "\nThe parameters fitted the observed arrivals.\n",
+        encoding="utf-8",
+    )
+
+    result = run_suite(repo, reports_dir=repo / "reports" / "runout")
+
+    assert _check(result, "no_calibration_language").failed
+
+
+@pytest.mark.parametrize("word", ["fitted", "fit to", "matched to"])
+def test_bare_fitting_vocabulary_is_caught(repo: Path, word: str) -> None:
+    """Mutation check: a list holding only `fitted to` let `parameters fitted the arrivals` past."""
+    path = repo / "reports" / "runout" / "langtang_sanity.md"
+    path.write_text(
+        path.read_text(encoding="utf-8") + f"\nThe parameters {word} the observed arrivals.\n",
+        encoding="utf-8",
+    )
+
+    result = run_suite(repo, reports_dir=repo / "reports" / "runout")
+
+    assert _check(result, "no_calibration_language").failed
+
+
+def test_a_missing_frozen_solver_version_fails_the_gate(repo: Path) -> None:
+    """A *missing* version used to satisfy the version gate, because `None` was allowed."""
+    reports = repo / "reports" / "runout"
+    summary = _summary()
+    del summary["frozen_solver_version"]
+    (reports / "ensemble_summary.json").write_text(json.dumps(summary), encoding="utf-8")
+
+    result = run_suite(repo, reports_dir=reports)
+
+    assert _check(result, "ensemble_solver_version_matches").failed

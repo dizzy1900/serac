@@ -21,6 +21,7 @@ A gate that fails is an `error` and the suite fails. A gate whose *inputs* do no
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -100,7 +101,11 @@ def run_suite(repo: Path = Path("."), reports_dir: Path | None = None) -> SuiteR
     # -- 2. no calibration language -----------------------------------------------------------
     offenders: list[str] = []
     scanned = 0
-    for path in sorted(reports.glob("*.md")):
+    card_path = repo / MODEL_CARD
+    scan_paths = sorted(reports.glob("*.md"))
+    if card_path.exists():
+        scan_paths.append(card_path)
+    for path in scan_paths:
         scanned += 1
         lowered = path.read_text(encoding="utf-8").lower()
         for word in FORBIDDEN_VOCABULARY:
@@ -112,7 +117,7 @@ def run_suite(repo: Path = Path("."), reports_dir: Path | None = None) -> SuiteR
     suite.check(
         "no_calibration_language",
         not offenders,
-        f"scanned {scanned} report(s); "
+        f"scanned {scanned} file(s) including the model card; "
         + ("clean" if not offenders else f"forbidden vocabulary: {'; '.join(offenders)}"),
     )
 
@@ -124,10 +129,29 @@ def run_suite(repo: Path = Path("."), reports_dir: Path | None = None) -> SuiteR
         str(MODEL_CARD),
     )
     if card.exists():
+        card_text = card.read_text(encoding="utf-8")
         suite.check(
             "model_card_disclaims_ravaflow",
-            DISCLAIMER_MARKER in card.read_text(encoding="utf-8"),
+            DISCLAIMER_MARKER in card_text,
             f"{MODEL_CARD} must contain {DISCLAIMER_MARKER!r}",
+        )
+        # The card credited v0.1.0 through the bump to v0.2.0 and this gate passed anyway,
+        # because it only ever grepped for the disclaimer. A model card that names the wrong
+        # solver is describing a different model.
+        stale = sorted(
+            {
+                version
+                for version in re.findall(
+                    r"serac-swe-voellmy[^\n]{0,40}?v(\d+\.\d+\.\d+)", card_text
+                )
+                if version != SOLVER_VERSION
+            }
+        )
+        suite.check(
+            "model_card_names_the_current_solver_version",
+            SOLVER_VERSION in card_text and not stale,
+            f"card must name v{SOLVER_VERSION}"
+            + (f" and no other; found stale {stale}" if stale else "; no stale versions found"),
         )
     missing_disclaimer = [
         p.name
@@ -169,10 +193,13 @@ def run_suite(repo: Path = Path("."), reports_dir: Path | None = None) -> SuiteR
             bool(summary.get("bytes_within_cap", False)),
             f"{summary.get('bytes_on_disk')} B against a cap of {summary.get('bytes_cap')} B",
         )
+        # A *missing* version used to satisfy this check, so an ensemble summary that had
+        # simply never recorded one passed the version gate.
+        recorded_version = summary.get("frozen_solver_version")
         suite.check(
             "ensemble_solver_version_matches",
-            summary.get("frozen_solver_version") in (None, SOLVER_VERSION),
-            f"ensemble built with {summary.get('frozen_solver_version')}, current {SOLVER_VERSION}",
+            recorded_version == SOLVER_VERSION,
+            f"ensemble built with {recorded_version!r}, current {SOLVER_VERSION!r}",
         )
     index_path = reports / INDEX_FILENAME
     suite.warn("ensemble_index_present", index_path.exists(), str(index_path))

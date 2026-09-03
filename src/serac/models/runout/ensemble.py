@@ -19,9 +19,14 @@ Parameter ranges, and where they come from
 * `mu` 0.02 - 0.30, log-uniform, and `xi_m_s2` 200 - 3000, log-uniform: the published spread of
   Voellmy-Salm coefficients for rock-ice avalanches and debris flows. **These bounds were fixed
   from the literature range, not from the Langtang timings**, and the scoping runs recorded in
-  `reports/runout/timing.json` show what that costs: with 92% of the corridor thalweg below
-  6.8 degrees, members above mu ~ 0.08 stop within 15 km whatever else is varied. That is a
-  result about single-phase Voellmy rheology on this corridor, and it is reported as one.
+  `reports/runout/timing.json` show what that costs: most of this corridor's thalweg is too flat
+  to sustain motion above mu ~ 0.08, so those members stop within about 15 km whatever else is
+  varied. The measured share and threshold are in `reports/runout/terrain.json`
+  (`thalweg_fraction_below_mu_threshold`) and are rendered by
+  `serac.models.runout.terrain.thalweg_sentence`; they are deliberately not repeated here,
+  because an earlier draft of this docstring quoted a figure at a different threshold from the
+  one it was arguing about. That is a result about single-phase Voellmy rheology on this
+  corridor, and it is reported as one.
 """
 
 from __future__ import annotations

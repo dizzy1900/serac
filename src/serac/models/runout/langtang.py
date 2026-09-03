@@ -37,6 +37,7 @@ from serac.models.runout.params import (
     SOLVER_VERSION,
 )
 from serac.models.runout.release import RELEASE_AT_REST_ASSUMPTION
+from serac.models.runout.terrain import thalweg_sentence, thalweg_statistics
 
 SANITY_FILENAME = "langtang_sanity.md"
 SANITY_JSON = "langtang_sanity.json"
@@ -57,14 +58,21 @@ FORBIDDEN_VOCABULARY: tuple[str, ...] = (
     "calibration",
     "tuned",
     "tuning",
-    "fitted to",
-    "fitting to",
+    "fitted",
+    "fitting",
+    "fit to",
     "best fit",
     "best-fit",
+    "matched to",
     "history match",
     "history-match",
 )
-"""Grepped over `reports/runout/*.md` by `validate-runout`. If any appears, the gate fails."""
+"""Grepped over the M4 write-ups by `validate-runout`. If any appears, the gate fails.
+
+Bare `fitted` and `fitting` are in the list, not just `fitted to`: a mutation check found that
+"parameters fitted the arrivals" slipped through a list that only held the two-word forms. The
+rule is deliberately blunt -- a sentence that needs one of these words to say what it means is a
+sentence a reviewer should see."""
 
 
 @dataclass(frozen=True)
@@ -85,6 +93,24 @@ class MemberMismatch:
             "mean_abs_mismatch_min": self.mean_abs_mismatch_min,
             "parameters": self.parameters,
         }
+
+
+def _splitting_bias(reports_dir: Path) -> dict[str, float]:
+    """The production-CFL terminal-velocity bias, read from the committed verification record.
+
+    Read rather than hardcoded: earlier drafts quoted the CFL 0.4 figure as though it were the
+    production one, understating the model's own late-arrival bias.
+    """
+    path = reports_dir / "verification.json"
+    if not path.exists():
+        raise FileNotFoundError(f"{path} does not exist; run scripts/runout_verification_report.py")
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        "production_cfl": float(doc["production_cfl"]),
+        "terminal_velocity_bias_at_production_cfl": float(
+            doc["voellmy_terminal_velocity_at_production_cfl"]
+        ),
+    }
 
 
 def collect_mismatches(
@@ -186,6 +212,10 @@ def write_sanity_check(
 
     payload = {
         "generated_utc": datetime.now(tz=UTC).isoformat(),
+        "thalweg_sentence": thalweg_sentence(reports),
+        "thalweg_source": "measured, reports/runout/terrain.json",
+        "thalweg_statistics": thalweg_statistics(reports),
+        **_splitting_bias(reports),
         "solver": {"name": SOLVER_NAME, "version": SOLVER_VERSION},
         "frozen_design_hash": design.design_hash,
         "frozen_solver_version": design.payload["solver_version"],
@@ -205,6 +235,10 @@ def write_sanity_check(
 
 
 def _render(payload: dict[str, Any]) -> str:
+    thalweg = payload["thalweg_sentence"]
+    thalweg_source = payload["thalweg_source"]
+    production_cfl = payload["production_cfl"]
+    splitting_bias = payload["terminal_velocity_bias_at_production_cfl"]
     best = payload["closest_member"]
     rows = []
     for name, block in payload["per_transect"].items():
@@ -300,13 +334,12 @@ known before the comparison ran:
 1. **{RELEASE_AT_REST_ASSUMPTION}** Arrival times are therefore biased late at every transect.
 2. **{SINGLE_PHASE_LIMITATION}** The observed cascade travelled roughly 100 km, which a
    water-dominated flood wave does readily and a Coulomb-plus-turbulent avalanche rheology does
-   not: 92% of this corridor's thalweg is below 6.8 degrees, so a Voellmy `mu` above about 0.08
-   cannot sustain motion there at all, whatever else is varied.
+   not: {thalweg}, whatever else is varied ({thalweg_source}).
 3. **{RESOLUTION_LIMITATION}**
 
 The operator-splitting error measured in `reports/runout/verification.json` adds a further
-known bias: at the production CFL the modelled terminal velocity sits about 7.6% below the
-analytic Voellmy value, which makes arrivals later still.
+known bias: at the production CFL of {production_cfl:g} the modelled terminal velocity sits
+{splitting_bias:.1%} below the analytic Voellmy value, which makes arrivals later still.
 
 r.avaflow cross-validation remains outstanding, so there is no independent simulator against
 which to separate these structural biases from implementation error.
