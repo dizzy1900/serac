@@ -1,6 +1,6 @@
 {
   "citation_rule": "A published number enters this file only when, in the same session, the bytes carrying it were fetched, its DOI resolved through Crossref or DataCite, and the sha256 of those bytes plus accessed_utc were recorded. Every figure carries the verbatim sentence it was read from. Fewer than three sources clearing that bar fails validate-lfh.",
-  "generated_at_utc": "2026-09-03T21:55:03.886002Z",
+  "generated_at_utc": "2026-09-03T22:51:20.757216Z",
   "schema_version": "0.1.0",
   "sources": [
     {
@@ -15,6 +15,7 @@
       "kind": "dataset",
       "licence": "public domain (US federally funded data product); acknowledge EarthScope",
       "peer_reviewed": false,
+      "related_url": null,
       "sha256": "f4e107f36118481fa112a4fe32bd57e1d85d1f642005ec426b563bef3990c6ea",
       "size_bytes": 1075875,
       "title": "Exotic Seismic Events Catalog entry: Bingham Canyon Mine 1 - rock avalanche",
@@ -33,10 +34,11 @@
       "kind": "dataset",
       "licence": "public domain (US federally funded data product); acknowledge EarthScope",
       "peer_reviewed": false,
+      "related_url": "http://ds.iris.edu/spudservice/esec/14708357",
       "sha256": "f4e107f36118481fa112a4fe32bd57e1d85d1f642005ec426b563bef3990c6ea",
       "size_bytes": 1075875,
       "title": "Exotic Seismic Events Catalog entry: Taan Fjord",
-      "url": "http://ds.iris.edu/spudservice/esec/14708357",
+      "url": "https://ds.iris.edu/spudservice/esec",
       "year": 2025
     },
     {
@@ -51,14 +53,15 @@
       "kind": "dataset",
       "licence": "public domain (US federally funded data product); acknowledge EarthScope",
       "peer_reviewed": false,
+      "related_url": "http://ds.iris.edu/spudservice/esec/14681819",
       "sha256": "f4e107f36118481fa112a4fe32bd57e1d85d1f642005ec426b563bef3990c6ea",
       "size_bytes": 1075875,
       "title": "Exotic Seismic Events Catalog entry: Lamplugh Glacier main",
-      "url": "http://ds.iris.edu/spudservice/esec/14681819",
+      "url": "https://ds.iris.edu/spudservice/esec",
       "year": 2025
     },
     {
-      "accessed_utc": "2026-09-03T21:55:03.886002Z",
+      "accessed_utc": "2026-09-03T22:51:20.757216Z",
       "authors": "Higman, B. et al.",
       "container": "Scientific Reports",
       "content_type": "text/html",
@@ -69,14 +72,15 @@
       "kind": "peer_reviewed",
       "licence": "CC BY 4.0 (Scientific Reports open access)",
       "peer_reviewed": true,
-      "sha256": "fb84095286adcc9dc9cac3b2489ebd649553b929c2acf61e4ee86fe23bf771d1",
-      "size_bytes": 451448,
+      "related_url": null,
+      "sha256": "da031fc43b6517c2ce96ddef21957e7e228a33fbdde213de8a7a64a08c05594d",
+      "size_bytes": 451446,
       "title": "The 2015 landslide and tsunami in Taan Fiord, Alaska",
       "url": "https://www.nature.com/articles/s41598-018-30475-w",
       "year": 2018
     },
     {
-      "accessed_utc": "2026-09-03T21:55:03.886002Z",
+      "accessed_utc": "2026-09-03T22:51:20.757216Z",
       "authors": "van Wyk de Vries, M. et al.",
       "container": "Natural Hazards and Earth System Sciences",
       "content_type": "text/html",
@@ -87,14 +91,15 @@
       "kind": "peer_reviewed",
       "licence": "CC BY 4.0 (Copernicus open access)",
       "peer_reviewed": true,
+      "related_url": null,
       "sha256": "bc2c2ed0a0e34061de64a8b67a925ca910bbc85373c4098c10ca005320713ebb",
       "size_bytes": 440836,
-      "title": "Detecting the impact of climate change on alpine mass movements: the 2021 Chamoli rock and ice avalanche (as published in NHESS 22, 3309-2022)",
+      "title": "Pre-collapse motion of the February 2021 Chamoli rock\u2013ice avalanche, Indian Himalaya",
       "url": "https://nhess.copernicus.org/articles/22/3309/2022/",
       "year": 2022
     },
     {
-      "accessed_utc": "2026-09-03T21:55:03.886002Z",
+      "accessed_utc": "2026-09-03T22:51:20.757216Z",
       "authors": "Hibert, C. et al.",
       "container": "Geophysical Research Letters",
       "content_type": "application/json",
@@ -105,6 +110,7 @@
       "kind": "peer_reviewed",
       "licence": "all-rights-reserved; cited only, no copy stored",
       "peer_reviewed": true,
+      "related_url": null,
       "sha256": "d0d2cbe153dd63469add1aec453cffb6a5f24abf398c48aa2cb1b8dac9670099",
       "size_bytes": 5799,
       "title": "Dynamics of the Bingham Canyon Mine landslides from seismic signal analysis",
@@ -112,7 +118,7 @@
       "year": 2014
     },
     {
-      "accessed_utc": "2026-09-03T21:55:03.886002Z",
+      "accessed_utc": "2026-09-03T22:51:20.757216Z",
       "authors": "Ekstrom, G. and Stark, C. P.",
       "container": "Science",
       "content_type": "application/json",
@@ -123,6 +129,7 @@
       "kind": "peer_reviewed",
       "licence": "all-rights-reserved; cited only, no copy stored",
       "peer_reviewed": true,
+      "related_url": null,
       "sha256": "a715deb0212ac89a7aa46a03e35753ddb5722cffe7a243b83574f3efb967acc5",
       "size_bytes": 9224,
       "title": "Simple Scaling of Catastrophic Landslide Dynamics",
@@ -130,7 +137,7 @@
       "year": 2013
     },
     {
-      "accessed_utc": "2026-09-03T21:55:03.886002Z",
+      "accessed_utc": "2026-09-03T22:51:20.757216Z",
       "authors": "Cook, K. L. et al.",
       "container": "Science",
       "content_type": "application/json",
@@ -141,6 +148,7 @@
       "kind": "peer_reviewed",
       "licence": "all-rights-reserved; cited only, no copy stored",
       "peer_reviewed": true,
+      "related_url": null,
       "sha256": "eddf744afcf42cbed08e61a29c7682b40b471a135ff086954785fcb25eff3291",
       "size_bytes": 13568,
       "title": "Detection and potential early warning of catastrophic flow events with regional seismic networks",
@@ -148,7 +156,7 @@
       "year": 2021
     },
     {
-      "accessed_utc": "2026-09-03T21:55:03.886002Z",
+      "accessed_utc": "2026-09-03T22:51:20.757216Z",
       "authors": "Pankow, K. L. et al.",
       "container": "GSA Today",
       "content_type": "text/html",
@@ -159,6 +167,7 @@
       "kind": "peer_reviewed",
       "licence": "open access (GSA Today)",
       "peer_reviewed": true,
+      "related_url": null,
       "sha256": "e2a61b4b1f128f067bda0324211ca4e6974be615d67629b5194fe3c3991fc92b",
       "size_bytes": 538701,
       "title": "Massive landslide at Utah copper mine generates wealth of geophysical data",
@@ -166,7 +175,7 @@
       "year": 2014
     },
     {
-      "accessed_utc": "2026-09-03T21:55:03.886002Z",
+      "accessed_utc": "2026-09-03T22:51:20.757216Z",
       "authors": "Swiss Seismological Service (SED) at ETH Zurich",
       "container": "Swiss Seismological Service (SED) at ETH Zurich, fdsnws-event",
       "content_type": "application/xml",
@@ -177,6 +186,7 @@
       "kind": "agency_official",
       "licence": "CC BY 4.0 (SED catalogue and CH network data)",
       "peer_reviewed": false,
+      "related_url": null,
       "sha256": "90319461066b894f0edb36ad2dfdeaf483573455367c9deeeb88054d3a5edb42",
       "size_bytes": 2710,
       "title": "Swiss Seismological Service earthquake catalogue: 28 May 2025 Goppenstein VS landslide, origin 2025-05-28T13:24:26.162933+00:00, event type landslide",

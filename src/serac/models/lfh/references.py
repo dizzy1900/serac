@@ -46,7 +46,20 @@ class SourceRef(BaseModel):
     doi: str | None = None
     doi_resolved_via: Literal["crossref", "datacite", "publisher_landing_page"] | None = None
     doi_resolution_url: str | None = None
-    url: str = Field(min_length=1)
+    url: str = Field(
+        min_length=1,
+        description=(
+            "The URL whose bytes produced `sha256`. A reader who fetches this and hashes it "
+            "must get `sha256`. Two ESEC sources once recorded a per-event landing page here "
+            "while the digest was of the whole-catalogue response, so re-fetching the url gave "
+            "a different hash and the provenance was unverifiable. A human-facing page that is "
+            "not the hashed bytes belongs in `related_url`."
+        ),
+    )
+    related_url: str | None = Field(
+        default=None,
+        description="Landing page for a reader, when it differs from the bytes that were hashed.",
+    )
     accessed_utc: AwareDatetime
     sha256: str = Field(pattern=SHA256_PATTERN, description="sha256 of the bytes retrieved.")
     content_type: str | None = None
