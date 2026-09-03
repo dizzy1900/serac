@@ -137,3 +137,26 @@ A single-phase Voellmy rheology stops far short of the ~100 km the 26 August 202
 reported to have travelled. That is a finding about the rheology, reported in
 `reports/runout/langtang_sanity.md` as a comparison against public timings and **not** used to
 adjust anything.
+
+## Change log
+
+### v0.2.0 — the stopping criterion
+
+`stop_kinetic_fraction` was measured against the **first** non-zero kinetic energy. The release
+is emplaced at rest, so that value is whatever the flow had after one step — essentially nothing
+— and a threshold of one part in a thousand of it can never be reached. Every member of the
+first ensemble therefore ran to `max_time_s`, and its runout distances were a statement about
+the compute budget rather than about the rheology. v0.2.0 measures against the **peak** kinetic
+energy instead.
+
+Re-measured at 60 m with the fix, members stop themselves:
+
+| mu | Simulated time at stop | Reach | Hit the time limit? |
+|---|---|---|---|
+| 0.217 | 2,698 s | 10.83 km | no |
+| 0.091 | 1,262 s | 13.91 km | no |
+| 0.023 | 7,200 s (probe limit) | 21.19 km | yes |
+
+The version bump invalidated the frozen ensemble, which is what the version is for. Member
+outputs are now written under `data/interim/runout/<aoi>/v<SOLVER_VERSION>/<run_id>/` so that a
+future bump cannot leave `data/manifest.jsonl` pointing at deleted files.
