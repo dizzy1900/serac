@@ -4,7 +4,7 @@
 - Origin: 2015-10-18T05:18:36+00:00
 - Nominal source: 60.1737, -141.1822
 - Config hash: `4762e79e5879b7b2559a0f7d476dddd45fc2dd869858f7a5e023535ff1a0d988`
-- Wall clock: 74.2 s
+- Wall clock: 384.5 s
 - Status: **computed**
 
 ## Station geometry
@@ -105,12 +105,12 @@ The published interval is the **union** of the two, not their average.
 
 | stage | seconds |
 |---|---:|
-| prepare | 0.16 |
-| gridearch | 5.81 |
-| final_inversion | 0.76 |
+| prepare | 0.80 |
+| gridearch | 29.90 |
+| final_inversion | 3.54 |
 | terrain | 0.00 |
-| bootstrap | 67.43 |
-| **total wall clock** | **74.16** |
+| bootstrap | 350.19 |
+| **total wall clock** | **384.47** |
 
 ## Disagreement
 
@@ -125,5 +125,5 @@ This section states the numeric relationship and stops there. serac's estimate r
 ## Sources
 
 - `esec-taan` — EarthScope Data Products (2025) Exotic Seismic Events Catalog entry: Taan Fjord IRIS/EarthScope Exotic Seismic Events Catalog (ESEC); fetched 2026-09-03, sha256 `f4e107f36118481f...`, DOI resolved via not resolved
-- `higman-2018` — Higman, B. et al. (2018) The 2015 landslide and tsunami in Taan Fiord, Alaska Scientific Reports doi:10.1038/s41598-018-30475-w; fetched 2026-09-03, sha256 `6daf888298523b12...`, DOI resolved via crossref
+- `higman-2018` — Higman, B. et al. (2018) The 2015 landslide and tsunami in Taan Fiord, Alaska Scientific Reports doi:10.1038/s41598-018-30475-w; fetched 2026-09-03, sha256 `27ab9f6154fd7187...`, DOI resolved via crossref
 

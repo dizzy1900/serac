@@ -4,7 +4,7 @@
 - Origin: 2026-08-26T02:52:10+00:00
 - Nominal source: 28.2710, 85.5150
 - Config hash: `4762e79e5879b7b2559a0f7d476dddd45fc2dd869858f7a5e023535ff1a0d988`
-- Wall clock: 0.8 s
+- Wall clock: 4.2 s
 - Status: **failed**
 
 ## Station geometry
@@ -30,7 +30,9 @@
 
 REFUSED: only 3 station(s) contributed, below the minimum of 5; 3 stations / 12 channels, azimuthal gap 317 deg, distance 11.80-14.66 deg, median pre-event SNR 3.52. serac does not publish a source location it cannot support. No location, no mass and no force history are reported for this event.
 
-serac refuses rather than guesses. A source location published from a station set this sparse would be a number with no evidence behind it, and the contract makes that impossible to emit: `status="failed"` histories may not carry a location, a mass or any force samples.
+serac refuses rather than guesses. A source location published from a station set this sparse would be a number with no evidence behind it. Note that this is a statement about the recording network, not about the event: the signal may be perfectly clear on the stations that did record it.
+
+The contract makes the refusal structural rather than editorial: a `status="failed"` history may not carry a location, a mass or any force samples.
 
 ## Disagreement
 

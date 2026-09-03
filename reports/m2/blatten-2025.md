@@ -4,7 +4,7 @@
 - Origin: 2025-05-28T13:24:26.162933+00:00
 - Nominal source: 46.4042, 7.8362
 - Config hash: `4762e79e5879b7b2559a0f7d476dddd45fc2dd869858f7a5e023535ff1a0d988`
-- Wall clock: 14.8 s
+- Wall clock: 38.2 s
 - Status: **failed**
 
 ## Station geometry
@@ -45,7 +45,11 @@
 
 REFUSED: the best-fitting trial location explains only 0.191 of the data variance, below the floor of 0.20; 9 stations / 27 channels, azimuthal gap 78 deg, distance 0.97-14.64 deg, median pre-event SNR 1.82. A least-squares inversion of records that do not contain the signal still returns a smooth force history with a clean envelope, and an amplitude set by noise rather than by the event, so serac reports nothing. serac does not publish a source location it cannot support. No location, no mass and no force history are reported for this event.
 
-serac refuses rather than guesses. A source location published from a station set this sparse would be a number with no evidence behind it, and the contract makes that impossible to emit: `status="failed"` histories may not carry a location, a mass or any force samples.
+The geometry was not the problem here. What failed is the fit: the best trial location does not explain enough of the recorded variance for the amplitude to be set by the event rather than by noise. Least squares does not announce this -- it returns a smooth force history with a well-formed envelope either way -- which is why the floor is a hard threshold checked before anything is published.
+
+**This is a marginal refusal**: 0.191 against a floor of 0.20. The floor was fixed before this run and has not been moved. It is stated plainly because a threshold that gets relaxed when a particular event falls just below it is not a threshold.
+
+The contract makes the refusal structural rather than editorial: a `status="failed"` history may not carry a location, a mass or any force samples.
 
 ## Disagreement
 

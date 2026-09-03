@@ -187,6 +187,43 @@ def _disagreement_section(target: LfhTarget, run: InversionRun) -> list[str]:
     return lines
 
 
+def _refusal_explanation(run: InversionRun) -> list[str]:
+    """Say which refusal this was, in its own terms.
+
+    The three conditions fail for different reasons and deserve different sentences. Calling a
+    nine-station, 78-degree-gap network "sparse" because the fit was poor would be wrong, and
+    it would hide the actually interesting finding -- that the geometry was fine.
+    """
+    notes = run.force_history.notes
+    if "variance" in notes:
+        lines = [
+            "The geometry was not the problem here. What failed is the fit: the best trial "
+            "location does not explain enough of the recorded variance for the amplitude to be "
+            "set by the event rather than by noise. Least squares does not announce this -- it "
+            "returns a smooth force history with a well-formed envelope either way -- which is "
+            "why the floor is a hard threshold checked before anything is published.",
+        ]
+        if run.grid is not None:
+            floor = run.config.stations.min_variance_reduction
+            achieved = run.grid.variance_reduction
+            if achieved > 0.75 * floor:
+                lines.append("")
+                lines.append(
+                    f"**This is a marginal refusal**: {achieved:.3f} against a floor of "
+                    f"{floor:.2f}. The floor was fixed before this run and has not been moved. "
+                    "It is stated plainly because a threshold that gets relaxed when a "
+                    "particular event falls just below it is not a threshold."
+                )
+        return [*lines, ""]
+    return [
+        "serac refuses rather than guesses. A source location published from a station set "
+        "this sparse would be a number with no evidence behind it. Note that this is a "
+        "statement about the recording network, not about the event: the signal may be "
+        "perfectly clear on the stations that did record it.",
+        "",
+    ]
+
+
 def event_report(run: InversionRun, references: LfhReferences, *, wall_s: float) -> str:
     target = run.target
     history = run.force_history
@@ -220,15 +257,11 @@ def event_report(run: InversionRun, references: LfhReferences, *, wall_s: float)
         lines.append("")
 
     if history.status != "computed":
+        lines += ["## Refusal", "", history.notes, ""]
+        lines += _refusal_explanation(run)
         lines += [
-            "## Refusal",
-            "",
-            history.notes,
-            "",
-            "serac refuses rather than guesses. A source location published from a station set "
-            "this sparse would be a number with no evidence behind it, and the contract makes "
-            'that impossible to emit: `status="failed"` histories may not carry a location, a '
-            "mass or any force samples.",
+            "The contract makes the refusal structural rather than editorial: a "
+            '`status="failed"` history may not carry a location, a mass or any force samples.',
             "",
         ]
         lines += _disagreement_section(target, run)

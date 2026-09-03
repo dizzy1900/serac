@@ -4,7 +4,7 @@
 - Origin: 2016-06-28T16:20:48+00:00
 - Nominal source: 58.7792, -136.8883
 - Config hash: `4762e79e5879b7b2559a0f7d476dddd45fc2dd869858f7a5e023535ff1a0d988`
-- Wall clock: 71.7 s
+- Wall clock: 375.8 s
 - Status: **computed**
 
 ## Station geometry
@@ -105,12 +105,12 @@ The published interval is the **union** of the two, not their average.
 
 | stage | seconds |
 |---|---:|
-| prepare | 0.26 |
-| gridearch | 5.26 |
-| final_inversion | 0.61 |
+| prepare | 0.85 |
+| gridearch | 29.01 |
+| final_inversion | 3.81 |
 | terrain | 0.00 |
-| bootstrap | 65.36 |
-| **total wall clock** | **71.71** |
+| bootstrap | 342.08 |
+| **total wall clock** | **375.80** |
 
 ## Disagreement
 
