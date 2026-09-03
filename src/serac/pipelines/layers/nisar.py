@@ -53,7 +53,7 @@ PROCESSING = (
 def read_gcov_hh(path: Path) -> tuple[np.ndarray, Affine, int]:
     """(HHHH array, affine, EPSG) from a GCOV HDF5. Requires h5py; untested on real data."""
     try:
-        import h5py  # type: ignore[import-not-found]
+        import h5py  # type: ignore[import-untyped]
     except ImportError as exc:  # pragma: no cover - environment-dependent
         raise ImportError(
             "reading NISAR GCOV HDF5 needs h5py, which the locked environment does not ship"

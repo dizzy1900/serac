@@ -94,6 +94,7 @@ class SolverSettings(BaseModel):
     min_dt_s: float = Field(default=1e-4, gt=0.0, allow_inf_nan=False)
     output_interval_s: float = Field(default=30.0, gt=0.0, allow_inf_nan=False)
     max_velocity_m_s: float = Field(default=120.0, gt=0.0, allow_inf_nan=False)
+    window_refresh_steps: int = Field(default=8, ge=1)
     stop_when_dry: bool = True
     stop_kinetic_fraction: float = Field(default=1e-3, ge=0.0, le=1.0, allow_inf_nan=False)
 

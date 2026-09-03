@@ -201,6 +201,21 @@ def _velocity(h: F64, hu: F64, hv: F64, dry: float) -> tuple[F64, F64]:
     return hu * inv, hv * inv
 
 
+def _active_window(h: F64, dry_depth: float, margin: int) -> tuple[slice, slice] | None:
+    """Bounding box of the wet cells grown by `margin`, or None when nothing is wet."""
+    wet = h > dry_depth
+    rows = np.flatnonzero(wet.any(axis=1))
+    cols = np.flatnonzero(wet.any(axis=0))
+    if rows.size == 0 or cols.size == 0:
+        return None
+    height, width = h.shape
+    r0 = max(0, int(rows[0]) - margin)
+    r1 = min(height, int(rows[-1]) + 1 + margin)
+    c0 = max(0, int(cols[0]) - margin)
+    c1 = min(width, int(cols[-1]) + 1 + margin)
+    return slice(r0, r1), slice(c0, c1)
+
+
 def _sides(ndim: int, axis: int) -> tuple[tuple[slice, ...], tuple[slice, ...]]:
     """The `(left, right)` index tuples of every interface along `axis`."""
     sl: list[slice] = [slice(None)] * ndim
@@ -320,21 +335,22 @@ class VoellmySolver:
         # Walls are a bed 1e6 m high: the dry-neighbour clamp in `_effective_surface` then
         # gives them zero gradient and zero viscous flux, i.e. a reflective wall.
         self.wall_bed = np.where(self.mask, self.bed, self.bed + 1.0e6)
-        self.wave_coeff = self.g * self.cos_theta
+        self.wave_coeff: F64 = self.g * self.cos_theta
 
     # -- one step -------------------------------------------------------------------------------
 
-    def timestep(self, h: F64, u: F64, v: F64) -> float:
+    def timestep(self, h: F64, u: F64, v: F64, cos_theta: F64 | None = None) -> float:
+        cos_theta = self.cos_theta if cos_theta is None else cos_theta
         wet = h > self.s.dry_depth_m
         if not wet.any():
             return self.s.max_time_s
-        speed = np.hypot(u, v) + np.sqrt(self.g * self.cos_theta * np.maximum(h, 0.0))
+        speed = np.hypot(u, v) + np.sqrt(self.g * cos_theta * np.maximum(h, 0.0))
         fastest = float(speed[wet].max())
         if fastest <= 1e-12:
             return self.s.max_time_s
         return self.s.cfl * self.dx / fastest
 
-    def _surface_gradient(self, h: F64, wet: BOOL) -> tuple[F64, F64]:
+    def _surface_gradient(self, h: F64, wet: BOOL, wall_bed: F64, mask: BOOL) -> tuple[F64, F64]:
         """Centred `grad(h + b)` with dry and walled neighbours clamped to the cell's own level.
 
         The clamp is the same rule as `_effective_surface`: a neighbour that holds no water and
@@ -342,8 +358,8 @@ class VoellmySolver:
         feels a gradient towards the bank and climbs it, and `test_lake_at_rest_with_dry_banks`
         fails.
         """
-        w = h + self.wall_bed
-        usable = wet & self.mask
+        w = h + wall_bed
+        usable = wet & mask
         dwdx = np.zeros_like(h)
         dwdy = np.zeros_like(h)
         for axis, out in ((1, dwdx), (0, dwdy)):
@@ -366,11 +382,14 @@ class VoellmySolver:
             out[...] = (hi - lo) / (2.0 * self.dx)
         return dwdx, dwdy
 
-    def _friction(self, h: F64, u: F64, v: F64, dt: float) -> tuple[F64, F64]:
+    def _friction(
+        self, h: F64, u: F64, v: F64, dt: float, cos_theta: F64 | None = None
+    ) -> tuple[F64, F64]:
         """Voellmy-Salm stopping operator; cannot reverse the flow."""
+        cos_theta = self.cos_theta if cos_theta is None else cos_theta
         speed = np.hypot(u, v)
         wet = h > self.s.dry_depth_m
-        coulomb = self.p.mu * self.g * self.cos_theta
+        coulomb = self.p.mu * self.g * cos_theta
         turbulent = self.g * speed * speed / (self.p.xi_m_s2 * np.maximum(h, self.s.dry_depth_m))
         decel = np.where(wet, coulomb + turbulent, 0.0)
         factor = np.where(
@@ -378,14 +397,17 @@ class VoellmySolver:
         )
         return u * factor, v * factor
 
-    def entrainment_depth(self, h: F64, u: F64, v: F64, erodible: F64, dt: float) -> F64:
+    def entrainment_depth(
+        self, h: F64, u: F64, v: F64, erodible: F64, dt: float, cos_theta: F64 | None = None
+    ) -> F64:
         """Depth of bed entrained this step (m), capped by what is left and by stability."""
+        cos_theta = self.cos_theta if cos_theta is None else cos_theta
         c_e = self.p.entrainment_coefficient
         if c_e <= 0.0:
             return np.zeros_like(h)
         speed = np.hypot(u, v)
         wet = h > self.s.dry_depth_m
-        tau_b = self.p.bulk_density * self.g * np.maximum(h, 0.0) * self.cos_theta
+        tau_b = self.p.bulk_density * self.g * np.maximum(h, 0.0) * cos_theta
         active = np.where(
             tau_b > 0.0,
             np.maximum(0.0, 1.0 - self.p.critical_shear_pa / np.maximum(tau_b, 1e-9)),
@@ -406,39 +428,71 @@ class VoellmySolver:
         record_history: bool = False,
         observers: list[Any] | None = None,
     ) -> RunResult:
-        """Advance to `max_time_s`, exhaustion of motion, or `max_steps`, whichever is first."""
+        """Advance to `max_time_s`, exhaustion of motion, or `max_steps`, whichever is first.
+
+        The step is evaluated on an **active window**: the bounding box of the wet cells grown
+        by a margin, refreshed every few steps. Everything outside is dry and static, so nothing
+        is lost, and on the Lhende corridor at 90 m only about 2,000 of 403,000 cells are ever
+        wet at once -- computing the whole grid every step cost 78 ms/step for no information.
+        The margin is set from the refresh interval so the front, which advances at most one
+        cell per step under the CFL condition, cannot reach the window edge between refreshes.
+        """
         import time as _time
 
         started = _time.perf_counter()
-        h = np.ascontiguousarray(initial_depth, dtype=np.float64) * self.mask
-        hu = (
-            np.zeros_like(h) if initial_hu is None else np.ascontiguousarray(initial_hu, np.float64)
+        h_full = np.ascontiguousarray(initial_depth, dtype=np.float64) * self.mask
+        hu_full = (
+            np.zeros_like(h_full)
+            if initial_hu is None
+            else np.ascontiguousarray(initial_hu, np.float64) * self.mask
         )
-        hv = (
-            np.zeros_like(h) if initial_hv is None else np.ascontiguousarray(initial_hv, np.float64)
+        hv_full = (
+            np.zeros_like(h_full)
+            if initial_hv is None
+            else np.ascontiguousarray(initial_hv, np.float64) * self.mask
         )
-        hu *= self.mask
-        hv *= self.mask
-        erodible = self.erodible0.copy()
+        erodible_full = self.erodible0.copy()
         flags = RunFlags()
 
-        initial_volume = float(h.sum() * self.cell_area)
+        initial_volume = float(h_full.sum() * self.cell_area)
         entrained_total = 0.0
         outflow_total = 0.0
 
-        max_depth = h.copy()
-        max_speed = np.zeros_like(h)
-        arrival = np.full(h.shape, np.nan)
-        arrival[h > self.s.dry_depth_m] = 0.0
+        max_depth = h_full.copy()
+        max_speed = np.zeros_like(h_full)
+        arrival = np.full(h_full.shape, np.nan)
+        arrival[h_full > self.s.dry_depth_m] = 0.0
         history: list[dict[str, float]] = []
         next_output = 0.0
 
+        refresh = self.s.window_refresh_steps
+        margin = 2 * refresh + 4
+        window: tuple[slice, slice] | None = None
+        steps_since_refresh = refresh
+
         t = 0.0
         step = 0
-        initial_kinetic = None
+        initial_kinetic: float | None = None
         while t < self.s.max_time_s and step < self.s.max_steps:
+            if steps_since_refresh >= refresh:
+                window = _active_window(h_full, self.s.dry_depth_m, margin)
+                if window is None:
+                    break
+                steps_since_refresh = 0
+                h = h_full[window]
+                hu = hu_full[window]
+                hv = hv_full[window]
+                erodible = erodible_full[window]
+                mask = self.mask[window]
+                wall_bed = self.wall_bed[window]
+                cos_theta = self.cos_theta[window]
+                outflow = self.outflow[window]
+                has_outflow = bool(outflow.any())
+                wave_coeff = self.wave_coeff[window]
+            steps_since_refresh += 1
+
             u, v = _velocity(h, hu, hv, self.s.dry_depth_m)
-            dt = self.timestep(h, u, v)
+            dt = self.timestep(h, u, v, cos_theta)
             if dt < self.s.min_dt_s:
                 dt = self.s.min_dt_s
                 flags.dt_floor_steps += 1
@@ -451,7 +505,7 @@ class VoellmySolver:
             dhv = np.zeros_like(h)
             scale = dt / self.dx
             wet = h > self.s.dry_depth_m
-            cell_speed = np.hypot(u, v) + np.sqrt(self.wave_coeff * np.maximum(h, 0.0))
+            cell_speed = np.hypot(u, v) + np.sqrt(wave_coeff * np.maximum(h, 0.0))
 
             faces: list[tuple[int, F64, F64, F64]] = []
             for axis in (0, 1):
@@ -460,7 +514,7 @@ class VoellmySolver:
                 normal = v if axis == 0 else u
                 h_normal = hv if axis == 0 else hu
                 h_transverse = hu if axis == 0 else hv
-                wl, wr = _effective_surface(h, self.wall_bed, wet, axis)
+                wl, wr = _effective_surface(h, wall_bed, wet, axis)
                 face_speed = np.maximum(cell_speed[left], cell_speed[right])
                 f_h, f_n, f_t = _rusanov_flux(
                     h[left],
@@ -476,7 +530,7 @@ class VoellmySolver:
                     face_speed,
                 )
                 # a wall on either side blocks the interface entirely
-                open_face = self.mask[left] & self.mask[right]
+                open_face = mask[left] & mask[right]
                 faces.append(
                     (
                         axis,
@@ -514,14 +568,14 @@ class VoellmySolver:
             # Voellmy terminal velocity comes out right. Map-space hydrostatic reconstruction
             # was tried first and under-drove a 20 deg slope by a factor of 7, because at 20 m
             # cells the bed drops 7.3 m per cell against a 2 m flow depth.
-            dwdx, dwdy = self._surface_gradient(h, wet)
-            drive = self.g * self.cos_theta * h
+            dwdx, dwdy = self._surface_gradient(h, wet, wall_bed, mask)
+            drive = self.g * cos_theta * h
             dhu -= dt * drive * dwdx
             dhv -= dt * drive * dwdy
 
-            h = h + dh
-            hu = hu + dhu
-            hv = hv + dhv
+            h += dh
+            hu += dhu
+            hv += dhv
 
             negative = h < 0.0
             if negative.any():
@@ -532,21 +586,21 @@ class VoellmySolver:
                 hu[negative] = 0.0
                 hv[negative] = 0.0
                 h[negative] = 0.0
-            h *= self.mask
-            hu *= self.mask
-            hv *= self.mask
+            h *= mask
+            hu *= mask
+            hv *= mask
 
             # entrainment: mass in, momentum unchanged (bed material starts at rest)
             u, v = _velocity(h, hu, hv, self.s.dry_depth_m)
-            de = self.entrainment_depth(h, u, v, erodible, dt)
+            de = self.entrainment_depth(h, u, v, erodible, dt, cos_theta)
             if de.any():
-                h = h + de
-                erodible = erodible - de
+                h += de
+                erodible -= de
                 entrained_total += float(de.sum() * self.cell_area)
 
             # friction
             u, v = _velocity(h, hu, hv, self.s.dry_depth_m)
-            u, v = self._friction(h, u, v, dt)
+            u, v = self._friction(h, u, v, dt, cos_theta)
             speed = np.hypot(u, v)
             over = speed > self.s.max_velocity_m_s
             if over.any():
@@ -555,25 +609,26 @@ class VoellmySolver:
                 u = u * clip
                 v = v * clip
                 speed = np.hypot(u, v)
-            hu = h * u
-            hv = h * v
+            np.multiply(h, u, out=hu)
+            np.multiply(h, v, out=hv)
 
             # free outflow at the downstream end
-            if self.outflow.any():
-                leaving = h * self.outflow
+            if has_outflow:
+                leaving = h * outflow
                 outflow_total += float(leaving.sum() * self.cell_area)
-                h = h - leaving
-                hu = np.where(self.outflow, 0.0, hu)
-                hv = np.where(self.outflow, 0.0, hv)
+                h -= leaving
+                hu[outflow] = 0.0
+                hv[outflow] = 0.0
 
             t += dt
             step += 1
 
             wet_now = h > self.s.dry_depth_m
-            np.maximum(max_depth, h, out=max_depth)
-            np.maximum(max_speed, speed, out=max_speed)
-            newly = wet_now & np.isnan(arrival)
-            arrival[newly] = t
+            np.maximum(max_depth[window], h, out=max_depth[window])
+            np.maximum(max_speed[window], speed, out=max_speed[window])
+            arrival_view = arrival[window]
+            newly = wet_now & np.isnan(arrival_view)
+            arrival_view[newly] = t
 
             kinetic = float((0.5 * h * speed * speed).sum())
             if initial_kinetic is None and kinetic > 0.0:
@@ -590,8 +645,14 @@ class VoellmySolver:
                 )
                 next_output = t + self.s.output_interval_s
             if observers:
+                # observers see full-grid arrays; the window is an optimisation, not an
+                # interface, so it must not leak into what a caller indexes
+                u_full = np.zeros_like(h_full)
+                v_full = np.zeros_like(h_full)
+                u_full[window] = u
+                v_full[window] = v
                 for obs in observers:
-                    obs(t, dt, h, u, v)
+                    obs(t, dt, h_full, u_full, v_full)
 
             if self.s.stop_when_dry and not wet_now.any():
                 break
@@ -604,13 +665,13 @@ class VoellmySolver:
 
         flags.hit_step_limit = step >= self.s.max_steps
         flags.hit_time_limit = t >= self.s.max_time_s
-        final_volume = float(h.sum() * self.cell_area)
+        final_volume = float(h_full.sum() * self.cell_area)
         result = RunResult(
             max_depth=max_depth,
             max_speed=max_speed,
             arrival_time_s=arrival,
-            final_depth=h,
-            deposit_depth=h,
+            final_depth=h_full,
+            deposit_depth=h_full,
             entrained_volume_m3=entrained_total,
             outflow_volume_m3=outflow_total,
             initial_volume_m3=initial_volume,
