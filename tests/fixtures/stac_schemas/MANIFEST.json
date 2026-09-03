@@ -1,0 +1,127 @@
+{
+ "purpose": "STAC 1.1.0 core JSON Schemas (plus the GeoJSON schemas they reference) vendored so serac.adapters.storage.stac_catalog.validate_stac runs offline",
+ "resolver": "serac.adapters.storage.stac_catalog.schema_registry maps each schema's $id to the vendored file; nothing is fetched at test time",
+ "licence_sources": {
+  "stac-spec": "https://github.com/radiantearth/stac-spec/blob/v1.1.0/LICENSE",
+  "geojson-schema": "https://github.com/geojson/schema/blob/main/license.md"
+ },
+ "files": [
+  {
+   "file": "item.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json",
+   "sha256": "d38ed83cda8c93f5f2f4967ba2be398e9d7407aa1c3210f9c27bbbc4e8ba35e2",
+   "size_bytes": 9261,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "common.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/common.json",
+   "sha256": "9f1bb9d24a94d7f519cc2c478b6581c0d9a66117518376ac1a71ec5643ad3fd7",
+   "size_bytes": 583,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "basics.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/basics.json",
+   "sha256": "c11193fa08465b53257e93ea4e8c0c671806485ece9b2482447c792f2e9b7809",
+   "size_bytes": 856,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "datetime.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/datetime.json",
+   "sha256": "2656b4bec14ee63b0c17c7a68caeba4a10a5ba3bfe018e4d23ebd8b6efb5fd9f",
+   "size_bytes": 1465,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "instrument.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/instrument.json",
+   "sha256": "09cd369e88c2f7c248683d922fd90e3ab2e7e832b86e6130722d8a0bf27cdd78",
+   "size_bytes": 695,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "licensing.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/licensing.json",
+   "sha256": "b4f882c70c6616698fa3c390d1efbdc59816129f36a6173769fbf07655313726",
+   "size_bytes": 301,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "provider.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/provider.json",
+   "sha256": "2db89bb50a352aaece743173742fa450cbb5fb4583fe3a237968054aeaea86ad",
+   "size_bytes": 1134,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "bands.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/bands.json",
+   "sha256": "0a44673eda5cf49ad83247ebf50bffc9eac6cd126d4778c0f17a64b21002818e",
+   "size_bytes": 509,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "data-values.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/data-values.json",
+   "sha256": "5ca5d324272b76188fd70391b6d57fa0438d87fa8dfa5b6f2fd15af57bff9539",
+   "size_bytes": 2005,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "collection.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/collection-spec/json-schema/collection.json",
+   "sha256": "c2106427e6b7a7a2c1b6fef980d9df332c4000e8676efa2aba7a1dbcd1914ccf",
+   "size_bytes": 6522,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "catalog.json",
+   "url": "https://schemas.stacspec.org/v1.1.0/catalog-spec/json-schema/catalog.json",
+   "sha256": "d82974d084fb600ec0e92d6962ef536157eda6d36bbb4299e8235a6042efbeed",
+   "size_bytes": 1473,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "Apache-2.0 (radiantearth/stac-spec v1.1.0)",
+   "provenance": "real"
+  },
+  {
+   "file": "Feature.json",
+   "url": "https://geojson.org/schema/Feature.json",
+   "sha256": "3957840b2ff19f9450ea97a12f85944d938c68a7a6bf115a2e69b98e007b9922",
+   "size_bytes": 13777,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "MIT (github.com/geojson/schema)",
+   "provenance": "real"
+  },
+  {
+   "file": "Geometry.json",
+   "url": "https://geojson.org/schema/Geometry.json",
+   "sha256": "152369d7eb6b3314ffc7deca1d66f9d498ed5b614ca38ed4e2c813fed01024fd",
+   "size_bytes": 4388,
+   "retrieved_at": "2026-09-03T10:18:42.792432+00:00",
+   "licence": "MIT (github.com/geojson/schema)",
+   "provenance": "real"
+  }
+ ]
+}
