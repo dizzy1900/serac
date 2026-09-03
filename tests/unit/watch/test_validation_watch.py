@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from serac.validation.result import Suite
 from serac.validation.watch import (
     BACKTEST_JSON,
     BACKTEST_MD,
@@ -22,7 +23,6 @@ from serac.validation.watch import (
     check_no_failure_date_anywhere,
     run_suite,
 )
-from serac.validation.result import Suite
 
 
 def _git(repo: Path, *args: str) -> None:

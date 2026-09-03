@@ -31,8 +31,21 @@ PAIR = "S1_063_20210130_20210211"
 
 @pytest.fixture(scope="module")
 def entries(repo_root: Path) -> list[ManifestEntry]:
+    """Fixture-backed entries only.
+
+    M3 writes real HyP3 burst-InSAR crops into the same ledger under the same DataSource, and
+    their `_corr.tif` files match the same suffix the S1 layer builders look for. This module
+    is about the *synthetic* pair and the committed S2 crops, so it excludes anything fetched
+    into `data/raw/`. That the cube's S1 layers would otherwise now prefer real burst products
+    over the synthetic placeholder is a real integration question, but it is not this test's.
+    """
     ledger = JsonlManifestLedger(repo_root / "data" / "manifest.jsonl")
-    return [e for e in ledger.entries() if e.aoi_id == "chamoli-rishiganga"]
+    return [
+        e
+        for e in ledger.entries()
+        if e.aoi_id == "chamoli-rishiganga"
+        and not (e.path or "").startswith("data/raw/hyp3_burst_insar/")
+    ]
 
 
 def test_scene_grouping(entries: list[ManifestEntry]) -> None:
