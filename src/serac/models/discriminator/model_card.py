@@ -327,6 +327,60 @@ def render(repo: Path) -> str:
         add(f"**Verdict.** {report['verdict']}")
         add("")
 
+    add("## Case study: Langtang / Lhende Khola, 26 August 2026")
+    add("")
+    case = _load(reports / "case_study_langtang-lhende-2026.json")
+    if case is None:
+        add("_Not run._")
+    else:
+        add(
+            f"This is the event M1 exists for. Eight days after it happened, only "
+            f"**{case['receivers_with_response_removed_data']} of "
+            f"{case['receivers_selected']} selected receivers** "
+            f"({', '.join(f'`{r}`' for r in case['receivers_used'])}) had data in the open "
+            f"archives at 100-1500 km, against the dataset's minimum of "
+            f"{case['min_stations_required_by_the_dataset']}. The window was therefore "
+            "**excluded from the dataset** and recorded as `not_fetched` with that reason, so "
+            "it contributes to no metric above. The nearest open broadband, NK.KKN at ~55 km, "
+            "is inside the 100 km floor and is excluded by design."
+        )
+        add("")
+        add(
+            "The receiver threshold was **not** lowered to admit it. Moving a data-quality "
+            "threshold after discovering it excludes the headline event is post-hoc tuning, "
+            "and it is the kind this component was built to refuse. Instead the "
+            "already-trained, already-sealed model was applied to the window as it is:"
+        )
+        add("")
+        add("| class | probability |")
+        add("|---|---|")
+        for name, value in case["class_probabilities"].items():
+            add(f"| {name} | {value:.3f} |")
+        add("")
+        add(
+            f"**Predicted class: `{case['predicted_class']}`. Calibrated P(mass movement) = "
+            f"{case['calibrated_probability_mass_movement']:.3f}.**"
+        )
+        add("")
+        add(
+            "**On this evidence M1 would not have prevented the 'M4.4 earthquake' misreport.** "
+            "It puts `tectonic` marginally above `mass_movement` "
+            f"({case['class_probabilities']['tectonic']:.3f} against "
+            f"{case['class_probabilities']['mass_movement']:.3f}) — the two are nearly tied and "
+            "the ordering is the wrong way round. That is the result, and it is reported as the "
+            "result. Two caveats belong with it and neither rescues it: the window has two "
+            "receivers where the model was trained on three or more, and a two-receiver window "
+            "cannot support the cross-receiver coherence and azimuthal spread the feature set "
+            "leans on. The honest reading is that M1 v0 needs regional coverage this event did "
+            "not have in the open archives within eight days, not that it succeeded."
+        )
+        add("")
+        add(
+            "By contrast Chamoli 2021, which had twelve receivers, is classified correctly in "
+            "the held-out fold under both split schemes."
+        )
+        add("")
+
     add("## Failure modes")
     add("")
     add(
@@ -352,7 +406,10 @@ def render(repo: Path) -> str:
         "are commonest there.\n"
         "7. **Events with no open coverage are absent, and their absence is recorded.** They are "
         "counted above and appear in `data/manifest.jsonl` as `not_fetched` rows with reasons.\n"
-        "8. **A response gap silently narrows a window.** Receivers whose response could not be "
+        "8. **Thin coverage on a recent event is the binding constraint, not model skill.** "
+        "Langtang 2026 had two usable open receivers eight days after the event. Whatever the "
+        "classifier can do, it cannot do it without records.\n"
+        "9. **A response gap silently narrows a window.** Receivers whose response could not be "
         "read are dropped; a window below three usable receivers is excluded entirely."
     )
     add("")

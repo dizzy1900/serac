@@ -23,6 +23,12 @@ data/raw/*
 data/interim/*
 data/features/*
 baselines/*
+# The discriminator's trained artifacts are deliberately committed: they are small (a text
+# lightgbm model, a two-number calibrator, a provenance record, and a 0.5 MB torch
+# state dict), and committing them is what lets CI, `validate-discriminator` and the
+# streaming detector run offline with no training step.
+!baselines/discriminator/
+!baselines/discriminator_deep/
 !data/raw/.gitkeep
 !data/interim/.gitkeep
 !data/features/.gitkeep

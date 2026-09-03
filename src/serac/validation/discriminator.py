@@ -137,41 +137,72 @@ def run_suite(repo: Path) -> SuiteResult:
     )
 
     # --- 4. shared receivers within a group ------------------------------------------------
-    by_group: dict[str, set[tuple[str, ...]]] = {}
-    for window in index.windows:
-        by_group.setdefault(window.event_group, set()).add(tuple(sorted(window.station_keys)))
-    mixed = {g: len(v) for g, v in by_group.items() if len(v) > 1}
-    # A window can lose receivers to a data gap, so the assertion is containment in the
-    # positive's set, not exact equality: no window may use a receiver its group's positive
-    # did not use.
+    # The design invariant is that a group's receivers are *selected once* from its positive
+    # and every window in the group is cut at that selection. What each window then realises
+    # is a subset, because dataselect has gaps. So the assertion is containment in the group's
+    # selection, not equality with the positive's realised set: a negative may have data at a
+    # receiver where the positive had none, and that is a coverage gap, not a leak.
+    selections_dir = repo / "data" / "interim" / "discriminator" / "stations"
+    selected: dict[str, set[str]] = {}
+    for path in sorted(selections_dir.glob("*.json")):
+        document = json.loads(path.read_text(encoding="utf-8"))
+        selected[document["event_group"]] = {
+            f"{s['network']}.{s['station']}.{s['location']}.{s['band_code']}"
+            for s in document["stations"]
+        }
     outside: list[str] = []
-    group_receivers: dict[str, set[str]] = {}
     for window in index.windows:
-        if window.class_label is ClassLabel.mass_movement:
-            group_receivers.setdefault(window.event_group, set()).update(window.station_keys)
-    for window in index.windows:
-        allowed = group_receivers.get(window.event_group)
+        allowed = selected.get(window.event_group)
         if allowed is None:
             continue
         extra = set(window.station_keys) - allowed
         if extra:
             outside.append(f"{window.entry_id}: {sorted(extra)[:3]}")
     suite.check(
-        "negatives_use_the_positives_receivers",
+        "every_window_uses_only_its_groups_selected_receivers",
         not outside,
         (
-            f"{len(by_group)} groups; {len(mixed)} have windows with differing receiver "
-            "subsets (expected: data gaps drop receivers). No window uses a receiver outside "
-            "its group's positive set."
+            f"{len(selected)} group selections checked against {len(index.windows)} windows; "
+            "no window used a receiver outside its group's selection, so the classes cannot "
+            "differ by instrument or network"
             if not outside
-            else f"{len(outside)} windows use receivers their positive did not: {outside[:5]}"
+            else f"{len(outside)} windows used receivers outside their group's selection: "
+            f"{outside[:5]}"
         ),
     )
 
+    # The residual this leaves, measured rather than asserted away: if positives systematically
+    # realise fewer receivers than their own negatives (open archives are thinner for recent
+    # events), receiver count would correlate with class. No feature counts receivers --
+    # `valid_channel_fraction` was removed for exactly this reason -- so it is reported as a
+    # residual rather than treated as a live leak.
+    realised: dict[str, dict[str, list[int]]] = {}
+    for window in index.windows:
+        realised.setdefault(window.event_group, {}).setdefault(window.class_label.value, []).append(
+            window.n_stations
+        )
+    deltas = [
+        sum(row["mass_movement"]) / len(row["mass_movement"])
+        - sum(row["tectonic"]) / len(row["tectonic"])
+        for row in realised.values()
+        if row.get("mass_movement") and row.get("tectonic")
+    ]
+    mean_delta = sum(deltas) / len(deltas) if deltas else 0.0
+    suite.warn(
+        "receiver_count_symmetry_between_classes",
+        abs(mean_delta) < 1.0,
+        f"mean(receivers on a group's positive) - mean(receivers on its negatives) = "
+        f"{mean_delta:+.2f} over {len(deltas)} groups. No feature counts receivers, so this is "
+        "a reported residual; a large value would mean the archives are systematically thinner "
+        "for one class.",
+    )
+
     # --- 2 and 3. splits -------------------------------------------------------------------
+    # loro_hma first: it is the headline scheme, so it is the artifact the gate proves when
+    # both are present.
     schemes = {
-        "time_forward": assign_time_forward(index),
         "loro_hma": assign_loro(index, HELD_OUT_REGION),
+        "time_forward": assign_time_forward(index),
     }
     for name, assignment in schemes.items():
         straddle = [g for g, s in assignment.by_group.items() if not isinstance(s, str)]
@@ -200,8 +231,11 @@ def run_suite(repo: Path) -> SuiteResult:
             suite.warn(
                 f"forced_groups_present[{name}]",
                 False,
-                f"not in the built dataset at all: {missing}. A group absent for lack of "
-                "station coverage is recorded in the ledger as not_fetched, not substituted.",
+                f"not present as group ids: {missing}. `us7000tbwb` and `us7000tc90` are "
+                "ComCat's ids for the Langtang 2026 pair, which the event library carries "
+                "under the group `langtang-lhende-2026`; they are listed as forced groups "
+                "defensively so a rename cannot let them into training. A group truly absent "
+                "for lack of coverage is recorded in the ledger as not_fetched.",
             )
 
     # --- 8. the dataset bytes are the evaluated bytes --------------------------------------
@@ -217,8 +251,12 @@ def run_suite(repo: Path) -> SuiteResult:
     )
 
     # --- 6 and 9. the shipped model --------------------------------------------------------
+    candidates = [repo / ARTIFACT_DIR / scheme for scheme in schemes] + [repo / ARTIFACT_DIR]
+    artifact_root = next((c for c in candidates if (c / "artifact.json").exists()), None)
     try:
-        model = load_baseline(repo / ARTIFACT_DIR)
+        if artifact_root is None:
+            raise FileNotFoundError(f"no artifact.json under {[str(c) for c in candidates]}")
+        model = load_baseline(artifact_root)
     except Exception as exc:
         suite.warn(
             "baseline_artifact_present",

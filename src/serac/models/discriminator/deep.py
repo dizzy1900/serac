@@ -31,7 +31,7 @@ from __future__ import annotations
 
 from itertools import pairwise
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, Final, Protocol
 
 import numpy as np
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
@@ -69,6 +69,18 @@ PROMOTION_RULE: Final = (
     "delta F1 against the lightgbm baseline, resampled over test event groups, exceeds 0. "
     "Fixed before either model was trained."
 )
+
+
+class WindowSource(Protocol):
+    """Row-at-a-time access to the window store.
+
+    A plain `np.ndarray` satisfies this, and so does a lazy Zarr-backed reader. The deep model
+    only ever needs one window at a time, so it does not require the whole store in memory.
+    """
+
+    shape: tuple[int, ...]
+
+    def __getitem__(self, key: Any) -> np.ndarray: ...
 
 
 class DeepError(SeracError):
@@ -198,7 +210,7 @@ def select_device() -> str:
 
 
 def train(
-    waveforms: np.ndarray,
+    waveforms: WindowSource,
     valids: np.ndarray,
     labels: np.ndarray,
     splits: np.ndarray,
@@ -229,19 +241,21 @@ def train(
     if not is_train.any() or not is_val.any():
         raise DeepError(f"scheme {split_scheme}: train and val folds must both be non-empty")
 
-    def tensors(mask: np.ndarray) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        x = np.stack([normalise(waveforms[i], valids[i]) for i in np.flatnonzero(mask)]).astype(
-            np.float32
-        )
-        slot_valid = valids[mask].any(axis=2)
+    # Batches are normalised on demand rather than materialised up front. The full training
+    # tensor would be ~2.6 GB of float32 on a 16 GB machine shared with three other tracks,
+    # and the resulting swap made an epoch unbounded; this keeps peak resident memory to one
+    # batch at a time.
+    train_rows = np.flatnonzero(is_train)
+    val_rows = np.flatnonzero(is_val)
+
+    def batch(rows: np.ndarray) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        x = np.stack([normalise(waveforms[i], valids[i]) for i in rows]).astype(np.float32)
+        slot_valid = valids[rows].any(axis=2)
         return (
             torch.from_numpy(x),
             torch.from_numpy(slot_valid.astype(bool)),
-            torch.from_numpy(labels[mask].astype(np.int64)),
+            torch.from_numpy(labels[rows].astype(np.int64)),
         )
-
-    x_train, v_train, y_train = tensors(is_train)
-    x_val, v_val, y_val = tensors(is_val)
 
     counts = np.bincount(labels[is_train].astype(int), minlength=len(CLASSES)).astype(np.float64)
     weight = torch.tensor(
@@ -256,25 +270,36 @@ def train(
     best_f1, best_epoch, best_state, since_best = -1.0, 0, None, 0
     for epoch in range(1, epochs + 1):
         model.train()
-        order = torch.randperm(x_train.shape[0], generator=generator)
+        order = torch.randperm(train_rows.size, generator=generator).numpy()
         total = 0.0
-        for start in range(0, order.numel(), BATCH_SIZE):
-            batch = order[start : start + BATCH_SIZE]
+        for start in range(0, order.size, BATCH_SIZE):
+            rows = train_rows[order[start : start + BATCH_SIZE]]
+            x, slot_valid, y = batch(rows)
             optimiser.zero_grad()
-            logits = model(x_train[batch].to(device), v_train[batch].to(device))
-            loss = criterion(logits, y_train[batch].to(device))
+            logits = model(x.to(device), slot_valid.to(device))
+            loss = criterion(logits, y.to(device))
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimiser.step()
-            total += float(loss.item()) * batch.numel()
+            total += float(loss.item()) * rows.size
 
         model.eval()
+        chunks: list[np.ndarray] = []
+        truths: list[np.ndarray] = []
         with torch.no_grad():
-            predicted = model(x_val.to(device), v_val.to(device)).argmax(dim=1).cpu().numpy()
-        macro = float(np.mean([_prf(y_val.numpy(), predicted, i)[2] for i in range(len(CLASSES))]))
+            for start in range(0, val_rows.size, BATCH_SIZE):
+                rows = val_rows[start : start + BATCH_SIZE]
+                x, slot_valid, y = batch(rows)
+                chunks.append(
+                    model(x.to(device), slot_valid.to(device)).argmax(dim=1).cpu().numpy()
+                )
+                truths.append(y.numpy())
+        predicted = np.concatenate(chunks)
+        y_true = np.concatenate(truths)
+        macro = float(np.mean([_prf(y_true, predicted, i)[2] for i in range(len(CLASSES))]))
         if progress is not None:
             progress(
-                f"epoch {epoch}: train loss {total / max(1, order.numel()):.4f}, "
+                f"epoch {epoch}: train loss {total / max(1, order.size):.4f}, "
                 f"val macro F1 {macro:.3f}"
             )
         if macro > best_f1:
@@ -330,7 +355,7 @@ def train(
 
 
 def predict(
-    waveforms: np.ndarray, valids: np.ndarray, artifact_dir: Path
+    waveforms: WindowSource, valids: np.ndarray, artifact_dir: Path
 ) -> tuple[np.ndarray, np.ndarray]:
     """(predicted class indices, softmax probabilities) from committed weights."""
     import torch
@@ -338,16 +363,15 @@ def predict(
     model = build_model()
     model.load_state_dict(torch.load(artifact_dir / WEIGHTS_FILE, map_location="cpu"))
     model.eval()
-    x = torch.from_numpy(
-        np.stack([normalise(waveforms[i], valids[i]) for i in range(waveforms.shape[0])]).astype(
-            np.float32
-        )
-    )
-    slot_valid = torch.from_numpy(valids.any(axis=2).astype(bool))
+    slot_valid_all = valids.any(axis=2).astype(bool)
     outputs = []
     with torch.no_grad():
-        for start in range(0, x.shape[0], 32):
-            outputs.append(model(x[start : start + 32], slot_valid[start : start + 32]))
+        for start in range(0, waveforms.shape[0], 16):
+            rows = range(start, min(start + 16, waveforms.shape[0]))
+            x = torch.from_numpy(
+                np.stack([normalise(waveforms[i], valids[i]) for i in rows]).astype(np.float32)
+            )
+            outputs.append(model(x, torch.from_numpy(slot_valid_all[start : start + 16])))
     logits = torch.cat(outputs)
     probabilities = torch.softmax(logits, dim=1).numpy()
     return probabilities.argmax(axis=1), probabilities

@@ -1,0 +1,27 @@
+{
+  "event_group": "langtang-lhende-2026",
+  "origin_utc": "2026-08-26T02:52:10+00:00",
+  "receivers_selected": 12,
+  "receivers_with_response_removed_data": 2,
+  "receivers_used": [
+    "IN.SHL..H",
+    "IO.EVN..B"
+  ],
+  "min_stations_required_by_the_dataset": 3,
+  "below_the_datasets_quality_bar": true,
+  "predicted_class": "tectonic",
+  "calibrated_probability_mass_movement": 0.36900604944410326,
+  "class_probabilities": {
+    "mass_movement": 0.4469827152782939,
+    "tectonic": 0.46374107668894127,
+    "noise": 0.08927620803276472
+  },
+  "model": {
+    "name": "lgbm-3class",
+    "split_scheme": "loro_hma",
+    "model_sha256": "49e15139d3af4efa706b894cebbb8f5578953c38873dbdf781d0903aeccf009d",
+    "train_event_groups_sha256": "222b8b6be979121eb88867355217c09e58643eb54a7b8db9ab2e3696830c572f",
+    "event_group_in_training": false
+  },
+  "caveat": "This is a single-window case study, not a test-set metric, and it is never averaged into one. The window has 2 receiver(s) with response-removed data against the dataset's minimum of 3, so it was excluded from the built dataset and recorded as `not_fetched` with that reason. The threshold was deliberately NOT lowered to admit it: moving a data-quality threshold after discovering it excludes the headline event is post-hoc tuning. The model here is the already-trained, already-sealed one, applied unchanged."
+}

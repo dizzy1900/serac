@@ -1,8 +1,8 @@
 {
   "evaluate_version": "0.1.0",
   "scheme": "loro_hma",
-  "model_name": "lgbm-3class",
-  "evaluated_at_utc": "2026-09-03T21:15:40.887445Z",
+  "model_name": "cnn-station-transformer",
+  "evaluated_at_utc": "2026-09-03T21:58:46.355026Z",
   "config_sha256": "b3aa4d1925c401ae65ab777b584151729c0e1f54f77a1abfcec81c6ab9482729",
   "n_test_windows": 56,
   "n_test_groups": 9,
@@ -11,104 +11,104 @@
     {
       "label": "mass_movement",
       "support": 9,
-      "precision": 0.36363636363636365,
-      "recall": 0.8888888888888888,
-      "f1": 0.5161290322580644
+      "precision": 0.3684210526315789,
+      "recall": 0.7777777777777778,
+      "f1": 0.5
     },
     {
       "label": "tectonic",
       "support": 39,
-      "precision": 0.9615384615384616,
-      "recall": 0.6410256410256411,
-      "f1": 0.7692307692307693
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "f1": 0.8
     },
     {
       "label": "noise",
       "support": 8,
-      "precision": 0.625,
-      "recall": 0.625,
-      "f1": 0.625
+      "precision": 0.36363636363636365,
+      "recall": 0.5,
+      "f1": 0.4210526315789474
     }
   ],
   "macro_f1": {
-    "point": 0.6367866004962779,
-    "low": 0.47349402919062356,
-    "high": 0.7918561850027367,
+    "point": 0.5736842105263158,
+    "low": 0.4672618432195046,
+    "high": 0.6833195510088091,
     "level": 0.95,
     "n_resamples": 2000,
     "resample_unit": "event_group"
   },
   "mass_movement_f1": {
-    "point": 0.5161290322580644,
-    "low": 0.3333333333333333,
-    "high": 0.6923076923076924,
+    "point": 0.5,
+    "low": 0.3,
+    "high": 0.64,
     "level": 0.95,
     "n_resamples": 2000,
     "resample_unit": "event_group"
   },
   "mass_movement_precision": {
-    "point": 0.36363636363636365,
-    "low": 0.2222222222222222,
-    "high": 0.5294117647058824,
+    "point": 0.3684210526315789,
+    "low": 0.23076923076923078,
+    "high": 0.5,
     "level": 0.95,
     "n_resamples": 2000,
     "resample_unit": "event_group"
   },
   "mass_movement_recall": {
-    "point": 0.8888888888888888,
-    "low": 0.625,
+    "point": 0.7777777777777778,
+    "low": 0.4444444444444444,
     "high": 1.0,
     "level": 0.95,
     "n_resamples": 2000,
     "resample_unit": "event_group"
   },
   "roc_auc": {
-    "point": 0.8676122931442081,
-    "low": 0.6313802083333333,
-    "high": 0.9912913317063833,
+    "point": 0.8628841607565012,
+    "low": 0.7387295725958517,
+    "high": 0.9544191919191919,
     "level": 0.95,
     "n_resamples": 2000,
     "resample_unit": "event_group"
   },
   "confusion": [
     [
-      8,
-      1,
-      0
-    ],
-    [
-      11,
-      25,
-      3
-    ],
-    [
-      3,
+      7,
       0,
+      2
+    ],
+    [
+      8,
+      26,
       5
+    ],
+    [
+      4,
+      0,
+      4
     ]
   ],
   "confusion_by_region": {
     "high_mountain_asia": [
       [
-        8,
-        1,
-        0
-      ],
-      [
-        11,
-        25,
-        3
-      ],
-      [
-        3,
+        7,
         0,
+        2
+      ],
+      [
+        8,
+        26,
         5
+      ],
+      [
+        4,
+        0,
+        4
       ]
     ]
   },
   "reliability": {
-    "brier": 0.1293692733441363,
-    "ece": 0.19320311173917015,
+    "brier": 0.16733010505212026,
+    "ece": 0.1911262334220477,
     "bin_edges": [
       0.0,
       0.1,
@@ -123,52 +123,52 @@
       1.0
     ],
     "bin_counts": [
-      11,
-      9,
-      9,
-      6,
-      9,
-      7,
-      3,
-      2,
+      29,
+      5,
       0,
-      0
+      1,
+      3,
+      4,
+      2,
+      1,
+      3,
+      8
     ],
     "bin_mean_probability": [
-      0.0463353946536511,
-      0.16475693482699866,
-      0.25036252105832957,
-      0.34922087207577507,
-      0.44729995221510827,
-      0.5427624845568385,
-      0.609645209533509,
-      0.7410916237737223,
+      0.02250438631142907,
+      0.16234875172376634,
       0.0,
-      0.0
+      0.3195318579673767,
+      0.4623916645844777,
+      0.5446643233299255,
+      0.6464703977108002,
+      0.7653293609619141,
+      0.8526329199473063,
+      0.9412968754768372
     ],
     "bin_observed_frequency": [
       0.0,
+      0.2,
       0.0,
-      0.1111111111111111,
-      0.0,
-      0.3333333333333333,
-      0.14285714285714285,
       1.0,
-      0.5,
+      0.3333333333333333,
       0.0,
-      0.0
+      0.5,
+      1.0,
+      0.0,
+      0.5
     ]
   },
   "forced_group_outcomes": {
     "chamoli-2021": {
       "present_in_test": true,
       "n_windows": 7,
-      "positive_detected": true,
+      "positive_detected": false,
       "positive_probability": [
-        0.5295011642057127
+        0.1875322461128235
       ],
       "positive_predicted_class": [
-        "mass_movement"
+        "noise"
       ]
     },
     "langtang-lhende-2026": {
@@ -186,8 +186,6 @@
     }
   },
   "notes": [
-    "test = every group in region 'high_mountain_asia', plus the forced groups",
-    "val = the 60 most recent of the 299 remaining groups by origin year, so early stopping and the calibrator never touch the held-out region",
-    "no forced group fell outside the held-out region"
+    "deep softmax used directly as the probability: it carries no separate calibrator, so its reliability numbers are for an uncalibrated softmax"
   ]
 }

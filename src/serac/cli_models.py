@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import numpy as np
 import typer
@@ -22,12 +22,35 @@ import typer
 app = typer.Typer(help="Train and evaluate serac's model components.", no_args_is_help=True)
 
 DATASET_DIR = Path("data/features/discriminator")
+
+
+class _LazyWindows:
+    """Row-at-a-time access to the Zarr waveform array, with the numpy shape API the models use.
+
+    Only `shape`, integer indexing and boolean-mask selection are supported, which is all the
+    training and prediction paths need, and each of them reads one window at a time.
+    """
+
+    def __init__(self, array: Any, n_windows: int) -> None:
+        self._array = array
+        self.shape = (n_windows, *array.shape[1:])
+
+    def __len__(self) -> int:
+        return int(self.shape[0])
+
+    def __getitem__(self, key: Any) -> np.ndarray:
+        if isinstance(key, (int, np.integer)):
+            return np.asarray(self._array[int(key)])
+        rows = np.flatnonzero(np.asarray(key)) if np.asarray(key).dtype == bool else np.asarray(key)
+        return np.stack([np.asarray(self._array[int(r)]) for r in rows])
+
+
 REPORTS_DIR = Path("reports/m1")
 FEATURE_CACHE = "features.npy"
 FEATURE_CACHE_KEY = "features.key"
 
 
-def _load_features(repo: Path, *, echo: bool = True) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _load_features(repo: Path, *, echo: bool = True) -> tuple[np.ndarray, _LazyWindows, np.ndarray]:
     """(features, waveforms, valids). Features are cached against the store's own hash.
 
     The Zarr arrays are allocated for every *requested* window and only the ones that yielded
@@ -43,17 +66,24 @@ def _load_features(repo: Path, *, echo: bool = True) -> tuple[np.ndarray, np.nda
     cache, key_file = root / FEATURE_CACHE, root / FEATURE_CACHE_KEY
     n_windows = load_index(root).n_windows
     waveform, valid = load_arrays(root)
-    waveforms = np.asarray(waveform[:n_windows])
+    # `valid` is a few hundred kilobytes and is materialised; `waveform` is ~3 GB and is left
+    # as a lazy Zarr array, read a row at a time. On a 16 GB machine shared with three other
+    # tracks, materialising it put the box into swap and made an epoch unbounded.
     valids = np.asarray(valid[:n_windows])
+    waveforms = _LazyWindows(waveform, n_windows)
     if cache.exists() and key_file.exists() and key_file.read_text().strip() == store_hash:
         features = np.load(cache)
-        if features.shape == (waveforms.shape[0], N_FEATURES):
+        if features.shape == (n_windows, N_FEATURES):
             if echo:
                 typer.echo(f"features: reused cache for store {store_hash[:16]}")
             return features, waveforms, valids
     if echo:
-        typer.echo(f"features: extracting {waveforms.shape[0]} windows...")
-    features = feature_matrix(waveforms, valids)
+        typer.echo(f"features: extracting {n_windows} windows...")
+    features = np.zeros((n_windows, N_FEATURES), dtype=np.float64)
+    for row in range(n_windows):
+        features[row] = feature_matrix(
+            np.asarray(waveform[row])[None, ...], valids[row][None, ...]
+        )[0]
     np.save(cache, features)
     key_file.write_text(store_hash + "\n", encoding="utf-8")
     return features, waveforms, valids
