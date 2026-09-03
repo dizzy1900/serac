@@ -15,3 +15,11 @@ class CredentialsMissingError(SeracError):
 
 class NotImplementedYetError(SeracError):
     """Capability is designed but deliberately not implemented yet."""
+
+
+class IngestRefusedError(SeracError):
+    """The dry-run plan carries refusals (e.g. product-level mixing); fetch will not proceed."""
+
+
+class FetchDeclinedError(SeracError):
+    """The operator declined the confirmation gate (size unknown or above the limit)."""

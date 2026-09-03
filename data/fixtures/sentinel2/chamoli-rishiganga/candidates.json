@@ -1,0 +1,317 @@
+{
+ "aoi_id": "chamoli-rishiganga",
+ "aoi_window_bounds": [
+  376680.0,
+  3359180.0,
+  379240.0,
+  3361740.0
+ ],
+ "aoi_window_epsg": 32644,
+ "candidates": [
+  {
+   "aoi_cloud_only_fraction": 0.0,
+   "aoi_cloud_shadow_snow_fraction": 0.7242431640625,
+   "datetime": "2021-02-20T05:30:30.064000+00:00",
+   "eo:cloud_cover": 0.182096,
+   "product_id": "S2B_44RLU_20210220_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "dark_area": 4486,
+    "not_vegetated": 32,
+    "snow_or_ice": 11866
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.6597900390625,
+   "aoi_cloud_shadow_snow_fraction": 0.68060302734375,
+   "datetime": "2021-02-20T05:30:30.063000+00:00",
+   "eo:cloud_cover": 15.303641,
+   "product_id": "S2B_44RLU_20210220_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 104,
+    "cloud_medium_probability": 10706,
+    "dark_area": 4922,
+    "not_vegetated": 34,
+    "snow_or_ice": 341,
+    "unclassified": 13,
+    "water": 264
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.6844482421875,
+   "aoi_cloud_shadow_snow_fraction": 0.6907958984375,
+   "datetime": "2021-02-15T05:30:31.244000+00:00",
+   "eo:cloud_cover": 21.897292,
+   "product_id": "S2A_44RLU_20210215_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 69,
+    "cloud_medium_probability": 11145,
+    "dark_area": 4969,
+    "not_vegetated": 18,
+    "snow_or_ice": 104,
+    "unclassified": 3,
+    "water": 76
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.0003662109375,
+   "aoi_cloud_shadow_snow_fraction": 0.728759765625,
+   "datetime": "2021-02-15T05:30:31.243000+00:00",
+   "eo:cloud_cover": 16.34692,
+   "product_id": "S2A_44RLU_20210215_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "cloud_high_probability": 6,
+    "dark_area": 4438,
+    "not_vegetated": 6,
+    "snow_or_ice": 11934
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.61322021484375,
+   "aoi_cloud_shadow_snow_fraction": 0.63763427734375,
+   "datetime": "2021-02-10T05:30:31.061000+00:00",
+   "eo:cloud_cover": 13.819823,
+   "product_id": "S2B_44RLU_20210210_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 1581,
+    "cloud_medium_probability": 8272,
+    "cloud_shadow": 194,
+    "dark_area": 5348,
+    "not_vegetated": 32,
+    "snow_or_ice": 400,
+    "unclassified": 105,
+    "water": 452
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.00689697265625,
+   "aoi_cloud_shadow_snow_fraction": 0.61822509765625,
+   "datetime": "2021-02-10T05:30:31.060000+00:00",
+   "eo:cloud_cover": 8.167754,
+   "product_id": "S2B_44RLU_20210210_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "cloud_high_probability": 33,
+    "cloud_medium_probability": 36,
+    "cloud_shadow": 44,
+    "dark_area": 5714,
+    "not_vegetated": 541,
+    "snow_or_ice": 10016
+   },
+   "selected_role": "post"
+  },
+  {
+   "aoi_cloud_only_fraction": 0.5860595703125,
+   "aoi_cloud_shadow_snow_fraction": 0.58990478515625,
+   "datetime": "2021-02-05T05:30:31.766000+00:00",
+   "eo:cloud_cover": 31.352483,
+   "product_id": "S2A_44RLU_20210205_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 653,
+    "cloud_medium_probability": 8949,
+    "dark_area": 6421,
+    "not_vegetated": 203,
+    "snow_or_ice": 63,
+    "water": 95
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.00860595703125,
+   "aoi_cloud_shadow_snow_fraction": 0.68157958984375,
+   "datetime": "2021-02-05T05:30:31.765000+00:00",
+   "eo:cloud_cover": 22.974211,
+   "product_id": "S2A_44RLU_20210205_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "cloud_high_probability": 141,
+    "dark_area": 5176,
+    "not_vegetated": 40,
+    "snow_or_ice": 11026,
+    "water": 1
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.59027099609375,
+   "aoi_cloud_shadow_snow_fraction": 0.603271484375,
+   "datetime": "2021-01-31T05:30:31.939000+00:00",
+   "eo:cloud_cover": 17.364091,
+   "product_id": "S2B_44RLU_20210131_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 2021,
+    "cloud_medium_probability": 7555,
+    "cloud_shadow": 95,
+    "dark_area": 5989,
+    "not_vegetated": 16,
+    "snow_or_ice": 213,
+    "unclassified": 29,
+    "water": 466
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.0,
+   "aoi_cloud_shadow_snow_fraction": 0.52630615234375,
+   "datetime": "2021-01-31T05:30:31.938000+00:00",
+   "eo:cloud_cover": 0.004459,
+   "product_id": "S2B_44RLU_20210131_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "dark_area": 6643,
+    "not_vegetated": 1116,
+    "snow_or_ice": 8623,
+    "water": 2
+   },
+   "selected_role": "pre"
+  },
+  {
+   "aoi_cloud_only_fraction": 0.0,
+   "aoi_cloud_shadow_snow_fraction": 0.4930419921875,
+   "datetime": "2021-01-26T05:30:32.781000+00:00",
+   "eo:cloud_cover": 0.046619,
+   "product_id": "S2A_44RLU_20210126_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "dark_area": 7145,
+    "not_vegetated": 1159,
+    "snow_or_ice": 8078,
+    "water": 2
+   },
+   "selected_role": "pre"
+  },
+  {
+   "aoi_cloud_only_fraction": 0.5828602819996338,
+   "aoi_cloud_shadow_snow_fraction": 0.5912836476835744,
+   "datetime": "2021-01-26T05:30:32.780000+00:00",
+   "eo:cloud_cover": 24.381777,
+   "product_id": "S2A_44RLU_20210126_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 1896,
+    "cloud_medium_probability": 7476,
+    "cloud_shadow": 177,
+    "dark_area": 6149,
+    "no_data": 1,
+    "not_vegetated": 9,
+    "snow_or_ice": 138,
+    "unclassified": 31,
+    "water": 507
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.0,
+   "aoi_cloud_shadow_snow_fraction": 0.52825927734375,
+   "datetime": "2021-01-21T05:30:32.118000+00:00",
+   "eo:cloud_cover": 0.003238,
+   "product_id": "S2B_44RLU_20210121_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "dark_area": 7231,
+    "not_vegetated": 493,
+    "snow_or_ice": 8655,
+    "water": 5
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.5118110236220472,
+   "aoi_cloud_shadow_snow_fraction": 0.5490447415003357,
+   "datetime": "2021-01-21T05:30:32.118000+00:00",
+   "eo:cloud_cover": 18.389237,
+   "product_id": "S2B_44RLU_20210121_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 1679,
+    "cloud_medium_probability": 6545,
+    "cloud_shadow": 161,
+    "dark_area": 6615,
+    "no_data": 1,
+    "not_vegetated": 38,
+    "snow_or_ice": 610,
+    "unclassified": 51,
+    "water": 684
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.5317707379600806,
+   "aoi_cloud_shadow_snow_fraction": 0.5407434535799304,
+   "datetime": "2021-01-16T05:30:33.117000+00:00",
+   "eo:cloud_cover": 17.081269,
+   "product_id": "S2A_44RLU_20210116_0_L2A",
+   "s2:processing_baseline": "02.14",
+   "scl_histogram": {
+    "cloud_high_probability": 1292,
+    "cloud_medium_probability": 7316,
+    "cloud_shadow": 104,
+    "dark_area": 6760,
+    "no_data": 1,
+    "not_vegetated": 62,
+    "snow_or_ice": 147,
+    "unclassified": 24,
+    "water": 678
+   },
+   "selected_role": null
+  },
+  {
+   "aoi_cloud_only_fraction": 0.0,
+   "aoi_cloud_shadow_snow_fraction": 0.5296630859375,
+   "datetime": "2021-01-16T05:30:33.116000+00:00",
+   "eo:cloud_cover": 0.025727,
+   "product_id": "S2A_44RLU_20210116_1_L2A",
+   "s2:processing_baseline": "05.00",
+   "scl_histogram": {
+    "dark_area": 7476,
+    "not_vegetated": 228,
+    "snow_or_ice": 8678,
+    "water": 2
+   },
+   "selected_role": null
+  }
+ ],
+ "cloud_only_classes": [
+  3,
+  8,
+  9,
+  10
+ ],
+ "cloud_shadow_snow_classes": [
+  3,
+  8,
+  9,
+  10,
+  11
+ ],
+ "collection": "sentinel-2-l2a",
+ "search_bbox_4326": [
+  79.68,
+  30.33,
+  79.8,
+  30.42
+ ],
+ "search_window": [
+  "2021-01-15T00:00:00+00:00",
+  "2021-02-20T23:59:59+00:00"
+ ],
+ "selection": {
+  "n_post": 1,
+  "n_pre": 2,
+  "post_window_end": "2021-02-12T00:00:00+00:00",
+  "rule": "collapse reprocessings (newest baseline), rank by AOI cloud/shadow/snow fraction",
+  "split_date": "2021-02-07T00:00:00+00:00"
+ },
+ "stac_url": "https://earth-search.aws.element84.com/v1"
+}
