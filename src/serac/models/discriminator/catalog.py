@@ -319,8 +319,10 @@ def _entry_from_cluster(cluster: Sequence[_RawPositive]) -> CatalogEntry:
     primary = min(cluster, key=lambda r: (order[r.source], r.source_id))
     group = primary.preferred_group or f"esec-{primary.source_id.split(':', 1)[1]}"
     sub_type = next((r.sub_type for r in cluster if r.sub_type), None)
+    # The id is per catalogue record, the group is per split unit: Sedongpu 2017 and 2018 are
+    # two records that must share a group (they are the same slope) but not an id.
     return CatalogEntry(
-        entry_id=f"pos/{group}",
+        entry_id=f"pos/{primary.source_id.replace(':', '-')}",
         event_group=group,
         class_label=ClassLabel.mass_movement,
         origin_utc=primary.origin_utc,
