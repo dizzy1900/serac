@@ -1,0 +1,20 @@
+# Fixtures
+
+Real, small, licence-recorded samples used by offline tests and replay. Every file has a matching `fetched` row in `data/manifest.jsonl`. Nothing synthetic lives here (synthetic doubles are under `tests/fixtures/synthetic/`).
+
+Licence `null` means the data-centre page linked in the ledger's `licence_source_url` carries no licence statement; attribution requirements are recorded in the ledger `notes`.
+
+| path | source URL | retrieved_at | sha256 | size | licence |
+|---|---|---|---|---|---|
+| `data/fixtures/seismic/chamoli-2021/NK.KKN..BHZ.mseed` | https://service.earthscope.org/fdsnws/dataselect/1/query?net=NK&sta=KKN&loc=--&cha=BHZ&start=2021-02-07T04:49:00&end=2021-02-07T04:57:00 | 2026-09-03T09:45:06.799582+00:00 | `e64753b990ec74a96aaac4d50e1947aab5fccad6384f9550c097a84370c3f9dc` | 27136 | null |
+| `data/fixtures/seismic/chamoli-2021/IC.LSA.00.BHZ.mseed` | https://service.earthscope.org/fdsnws/dataselect/1/query?net=IC&sta=LSA&loc=00&cha=BHZ&start=2021-02-07T04:49:00&end=2021-02-07T04:57:00 | 2026-09-03T09:45:06.799582+00:00 | `23b88f5348d29579fc5b7227eff70cbb2015022990e91c6677024eeb27aa0317` | 21504 | null |
+| `data/fixtures/seismic/chamoli-2021/stations.xml` | https://service.earthscope.org/fdsnws/station/1/query?net=IC,NK&sta=KKN,LSA&cha=BHZ&level=channel&start=2021-02-07T04:49:00&end=2021-02-07T04:57:00 | 2026-09-03T09:45:06.799582+00:00 | `a73d5cda0f749abc5118da8bcf68e25f6c25894c800ad54e0c50b9a7239db888` | 4736 | null |
+| `data/fixtures/seismic/langtang-2026/NK.KKN..BHZ.mseed` | https://service.earthscope.org/fdsnws/dataselect/1/query?net=NK&sta=KKN&loc=--&cha=BHZ&start=2026-08-26T02:50:00&end=2026-08-26T02:58:00 | 2026-09-03T09:45:07.660615+00:00 | `1f8f359b9f1d6e69ff7543a1b238eba7c9848a07767d2d905f632e06d0047bac` | 55296 | null |
+| `data/fixtures/seismic/langtang-2026/IO.EVN..BHZ.mseed` | https://service.earthscope.org/fdsnws/dataselect/1/query?net=IO&sta=EVN&loc=--&cha=BHZ&start=2026-08-26T02:50:00&end=2026-08-26T02:58:00 | 2026-09-03T09:45:07.660615+00:00 | `0c5314e39a1be190233065eee205115e4b80f2afa935cd07ae96416535e279a3` | 22528 | null |
+| `data/fixtures/seismic/langtang-2026/stations.xml` | https://service.earthscope.org/fdsnws/station/1/query?net=IO,NK&sta=EVN,KKN&cha=BHZ&level=channel&start=2026-08-26T02:50:00&end=2026-08-26T02:58:00 | 2026-09-03T09:45:07.660615+00:00 | `183ad7bd8516e56b3f7a749d1fe1811234e0a1ff27948b7cc3474f12e5c5e752` | 4091 | null |
+| `data/fixtures/usgs_comcat/landslide_2000-01-01_2026-09-03.geojson` | https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=landslide&starttime=2000-01-01&endtime=2026-09-03&orderby=time-asc&limit=20000 | 2026-09-03T09:45:08.287760+00:00 | `af33f597f2780787684707f4f5efc594da296584f08b94dab14fdc1716a88e3c` | 41870 | US-PD |
+| `data/fixtures/usgs_comcat/us7000tbwb.geojson` | https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000tbwb&format=geojson | 2026-09-03T09:45:08.458851+00:00 | `1d8f20a0d4e183e02fdf2b09b3a2ff38ae0d8dc63da2ae602cd3fb599bfe2073` | 15173 | US-PD |
+| `data/fixtures/usgs_comcat/us7000tc90.geojson` | https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us7000tc90&format=geojson | 2026-09-03T09:45:08.562849+00:00 | `4d66ec1021ed007eae976cf6864c45359e6038a91237dc68f0a460fdfe596c04` | 5790 | US-PD |
+| `data/fixtures/usgs_comcat/us20002926.geojson` | https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us20002926&format=geojson | 2026-09-03T09:45:08.945114+00:00 | `08b5b07faf9056cfd26be0614051e9b23bf880d6db5e2a7b9ef0a1b5ee276bb3` | 113416 | US-PD |
+| `contracts/vendor/cap/CAP-v1.2.xsd` | https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd | 2026-09-03T09:45:09.240927+00:00 | `b7798ef25868b068c97b268bda02d067c7d4ba9373adc5638bf37105804ee723` | 10098 | Copyright OASIS Open 2010 All Rights Reserved (OASIS IPR Policy) |
+| `contracts/vendor/cap/xmldsig-core-schema.xsd` | http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd | 2026-09-03T09:45:09.305047+00:00 | `d102ad3df7664c307e0c2c776ba4a90513b1969974d8a940bae1a77f9f21e15d` | 10292 | W3C Software Notice and License (19980720) |

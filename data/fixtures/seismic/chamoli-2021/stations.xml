@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+ <FDSNStationXML xmlns="http://www.fdsn.org/xml/station/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:iris="http://www.fdsn.org/xml/station/1/iris" xsi:schemaLocation="http://www.fdsn.org/xml/station/1 http://www.fdsn.org/xml/station/fdsn-station-1.1.xsd" schemaVersion="1.1">
+  <Source>EarthScope</Source>
+  <Sender>EarthScope</Sender>
+  <Module>EarthScope WEB SERVICE: fdsnws-station | version: 1.1.56</Module>
+  <ModuleURI></ModuleURI>
+  <Created>2026-09-03T09:45:07.6139</Created>
+  <Network code="IC" startDate="1992-01-01T00:00:00.0000" restrictedStatus="open">
+   <Description>New China Digital Seismograph Network (NCDSN)</Description>
+   <Identifier type="DOI">10.7914/SN/IC
+   </Identifier>
+   <TotalNumberStations>10</TotalNumberStations>
+   <SelectedNumberStations>1</SelectedNumberStations>
+   <Station code="LSA" startDate="1995-08-03T00:00:00.0000" restrictedStatus="open" iris:alternateNetworkCodes="_FDSN,_FDSN-ALL,_GSN,_GSN-BROADBAND,_STS-1,.UNRESTRICTED">
+    <Description>(GSN) New CDSN (IC) - USGS, IRIS, IG and CEA</Description>
+    <Latitude>29.70317</Latitude>
+    <Longitude>91.12757</Longitude>
+    <Elevation>3660.0</Elevation>
+    <Site>
+     <Name>Tibet, China</Name>
+    </Site>
+    <CreationDate>1995-08-03T00:00:00.0000</CreationDate>
+    <TotalNumberChannels>277</TotalNumberChannels>
+    <SelectedNumberChannels>1</SelectedNumberChannels>
+    <Channel code="BHZ" locationCode="00" startDate="2016-04-12T00:00:00.0000" endDate="2023-04-16T00:00:00.0000" restrictedStatus="open">
+     <Comment>
+      <Value>[SENSOR::PTD25-10-VH::LSAvacmon], [SENSOR::STS-1 VERTICAL::1822], [SENSOR::STS-1 HORIZONTAL::38110], [SENSOR::STS-1 HORIZONTAL::58407], [SENSOR::EPISENSOR ES-T::4357], [LOGGER::Q330HR::4255]</Value>
+      <BeginEffectiveTime>2016-04-12T00:00:00.0000</BeginEffectiveTime>
+      <EndEffectiveTime>2023-04-16T00:00:00.0000</EndEffectiveTime>
+     </Comment>
+     <Latitude>29.70325</Latitude>
+     <Longitude>91.12762</Longitude>
+     <Elevation>3645</Elevation>
+     <Depth>15</Depth>
+     <Azimuth>0</Azimuth>
+     <Dip>-90</Dip>
+     <Type>CONTINUOUS</Type>
+     <Type>GEOPHYSICAL</Type>
+     <SampleRate>2E01</SampleRate>
+     <Sensor>
+      <Type>STRECKEISEN</Type>
+      <Description>Velocity Sensor</Description>
+      <Manufacturer>STRECKEISEN</Manufacturer>
+      <Model>STS-1 VERTICAL</Model>
+      <SerialNumber>1822</SerialNumber>
+     </Sensor>
+     <DataLogger>
+      <Type>QUANTERRA</Type>
+      <Manufacturer>QUANTERRA</Manufacturer>
+      <Model>Q330HR</Model>
+      <SerialNumber>4255</SerialNumber>
+     </DataLogger>
+     <Response>
+     <InstrumentSensitivity>
+       <Value>5.5399E9</Value>
+       <Frequency>0.02</Frequency>
+       <InputUnits>
+         <Name>m/s</Name>
+         <Description>Velocity in meters per second</Description>
+       </InputUnits>
+       <OutputUnits>
+         <Name>counts</Name>
+         <Description>Digital Count in Digital counts</Description>
+       </OutputUnits>
+     </InstrumentSensitivity>
+     </Response>
+    </Channel>
+   </Station>
+  </Network>
+  <Network code="NK" startDate="1978-01-01T00:00:00.0000" restrictedStatus="open">
+   <Description>Nepal Kathmandu (NK)</Description>
+   <Identifier type="DOI">10.7914/SN/NK
+   </Identifier>
+   <TotalNumberStations>1</TotalNumberStations>
+   <SelectedNumberStations>1</SelectedNumberStations>
+   <Station code="KKN" startDate="2016-05-22T00:00:00.0000" restrictedStatus="open" iris:alternateNetworkCodes=".UNRESTRICTED">
+    <Latitude>27.8</Latitude>
+    <Longitude>85.279</Longitude>
+    <Elevation>2042.0</Elevation>
+    <Site>
+     <Name>Kakani, Nepal</Name>
+    </Site>
+    <CreationDate>2016-05-22T00:00:00.0000</CreationDate>
+    <TotalNumberChannels>3</TotalNumberChannels>
+    <SelectedNumberChannels>1</SelectedNumberChannels>
+    <Channel code="BHZ" locationCode="" startDate="2016-05-22T00:00:00.0000" restrictedStatus="open">
+     <Latitude>27.8</Latitude>
+     <Longitude>85.279</Longitude>
+     <Elevation>2042</Elevation>
+     <Depth>0</Depth>
+     <Azimuth>0</Azimuth>
+     <Dip>-90</Dip>
+     <SampleRate>5E01</SampleRate>
+     <ClockDrift>1E-04</ClockDrift>
+     <Sensor>
+      <Description>Guralp CMG 3T</Description>
+     </Sensor>
+     <Response>
+     <InstrumentSensitivity>
+       <Value>6.36672E8</Value>
+       <Frequency>0.05</Frequency>
+       <InputUnits>
+         <Name>m/s</Name>
+         <Description>Velocity in Meters per Second</Description>
+       </InputUnits>
+       <OutputUnits>
+         <Name>counts</Name>
+         <Description>Digital Counts</Description>
+       </OutputUnits>
+     </InstrumentSensitivity>
+     </Response>
+    </Channel>
+   </Station>
+  </Network>
+ </FDSNStationXML>

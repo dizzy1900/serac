@@ -1,0 +1,28 @@
+{
+  "contract_version": "0.1.0",
+  "description": "Vendored XML Schemas for offline CAP 1.2 validation. CAP-v1.2.xsd does not import xmldsig; it declares <any namespace=\"http://www.w3.org/2000/09/xmldsig#\" processContents=\"lax\"/>, so validation works without the xmldsig schema. The xmldsig schema is vendored so a local lxml resolver can validate ds:Signature strictly if a future stage signs alerts.",
+  "files": [
+    {
+      "file": "CAP-v1.2.xsd",
+      "url": "https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd",
+      "status": "fetched",
+      "retrieved_at_utc": "2026-09-03T09:45:09.240927+00:00",
+      "sha256": "b7798ef25868b068c97b268bda02d067c7d4ba9373adc5638bf37105804ee723",
+      "size_bytes": 10098,
+      "licence": "Copyright OASIS Open 2010 All Rights Reserved (OASIS IPR Policy)",
+      "licence_source_url": "https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2-os.html",
+      "licence_notes": "CAP-v1.2-os notice: 'This document and translations of it may be copied and furnished to others, and derivative works that comment on or otherwise explain it or assist in its implementation may be prepared, copied, published, and distributed, in whole or in part, without restriction of any kind, provided that the above copyright notice and this section are included on all such copies and derivative works.' OASIS IPR Policy: https://www.oasis-open.org/policies-guidelines/ipr/"
+    },
+    {
+      "file": "xmldsig-core-schema.xsd",
+      "url": "http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd",
+      "status": "fetched",
+      "retrieved_at_utc": "2026-09-03T09:45:09.305047+00:00",
+      "sha256": "d102ad3df7664c307e0c2c776ba4a90513b1969974d8a940bae1a77f9f21e15d",
+      "size_bytes": 10292,
+      "licence": "W3C Software Notice and License (19980720)",
+      "licence_source_url": "http://www.w3.org/Consortium/Legal/copyright-software-19980720",
+      "licence_notes": "Schema header: 'This document is governed by the W3C Software License'. Licence text: 'Permission to use, copy, modify, and distribute this software and its documentation, with or without modification, for any purpose and without fee or royalty is hereby granted' subject to retaining the notice."
+    }
+  ]
+}
