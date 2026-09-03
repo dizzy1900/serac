@@ -23,9 +23,9 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | 6–12 d (brief) |
 | Latency | to be recorded at fetch time |
 | Credentials | search: none; download: `EARTHDATA_USERNAME/PASSWORD` |
-| Adapter | `src/serac/adapters/eo/asf.py` (`Sentinel1AsfAdapter`; planned) |
+| Adapter | `src/serac/adapters/eo/asf_sentinel1.py` (`Sentinel1AsfAdapter`; `serac ingest s1`) |
 | Ledger source | `sentinel1_asf` |
-| Fixture | a real recorded ASF listing for Chamoli Jan–Feb 2021 (planned, `data/fixtures/`) |
+| Fixture | `data/fixtures/asf/chamoli_s1_2021-01-01_2021-02-28.geojson` (real ASF listing, 53 IW granules: 29 SLC / 24 GRD_HD on paths 56, 63, 129, 165) |
 | Known gaps | no credentials in the founding session, so no SLC/GRD bytes were fetched; S1 cube layers are synthetic placeholders under `tests/fixtures/synthetic/` until someone fetches |
 
 ## HyP3 InSAR (ASF on-demand Sentinel-1 InSAR)
@@ -37,9 +37,9 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | derived from Sentinel-1 pairs; the pair planner uses 12-day same-orbit pairs |
 | Latency | asynchronous job; `status: requested` in the ledger until downloaded |
 | Credentials | `EARTHDATA_USERNAME/PASSWORD` |
-| Adapter | `src/serac/adapters/eo/hyp3.py` (`Hyp3InsarAdapter`, `InSARPairPlanner`; planned) |
+| Adapter | `src/serac/adapters/eo/hyp3_insar.py` (`Hyp3InsarAdapter`, `InSARPairPlanner`; `serac ingest hyp3 [--poll|--wait]`; jobs ledger `data/raw/hyp3_insar/<aoi>/jobs.jsonl`) |
 | Ledger source | `hyp3_insar` |
-| Fixture | synthetic 32×32 coherence/LOS pair under `tests/fixtures/synthetic/` (`provenance: synthetic`) |
+| Fixture | synthetic 32×32 px (80 m, EPSG:32644) coherence/LOS pair `tests/fixtures/synthetic/hyp3/chamoli-rishiganga/S1_063_20210130_20210211/` (`provenance: synthetic`; the pair name is a real ASF-listed pair, the pixels are not observations) |
 | Known gaps | no real HyP3 product in the tree; `s1_coherence_t` / `s1_los_velocity_t` are flagged synthetic in any cube built from fixtures |
 
 ## Sentinel-2 L2A via CDSE (production path)
@@ -51,9 +51,9 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | 2–5 d, cloud-permitting (brief) |
 | Latency | to be recorded at fetch time |
 | Credentials | search: none; download: `CDSE_CLIENT_ID/SECRET` (OAuth client credentials) |
-| Adapter | `src/serac/adapters/eo/cdse.py` (`CdseSentinel2Adapter`; planned) |
+| Adapter | `src/serac/adapters/eo/cdse_sentinel2.py` (`CdseSentinel2Adapter`; OAuth client credentials against `identity.dataspace.copernicus.eu`; `serac ingest s2-cdse`) |
 | Ledger source | `sentinel2_cdse` |
-| Fixture | a real recorded CDSE search page (planned, `data/fixtures/`) |
+| Fixture | `data/fixtures/cdse/chamoli_s2_search_2021-02.json` (real CDSE STAC search page, 5 items) |
 | Known gaps | the download path is exercised only with fakes; no CDSE bytes fetched in the founding session |
 
 ## Sentinel-2 L2A via Earth Search (fixture / secondary source)
@@ -65,9 +65,9 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | as Sentinel-2 |
 | Latency | to be recorded at fetch time |
 | Credentials | none |
-| Adapter | `src/serac/adapters/eo/earthsearch.py` (`EarthSearchSentinel2Adapter`; planned); shares `s2_cloud.py` with the CDSE adapter |
+| Adapter | `src/serac/adapters/eo/earthsearch_sentinel2.py` (`EarthSearchSentinel2Adapter`; `serac ingest s2-earthsearch`); shares `s2_cloud.py` with the CDSE adapter |
 | Ledger source | `sentinel2_earthsearch` |
-| Fixture | 2–3 real Chamoli date crops of B03/B11/SCL, 64×64 px (planned, `data/fixtures/`) |
+| Fixture | 3 real Chamoli scene crops of B03/B11/SCL (256×256 px at 10 m / 128×128 px at 20 m) under `data/fixtures/sentinel2/chamoli-rishiganga/` |
 | Known gaps | documented as secondary; CDSE remains the production adapter (ADR-0006) |
 
 ## NISAR L-band via asf_search
@@ -79,10 +79,28 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | 12 d (brief) |
 | Latency | to be recorded at fetch time |
 | Credentials | search: none; download: `EARTHDATA_USERNAME/PASSWORD` |
-| Adapter | `src/serac/adapters/eo/nisar.py` + `nisar_constraints.py` (planned) |
+| Adapter | `src/serac/adapters/eo/nisar.py` + `nisar_constraints.py` (`NisarAdapter`, `classify_collection`, `MixedProductLevelError`; `serac ingest nisar [--level beta|provisional]`) |
 | Ledger source | `nisar_asf` |
-| Fixture | the real search probe response (planned, `data/fixtures/`) |
-| Known gaps | calibrated PROVISIONAL products exist only for acquisitions from 17 Jun 2026 (released 20 Jul 2026); BETA products Oct 2025–Jan 2026 are not inter-comparable; permanent instrument gap 27 Jul–10 Aug 2026; the adapter refuses to mix BETA and PROVISIONAL silently. As of 2026-09-03 the search returns only ancillary SCLKSCET files, so NISAR is `status: not_fetched` and **no calibrated pre-Langtang series exists**. |
+| Fixture | `data/fixtures/asf/nisar_probe_2026-09-03.json` (real `asf_search` probe over Lhende: 159 science granules; per-file URL/size lists stripped) |
+| Known gaps | calibrated PROVISIONAL products exist only for acquisitions from 17 Jun 2026 (released 20 Jul 2026); BETA products Oct 2025–Jan 2026 are not inter-comparable; permanent instrument gap 27 Jul–10 Aug 2026; the adapter refuses to mix BETA and PROVISIONAL silently. Nothing has been downloaded (Earthdata Login absent), so NISAR is `status: not_fetched` and **no calibrated pre-Langtang series exists**. Reading GCOV HDF5 needs `h5py`, absent from the locked environment. |
+
+### Product-level rule (verified on the probe, 2026-09-03)
+
+The level discriminator is the CMR **`collectionName`**: `NISAR_L<n>_<LEVEL>_BETA_V1` versus
+`NISAR_L<n>_<LEVEL>_PROVISIONAL_V1`. `productionConfiguration` is `"PR"` on all 159 science
+granules of the probe and is **not** a discriminator; the probe's own
+`serac_probe.by_level_and_production_configuration` bucket (`GCOV/PR: 21`, ...) therefore says
+nothing about maturity and must not be read as such (the fixture was not re-fetched to remove
+it). `crid` is a consistency check only: `X05009`/`X05010` on BETA, `P05023` on PROVISIONAL.
+
+Probe facts encoded as tests (`tests/unit/adapters/eo/test_nisar.py`): 72 BETA granules,
+acquisitions 2025-11-25 .. 2026-01-15; 87 PROVISIONAL granules, acquisitions 2026-06-20 ..
+2026-08-31 (consistent with "from 17 Jun 2026"); no acquisition 2026-07-27 .. 2026-08-10
+(the instrument gap); science levels present: RSLC, GSLC, GCOV, RIFG, RUNW, GUNW, ROFF, GOFF,
+SME2. Raw listings are dominated by ancillary products (`ECMWF_SMST`, `RRSD`, SCLKSCET, orbit
+files); `NisarAdapter.search` keeps only `SCIENCE_LEVELS`. A request that matches both BETA
+and PROVISIONAL is refused with `MixedProductLevelError` unless `--level` is explicit; a
+granule whose level cannot be established (`NisarLevel.unknown`) is always refused.
 
 ## Copernicus GLO-30 DEM
 
@@ -93,7 +111,7 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | static |
 | Latency | n/a |
 | Credentials | none |
-| Adapter | `src/serac/adapters/eo/dem.py` (`Glo30DemAdapter`; windowed reads; `ports/dem.py` hook for licensed DEMs; planned) |
+| Adapter | `src/serac/adapters/eo/dem_glo30.py` (`Glo30DemAdapter`; windowed reads; `ports/dem.py` hook for licensed DEMs; `serac ingest dem`) |
 | Ledger source | `dem_glo30` |
 | Fixture | real DEM crops for all three AOIs (planned, `data/fixtures/`) |
 | Known gaps | 30 m only; higher-resolution DEMs need a licence and go through the `DemProvider` hook |
@@ -107,10 +125,10 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | reanalysis; product cadence to be recorded at fetch time |
 | Latency | to be recorded at fetch time |
 | Credentials | `CDSAPI_KEY` |
-| Adapter | `src/serac/adapters/eo/era5.py` (`Era5Adapter`; planned) |
+| Adapter | `src/serac/adapters/eo/era5_cds.py` (`Era5Adapter`; `serac ingest era5`) |
 | Ledger source | `era5_cds` |
-| Fixture | synthetic regridding sample under `tests/fixtures/synthetic/` |
-| Known gaps | no key in the founding session; `era5_t2m_t` is `not_fetched` in fixture cubes |
+| Fixture | synthetic regridding sample `tests/fixtures/synthetic/era5/regrid_sample.nc` (NetCDF-3, fictional AOI id `synthetic-regrid-sample`) |
+| Known gaps | no key in the founding session; `era5_t2m_t` is `not_fetched` in fixture cubes. CDS delivers NetCDF-4, which needs `h5py`; the locked environment does not ship it, so a real ERA5 file cannot be read here until `h5py` is added to `pyproject.toml` |
 
 ## GACOS tropospheric corrections
 
@@ -121,10 +139,10 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Cadence | on request |
 | Latency | request/poll; human-in-the-loop |
 | Credentials | `GACOS_EMAIL` |
-| Adapter | `src/serac/adapters/eo/gacos.py` (`GacosAdapter.request()` records `status: requested`; `serac ingest gacos --receive URL --request-id …` completes it; planned) |
+| Adapter | `src/serac/adapters/eo/gacos.py` (`GacosAdapter.request()` records `status: requested` with the form values and a `request_id`; `serac ingest gacos --poll --request-id ID`; `serac ingest gacos --receive URL --request-id ID` downloads the e-mailed archive and records `fetched`). The GACOS form endpoint is not verified: by default the operator submits the printed form values on the site by hand and the ledger row is the receipt |
 | Ledger source | `gacos` |
 | Fixture | none real; absent without a request |
-| Known gaps | nothing fetched; the request pattern is tested on recorded responses only |
+| Known gaps | nothing fetched; the request/poll/receive pattern is tested with fakes only |
 
 ## FDSN waveforms (EarthScope, GEOFON)
 
