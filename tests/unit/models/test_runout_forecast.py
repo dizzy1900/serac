@@ -11,7 +11,7 @@ from datetime import UTC, datetime, timedelta
 import numpy as np
 import pytest
 
-from serac.domain.common import Range, iter_ranges
+from serac.domain.common import iter_ranges
 from serac.domain.forecast import CascadeForecast, ConfidenceTier, ModelProvenance
 from serac.models.runout.forecast import MODEL_SOURCE_REF, RunoutSurrogate
 from serac.models.runout.surrogate import Dataset, corridor_features, parameter_vector
@@ -42,7 +42,7 @@ def surrogate() -> RunoutSurrogate:
     for _ in range(32):
         mu = float(np.exp(rng.uniform(np.log(0.02), np.log(0.30))))
         params.append(parameter_vector(_parameters(mu=mu), 30.0))
-        wet = CHAINAGE / 1000.0 < 40.0 * (0.03 / mu)
+        wet = 40.0 * (0.03 / mu) > CHAINAGE / 1000.0
         depth = np.where(wet, 20.0 * np.exp(-CHAINAGE / 30000.0), 0.0).astype(np.float32)
         arrival = np.where(wet, CHAINAGE / 20.0, 0.0).astype(np.float32)
         depths.append(depth)
