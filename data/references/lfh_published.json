@@ -1,6 +1,6 @@
 {
   "citation_rule": "A published number enters this file only when, in the same session, the bytes carrying it were fetched, its DOI resolved through Crossref or DataCite, and the sha256 of those bytes plus accessed_utc were recorded. Every figure carries the verbatim sentence it was read from. Fewer than three sources clearing that bar fails validate-lfh.",
-  "generated_at_utc": "2026-09-03T20:45:06.750073Z",
+  "generated_at_utc": "2026-09-03T21:55:03.886002Z",
   "schema_version": "0.1.0",
   "sources": [
     {
@@ -58,7 +58,7 @@
       "year": 2025
     },
     {
-      "accessed_utc": "2026-09-03T20:45:06.750073Z",
+      "accessed_utc": "2026-09-03T21:55:03.886002Z",
       "authors": "Higman, B. et al.",
       "container": "Scientific Reports",
       "content_type": "text/html",
@@ -69,14 +69,14 @@
       "kind": "peer_reviewed",
       "licence": "CC BY 4.0 (Scientific Reports open access)",
       "peer_reviewed": true,
-      "sha256": "27ab9f6154fd718737bdc2ba4e84683e2f55b280f0e2e63eaa86a682ff4b3587",
-      "size_bytes": 451450,
+      "sha256": "fb84095286adcc9dc9cac3b2489ebd649553b929c2acf61e4ee86fe23bf771d1",
+      "size_bytes": 451448,
       "title": "The 2015 landslide and tsunami in Taan Fiord, Alaska",
       "url": "https://www.nature.com/articles/s41598-018-30475-w",
       "year": 2018
     },
     {
-      "accessed_utc": "2026-09-03T20:45:06.750073Z",
+      "accessed_utc": "2026-09-03T21:55:03.886002Z",
       "authors": "van Wyk de Vries, M. et al.",
       "container": "Natural Hazards and Earth System Sciences",
       "content_type": "text/html",
@@ -94,7 +94,7 @@
       "year": 2022
     },
     {
-      "accessed_utc": "2026-09-03T20:45:06.750073Z",
+      "accessed_utc": "2026-09-03T21:55:03.886002Z",
       "authors": "Hibert, C. et al.",
       "container": "Geophysical Research Letters",
       "content_type": "application/json",
@@ -112,7 +112,7 @@
       "year": 2014
     },
     {
-      "accessed_utc": "2026-09-03T20:45:06.750073Z",
+      "accessed_utc": "2026-09-03T21:55:03.886002Z",
       "authors": "Ekstrom, G. and Stark, C. P.",
       "container": "Science",
       "content_type": "application/json",
@@ -130,7 +130,7 @@
       "year": 2013
     },
     {
-      "accessed_utc": "2026-09-03T20:45:06.750073Z",
+      "accessed_utc": "2026-09-03T21:55:03.886002Z",
       "authors": "Cook, K. L. et al.",
       "container": "Science",
       "content_type": "application/json",
@@ -148,7 +148,7 @@
       "year": 2021
     },
     {
-      "accessed_utc": "2026-09-03T20:45:06.750073Z",
+      "accessed_utc": "2026-09-03T21:55:03.886002Z",
       "authors": "Pankow, K. L. et al.",
       "container": "GSA Today",
       "content_type": "text/html",
@@ -166,7 +166,7 @@
       "year": 2014
     },
     {
-      "accessed_utc": "2026-09-03T20:45:06.750073Z",
+      "accessed_utc": "2026-09-03T21:55:03.886002Z",
       "authors": "Swiss Seismological Service (SED) at ETH Zurich",
       "container": "Swiss Seismological Service (SED) at ETH Zurich, fdsnws-event",
       "content_type": "application/xml",
@@ -208,6 +208,7 @@
         "units": "kg"
       },
       "published_peak_force_n": null,
+      "published_runout_bearing_deg": null,
       "published_volume_m3": null,
       "role": "reproduction",
       "runout_m": 2950.0,
@@ -254,6 +255,15 @@
         "source_ref": "higman-2018",
         "units": "N"
       },
+      "published_runout_bearing_deg": {
+        "best": 96.0,
+        "excerpt": "Seismic inversion suggested an eastward-moving (bearing 96\u00b0) landslide that generated peak forces of about 2 \u00d7 10 11 N and lasting 90 seconds.",
+        "high": 96.0,
+        "low": 96.0,
+        "notes": "'an eastward-moving (bearing 96 deg) landslide'; no uncertainty was published, so low equals high.",
+        "source_ref": "higman-2018",
+        "units": "deg from north"
+      },
       "published_volume_m3": null,
       "role": "reproduction",
       "runout_m": 1600.0,
@@ -284,6 +294,7 @@
         "units": "kg"
       },
       "published_peak_force_n": null,
+      "published_runout_bearing_deg": null,
       "published_volume_m3": null,
       "role": "reproduction",
       "runout_m": 10500.0,
@@ -313,6 +324,7 @@
       "published_duration_s": null,
       "published_mass_kg": null,
       "published_peak_force_n": null,
+      "published_runout_bearing_deg": null,
       "published_volume_m3": {
         "best": 26900000.0,
         "excerpt": "6 c; volume: 26.9 \u00d710 6 m 3 , 95 % confidence interval: 26.5\u201327.3 \u00d710 6 m 3 ; Shugar et al.",
@@ -347,6 +359,7 @@
       "published_duration_s": null,
       "published_mass_kg": null,
       "published_peak_force_n": null,
+      "published_runout_bearing_deg": null,
       "published_volume_m3": null,
       "role": "new_event",
       "runout_m": null,
@@ -373,6 +386,7 @@
       "published_duration_s": null,
       "published_mass_kg": null,
       "published_peak_force_n": null,
+      "published_runout_bearing_deg": null,
       "published_volume_m3": null,
       "role": "new_event",
       "runout_m": null,

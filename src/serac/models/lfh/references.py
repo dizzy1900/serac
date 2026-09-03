@@ -138,6 +138,12 @@ class LfhTarget(BaseModel):
     published_peak_force_n: PublishedQuantity | None = None
     published_duration_s: PublishedQuantity | None = None
     published_volume_m3: PublishedQuantity | None = None
+    #: The direction the mass travelled, in degrees from north. Compared against serac's
+    #: `force_azimuth_deg` interval rotated by 180 degrees, since the force a slide exerts
+    #: points opposite its motion. It is the strongest independent check available: nothing in
+    #: the inversion is fitted to a bearing, and a wrong transverse sign or a mirrored
+    #: `F_north = -Ft` convention would move it by 180 or reflect it about the meridian.
+    published_runout_bearing_deg: PublishedQuantity | None = None
     mass_conversion: Conversion | None = None
     public_statements: list[str] = Field(
         default_factory=list,
@@ -194,6 +200,7 @@ class LfhReferences(BaseModel):
                     target.published_peak_force_n,
                     target.published_duration_s,
                     target.published_volume_m3,
+                    target.published_runout_bearing_deg,
                 )
                 if quantity is not None
             ]

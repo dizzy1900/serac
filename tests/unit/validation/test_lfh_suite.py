@@ -232,3 +232,33 @@ def test_a_missing_reference_file_fails_cleanly(tmp_path: Path) -> None:
     result = run_suite(tmp_path)
     assert "lfh.references_load" in failed(result)
     assert len(result.checks) == 1, "the suite must stop rather than cascade"
+
+
+def test_the_published_bearing_check_uses_the_direction_of_motion(tree: Path) -> None:
+    """Taan Fiord's published bearing is the strongest independent check M2 has.
+
+    Nothing in the inversion is fitted to a direction, so a mirrored `F_north = -Ft` or a
+    flipped transverse sign would move this conspicuously. The comparison is the force azimuth
+    rotated by 180 degrees, because a slide pushes the ground opposite the way it travels.
+    """
+    result = run_suite(tree)
+    check = next(c for c in result.checks if c.name == "lfh.runout_bearing_matches_published")
+    assert check.ok
+    assert "published 96 deg" in check.details
+    assert "inside the interval" in check.details, (
+        "a bearing inside its interval must not read as outside it -- `x or y - z` binds "
+        "the subtraction to the wrong operand"
+    )
+
+
+def test_a_mirrored_bearing_is_caught(tree: Path) -> None:
+    """What a flipped force convention would look like: 180 degrees out."""
+    payload = _run(tree, "taan-fiord-2015")
+    azimuth = payload["force_history"]["force_azimuth_deg"]
+    for key in ("p05", "p50", "p95"):
+        azimuth[key] = azimuth[key] + 180.0
+    _write_run(tree, "taan-fiord-2015", payload)
+    result = run_suite(tree)
+    check = next(c for c in result.checks if c.name == "lfh.runout_bearing_matches_published")
+    assert not check.ok
+    assert "from the published one" in check.details

@@ -533,6 +533,18 @@ def main() -> None:
             geometry_source_ref="esec-taan",
             published_mass_kg=taan_mass,
             published_peak_force_n=taan_force,
+            published_runout_bearing_deg=PublishedQuantity(
+                low=96.0,
+                high=96.0,
+                best=96.0,
+                units="deg from north",
+                source_ref="higman-2018",
+                excerpt=higman_force,
+                notes=(
+                    "'an eastward-moving (bearing 96 deg) landslide'; no uncertainty was "
+                    "published, so low equals high."
+                ),
+            ),
             published_duration_s=PublishedQuantity(
                 low=90.0,
                 high=90.0,

@@ -121,8 +121,27 @@ figure it would otherwise disagree with.
 | Lamplugh Glacier, 2016 | 1.34–1.41 × 10¹¹ (ESEC) | 2.2 × 10¹⁰ / **1.9 × 10¹¹** / 1.2 × 10¹² | yes | **1.40** | 0.61 | 172° |
 | Chamoli, 2021 | 26.5–27.3 × 10⁶ m³ → 5.9–6.5 × 10¹⁰ | **REFUSED** | — | — | 0.089 | 180° |
 
-Peak force is checked separately where published: Taan Fiord's "about 2 × 10¹¹ N" against
-serac's 1.4–2.2 × 10¹¹ N (median 1.7 × 10¹¹), a ratio of 0.87.
+Two other published quantities are checked where they exist, both for Taan Fiord:
+
+| Quantity | Published (Higman et al. 2018) | serac | Verdict |
+|---|---|---|---|
+| Peak force | "about 2 × 10¹¹ N" | 1.4 / **1.7** / 2.2 × 10¹¹ N | ratio 0.87 |
+| **Runout bearing** | "an eastward-moving (**bearing 96°**) landslide" | **81 / 99 / 114°** | inside the interval, **3° from the median** |
+| Duration | "lasting 90 seconds" | 293 / **296** / 297 s | **wrong — see below** |
+
+The bearing is the strongest independent check M2 has. Nothing in the inversion is fitted to
+a direction; it falls out of the three-component force history, compared as the force azimuth
+rotated by 180° because a slide pushes the ground opposite the way it travels. Both ways the
+Syngine force convention could have been wrong — a mirrored `F_north = -Ft`, or a flipped
+transverse sign — would move it conspicuously, and neither would show up in a misfit.
+
+**Duration is not a usable output.** serac returns 296 s against a published 90 s. The source
+time series is 300 s long and the second-difference penalty spreads energy across it, so the
+5%-of-peak threshold that defines duration simply reads back the window. It is reported in the
+contract because the contract has a field for it; it should not be believed, and `duration_s`
+is the one published quantity where serac and the literature disagree outright. Shortening the
+source window would probably fix it, and doing so after seeing this number is exactly the
+adjustment the seal exists to prevent — so it stands as a known defect for the next cycle.
 
 Every median lands inside the magnitude sanity band [1/3, 3], so none of the three overlaps is
 an artefact of interval width. Taan Fiord at 0.36 is close to the edge and should be read as a
@@ -161,6 +180,7 @@ minutes before the "gegen 15.30 Uhr" in the event library, whose own stated unce
 - **Reproduction**: interval overlap on mass, plus a magnitude ratio in [1/3, 3] (peak force,
   [1/2, 2]). 3 of 4 targets pass; the fourth refuses.
 - **Fit**: variance reduction 0.40–0.61 on the three that pass.
+- **Direction**: the one published bearing available is recovered to 3°.
 - **Location resolution**: the radius containing every grid node within 0.02 of the best
   variance reduction, reported per event as `uncertainty_radius_km`. It is a resolution
   statement about the grid search, not a confidence interval.
@@ -222,6 +242,7 @@ stands:
    sharply, is not one point force. Nothing here detects that.
 6. **One Earth model.** PREM only. The bootstrap does not resample the Earth model, so
    whatever a different model would change is outside every interval quoted.
+7. **Duration saturates the source window.** 296 s returned against 90 s published. See above.
 
 ## Limitations
 

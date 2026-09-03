@@ -269,6 +269,62 @@ def _check_peak_force_sanity(
     )
 
 
+def _check_runout_bearing(
+    suite: Suite, references: LfhReferences, repo: Path, m2_dir: Path
+) -> None:
+    """serac's inverted direction of motion against a published bearing.
+
+    The strongest independent check available. Nothing in the inversion is fitted to a
+    direction, and the two ways the force convention could be wrong -- a mirrored
+    `F_north = -Ft` or a flipped transverse sign -- both move this quantity conspicuously. It
+    is compared as the force azimuth rotated by 180 degrees, because a slide pushes the ground
+    opposite the way it travels.
+    """
+    problems: list[str] = []
+    evidence: list[str] = []
+    for target in references.targets:
+        published = target.published_runout_bearing_deg
+        if published is None:
+            continue
+        payload = _load_run(repo, target.target_id, m2_dir)
+        if payload is None:
+            continue
+        history = payload["force_history"]
+        if history["status"] != "computed" or history.get("force_azimuth_deg") is None:
+            continue
+        azimuth = history["force_azimuth_deg"]
+        low, mid, high = (
+            (azimuth["p05"] + 180.0) % 360.0,
+            (azimuth["p50"] + 180.0) % 360.0,
+            (azimuth["p95"] + 180.0) % 360.0,
+        )
+        # `published.best or published.low` inside an arithmetic expression is a precedence
+        # trap: `or` binds looser than `-`, so the subtraction happens on the wrong operand
+        # and every bearing reads as outside its interval. Bind it once, first.
+        target_bearing = published.best if published.best is not None else published.low
+        span = (high - low) % 360.0
+        offset = (target_bearing - low) % 360.0
+        inside = offset <= span
+        separation = abs((mid - target_bearing + 180.0) % 360.0 - 180.0)
+        evidence.append(
+            f"{target.target_id}: published {target_bearing:.0f} deg vs serac "
+            f"{low:.0f}-{high:.0f} deg (median {mid:.0f}), "
+            f"{'inside' if inside else 'OUTSIDE'} the interval, {separation:.0f} deg from the "
+            "median"
+        )
+        if separation > 45.0:
+            problems.append(
+                f"{target.target_id}: inverted bearing is {separation:.0f} deg from the "
+                "published one"
+            )
+    suite.check(
+        "lfh.runout_bearing_matches_published",
+        not problems,
+        "; ".join(problems) or ("; ".join(evidence) or "no published bearing to compare"),
+        Severity.warning if problems else Severity.error,
+    )
+
+
 def _check_no_point_mass(
     suite: Suite, repo: Path, references: LfhReferences, reports_dir: Path
 ) -> None:
@@ -686,6 +742,7 @@ def run_suite(repo: Path, m2_dir: Path = REPORTS_DIR) -> SuiteResult:
 
     _check_references(suite, references)
     _check_reproductions(suite, references, repo, m2_dir)
+    _check_runout_bearing(suite, references, repo, m2_dir)
     _check_no_point_mass(suite, repo, references, m2_dir)
     _check_refusals(suite, repo, references, m2_dir)
     _check_fixture_hashes(suite, repo)
