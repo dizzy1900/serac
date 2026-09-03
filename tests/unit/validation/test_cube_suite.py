@@ -203,7 +203,10 @@ def test_committed_grid_mismatch_is_reported(repo_root: Path, built: Path, tmp_p
     write_grid(other, fake_repo / "data" / "aoi" / "chamoli-rishiganga" / "grid.json")
     bad = failed(run_suite(fake_repo, built / "cube.zarr"))
     assert "cube.grid_matches_committed" in bad
-    matching = grid_from_bbox("chamoli-rishiganga", 32644, CHAMOLI)
+    # The cube sits on the grid the AOI lane published, so that is the matching one.
+    matching = resolve_cube_aoi(
+        repo_root / "data", "chamoli-rishiganga", bbox=CHAMOLI, epsg=32644
+    ).grid
     write_grid(matching, fake_repo / "data" / "aoi" / "chamoli-rishiganga" / "grid.json")
     good = run_suite(fake_repo, built / "cube.zarr")
     assert "cube.grid_matches_committed" not in failed(good)

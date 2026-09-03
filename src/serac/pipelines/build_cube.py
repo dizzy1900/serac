@@ -75,6 +75,8 @@ class CubeAoi:
     grid: GridSpec
     committed_grid: bool
     """True when `grid` was read from `data/aoi/<id>/grid.json` rather than recomputed."""
+    override_ignored: str | None = None
+    """Set when an explicit --bbox/--epsg was overridden by the committed grid."""
 
 
 def resolve_cube_aoi(
@@ -85,7 +87,14 @@ def resolve_cube_aoi(
     epsg: int | None = None,
     resolution_m: float = 30.0,
 ) -> CubeAoi:
-    """AOI from `data/aoi/<id>/{aoi.json,grid.json}`; `bbox`/`epsg` overrides win."""
+    """AOI from `data/aoi/<id>/{aoi.json,grid.json}`.
+
+    A committed `grid.json` is the authority for an AOI: `validate-cube` requires the cube to
+    sit on exactly that grid, so a `bbox`/`epsg` override that disagrees with it does NOT
+    silently reshape the cube. The committed grid is used and the disagreement is reported on
+    `CubeAoi.override_ignored`, which the builder surfaces as a warning. Overrides are the way
+    to build an AOI that has no committed grid yet.
+    """
     aoi_file = aoi_path(data_dir, aoi_id)
     grid_file = grid_path(data_dir, aoi_id)
     committed_grid: GridSpec | None = None
@@ -109,10 +118,21 @@ def resolve_cube_aoi(
     ):
         return CubeAoi(aoi_id, epsg, bbox, committed_grid, committed_grid=True)
     if committed_grid is not None and committed_grid.epsg == epsg and bbox is not None:
-        # A committed grid wins over a recomputation from the same bbox/EPSG so the cube
-        # matches what the domain lane published; overrides that change the EPSG do not.
-        return CubeAoi(aoi_id, epsg, bbox, committed_grid, committed_grid=True)
+        note = (
+            f"--bbox {bbox} recomputes a {recomputed.width}x{recomputed.height} grid at "
+            f"({recomputed.x_min:.0f}, {recomputed.y_max:.0f}), but "
+            f"data/aoi/{aoi_id}/grid.json publishes {committed_grid.width}x"
+            f"{committed_grid.height} at ({committed_grid.x_min:.0f}, "
+            f"{committed_grid.y_max:.0f}); the committed grid is used"
+        )
+        return CubeAoi(
+            aoi_id, epsg, bbox, committed_grid, committed_grid=True, override_ignored=note
+        )
     return CubeAoi(aoi_id, epsg, bbox, recomputed, committed_grid=False)
+
+
+STATIC_COVERAGE_COMPLETE = 0.999
+"""Below this finite fraction a static layer is reported `partial`, not `fetched`."""
 
 
 class LayerReport(BaseModel):
@@ -274,12 +294,26 @@ def build_cube(
         ledger, aoi.aoi_id, raw_root_rel=raw_root_rel, include_synthetic=include_synthetic
     )
     warnings: list[str] = []
+    if aoi.override_ignored:
+        warnings.append(aoi.override_ignored)
 
     dem_builder = DemLayerBuilder(repo_root)
     dem = dem_builder.build(grid, entries, window)
     slope, aspect = derive_terrain(dem, grid)
     if dem.attrs.get("status") == LayerStatus.not_fetched.value:
         warnings.append("dem: no fetched GLO-30 crop for this AOI; dem/slope/aspect are NaN")
+    else:
+        # A DEM crop smaller than the AOI extent leaves real NaN holes. Say so: a 12 %-covered
+        # DEM must never read as a complete one (STATIC_COVERAGE_COMPLETE is the threshold).
+        covered = float(np.isfinite(dem.values).mean())
+        if covered < STATIC_COVERAGE_COMPLETE:
+            for layer in (dem, slope, aspect):
+                layer.attrs["status"] = LayerStatus.partial.value
+                layer.attrs["coverage_fraction"] = round(covered, 6)
+            warnings.append(
+                f"dem: covers {covered:.1%} of the AOI grid; the fetched crop is smaller than "
+                "the AOI extent, so dem/slope/aspect are partial and NaN elsewhere"
+            )
 
     imaging: list[LayerBuilder] = (
         list(builders)

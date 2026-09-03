@@ -93,7 +93,7 @@ def test_cube_build_then_describe(repo_root: Path, tmp_path: Path) -> None:
     layers = {row["layer"]: row for row in doc["layers"]}
     assert layers["s1_coherence_t"]["provenance"] == "synthetic"
     assert layers["nisar_hh_t"]["status"] == "not_fetched"
-    assert layers["dem"]["status"] == "fetched" and len(doc["times"]) == 4
+    assert layers["dem"]["status"] == "partial" and len(doc["times"]) == 4
     assert [row["layer"] for row in doc["layers"]][:3] == ["dem", "slope", "aspect"]
 
 

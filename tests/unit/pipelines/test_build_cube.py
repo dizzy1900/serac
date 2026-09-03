@@ -55,15 +55,21 @@ def acceptance(
 def test_acceptance_report(acceptance: tuple[Path, CubeBuildReport]) -> None:
     out, report = acceptance
     assert report.aoi_id == "chamoli-rishiganga" and report.grid.epsg == 32644
-    assert report.grid.resolution_m == 30.0 and report.committed_grid is False
+    # data/aoi/chamoli-rishiganga/grid.json is the authority; the --bbox override is
+    # reported, not silently applied (see resolve_cube_aoi).
+    assert report.grid.resolution_m == 30.0 and report.committed_grid is True
+    assert any("committed grid is used" in w for w in report.warnings)
     assert report.n_times == 4 and report.stac_items == 4
     assert report.contains_synthetic is True
     assert report.duration_s < 60
     by_name = {layer.name: layer for layer in report.layers}
     assert list(by_name) == list(REQUIRED_LAYERS)
     for name in ("dem", "slope", "aspect"):
-        assert by_name[name].status == "fetched" and by_name[name].provenance == "real"
-        assert by_name[name].finite_fraction > 0.9
+        # The GLO-30 fixture crop covers the source zone, not the whole corridor AOI, so the
+        # terrain layers are honestly `partial` with the rest NaN.
+        assert by_name[name].status == "partial" and by_name[name].provenance == "real"
+        assert 0.0 < by_name[name].finite_fraction < 0.999
+    assert any("covers" in w and "partial" in w for w in report.warnings)
     for name in ("s2_ndsi_t", "s2_cloud_t"):
         assert by_name[name].status == "fetched" and by_name[name].n_times_valid == 3
         assert len(by_name[name].product_ids) == 3
