@@ -79,11 +79,38 @@ reported instead:
   its first Watch, and **the number of other units simultaneously at Watch** — the false-alarm
   burden, which is what decides whether the tier could be acted on.
 - The Langtang result, with observability separated from the absence of a precursor.
-- Per-pair optical noise floors, measured.
+- Per-pair optical noise floors, measured — including the finding that the pre-registered
+  median floor is **not a usable discriminator** as implemented (see below).
 - Coverage: how much of each AOI the processed burst footprint actually images.
 
 See `reports/watch/backtest_chamoli.md` and `reports/watch/backtest_langtang.md` for the
 numbers. A result there is a description of one event, not a performance estimate.
+
+### What the optical layer actually showed
+
+Four season-matched post-monsoon scenes per AOI, three annual pairs each.
+
+| AOI | pairs | stable chips | median floor | p95 floor | verdict |
+|---|---|---|---|---|---|
+| chamoli-rishiganga | 3 | 512 | 2.6 - 10.3 m | 54 - 59 m | heavy-tailed; median unusable |
+| lhende-khola-trishuli | 3 | 6,133 | 0.0 m | 1.5 - 2.7 m | degenerate; median unusable |
+
+Two honest negatives here, both left uncorrected because fixing them after seeing them would
+be tuning:
+
+1. **The median floor is degenerate on well-correlated ground.** A stable chip's correlation
+   peak lands on the zero-shift sample and the sub-pixel fit returns exactly 0, so over half
+   the Langtang stable chips are exactly zero and the median floor collapses to 0.0 m. The
+   pre-registered test "displacement exceeds the median floor" is then true of every non-zero
+   measurement and means nothing. `noise_floor_degenerate` flags it.
+2. **The floor is heavy-tailed everywhere.** Chamoli's stable ground has a p95 of 54-59 m
+   against a median of 3-10 m, on only 512 stable chips — that AOI has very little terrain
+   below 10 degrees to measure a floor on.
+
+**The optical significance flag should not be read as a detection at v0.** The p95 in each
+pair's record is the statistic with meaning. The optical layer does not enter the watch score,
+so none of this affects any tier. A v1 should pre-register a percentile floor rather than a
+median, and should measure it on a stable-ground sample large enough to estimate a tail.
 
 ## Failure modes
 

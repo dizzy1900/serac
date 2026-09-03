@@ -358,8 +358,35 @@ def _fetch_scenes(
         time_end=window_end,
         params={"max_cloud": MAX_CLOUD_PERCENT},
     )
-    found = adapter.search(request)
-    in_window = [p for p in found if p.time_start is not None and in_season(p.time_start)]
+    # Search a year at a time. One STAC request is capped at a few hundred items, and a
+    # four-tile AOI over five years goes straight through that cap: a single request returned
+    # only the most recent two years, which would have been written up as an archive gap.
+    found: dict[str, Any] = {}
+    for year in range(window_start.year, window_end.year + 1):
+        slice_start = max(window_start, datetime(year, 1, 1, tzinfo=UTC))
+        slice_end = min(window_end, datetime(year, 12, 31, 23, 59, 59, tzinfo=UTC))
+        if slice_start >= slice_end:
+            continue
+        for product in adapter.search(
+            request.model_copy(update={"time_start": slice_start, "time_end": slice_end})
+        ):
+            found[product.product_id] = product
+
+    in_window = [p for p in found.values() if p.time_start is not None and in_season(p.time_start)]
+    if not in_window:
+        return
+
+    # Pin one MGRS tile for the whole series. A Sentinel-2 tile is 110 km square and this AOI
+    # spans four of them; mixing tiles between epochs would change the footprint under the
+    # tracker from pair to pair. The tile with the most in-season scenes wins, so the optical
+    # layer covers that tile's intersection with the AOI rather than the whole AOI.
+    counts: dict[str, int] = {}
+    for product in in_window:
+        tile = _mgrs_tile(product.product_id)
+        counts[tile] = counts.get(tile, 0) + 1
+    best_tile = max(sorted(counts), key=lambda t: counts[t])
+    in_window = [p for p in in_window if _mgrs_tile(p.product_id) == best_tile]
+
     by_year: dict[int, list[Any]] = {}
     for product in in_window:
         assert product.time_start is not None
@@ -376,10 +403,18 @@ def _fetch_scenes(
         chosen.extend(ranked[:per_year])
     if not chosen:
         return
-    plan = adapter.plan(request).model_copy(update={"products": chosen})
+    plan = adapter.plan(
+        request.model_copy(update={"params": {**request.params, "max_scenes": len(chosen)}})
+    ).model_copy(update={"products": chosen})
     adapter.fetch(
         plan,
         dest_root=data_dir,
         ledger=JsonlManifestLedger(data_dir / "manifest.jsonl"),
         confirm=lambda _q: True,
     )
+
+
+def _mgrs_tile(product_id: str) -> str:
+    """`S2A_44RLU_20210126_1_L2A` -> `44RLU`."""
+    parts = product_id.split("_")
+    return parts[1] if len(parts) > 1 else product_id

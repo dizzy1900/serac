@@ -194,3 +194,22 @@ def test_a_heavy_tailed_stable_sample_is_flagged() -> None:
 
 def test_an_unmeasurable_floor_counts_as_heavy_tailed() -> None:
     assert NoiseFloor(float("nan"), float("nan"), 0).heavy_tailed
+
+
+def test_a_zero_median_floor_is_flagged_degenerate() -> None:
+    """On stable ground most chips match at exactly zero, collapsing the median floor."""
+    floor = NoiseFloor(
+        median_abs_displacement_m=0.0, p95_abs_displacement_m=2.0, n_stable_chips=6000
+    )
+    assert floor.degenerate
+    assert floor.heavy_tailed
+    # The pre-registered rule stays as written, which is what makes it vacuous here.
+    assert floor.is_significant(0.001)
+
+
+def test_a_healthy_floor_is_neither_degenerate_nor_heavy_tailed() -> None:
+    floor = NoiseFloor(
+        median_abs_displacement_m=2.0, p95_abs_displacement_m=6.0, n_stable_chips=600
+    )
+    assert not floor.degenerate
+    assert not floor.heavy_tailed

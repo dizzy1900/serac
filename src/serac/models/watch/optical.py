@@ -183,6 +183,21 @@ class NoiseFloor:
         return abs(displacement_m) > self.median_abs_displacement_m
 
     @property
+    def degenerate(self) -> bool:
+        """Is the median floor exactly zero, making the significance test vacuous?
+
+        On stable ground the correlation peak lands on the zero-shift sample and the sub-pixel
+        fit returns exactly 0, so more than half the stable chips can be exactly zero and the
+        median floor collapses to 0.0 — at which point "displacement exceeds the floor" is true
+        of every non-zero measurement. Observed on the Langtang scenes. The pre-registered rule
+        is left alone and this flag is reported instead; the p95 in the same record is the
+        statistic a reader should use.
+        """
+        return not (
+            np.isfinite(self.median_abs_displacement_m) and self.median_abs_displacement_m > 0.0
+        )
+
+    @property
     def heavy_tailed(self) -> bool:
         """Is the stable-ground distribution so skewed that the median understates the noise?
 
@@ -342,14 +357,8 @@ def run_optical_tracking(
                 "noise_floor_definition": floor.definition,
                 "n_stable_chips": floor.n_stable_chips,
                 "noise_floor_heavy_tailed": floor.heavy_tailed,
-                "noise_floor_caveat": (
-                    "the stable-ground distribution is heavy-tailed (p95 / median > "
-                    f"{NoiseFloor.HEAVY_TAIL_RATIO:.0f}), so the pre-registered median floor "
-                    "describes the well-behaved chips only and the significance flag derived "
-                    "from it should not be read as a detection"
-                )
-                if floor.heavy_tailed
-                else None,
+                "noise_floor_degenerate": floor.degenerate,
+                "noise_floor_caveat": _floor_caveat(floor),
                 "n_units_measured": sum(
                     1 for v in units.values() if v["displacement_m"] is not None
                 ),
@@ -365,6 +374,25 @@ def run_optical_tracking(
             }
         )
     return _write(reports_dir, aoi_id, summary)
+
+
+def _floor_caveat(floor: NoiseFloor) -> str | None:
+    """How badly the pre-registered median floor misdescribes this pair, if at all."""
+    if floor.degenerate:
+        return (
+            "the stable-ground median is 0.0 m, so the pre-registered significance test "
+            "(displacement > median) is satisfied by every non-zero measurement and means "
+            "nothing for this pair; use the p95 in this record instead. The threshold is left "
+            "as pre-registered rather than moved to fit this observation."
+        )
+    if floor.heavy_tailed:
+        return (
+            "the stable-ground distribution is heavy-tailed (p95 / median > "
+            f"{NoiseFloor.HEAVY_TAIL_RATIO:.0f}), so the pre-registered median floor describes "
+            "the well-behaved chips only and the significance flag derived from it should not "
+            "be read as a detection"
+        )
+    return None
 
 
 def _write(reports_dir: Path, aoi_id: str, payload: dict[str, Any]) -> dict[str, Any]:

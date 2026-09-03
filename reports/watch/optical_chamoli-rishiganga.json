@@ -2,7 +2,7 @@
   "aoi_id": "chamoli-rishiganga",
   "tracker_id": "serac-orientation-correlation-v1",
   "not_autorift": "NOT autoRIFT and NOT comparable with ITS_LIVE: autoRIFT is unavailable on PyPI and vendoring it requires ISCE2. This is a single-pass, fixed-chip orientation-correlation NCC tracker written for serac.",
-  "generated_at": "2026-09-03T21:06:50.568205+00:00",
+  "generated_at": "2026-09-03T23:37:58.133951+00:00",
   "window": [
     "2016-01-01",
     "2021-02-07"
@@ -50,6 +50,7 @@
       "noise_floor_definition": "median |displacement| over chips whose centre has slope < 10 degrees, is not inside an RGI 7.0 glacier outline, and is not water",
       "n_stable_chips": 512,
       "noise_floor_heavy_tailed": true,
+      "noise_floor_degenerate": false,
       "noise_floor_caveat": "the stable-ground distribution is heavy-tailed (p95 / median > 5), so the pre-registered median floor describes the well-behaved chips only and the significance flag derived from it should not be read as a detection",
       "n_units_measured": 4843,
       "n_units_significant": 2524,
@@ -138,6 +139,7 @@
       "noise_floor_definition": "median |displacement| over chips whose centre has slope < 10 degrees, is not inside an RGI 7.0 glacier outline, and is not water",
       "n_stable_chips": 512,
       "noise_floor_heavy_tailed": true,
+      "noise_floor_degenerate": false,
       "noise_floor_caveat": "the stable-ground distribution is heavy-tailed (p95 / median > 5), so the pre-registered median floor describes the well-behaved chips only and the significance flag derived from it should not be read as a detection",
       "n_units_measured": 4827,
       "n_units_significant": 2550,
@@ -226,6 +228,7 @@
       "noise_floor_definition": "median |displacement| over chips whose centre has slope < 10 degrees, is not inside an RGI 7.0 glacier outline, and is not water",
       "n_stable_chips": 512,
       "noise_floor_heavy_tailed": true,
+      "noise_floor_degenerate": false,
       "noise_floor_caveat": "the stable-ground distribution is heavy-tailed (p95 / median > 5), so the pre-registered median floor describes the well-behaved chips only and the significance flag derived from it should not be read as a detection",
       "n_units_measured": 4849,
       "n_units_significant": 2421,
