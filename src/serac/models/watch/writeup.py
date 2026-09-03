@@ -69,6 +69,62 @@ def _coverage_section(summary: dict[str, Any], context: dict[str, Any]) -> str:
     )
 
 
+def _coherence_table(context: dict[str, Any]) -> str:
+    rows = context.get("coherence_by_elevation") or []
+    if not rows:
+        return "_No MintPy temporal-coherence raster was available to tabulate._"
+    lines = [
+        "| elevation band | pixels | median temporal coherence | fraction >= 0.40 |",
+        "|---|---|---|---|",
+    ]
+    for row in rows:
+        band = row["elevation_m"]
+        label = "**whole AOI**" if band is None else f"{band[0]:,.0f} - {band[1]:,.0f} m"
+        lines.append(
+            f"| {label} | {row['n_pixels']:,} | {row['median_temporal_coherence']:.3f} | "
+            f"{row['fraction_above_threshold']:.3f} |"
+        )
+    return "\n".join(lines)
+
+
+def _source_zone_table(summary: dict[str, Any], limit: int = 12) -> str:
+    rows = summary.get("source_zone_neighbourhood") or []
+    if not rows:
+        return "_The AOI defines no source zone, so no neighbourhood could be tabulated._"
+    lines = [
+        "| unit | overlap (m2) | aspect | LOS sens | measurable | best tier | reason |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for row in rows[:limit]:
+        sensitivity = row.get("los_sensitivity_signed")
+        lines.append(
+            f"| `{row['unit_id']}` | {row['overlap_m2']:,.0f} | {row['aspect_deg']:.0f} deg | "
+            f"{'n/a' if sensitivity is None else f'{sensitivity:+.3f}'} | "
+            f"{row['steps_measurable']}/{row['steps_total']} | {row['best_tier_reached']} | "
+            f"{row.get('insufficient_reason') or '-'} |"
+        )
+    if len(rows) > limit:
+        lines.append(f"| _... {len(rows) - limit} more_ | | | | | | |")
+    return "\n".join(lines)
+
+
+def _observability_paragraph(summary: dict[str, Any]) -> str:
+    counts = summary.get("source_zone_insufficient_reasons") or {}
+    total = sum(counts.values())
+    if not total:
+        return ""
+    measurable = counts.get("measurable", 0)
+    parts = ", ".join(
+        f"{v} {k.replace('_', ' ')}" for k, v in sorted(counts.items()) if k != "measurable"
+    )
+    return (
+        f"{total} slope units intersect the source zone. **{measurable}** of them were "
+        f"measurable at any step; the rest failed a data-adequacy test ({parts}). "
+        "A unit that fails one of those tests is not being watched at all, and nothing about "
+        "its stability follows from its absence from the Watch list."
+    )
+
+
 def backtest_markdown(payload: dict[str, Any], context: dict[str, Any]) -> str:
     """The Chamoli write-up."""
     summary = payload["summary"]
@@ -91,6 +147,23 @@ def backtest_markdown(payload: dict[str, Any], context: dict[str, Any]) -> str:
             if isinstance(concurrent, int) and concurrent > 0
             else "No other unit was at Watch on that step, which is the best case this "
             "single event can demonstrate. It remains one event."
+        )
+    elif summary.get("steps_by_target_tier", {}).get("insufficient_data") == summary.get("n_steps"):
+        # The labelled unit was never measurable at any step. This is an observability result
+        # and calling it a detection failure would be wrong: the tier was never asked.
+        headline = (
+            f"The labelled unit (`{summary.get('labelled_unit')}`) was **`insufficient_data` at "
+            f"every one of the {summary.get('n_steps')} steps** (final reason: "
+            f"`{summary.get('final_step_reason')}`). It never entered the tier at all."
+        )
+        verdict = (
+            "**This is an observability result, not a statement about precursors.** This "
+            "configuration — one ascending track, 80 m pixels, C-band, a height-correlation "
+            "tropospheric correction — could not measure the slope that failed, whether or not "
+            "it was moving. Reporting it as 'no precursor detected' would be wrong, and "
+            "reporting it as a failure of the tier would be wrong too: the tier was never in a "
+            "position to be asked. Section 10 of the pre-registration named exactly this "
+            "outcome in advance as the third of the three ways the design could come out."
         )
     else:
         headline = (
@@ -156,6 +229,19 @@ The failed unit was identified **after** all scoring, by the rule pre-registered
 
 Tier of the labelled unit across the walk-forward:
 {json.dumps(summary.get("steps_by_target_tier", {}), sort_keys=True)}
+
+## The source zone, unit by unit
+
+{_observability_paragraph(summary)}
+
+{_source_zone_table(summary)}
+
+## Why: C-band temporal coherence against elevation
+
+The physical limitation this component is most constrained by, measured on this stack rather
+than asserted. MintPy temporal coherence over the 260-pair network, against the HyP3 DEM:
+
+{_coherence_table(context)}
 
 ## Step-by-step
 
@@ -243,6 +329,16 @@ measurable.
 | did it ever reach Watch | {summary.get("reached_watch")} |
 | did it ever reach Elevated | {summary.get("reached_elevated")} |
 
+## Why: C-band temporal coherence against elevation
+
+{_coherence_table(context)}
+
+## The source zone, unit by unit
+
+{_observability_paragraph(summary)}
+
+{_source_zone_table(summary)}
+
 ## Reading this honestly
 
 {
@@ -285,9 +381,15 @@ def gather_context(data_dir: Path, reports_dir: Path, aoi_id: str) -> dict[str, 
         loaded: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
         return loaded
 
+    from serac.models.watch.aggregate import coherence_by_elevation
     from serac.models.watch.insar_jobs import harvested_pairs
 
+    try:
+        coherence = coherence_by_elevation(data_dir, aoi_id)
+    except Exception:
+        coherence = []
     return {
+        "coherence_by_elevation": coherence,
         "network_plan": _load(data_dir / "interim" / "watch" / f"network_{aoi_id}.json"),
         "track_selection": _load(reports_dir / "watch" / f"track_selection_{aoi_id}.json"),
         "watch_cube": _load(reports_dir / "watch" / f"watch_cube_{aoi_id}.json"),

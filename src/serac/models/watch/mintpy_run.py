@@ -114,6 +114,9 @@ class MintPyConfig(BaseModel):
             "mintpy.troposphericDelay.method": self.tropo_method,
             "mintpy.deramp": self.deramp,
             "mintpy.geocode": "no",
+            # The `pic` folder costs minutes per pass and nothing here reads it; the reports
+            # this component writes are the product.
+            "mintpy.plot": "no",
         }
         if self.reference_yx is not None:
             options["mintpy.reference.yx"] = f"{self.reference_yx[0]}, {self.reference_yx[1]}"

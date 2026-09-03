@@ -108,35 +108,50 @@ def _circular_mean_aspect(aspect_deg: FloatArray, window: int) -> FloatArray:
     return smoothed
 
 
+STRUCTURE_8 = np.ones((3, 3), dtype=bool)
+
+
 def _dissolve_small(labels: IntArray, min_pixels: int) -> IntArray:
     """Merge components below `min_pixels` into the neighbour they share the most edge with.
 
     Iterated until nothing changes, smallest component first, so the result does not depend on
     label numbering. A component with no labelled neighbour is dropped (set to 0).
+
+    Every component is handled inside its own padded bounding box rather than by scanning the
+    whole raster. The rule is identical either way — a component's neighbours all touch it —
+    but the cost stops being (number of small components) x (raster size), which on the
+    2106 x 2285 Langtang grid is the difference between minutes and never finishing.
     """
     out = labels.copy()
+    height, width = out.shape
     while True:
         ids, counts = np.unique(out[out > 0], return_counts=True)
-        small = [int(i) for i, c in zip(ids, counts, strict=True) if c < min_pixels]
+        sizes = {int(i): int(c) for i, c in zip(ids, counts, strict=True)}
+        small = sorted((i for i, c in sizes.items() if c < min_pixels), key=lambda i: (sizes[i], i))
         if not small:
             return out
-        small.sort(key=lambda i: (int((out == i).sum()), i))
+        boxes = ndimage.find_objects(out)
         changed = False
         for unit in small:
-            mask = out == unit
+            box = boxes[unit - 1] if unit - 1 < len(boxes) else None
+            if box is None:
+                continue
+            rows = slice(max(box[0].start - 1, 0), min(box[0].stop + 1, height))
+            cols = slice(max(box[1].start - 1, 0), min(box[1].stop + 1, width))
+            window = out[rows, cols]
+            mask = window == unit
             if not mask.any():
                 continue
-            dilated = ndimage.binary_dilation(mask, structure=np.ones((3, 3), dtype=bool))
-            border = dilated & ~mask
-            neighbours = out[border]
+            border = ndimage.binary_dilation(mask, structure=STRUCTURE_8) & ~mask
+            neighbours = window[border]
             neighbours = neighbours[neighbours > 0]
             if neighbours.size == 0:
-                out[mask] = 0
+                window[mask] = 0
                 changed = True
                 continue
             values, counts_n = np.unique(neighbours, return_counts=True)
             best = int(values[np.lexsort((values, -counts_n))[0]])
-            out[mask] = best
+            window[mask] = best
             changed = True
         if not changed:
             return out

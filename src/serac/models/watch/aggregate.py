@@ -34,6 +34,27 @@ from numpy.typing import NDArray
 from serac.errors import SeracError
 from serac.models.watch.anomaly import MIN_COHERENCE
 
+TIMESERIES_PREFERENCE: Final[tuple[str, ...]] = (
+    "timeseries_tropHgt_ramp_demErr.h5",
+    "timeseries_tropHgt_ramp.h5",
+    "timeseries_tropHgt.h5",
+    "timeseries.h5",
+)
+"""Most-corrected time series first.
+
+MintPy writes one file per correction stage and leaves the raw `timeseries.h5` in place, so
+reading `timeseries.h5` silently discards the tropospheric correction, the ramp removal and
+the DEM-error correction — every correction the pipeline was configured to apply. The file
+actually used is recorded in the cube attributes and in the report.
+"""
+
+CORRECTIONS_APPLIED: Final[dict[str, str]] = {
+    "timeseries.h5": "none (network inversion only)",
+    "timeseries_tropHgt.h5": "height-correlation tropospheric delay",
+    "timeseries_tropHgt_ramp.h5": "height-correlation troposphere, linear ramp",
+    "timeseries_tropHgt_ramp_demErr.h5": ("height-correlation troposphere, linear ramp, DEM error"),
+}
+
 MIN_PIXEL_TEMPORAL_COHERENCE: Final[float] = 0.40
 MIN_PIXELS_PER_UNIT: Final[int] = 5
 EPOCH: Final[datetime] = datetime(2014, 1, 1, tzinfo=UTC)
@@ -62,6 +83,18 @@ class UnitCube:
 
 def watch_cube_path(data_dir: Path, aoi_id: str) -> Path:
     return data_dir / "features" / "watch" / aoi_id / "watch_cube.zarr"
+
+
+def select_timeseries(work_dir: Path) -> Path:
+    """The most-corrected MintPy time series present, per `TIMESERIES_PREFERENCE`."""
+    for name in TIMESERIES_PREFERENCE:
+        candidate = work_dir / name
+        if candidate.exists():
+            return candidate
+    raise SeracError(
+        f"no MintPy time series under {work_dir}; run `serac watch mintpy` first "
+        f"(looked for {', '.join(TIMESERIES_PREFERENCE)})"
+    )
 
 
 def _read_h5(path: Path, dataset: str) -> Any:
@@ -208,6 +241,8 @@ def write_watch_cube(cube: UnitCube, path: Path, *, provenance: dict[str, Any]) 
                         f"{MIN_PIXELS_PER_UNIT} pixels are valid"
                     ),
                     "tropospheric_correction": provenance.get("tropospheric_correction"),
+                    "timeseries_file": provenance.get("timeseries_file"),
+                    "corrections_applied": provenance.get("corrections_applied"),
                 },
             ),
             "temporal_coherence": (
@@ -308,9 +343,7 @@ def build_watch_cube(*, data_dir: Path, reports_dir: Path, aoi_id: str) -> dict[
 
     plan = load_network_plan(data_dir, aoi_id)
     work = mintpy_dir(data_dir, aoi_id, "pass2")
-    timeseries = work / "timeseries.h5"
-    if not timeseries.exists():
-        raise SeracError(f"no MintPy time series at {timeseries}; run `serac watch mintpy` first")
+    timeseries = select_timeseries(work)
     mintpy_report = reports_dir / "watch" / f"mintpy_{aoi_id}.json"
     mintpy_meta = (
         json.loads(mintpy_report.read_text(encoding="utf-8")) if mintpy_report.exists() else {}
@@ -349,6 +382,8 @@ def build_watch_cube(*, data_dir: Path, reports_dir: Path, aoi_id: str) -> dict[
             "delineation_sha256": str(frame["delineation_sha256"].iloc[0]),
             "network_plan_sha256": plan.plan_sha256,
             "tropospheric_correction": mintpy_meta.get("tropospheric_correction"),
+            "timeseries_file": timeseries.name,
+            "corrections_applied": CORRECTIONS_APPLIED.get(timeseries.name, "unknown"),
         },
     )
     summary = {
@@ -364,6 +399,9 @@ def build_watch_cube(*, data_dir: Path, reports_dir: Path, aoi_id: str) -> dict[
         if np.isfinite(cube.coherence_loss).any()
         else None,
         "tropospheric_correction": mintpy_meta.get("tropospheric_correction"),
+        "timeseries_file": timeseries.name,
+        "corrections_applied": CORRECTIONS_APPLIED.get(timeseries.name, "unknown"),
+        "mintpy_reference_point": mintpy_meta.get("reference_point"),
     }
     report = reports_dir / "watch" / f"watch_cube_{aoi_id}.json"
     report.parent.mkdir(parents=True, exist_ok=True)
@@ -429,3 +467,69 @@ __all__ = [
     "watch_cube_path",
     "write_watch_cube",
 ]
+
+
+ELEVATION_BANDS: Final[tuple[tuple[float, float], ...]] = (
+    (0.0, 3000.0),
+    (3000.0, 4000.0),
+    (4000.0, 4500.0),
+    (4500.0, 5000.0),
+    (5000.0, 5500.0),
+    (5500.0, 9000.0),
+)
+
+
+def coherence_by_elevation(
+    data_dir: Path, aoi_id: str, *, threshold: float = MIN_PIXEL_TEMPORAL_COHERENCE
+) -> list[dict[str, Any]]:
+    """Median MintPy temporal coherence per elevation band, and the fraction above `threshold`.
+
+    This is the measurement behind the C-band decorrelation limitation. Stating it as a table
+    rather than as a sentence is what turns "C-band decorrelates over snow and ice" from a
+    caveat into a number a reader can check.
+    """
+    import rasterio
+
+    from serac.models.watch.mintpy_run import mintpy_dir
+
+    work = mintpy_dir(data_dir, aoi_id, "pass2")
+    coherence = _read_h5(work / "temporalCoherence.h5", "temporalCoherence")
+    if coherence is None:
+        return []
+    dem_tif = next(
+        iter((data_dir / "raw" / "hyp3_burst_insar" / aoi_id).glob("S1_*/*_dem.tif")), None
+    )
+    if dem_tif is None:
+        return []
+    with rasterio.open(dem_tif) as src:
+        elevation = src.read(1).astype(np.float64)
+    if elevation.shape != coherence.shape:
+        return []
+    usable = np.isfinite(coherence) & np.isfinite(elevation) & (elevation > 0)
+    out: list[dict[str, Any]] = []
+    for low, high in ELEVATION_BANDS:
+        band = usable & (elevation >= low) & (elevation < high)
+        n = int(band.sum())
+        if n < 50:
+            continue
+        out.append(
+            {
+                "elevation_m": [low, high],
+                "n_pixels": n,
+                "median_temporal_coherence": round(float(np.median(coherence[band])), 4),
+                "fraction_above_threshold": round(float((coherence[band] >= threshold).mean()), 4),
+            }
+        )
+    total = usable.sum()
+    if total:
+        out.append(
+            {
+                "elevation_m": None,
+                "n_pixels": int(total),
+                "median_temporal_coherence": round(float(np.median(coherence[usable])), 4),
+                "fraction_above_threshold": round(
+                    float((coherence[usable] >= threshold).mean()), 4
+                ),
+            }
+        )
+    return out

@@ -30,6 +30,7 @@ from serac.errors import SeracError
 from serac.models.watch.aggregate import days_since_epoch, watch_cube_path
 from serac.models.watch.anomaly import (
     ELEVATED_THRESHOLD,
+    TIER_ORDER,
     WATCH_THRESHOLD,
     InsufficientReason,
     Tier,
@@ -86,6 +87,43 @@ def load_series(data_dir: Path, aoi_id: str) -> dict[str, UnitSeries]:
 
 
 # -- post-hoc labelling (reporting only) ---------------------------------------------------
+
+
+def source_zone_units(data_dir: Path, aoi_id: str) -> list[dict[str, Any]]:
+    """Every slope unit intersecting the AOI source zone, with its overlap and geometry.
+
+    **Post-hoc labelling**, like `failed_unit_id`, and used only for reporting. The
+    pre-registered rule names a single unit — the largest overlap — but a source zone spans
+    several aspects and a single track's sensitivity varies enormously between them, so
+    reporting the whole neighbourhood is what makes an observability result interpretable
+    instead of just negative. The headline number remains the pre-registered one.
+    """
+    import geopandas as gpd
+    from shapely.ops import unary_union
+
+    from serac.models.watch.slope_units import slope_units_path
+
+    zone_path = data_dir / "aoi" / aoi_id / "source_zone.geojson"
+    if not zone_path.exists():
+        return []
+    zones = gpd.read_file(zone_path)
+    units = gpd.read_parquet(slope_units_path(data_dir, aoi_id))
+    zone = unary_union(list(zones.to_crs(units.crs).geometry))
+    hits = units.iloc[units.sindex.query(zone, predicate="intersects")]
+    rows: list[dict[str, Any]] = []
+    for r in hits.itertuples():
+        rows.append(
+            {
+                "unit_id": str(r.unit_id),
+                "overlap_m2": round(float(r.geometry.intersection(zone).area), 1),
+                "aspect_deg": round(float(r.aspect_deg), 1),
+                "mean_slope_deg": round(float(r.mean_slope_deg), 1),
+                "area_m2": round(float(r.area_m2), 1),
+                "glacier_cover": None if r.glacier_cover is None else bool(r.glacier_cover),
+            }
+        )
+    rows.sort(key=lambda x: (-float(x["overlap_m2"] or 0.0), str(x["unit_id"])))
+    return rows
 
 
 def failed_unit_id(data_dir: Path, aoi_id: str) -> tuple[str | None, dict[str, Any]]:
@@ -207,6 +245,7 @@ def run_backtest(
     scored = walk_forward(series, [days_since_epoch(s) for s in steps])
     target, labelling = failed_unit_id(data_dir, aoi_id)
     rows = summarise_steps(steps, scored, target)
+    neighbourhood = _source_zone_history(data_dir, aoi_id, series, scored, steps, failure)
 
     first_watch = next((r for r in rows if r.target_tier is Tier.watch), None)
     first_elevated = next((r for r in rows if r.target_tier in (Tier.elevated, Tier.watch)), None)
@@ -221,6 +260,9 @@ def run_backtest(
         "n_units_total": len(series),
         "labelled_unit": target,
         "labelling": labelling,
+        "source_zone_neighbourhood": neighbourhood,
+        "observability": observability_breakdown(scored),
+        "source_zone_insufficient_reasons": _reason_counts(neighbourhood),
         "thresholds": {"elevated": ELEVATED_THRESHOLD, "watch": WATCH_THRESHOLD},
         "reached_watch": first_watch is not None,
         "lead_time_days_to_first_watch": (
@@ -262,11 +304,9 @@ def run_backtest(
     )
 
     context = gather_context(data_dir, reports_dir, aoi_id)
+    out.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
     if slug == "langtang":
-        observability = observability_breakdown(scored)
-        summary["observability"] = observability
-        out.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
-        text = langtang_markdown(payload, observability, context)
+        text = langtang_markdown(payload, summary["observability"], context)
     else:
         text = backtest_markdown(payload, context)
     markdown = write_markdown(text, reports_dir / "watch" / f"backtest_{slug}.md")
@@ -355,3 +395,67 @@ def observability_breakdown(
         "final_step_elevated": sum(1 for s in observable if s.tier is Tier.elevated),
         "final_step_watch": sum(1 for s in observable if s.tier is Tier.watch),
     }
+
+
+def _source_zone_history(
+    data_dir: Path,
+    aoi_id: str,
+    series: dict[str, UnitSeries],
+    scored: list[dict[str, UnitScore]],
+    steps: list[datetime],
+    failure: datetime,
+) -> list[dict[str, Any]]:
+    """Tier history of every source-zone unit, so an observability result can be read properly.
+
+    Reporting only. It answers the question a reader will immediately ask when the labelled
+    unit turns out to be unobservable: was any part of the source zone observable, and if so
+    what did it show?
+    """
+    out: list[dict[str, Any]] = []
+    for row in source_zone_units(data_dir, aoi_id):
+        unit_id = str(row["unit_id"])
+        unit_series = series.get(unit_id)
+        history = [step.get(unit_id) for step in scored]
+        measurable = [s for s in history if s is not None and s.reason is None]
+        first_watch = next(
+            (steps[i] for i, s in enumerate(history) if s is not None and s.tier is Tier.watch),
+            None,
+        )
+        best = max(
+            (TIER_ORDER[s.tier] for s in history if s is not None),
+            default=TIER_ORDER[Tier.insufficient_data],
+        )
+        out.append(
+            {
+                **row,
+                "los_sensitivity_signed": (
+                    round(unit_series.los_sensitivity_signed, 4) if unit_series else None
+                ),
+                "steps_measurable": len(measurable),
+                "steps_total": len(history),
+                "best_tier_reached": next(t.value for t, v in TIER_ORDER.items() if v == best),
+                "first_watch_step": first_watch.date().isoformat() if first_watch else None,
+                "lead_time_days_to_first_watch": (
+                    round((failure - first_watch).total_seconds() / 86_400.0, 1)
+                    if first_watch
+                    else None
+                ),
+                "insufficient_reason": next(
+                    (
+                        str(s.reason)
+                        for s in reversed(history)
+                        if s is not None and s.reason is not None
+                    ),
+                    None,
+                ),
+            }
+        )
+    return out
+
+
+def _reason_counts(neighbourhood: list[dict[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for row in neighbourhood:
+        key = str(row.get("insufficient_reason") or "measurable")
+        counts[key] = counts.get(key, 0) + 1
+    return counts
