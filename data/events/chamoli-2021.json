@@ -1,0 +1,492 @@
+{
+  "aoi_id": "chamoli-rishiganga",
+  "bulked_volume_m3": null,
+  "dammed_river": false,
+  "event_group": "chamoli-2021",
+  "event_id": "chamoli-2021",
+  "failure_type": "bedrock_rock_ice_avalanche",
+  "fall_height_m": {
+    "best": 1800.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 1800.0,
+    "low": 1800.0,
+    "notes": "'This wedge then dropped around 1800 m to the Ronti Gad valley floor'",
+    "source_refs": [
+      "vanwykdevries-2022"
+    ],
+    "unit": "m"
+  },
+  "fatalities": {
+    "best": null,
+    "disputed": false,
+    "estimates": [],
+    "high": 200.0,
+    "low": 200.0,
+    "notes": "'More than 200 people were killed or are missing' (Shugar et al. 2021); Cook et al. (2021) and Tiwari et al. (2022) also state more than 200 — a lower bound, no upper bound read",
+    "source_refs": [
+      "shugar-2021",
+      "cook-2021",
+      "tiwari-2022"
+    ],
+    "unit": "persons"
+  },
+  "field_notes": {
+    "bulked_volume_m3": {
+      "notes": "Shugar et al. (2021) describe an 'extraordinarily large and mobile debris flow' scouring 'up to 220 meters above the valley floor' but no bulked volume was read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "peak_velocity_ms": {
+      "notes": "No flow velocity was read in the retrieved abstracts.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "'rock and glacier ice' (Shugar et al. 2021); the ratio was not read in the retrieved abstracts.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "runout_km": {
+      "notes": "The flow descended the Ronti Gad, Rishiganga and Dhauliganga valleys; no total runout distance was read (the 13 and 19.7 km figures are distances to the two plants).",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "seismic.agency_range": {
+      "notes": "No agency magnitudes were read.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "seismic.magnitude": {
+      "notes": "No catalogue magnitude was read; Cook et al. (2021) discuss detectability, not magnitude.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [
+    {
+      "asset_id": null,
+      "asset_name": "Rishiganga hydropower project (13.2 MW)",
+      "asset_type": "hydropower_plant",
+      "description": "Shugar et al. (2021): the flow 'severely damaged two hydropower projects'; Kumar et al. (2023) name the Rishiganga Power Corporation 13.2 MW project 13 km from the source",
+      "impact": "damaged",
+      "source_refs": [
+        "shugar-2021",
+        "kumar-2023"
+      ]
+    },
+    {
+      "asset_id": null,
+      "asset_name": "Tapovan Vishnugad hydropower project (NTPC, 512 MW)",
+      "asset_type": "hydropower_plant",
+      "description": "Shugar et al. (2021): 'severely damaging two hydropower projects'; Kumar et al. (2023) name the NTPC Tapovan Vishnugad 512 MW project 19.7 km from the source",
+      "impact": "damaged",
+      "source_refs": [
+        "shugar-2021",
+        "kumar-2023"
+      ]
+    }
+  ],
+  "initially_reported_as": null,
+  "name": "Chamoli / Ronti Peak rock–ice avalanche and debris flow, Uttarakhand, India",
+  "notes": "Best-documented reference event and serac's replay/backtest event. Shugar et al. (2021) and Cook et al. (2021) are Science papers whose abstracts were read via the Europe PMC API (the science.org pages are behind a bot challenge); their DOIs resolved via Crossref. Transect ids raini/tapovan are defined by the chamoli-rishiganga AOI. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "peak_velocity_ms": null,
+  "precursors_observed": [
+    {
+      "description": "Tiwari et al. (2022) report a nucleation phase with precursory tremors for 2:30 h before detachment; Kumar et al. (2023) place the nucleation-phase onset at 04:51:18 UTC, after the arrival of surface waves from a M6 earthquake in Davao del Sur, Philippines (04:31:41 UTC)",
+      "kind": "seismic_tremor_sequence",
+      "lead_time_days": {
+        "best": null,
+        "disputed": false,
+        "estimates": [],
+        "high": 0.104,
+        "low": 0.104,
+        "notes": "Tiwari et al. (2022): 'seismic precursors which were continuously active for 2:30 h prior to main detachment' — 2.5 h expressed in days",
+        "source_refs": [
+          "tiwari-2022"
+        ],
+        "unit": "days"
+      },
+      "observed_utc": null,
+      "source_refs": [
+        "tiwari-2022",
+        "kumar-2023"
+      ]
+    }
+  ],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "reference",
+  "runout_km": null,
+  "schema_version": "0.1.0",
+  "secondary_surge": false,
+  "seismic": {
+    "agency_range": null,
+    "mag_type": null,
+    "magnitude": null,
+    "notes": "Cook et al. (2021): signals recorded on a regional network in Uttarakhand up to 100 km away. Kumar et al. (2023): nucleation phase at 04:51:18 UTC. No catalogue magnitude was read and the event is not in USGS ComCat as far as retrieved.",
+    "single_force": false,
+    "source_refs": [
+      "cook-2021",
+      "kumar-2023",
+      "tiwari-2022"
+    ],
+    "usgs_id": null
+  },
+  "source_elevation_m": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 5500.0,
+        "low": 5500.0,
+        "qualifier": "'the peak of Ronti, a 5500 m elevation summit'",
+        "source_ref": "vanwykdevries-2022",
+        "unit": "m"
+      },
+      {
+        "high": 5000.0,
+        "low": 5000.0,
+        "qualifier": "'the collapse altitude (∼5000 m)'",
+        "source_ref": "vanwykdevries-2022",
+        "unit": "m"
+      }
+    ],
+    "high": 5500.0,
+    "low": 5000.0,
+    "notes": "summit and approximate collapse altitude as stated; the scar elevation itself was not read",
+    "source_refs": [
+      "vanwykdevries-2022"
+    ],
+    "unit": "m"
+  },
+  "source_location": {
+    "basis": "OpenStreetMap Nominatim result for 'Ronti Glacier' (way 682961415); the wedge detached from the north face of Ronti Peak above the glacier (Shugar et al. 2021; Van Wyk de Vries et al. 2022), so the point is a proxy with a generous radius",
+    "lat": 30.3484632,
+    "lon": 79.7758979,
+    "source_refs": [
+      "osm-ronti-glacier",
+      "shugar-2021"
+    ],
+    "uncertainty_radius_m": 3000.0
+  },
+  "source_volume_m3": {
+    "best": 26900000.0,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 27000000.0,
+        "low": 27000000.0,
+        "qualifier": "'~27 × 10^6 cubic meters of rock and glacier ice'",
+        "source_ref": "shugar-2021",
+        "unit": "m3"
+      },
+      {
+        "high": 26900000.0,
+        "low": 26900000.0,
+        "qualifier": "'a 26.9 ×10^6 m3 wedge of rock and ice'",
+        "source_ref": "vanwykdevries-2022",
+        "unit": "m3"
+      }
+    ],
+    "high": 27000000.0,
+    "low": 26900000.0,
+    "notes": null,
+    "source_refs": [
+      "shugar-2021",
+      "vanwykdevries-2022"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:27:45.657306Z",
+      "authors": [
+        "Shugar, D. H.",
+        "Jacquemart, M.",
+        "Shean, D.",
+        "Bhushan, S.",
+        "Upadhyay, K.",
+        "Sattar, A.",
+        "Schwanghart, W.",
+        "McBride, S.",
+        "de Vries, M. Van Wyk",
+        "Mergili, M.",
+        "Emmer, A.",
+        "Deschamps-Berger, C.",
+        "McDonnell, M.",
+        "Bhambri, R.",
+        "Allen, S.",
+        "Berthier, E.",
+        "Carrivick, J. L.",
+        "Clague, J. J.",
+        "Dokukin, M.",
+        "Dunning, S. A.",
+        "Frey, H.",
+        "Gascoin, S.",
+        "Haritashya, U. K.",
+        "Huggel, C.",
+        "Kääb, A.",
+        "Kargel, J. S.",
+        "Kavanaugh, J. L.",
+        "Lacroix, P.",
+        "Petley, D.",
+        "Rupper, S.",
+        "Azam, M. F.",
+        "Cook, S. J.",
+        "Dimri, A. P.",
+        "Eriksson, M.",
+        "Farinotti, D.",
+        "Fiddes, J.",
+        "Gnyawali, K. R.",
+        "Harrison, S.",
+        "Jha, M.",
+        "Koppes, M.",
+        "Kumar, A.",
+        "Leinss, S.",
+        "Majeed, U.",
+        "Mal, S.",
+        "Muhuri, A.",
+        "Noetzli, J.",
+        "Paul, F.",
+        "Rashid, I.",
+        "Sain, K.",
+        "Steiner, J.",
+        "Ugalde, F.",
+        "Watson, C. S.",
+        "Westoby, M. J."
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_location",
+        "source_volume_m3",
+        "fatalities",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description",
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description"
+      ],
+      "content_type": "application/json;charset=UTF-8",
+      "doi": "10.1126/science.abh4455",
+      "excerpt": "~27 × 10<sup>6</sup> cubic meters of rock and glacier ice collapsed from the steep north face of Ronti Peak",
+      "id": "shugar-2021",
+      "kind": "peer_reviewed",
+      "licence": "all-rights-reserved; cited-only (abstract read via Europe PMC)",
+      "peer_reviewed": true,
+      "publisher": "American Association for the Advancement of Science (AAAS)",
+      "sha256": "3de10ffcbe8eed4cbb526bb0d08237ae79737eca37acc6b2608c4732c77c41e8",
+      "stored_copy": null,
+      "title": "A massive rock and ice avalanche caused the 2021 disaster at Chamoli, Indian Himalaya",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1126/science.abh4455&resultType=core&format=json",
+      "year": 2021
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:48.438768Z",
+      "authors": [
+        "Cook, Kristen L.",
+        "Rekapalli, Rajesh",
+        "Dietze, Michael",
+        "Pilz, Marco",
+        "Cesca, Simone",
+        "Rao, N. Purnachandra",
+        "Srinagesh, D.",
+        "Paul, Himangshu",
+        "Metz, Malte",
+        "Mandal, Prantik",
+        "Suresh, G.",
+        "Cotton, Fabrice",
+        "Tiwari, V. M.",
+        "Hovius, Niels"
+      ],
+      "claims_supported": [
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range",
+        "fatalities"
+      ],
+      "content_type": "application/json;charset=UTF-8",
+      "doi": "10.1126/science.abj1227",
+      "excerpt": "a seismic monitoring system could have detected all event phases from up to 100 kilometers and provided downstream warnings within minutes of event initiation",
+      "id": "cook-2021",
+      "kind": "peer_reviewed",
+      "licence": "all-rights-reserved; cited-only (abstract read via Europe PMC)",
+      "peer_reviewed": true,
+      "publisher": "American Association for the Advancement of Science (AAAS)",
+      "sha256": "486f09df9b28c6a963f2a4df629ec4d43b040987d494c40828bab96e2b62dc74",
+      "stored_copy": null,
+      "title": "Detection and potential early warning of catastrophic flow events with regional seismic networks",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1126/science.abj1227&resultType=core&format=json",
+      "year": 2021
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:51.116927Z",
+      "authors": [
+        "Van Wyk de Vries, Maximillian",
+        "Bhushan, Shashank",
+        "Jacquemart, Mylène",
+        "Deschamps-Berger, César",
+        "Berthier, Etienne",
+        "Gascoin, Simon",
+        "Shean, David E.",
+        "Shugar, Dan H.",
+        "Kääb, Andreas"
+      ],
+      "claims_supported": [
+        "time",
+        "source_elevation_m",
+        "fall_height_m",
+        "source_volume_m3"
+      ],
+      "content_type": "text/html",
+      "doi": "10.5194/nhess-22-3309-2022",
+      "excerpt": "a 26.9 ×10 6 m 3 wedge of rock and ice detached from the north face of the peak of Ronti, a 5500 m elevation summit in the Uttarakhand Himalaya",
+      "id": "vanwykdevries-2022",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "bc2c2ed0a0e34061de64a8b67a925ca910bbc85373c4098c10ca005320713ebb",
+      "stored_copy": "data/raw/sources/chamoli-2021/vanwykdevries-2022.html",
+      "title": "Pre-collapse motion of the February 2021 Chamoli rock–ice avalanche, Indian Himalaya",
+      "url": "https://nhess.copernicus.org/articles/22/3309/2022/nhess-22-3309-2022.html",
+      "year": 2022
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:54.210532Z",
+      "authors": [
+        "Tiwari, Anil",
+        "Sain, Kalachand",
+        "Kumar, Amit",
+        "Tiwari, Jyoti",
+        "Paul, Ajay",
+        "Kumar, Naresh",
+        "Haldar, Chinmay",
+        "Kumar, Sushil",
+        "Pandey, Chhavi P"
+      ],
+      "claims_supported": [
+        "fatalities",
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range",
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days"
+      ],
+      "content_type": "text/html; charset=utf-8",
+      "doi": "10.1038/s41598-022-07491-y",
+      "excerpt": "The rock-ice avalanche appears to have been initiated by seismic precursors which were continuously active for 2:30 h prior to main detachment",
+      "id": "tiwari-2022",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-4.0",
+      "peer_reviewed": true,
+      "publisher": "Springer Science and Business Media LLC",
+      "sha256": "6b237799c8fe7aa0a906dfef1b005c6b9d21be0fd218d8d91cd4d308a37cb563",
+      "stored_copy": null,
+      "title": "Potential seismic precursors and surficial dynamics of a deadly Himalayan disaster: an early warning approach",
+      "url": "https://www.nature.com/articles/s41598-022-07491-y",
+      "year": 2022
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:50.561747Z",
+      "authors": [
+        "Rawat, Deepak",
+        "Sharma, M. L.",
+        "Varade, Divyesh",
+        "Kumar, Roshan",
+        "Kanungo, Debi Prasanna",
+        "Ahmed, Rayees",
+        "Gupta, S. C.",
+        "Singh, Hemant",
+        "Saxena, Nishant"
+      ],
+      "claims_supported": [
+        "time",
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range",
+        "precursors_observed[0].description",
+        "precursors_observed[0].lead_time_days",
+        "transect_observations[0].description",
+        "transect_observations[0].arrival_time_min",
+        "transect_observations[0].stage_rise_m",
+        "transect_observations[1].description",
+        "transect_observations[1].arrival_time_min",
+        "transect_observations[1].stage_rise_m",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description",
+        "infrastructure_impacts[1].impact",
+        "infrastructure_impacts[1].description"
+      ],
+      "content_type": "text/html; charset=utf-8",
+      "doi": "10.1007/s41748-023-00364-y",
+      "excerpt": "It has been observed that the nucleation phase (04:51:18 UTC) of the event initiated after the P- and S-wave arrival at 04:31:41 UTC and 04:38:41 UTC, respectively, at the nearest seismic station to the source from a M6 earthquake",
+      "id": "kumar-2023",
+      "kind": "peer_reviewed",
+      "licence": "all-rights-reserved; cited-only",
+      "peer_reviewed": true,
+      "publisher": "Springer Science and Business Media LLC",
+      "sha256": "1785f219e02b5d37594fa58ecd44280c6493de4062f202a570b859cfa5b6c0b8",
+      "stored_copy": null,
+      "title": "Early Warning Potential of Regional Seismic Network: Seismic Assessment of One of the Precursors of Chamoli 2021 Disaster",
+      "url": "https://link.springer.com/article/10.1007/s41748-023-00364-y",
+      "year": 2024
+    },
+    {
+      "accessed_utc": "2026-09-03T10:27:57.640739Z",
+      "authors": [],
+      "claims_supported": [
+        "source_location"
+      ],
+      "content_type": "application/json; charset=utf-8",
+      "doi": null,
+      "excerpt": null,
+      "id": "osm-ronti-glacier",
+      "kind": "dataset",
+      "licence": "ODbL-1.0",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "8b6babfbbc80cdfa0105f0295f5035bfcf54a14214eab33ba6df128a31c39e63",
+      "stored_copy": "data/raw/sources/chamoli-2021/osm-ronti-glacier.json",
+      "title": "OpenStreetMap Nominatim search result: Ronti Glacier, Chamoli, Uttarakhand (way 682961415)",
+      "url": "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=Ronti%20Glacier",
+      "year": null
+    }
+  ],
+  "time": {
+    "basis": "seismic nucleation-phase onset 04:51:18 UTC stated by Kumar et al. (2023, Earth Systems and Environment) from the SNATR network; 'during the morning of 7 February 2021' (Van Wyk de Vries et al. 2022; Shugar et al. 2021)",
+    "datetime_utc": "2021-02-07T04:51:18Z",
+    "source_refs": [
+      "kumar-2023",
+      "vanwykdevries-2022",
+      "shugar-2021"
+    ],
+    "uncertainty_s": 60.0
+  },
+  "transect_observations": [
+    {
+      "arrival_time_min": null,
+      "description": "No arrival time or stage was read. Kumar et al. (2023) estimate a seismic 'warning period of approximately 10 ... min at distances of 13 ... km' for the Rishiganga project site.",
+      "source_refs": [
+        "kumar-2023"
+      ],
+      "stage_rise_m": null,
+      "transect_id": "raini"
+    },
+    {
+      "arrival_time_min": null,
+      "description": "No arrival time or stage was read. Kumar et al. (2023) estimate a seismic 'warning period of approximately ... 14 min at distances of ... 19.7 km' for the Tapovan Vishnugad project site.",
+      "source_refs": [
+        "kumar-2023"
+      ],
+      "stage_rise_m": null,
+      "transect_id": "tapovan"
+    }
+  ]
+}
