@@ -28,16 +28,23 @@ FEATURE_CACHE_KEY = "features.key"
 
 
 def _load_features(repo: Path, *, echo: bool = True) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """(features, waveforms, valids). Features are cached against the store's own hash."""
-    from serac.models.discriminator.dataset import load_arrays, write_chunk_index
+    """(features, waveforms, valids). Features are cached against the store's own hash.
+
+    The Zarr arrays are allocated for every *requested* window and only the ones that yielded
+    usable data are written, so the arrays are sliced to `index.n_windows`. Without the slice
+    the trailing all-zero rows would line up against nothing in the index and quietly enter
+    training as unlabelled silence.
+    """
+    from serac.models.discriminator.dataset import load_arrays, load_index, write_chunk_index
     from serac.models.discriminator.features import N_FEATURES, feature_matrix
 
     root = repo / DATASET_DIR
     _, store_hash, _ = write_chunk_index(root)
     cache, key_file = root / FEATURE_CACHE, root / FEATURE_CACHE_KEY
+    n_windows = load_index(root).n_windows
     waveform, valid = load_arrays(root)
-    waveforms = np.asarray(waveform[:])
-    valids = np.asarray(valid[:])
+    waveforms = np.asarray(waveform[:n_windows])
+    valids = np.asarray(valid[:n_windows])
     if cache.exists() and key_file.exists() and key_file.read_text().strip() == store_hash:
         features = np.load(cache)
         if features.shape == (waveforms.shape[0], N_FEATURES):
