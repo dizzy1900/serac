@@ -50,6 +50,7 @@ _EXTENSIONS: dict[str, str] = {
     "text/plain": "txt",
     "application/xml": "xml",
     "text/xml": "xml",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
 }
 
 
