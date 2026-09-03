@@ -1,0 +1,326 @@
+{
+  "aoi_id": null,
+  "bulked_volume_m3": {
+    "best": 6810000.0,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 8350000.0,
+        "low": 5270000.0,
+        "qualifier": "primary event deposit '6.81 ± 1.54 × 10^6 m3'",
+        "source_ref": "fujita-2017",
+        "unit": "m3"
+      },
+      {
+        "high": 1760000.0,
+        "low": 0.0,
+        "qualifier": "succeeding rockfall deposits '0.84 ± 0.92 × 10^6 m3' (not included in low/high)",
+        "source_ref": "fujita-2017",
+        "unit": "m3"
+      },
+      {
+        "high": 6950000.0,
+        "low": 6950000.0,
+        "qualifier": "Lacroix (2016) as cited: 'deposit volume of 6.95 × 10^6 m3 over the village'",
+        "source_ref": "fujita-2017",
+        "unit": "m3"
+      }
+    ],
+    "high": 8350000.0,
+    "low": 5270000.0,
+    "notes": "Deposit volume over the village of the primary event (mostly snow per Fujita et al. 2017), recorded here as the closest slot to a bulked/deposit volume",
+    "source_refs": [
+      "fujita-2017"
+    ],
+    "unit": "m3"
+  },
+  "dammed_river": false,
+  "event_group": "langtang-2015",
+  "event_id": "langtang-2015",
+  "failure_type": "co_seismic_avalanche",
+  "fall_height_m": {
+    "best": null,
+    "disputed": false,
+    "estimates": [],
+    "high": 1900.0,
+    "low": 1900.0,
+    "notes": "USGS: 'fell nearly 1,900 meters' — 'nearly', so no best",
+    "source_refs": [
+      "usgs-2026-nepal-event-page"
+    ],
+    "unit": "m"
+  },
+  "fatalities": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 350.0,
+        "low": 350.0,
+        "qualifier": "'killed more than 350 people' (citing Kargel et al. 2016)",
+        "source_ref": "fujita-2017",
+        "unit": "persons"
+      },
+      {
+        "high": 200.0,
+        "low": 200.0,
+        "qualifier": "'killing more than 200'",
+        "source_ref": "usgs-2026-nepal-event-page",
+        "unit": "persons"
+      }
+    ],
+    "high": 350.0,
+    "low": 200.0,
+    "notes": "Both figures are lower bounds ('more than'); no best",
+    "source_refs": [
+      "fujita-2017",
+      "usgs-2026-nepal-event-page"
+    ],
+    "unit": "persons"
+  },
+  "field_notes": {
+    "peak_velocity_ms": {
+      "notes": "No velocity was read in the retrieved text.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "rock_fraction": {
+      "notes": "Fujita et al. (2017): the primary event 'was an avalanche composed mostly of snow, while the collapsed glacier ice could not be dominant source'; no fraction stated.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    },
+    "runout_km": {
+      "notes": "No runout distance was read in the retrieved text.",
+      "public_estimates": [],
+      "reason": "no_peer_reviewed_estimate"
+    }
+  },
+  "infrastructure_impacts": [
+    {
+      "asset_id": null,
+      "asset_name": "Langtang village",
+      "asset_type": "settlement",
+      "description": "Fujita et al. (2017): coseismic avalanches and rockfalls with their air blast and muddy flow 'destroyed the village of Langtang'; USGS: 'burying a village'",
+      "impact": "destroyed",
+      "source_refs": [
+        "fujita-2017",
+        "usgs-2026-nepal-event-page"
+      ]
+    }
+  ],
+  "initially_reported_as": null,
+  "name": "Langtang village co-seismic avalanche (Gorkha earthquake), Nepal",
+  "notes": "Co-seismic reference: an avalanche triggered by the 2015 Gorkha earthquake, not a spontaneous detachment. The USGS figures come from the 'Regional Background' paragraph of the 2026 Nepal event page, which is preliminary. dammed_river / secondary_surge are non-nullable booleans in the contract; where the retrieved sources do not state them they are recorded as false, meaning 'not established in the retrieved text', not 'established absent'.",
+  "peak_velocity_ms": null,
+  "precursors_observed": [],
+  "record": {
+    "created_by": "domain-modeller (Claude Code session 2026-09-03)",
+    "created_utc": "2026-09-03T10:39:09.013717Z",
+    "review_utc": null,
+    "reviewed_by": null
+  },
+  "related_seismic": [],
+  "rock_fraction": null,
+  "role": "co_seismic_reference",
+  "runout_km": null,
+  "schema_version": "0.1.0",
+  "secondary_surge": false,
+  "seismic": {
+    "agency_range": {
+      "best": null,
+      "disputed": false,
+      "estimates": [],
+      "high": 7.88,
+      "low": 7.8,
+      "notes": "ComCat origin products in the fixture: us 7.8 mww (preferred) and an earlier us origin 7.88 mw",
+      "source_refs": [
+        "usgs-comcat-us20002926"
+      ],
+      "unit": "magnitude"
+    },
+    "mag_type": "mww",
+    "magnitude": {
+      "best": 7.8,
+      "disputed": false,
+      "estimates": [],
+      "high": 7.8,
+      "low": 7.8,
+      "notes": "USGS ComCat preferred magnitude 7.8 mww",
+      "source_refs": [
+        "usgs-comcat-us20002926"
+      ],
+      "unit": "magnitude"
+    },
+    "notes": "The triggering Gorkha earthquake, not a signal of the avalanche itself.",
+    "single_force": false,
+    "source_refs": [
+      "usgs-comcat-us20002926"
+    ],
+    "usgs_id": "us20002926"
+  },
+  "source_elevation_m": {
+    "best": 5000.0,
+    "disputed": false,
+    "estimates": [],
+    "high": 5000.0,
+    "low": 5000.0,
+    "notes": "USGS: 'several million cubic meters of ice and debris collapsed, starting at 5,000-meter elevation'",
+    "source_refs": [
+      "usgs-2026-nepal-event-page"
+    ],
+    "unit": "m"
+  },
+  "source_location": {
+    "basis": "OpenStreetMap Nominatim result for 'Langtang, Rasuwa' (node 976471702), the village destroyed by the avalanche; the source area on Langtang Lirung above 5000 m a.s.l. (USGS) was not located more precisely in the retrieved text",
+    "lat": 28.2157564,
+    "lon": 85.5089756,
+    "source_refs": [
+      "osm-langtang-village",
+      "usgs-2026-nepal-event-page"
+    ],
+    "uncertainty_radius_m": 3000.0
+  },
+  "source_volume_m3": {
+    "best": null,
+    "disputed": false,
+    "estimates": [
+      {
+        "high": 14380000.0,
+        "low": 14380000.0,
+        "qualifier": "Lacroix (2016) as cited by Fujita et al. (2017): 'a total avalanche volume of 14.38 × 10^6 m3'",
+        "source_ref": "fujita-2017",
+        "unit": "m3"
+      }
+    ],
+    "high": 14380000.0,
+    "low": 14380000.0,
+    "notes": "Fujita et al. (2017) quote Lacroix (2016) for the total avalanche volume; their own DEM work measures the deposits (see bulked_volume_m3). USGS: 'several million cubic meters'. No best because the figure is second-hand in the retrieved text",
+    "source_refs": [
+      "fujita-2017"
+    ],
+    "unit": "m3"
+  },
+  "sources": [
+    {
+      "accessed_utc": "2026-09-03T10:28:34.688984Z",
+      "authors": [
+        "Fujita, Koji",
+        "Inoue, Hiroshi",
+        "Izumi, Takeki",
+        "Yamaguchi, Satoru",
+        "Sadakane, Ayako",
+        "Sunako, Sojiro",
+        "Nishimura, Kouichi",
+        "Immerzeel, Walter W.",
+        "Shea, Joseph M.",
+        "Kayastha, Rijan B.",
+        "Sawagaki, Takanobu",
+        "Breashears, David F.",
+        "Yagi, Hiroshi",
+        "Sakai, Akiko"
+      ],
+      "claims_supported": [
+        "time",
+        "failure_type",
+        "source_volume_m3",
+        "bulked_volume_m3",
+        "fatalities",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description"
+      ],
+      "content_type": "application/pdf",
+      "doi": "10.5194/nhess-17-749-2017",
+      "excerpt": "Coseismic avalanches and rockfalls, as well as their simultaneous air blast and muddy flow, killed more than 350 people and destroyed the village of Langtang (Kargel et al., 2016).",
+      "id": "fujita-2017",
+      "kind": "peer_reviewed",
+      "licence": "CC-BY-3.0",
+      "peer_reviewed": true,
+      "publisher": "Copernicus GmbH",
+      "sha256": "5c09272398f70263e682176413056678f499c3002863f958131673229231aa6a",
+      "stored_copy": "data/raw/sources/langtang-2015/fujita-2017.pdf",
+      "title": "Anomalous winter-snow-amplified earthquake-induced disaster of the 2015 Langtang avalanche in Nepal",
+      "url": "https://nhess.copernicus.org/articles/17/749/2017/nhess-17-749-2017.pdf",
+      "year": 2017
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:01.130661Z",
+      "authors": [],
+      "claims_supported": [
+        "source_location",
+        "source_elevation_m",
+        "fall_height_m",
+        "fatalities",
+        "infrastructure_impacts[0].impact",
+        "infrastructure_impacts[0].description"
+      ],
+      "content_type": "text/html; charset=UTF-8",
+      "doi": null,
+      "excerpt": "This mountain was previously the source of another large debris avalanche in 2015 caused by a M7.8 earthquake. There, several million cubic meters of ice and debris collapsed, starting at 5,000-meter elevation, and fell nearly 1,900 meters, burying a village, and killing more than 200.",
+      "id": "usgs-2026-nepal-event-page",
+      "kind": "agency_official",
+      "licence": "US-PD",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "1a063f071df90427e79ac0a4b8ef7f8d9e46119f7c17ef42286dcb5edbc72969",
+      "stored_copy": null,
+      "title": "2026 Nepal Debris Avalanche and Flash Flood",
+      "url": "https://www.usgs.gov/programs/landslide-hazards/science/2026-nepal-debris-avalanche-and-flash-flood",
+      "year": null
+    },
+    {
+      "accessed_utc": "2026-09-03T09:45:08.945114Z",
+      "authors": [
+        "U.S. Geological Survey"
+      ],
+      "claims_supported": [
+        "time",
+        "seismic",
+        "seismic.magnitude",
+        "seismic.agency_range"
+      ],
+      "content_type": "application/json; charset=utf-8",
+      "doi": null,
+      "excerpt": null,
+      "id": "usgs-comcat-us20002926",
+      "kind": "usgs_comcat",
+      "licence": "US-PD",
+      "peer_reviewed": false,
+      "publisher": "U.S. Geological Survey",
+      "sha256": "08b5b07faf9056cfd26be0614051e9b23bf880d6db5e2a7b9ef0a1b5ee276bb3",
+      "stored_copy": "data/fixtures/usgs_comcat/us20002926.geojson",
+      "title": "M 7.8 - 67 km NNE of Bharatpur, Nepal (USGS ComCat event us20002926)",
+      "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us20002926&format=geojson",
+      "year": 2015
+    },
+    {
+      "accessed_utc": "2026-09-03T10:29:03.069176Z",
+      "authors": [],
+      "claims_supported": [
+        "source_location"
+      ],
+      "content_type": "application/json; charset=utf-8",
+      "doi": null,
+      "excerpt": null,
+      "id": "osm-langtang-village",
+      "kind": "dataset",
+      "licence": "ODbL-1.0",
+      "peer_reviewed": false,
+      "publisher": null,
+      "sha256": "fae011dba79f29a7115388b0bc6301128292116903ada49030196be6bdbbc9d2",
+      "stored_copy": "data/raw/sources/langtang-2015/osm-langtang-village.json",
+      "title": "OpenStreetMap Nominatim search result: Langtang, Gosaikunda-04, Rasuwa (node 976471702)",
+      "url": "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=Langtang%2C%20Rasuwa",
+      "year": null
+    }
+  ],
+  "time": {
+    "basis": "usgs_comcat_origin of the triggering M 7.8 Gorkha earthquake (us20002926); Fujita et al. (2017) attribute the avalanche to this earthquake and the retrieved text gives no separate onset time for the avalanche",
+    "datetime_utc": "2015-04-25T06:11:25.950000Z",
+    "source_refs": [
+      "usgs-comcat-us20002926",
+      "fujita-2017"
+    ],
+    "uncertainty_s": null
+  },
+  "transect_observations": []
+}
