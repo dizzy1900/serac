@@ -234,3 +234,101 @@ def validate_discriminator(
     print_result(result)
     write_report(result, repo / "reports" / "validation")
     raise typer.Exit(0 if result.passed else 1)
+
+
+@app.command("measure-latency")
+def measure_latency(
+    repo: Annotated[Path, typer.Option(help="Repository root.")] = Path(),
+    event_group: Annotated[
+        str, typer.Option(help="Event group to replay, e.g. `langtang-lhende-2026`.")
+    ] = "langtang-lhende-2026",
+    scheme: Annotated[str, typer.Option(help="Which trained artifact to load.")] = "loro_hma",
+    threshold: Annotated[float, typer.Option(help="Calibrated-probability threshold.")] = 0.5,
+) -> None:
+    """Replay one event's raw waveforms through the detector in both modes and time both clocks."""
+    import json as _json
+
+    from obspy import Inventory, read_inventory
+
+    from serac.models.discriminator import baseline as bl
+    from serac.models.discriminator import latency as lat
+    from serac.models.discriminator import streaming as st
+    from serac.models.discriminator.catalog import build_positives
+    from serac.models.discriminator.windows import StationChoice
+
+    positives, _, _ = build_positives(repo)
+    positive = next((p for p in positives if p.event_group == event_group), None)
+    if positive is None:
+        typer.secho(f"no positive with group {event_group!r}", fg=typer.colors.RED)
+        raise typer.Exit(2)
+
+    raw = repo / "data/raw/discriminator/waveforms" / f"{positive.entry_id.replace('/', '_')}.mseed"
+    if not raw.exists():
+        typer.secho(
+            f"{raw} is absent; run `serac data build-discriminator-set` first",
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(2)
+
+    selection = repo / "data/interim/discriminator/stations" / f"{event_group}.json"
+    stations = [
+        StationChoice.model_validate(row)
+        for row in _json.loads(selection.read_text(encoding="utf-8"))["stations"]
+    ]
+    inventory = Inventory()
+    year = positive.origin_utc.year
+    for station in stations:
+        path = (
+            repo
+            / "data/raw/discriminator/responses"
+            / f"{station.key.replace('.', '_')}_{year}.xml"
+        )
+        if path.exists() and path.stat().st_size > 0:
+            inventory += read_inventory(str(path), format="STATIONXML")
+
+    chunks = lat.chunk_stream_from_miniseed(raw, positive.origin_utc)
+    typer.echo(
+        f"{event_group}: {len(chunks)} chunks from {len(stations)} selected receivers, "
+        f"{len(inventory.get_contents()['channels'])} responses loaded"
+    )
+
+    model = bl.load(repo / bl.ARTIFACT_DIR / scheme)
+    results = []
+    modes: tuple[st.Mode, ...] = ("batch_600s", "sliding_180s")
+    for mode in modes:
+        detector = st.DiscriminatorDetector(
+            model=model,
+            inventory=inventory,
+            require_response=True,
+            threshold=threshold,
+            mode=mode,
+        )
+        result = lat.measure(detector, chunks, positive.origin_utc, mode=mode)
+        results.append(result)
+        typer.echo(
+            f"  {mode:14s} fired={result.fired} "
+            f"stream_latency={result.stream_latency_s} s "
+            f"floor={result.theoretical_floor_s:.0f} s "
+            f"compute_p95={result.compute_seconds_per_poll_p95 * 1000:.0f} ms "
+            f"p={result.probability}"
+        )
+
+    report = lat.build_report(
+        event_group,
+        positive.origin_utc,
+        results,
+        n_receivers=len(stations),
+        notes=[
+            f"replayed from {raw.as_posix()} (raw counts, ledgered by the M1 build); the "
+            "detector's own response removal is inside the timed section",
+            f"model {model.artifact.name} trained under {model.artifact.split_scheme}; "
+            f"{event_group} is a forced test group and was not in training",
+        ],
+    )
+    out = repo / REPORTS_DIR / f"latency_{event_group}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    typer.echo("")
+    typer.secho(
+        report.verdict, fg=typer.colors.YELLOW if not report.budget_met else typer.colors.GREEN
+    )
