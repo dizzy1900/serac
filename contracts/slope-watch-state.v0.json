@@ -1,0 +1,176 @@
+{
+  "$defs": {
+    "WatchInsufficientReason": {
+      "description": "Why a unit could not be assessed. Each is a measurement, not a guess.",
+      "enum": [
+        "outside_footprint",
+        "low_los_sensitivity",
+        "too_few_samples",
+        "low_coherence",
+        "too_little_history"
+      ],
+      "title": "WatchInsufficientReason",
+      "type": "string"
+    },
+    "WatchTier": {
+      "description": "Ordinal state of a slope unit. Never a probability, never a date.",
+      "enum": [
+        "quiet",
+        "elevated",
+        "watch",
+        "insufficient_data"
+      ],
+      "title": "WatchTier",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/slope-watch-state.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One slope unit's tier at one moment, with the evidence behind it.",
+  "properties": {
+    "aoi_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Aoi Id",
+      "type": "string"
+    },
+    "as_of_utc": {
+      "format": "date-time",
+      "title": "As Of Utc",
+      "type": "string"
+    },
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "insufficient_reason": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WatchInsufficientReason"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "los_acceleration_mm_yr2": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Los Acceleration Mm Yr2"
+    },
+    "los_sensitivity_signed": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": -1.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Los Sensitivity Signed"
+    },
+    "los_velocity_mm_yr": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Los Velocity Mm Yr"
+    },
+    "median_coherence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Median Coherence"
+    },
+    "method_id": {
+      "minLength": 1,
+      "title": "Method Id",
+      "type": "string"
+    },
+    "n_samples": {
+      "minimum": 0,
+      "title": "N Samples",
+      "type": "integer"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "preregistration_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Preregistration Sha256",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Robust z-score. NOT a probability and NOT calibrated to any failure rate.",
+      "title": "Score"
+    },
+    "score_basis": {
+      "const": "robust_z_min_temporal_spatial",
+      "default": "robust_z_min_temporal_spatial",
+      "title": "Score Basis",
+      "type": "string"
+    },
+    "tier": {
+      "$ref": "#/$defs/WatchTier"
+    },
+    "unit_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Unit Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "aoi_id",
+    "unit_id",
+    "as_of_utc",
+    "tier",
+    "n_samples",
+    "method_id",
+    "preregistration_sha256"
+  ],
+  "title": "SlopeWatchState",
+  "type": "object"
+}
