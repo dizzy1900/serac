@@ -75,14 +75,48 @@ def main() -> None:
             f"{fmt(block.get('peak_stage_relative_error'), 3)} |\n"
         )
 
+    mass_error = verification.get("mass_conservation_closed_domain", {}).get(
+        "relative_error", float("nan")
+    )
+    lake = verification.get("lake_at_rest", {})
+    lake_dev = lake.get("max_surface_deviation_m", float("nan"))
+    lake_speed = lake.get("max_speed_m_s", float("nan"))
+    lake_steps = lake.get("steps", 0)
+    solver_version = design.get("solver_version", "0.1.0")
+    bytes_mb = summary.get("bytes_on_disk", 0) / 1e6
+    cap_gb = summary.get("bytes_cap", 0) / 1e9
+
     inundation = metrics.get("inundation", {})
     coverage = metrics.get("coverage", {})
     latency = metrics.get("latency", {})
 
+    lake_row = f"surface deviation {lake_dev} m, max speed {lake_speed} m/s over {lake_steps} steps"
+    reach_row = (
+        "| "
+        + " | ".join(fmt(reach.get(k)) for k in ("p5", "p25", "p50", "p75", "p95", "max"))
+        + " |"
+    )
+    iou_row = (
+        f"| Median inundation IoU at 1 m | {fmt(inundation.get('median_iou'), 3)} "
+        f"| >= 0.70 | {inundation.get('gate_pass')} |"
+    )
+    depth_cov_row = (
+        f"| 5-95% depth coverage | {fmt(coverage.get('max_depth_5_95'), 3)} "
+        f"| 0.85-0.95 | {coverage.get('depth_gate_pass')} |"
+    )
+    arrival_cov_row = (
+        f"| 5-95% arrival coverage | {fmt(coverage.get('arrival_5_95'), 3)} "
+        f"| 0.85-0.95 | {coverage.get('arrival_gate_pass')} |"
+    )
+    mae_row = (
+        f"| Worst per-transect arrival MAE | {fmt(metrics.get('arrival_mae_worst_s'), 1)} s "
+        f"| <= 90 s | {metrics.get('arrival_gate_pass')} |"
+    )
+
     text = f"""# M4 runout — summary of what was built and what it shows
 
 > **NOT r.avaflow.** Every depth, velocity and arrival time below comes from
-> `serac-swe-voellmy` v{design.get("solver_version", "0.1.0")}, a single-phase depth-averaged
+> `serac-swe-voellmy` v{solver_version}, a single-phase depth-averaged
 > Voellmy-Salm solver implemented in this repository. r.avaflow could not be obtained; see
 > `infra/docker/ravaflow/README.md` for the acquisition record with dates and URLs.
 > **Cross-validation against r.avaflow is outstanding.**
@@ -94,12 +128,12 @@ directory. Nothing here is retyped by hand.
 
 | Case | Result |
 |---|---|
-| Mass conservation, closed domain | relative error {verification.get("mass_conservation_closed_domain", {}).get("relative_error", float("nan")):.2e} |
-| Lake at rest, random topography | surface deviation {verification.get("lake_at_rest", {}).get("max_surface_deviation_m", float("nan"))} m, max speed {verification.get("lake_at_rest", {}).get("max_speed_m_s", float("nan"))} m/s over {verification.get("lake_at_rest", {}).get("steps", 0)} steps |
+| Mass conservation, closed domain | relative error {mass_error:.2e} |
+| Lake at rest, random topography | {lake_row} |
 
 ### Ritter dam break against the analytic solution
 
-| Cells | dx (m) | L1 (m²) | L1 relative |
+| Cells | dx (m) | L1 (m^2) | L1 relative |
 |---|---|---|---|
 {ritter_rows}
 
@@ -127,7 +161,7 @@ into `ENSEMBLE_FROZEN.md` and is not repeated here.
 
 ## 3. Grid convergence
 
-| Pair | Δ reach (m) | Δ reach (rel) | Depth profile rel. L1 | Inundation IoU at 1 m |
+| Pair | delta  reach (m) | delta  reach (rel) | Depth profile rel. L1 | Inundation IoU at 1 m |
 |---|---|---|---|---|
 {convergence_rows or "| (not run) | — | — | — | — |"}
 
@@ -139,14 +173,14 @@ into `ENSEMBLE_FROZEN.md` and is not repeated here.
 | Members recorded | {summary.get("n_members_recorded", "—")} |
 | **Valid** | **{summary.get("n_valid", "—")}** |
 | Flagged but retained | {summary.get("n_flagged_but_retained", "—")} |
-| Bytes on disk | {summary.get("bytes_on_disk", 0) / 1e6:.1f} MB (cap {summary.get("bytes_cap", 0) / 1e9:.0f} GB) |
+| Bytes on disk | {bytes_mb:.1f} MB (cap {cap_gb:.0f} GB) |
 | Total core-seconds | {summary.get("wall_time_total_core_s", "—")} |
 
 Runout distance reached, over valid members:
 
 | p5 | p25 | median | p75 | p95 | max |
 |---|---|---|---|---|---|
-| {fmt(reach.get("p5"))} | {fmt(reach.get("p25"))} | {fmt(reach.get("p50"))} | {fmt(reach.get("p75"))} | {fmt(reach.get("p95"))} | {fmt(reach.get("max"))} |
+{reach_row}
 
 (kilometres along the corridor; the corridor is 100 km long and the furthest transect is at
 97.0 km.)
@@ -161,14 +195,14 @@ Flags on retained members — a flag is information, not a failure:
 
 | Gate | Measured | Target | Pass |
 |---|---|---|---|
-| Median inundation IoU at 1 m | {fmt(inundation.get("median_iou"), 3)} | ≥ 0.70 | {inundation.get("gate_pass")} |
-| Worst per-transect arrival MAE | {fmt(metrics.get("arrival_mae_worst_s"), 1)} s | ≤ 90 s | {metrics.get("arrival_gate_pass")} |
-| p95 inference latency | {fmt(latency.get("p95_s"), 4)} s | ≤ 2 s | {latency.get("gate_pass")} |
-| 5–95% depth coverage | {fmt(coverage.get("max_depth_5_95"), 3)} | 0.85–0.95 | {coverage.get("depth_gate_pass")} |
-| 5–95% arrival coverage | {fmt(coverage.get("arrival_5_95"), 3)} | 0.85–0.95 | {coverage.get("arrival_gate_pass")} |
+{iou_row}
+{mae_row}
+| p95 inference latency | {fmt(latency.get("p95_s"), 4)} s | <= 2 s | {latency.get("gate_pass")} |
+{depth_cov_row}
+{arrival_cov_row}
 
 Splits are by `run_id` and disjoint: {metrics.get("splits_disjoint_by_run_id")}
-({metrics.get("split_sizes", {})}).
+({metrics.get("split_sizes")}).
 
 | Transect | Test members reaching | Arrival MAE (s) | Peak-stage rel. error |
 |---|---|---|---|
