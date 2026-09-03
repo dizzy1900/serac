@@ -1,0 +1,47 @@
+# serac local development dependencies.
+#
+# UNTESTED on the machine that wrote it (no Docker installed there); see infra/docker/README.md
+# and RELEASE_STATUS.md Known gaps #7. Run:
+#
+#   docker compose -f infra/docker/compose.yaml up -d
+#   SERAC_REDIS_URL=redis://localhost:6379/0 make smoke-online
+#
+# The serac application itself runs from the host with `uv run serac ...`; the deployment unit
+# (a plain Docker image containing the package) is a separate Dockerfile, not part of this file.
+
+name: serac
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: serac-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - serac-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+  # GRASS GIS service placeholder for Prompt 2 (runout / hydraulic routing over the feature
+  # cube). Deliberately commented out: no Prompt 1 code talks to GRASS, the image tag and the
+  # mounted volumes are undecided, and enabling it now would only add an untested dependency.
+  # When Prompt 2 introduces it, add an ADR and uncomment.
+  #
+  # grass:
+  #   image: <grass-gis image, tag to be pinned in Prompt 2>
+  #   volumes:
+  #     - ../../data:/data:ro
+  #     - serac-grass-work:/work
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+volumes:
+  serac-redis-data:
+  # serac-grass-work:

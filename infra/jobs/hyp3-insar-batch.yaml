@@ -1,0 +1,117 @@
+# NOTE: the CLI flags below are PROPOSED; reconcile with `serac ingest` when the adapters land.
+# serac job manifest — HyP3 InSAR batch for one AOI.
+# Generic container-host description; the aws: block is annotation only. See infra/jobs/README.md.
+# Status: designed, never executed. Every estimate states its basis.
+
+apiVersion: serac.jobs/v0
+kind: ContainerJob
+
+metadata:
+  name: hyp3-insar-batch
+  description: >
+    Plan 12-day same-orbit Sentinel-1 pairs for an AOI and date range, submit them as HyP3
+    InSAR jobs, watch until complete, download the products to data/raw/hyp3_insar/<aoi>/,
+    and append a ledger entry per product (status: requested -> fetched). The heavy compute
+    (interferogram formation) runs on ASF's HyP3 service, not in this container; this job is
+    I/O-bound.
+  owner_role: eo-data-engineer
+  status: designed
+
+image: "<registry>/serac:<git-sha>"
+
+command:
+  - serac
+  - ingest
+  - hyp3
+  - --aoi
+  - "${aoi_id}"
+  - --from
+  - "${date_from}"
+  - --to
+  - "${date_to}"
+  - --watch
+  - --confirm-bytes
+  - "${confirm_bytes}"
+
+parameters:
+  aoi_id: lhende-khola-trishuli        # or chamoli-rishiganga, blatten-lotschental
+  date_from: "2025-01-01"
+  date_to: "2026-08-31"
+  confirm_bytes: "0"                   # operator sets the confirmed byte ceiling after a --dry-run
+
+env:
+  - name: EARTHDATA_USERNAME
+    from: secret:EARTHDATA_USERNAME
+  - name: EARTHDATA_PASSWORD
+    from: secret:EARTHDATA_PASSWORD
+  - name: SERAC_DATA_DIR
+    from: value:/data
+
+resources:
+  cpu: 2
+  memory_gb: 8
+  gpu: 0
+  storage_gb: 200                      # scratch for downloads before dvc push
+
+parallelism:
+  array_size: 1                        # one task per AOI; pairs are submitted in bulk inside the task
+  shard_by: aoi_id
+
+estimated_core_hours:
+  low: 1
+  high: 10
+  basis: >
+    ASSUMPTION, not a measurement. The container only plans pairs, submits jobs, polls, and
+    downloads; per-product wall time is dominated by HyP3 queue time and download bandwidth.
+    Range assumes tens to a few hundred pairs per AOI-year at 2 vCPU. Nothing has been run.
+
+estimated_storage_gb:
+  low: 10
+  high: 200
+  basis: >
+    ASSUMPTION. Depends on the number of pairs and the HyP3 product options selected; the
+    adapter's --dry-run prints the estimated bytes before any download and the 5 GB
+    ask-first gate applies.
+
+inputs:
+  - data/aoi/${aoi_id}/                # committed to git; no dvc pull needed
+  - data/manifest.jsonl                # git-tracked ledger (ADR-0004)
+
+outputs:
+  - data/raw/hyp3_insar/${aoi_id}/     # DVC-tracked; operator runs dvc push afterwards
+  - data/manifest.jsonl                # appended, then committed
+
+ledger:
+  - source: hyp3_insar
+    statuses: [requested, fetched, failed, not_fetched]
+
+preconditions:
+  - Earthdata Login credentials present in the host secret store (docs/CREDENTIALS.md).
+  - A serac ingest hyp3 --dry-run has been run and its estimated bytes reviewed.
+  - If the estimate exceeds 5 GB, an explicit operator confirmation is recorded in the run notes.
+  - dvc remote configured (make dvc-remote) so outputs can be pushed.
+
+aws:
+  note: annotation only; any container host can run this job from the generic fields above.
+  instance_family: m6i                 # general purpose; I/O-bound, no GPU
+  suggested_instance: m6i.large
+  batch_job_definition:
+    type: container
+    containerProperties:
+      image: "<registry>/serac:<git-sha>"
+      vcpus: 2
+      memory: 8192
+      command: ["serac", "ingest", "hyp3", "--aoi", "Ref::aoi_id", "--from", "Ref::date_from", "--to", "Ref::date_to", "--watch", "--confirm-bytes", "Ref::confirm_bytes"]
+      secrets:
+        - name: EARTHDATA_USERNAME
+          valueFrom: "<secrets-manager arn>"
+        - name: EARTHDATA_PASSWORD
+          valueFrom: "<secrets-manager arn>"
+      volumes:
+        - name: scratch
+          host: { sourcePath: /scratch }
+      mountPoints:
+        - containerPath: /data
+          sourceVolume: scratch
+    retryStrategy: { attempts: 2 }
+    timeout: { attemptDurationSeconds: 43200 }
