@@ -1,0 +1,319 @@
+{
+  "$defs": {
+    "DataSource": {
+      "description": "Where a record came from. One value per adapter (or per fixture provenance).",
+      "enum": [
+        "sentinel1_asf",
+        "hyp3_insar",
+        "sentinel2_cdse",
+        "sentinel2_earthsearch",
+        "nisar_asf",
+        "dem_glo30",
+        "era5_cds",
+        "gacos",
+        "fdsn_waveforms",
+        "seedlink",
+        "usgs_comcat",
+        "hydrometric_icimod",
+        "osm_overpass",
+        "source_document",
+        "vendored_schema",
+        "synthetic"
+      ],
+      "title": "DataSource",
+      "type": "string"
+    },
+    "ManifestStatus": {
+      "description": "Lifecycle of a product with respect to this repository.",
+      "enum": [
+        "fetched",
+        "listed",
+        "requested",
+        "not_fetched",
+        "failed",
+        "dry_run",
+        "synthetic"
+      ],
+      "title": "ManifestStatus",
+      "type": "string"
+    },
+    "Provenance": {
+      "enum": [
+        "real",
+        "synthetic",
+        "derived"
+      ],
+      "title": "Provenance",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/manifest-entry.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One line of `data/manifest.jsonl`.",
+  "properties": {
+    "adapter": {
+      "minLength": 1,
+      "title": "Adapter",
+      "type": "string"
+    },
+    "adapter_version": {
+      "minLength": 1,
+      "title": "Adapter Version",
+      "type": "string"
+    },
+    "aoi_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Aoi Id"
+    },
+    "bbox_4326": {
+      "anyOf": [
+        {
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Bbox 4326"
+    },
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "entry_id": {
+      "title": "Entry Id",
+      "type": "string"
+    },
+    "estimated_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Estimated Bytes"
+    },
+    "event_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Event Id"
+    },
+    "licence": {
+      "description": "SPDX id or the licence text as stated",
+      "minLength": 1,
+      "title": "Licence",
+      "type": "string"
+    },
+    "licence_source_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Licence Source Url"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "params": {
+      "additionalProperties": true,
+      "title": "Params",
+      "type": "object"
+    },
+    "path": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Repo-relative path of the stored bytes",
+      "title": "Path"
+    },
+    "product_id": {
+      "minLength": 1,
+      "title": "Product Id",
+      "type": "string"
+    },
+    "product_level": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Product Level"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "recorded_at": {
+      "format": "date-time",
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retrieved At"
+    },
+    "serac_git_sha": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Serac Git Sha"
+    },
+    "sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sha256"
+    },
+    "size_bytes": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Size Bytes"
+    },
+    "source": {
+      "$ref": "#/$defs/DataSource"
+    },
+    "status": {
+      "$ref": "#/$defs/ManifestStatus"
+    },
+    "time_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Time End"
+    },
+    "time_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Time Start"
+    },
+    "url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Url"
+    }
+  },
+  "required": [
+    "source",
+    "product_id",
+    "licence",
+    "provenance",
+    "status",
+    "adapter",
+    "adapter_version"
+  ],
+  "title": "ManifestEntry",
+  "type": "object"
+}

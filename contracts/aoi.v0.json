@@ -1,0 +1,385 @@
+{
+  "$defs": {
+    "GridSpec": {
+      "additionalProperties": false,
+      "description": "The fixed raster grid of an AOI's feature cube (projected CRS, pixel edges).\n\n`x_min/y_min` are the outer edges of the lower-left pixel and must be snapped to\n`resolution_m`; `x_max/y_max` follow from `width/height`.",
+      "properties": {
+        "aoi_id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Aoi Id",
+          "type": "string"
+        },
+        "epsg": {
+          "maximum": 32767,
+          "minimum": 1024,
+          "title": "Epsg",
+          "type": "integer"
+        },
+        "height": {
+          "minimum": 1,
+          "title": "Height",
+          "type": "integer"
+        },
+        "resolution_m": {
+          "default": 30.0,
+          "exclusiveMinimum": 0,
+          "title": "Resolution M",
+          "type": "number"
+        },
+        "width": {
+          "minimum": 1,
+          "title": "Width",
+          "type": "integer"
+        },
+        "x_max": {
+          "title": "X Max",
+          "type": "number"
+        },
+        "x_min": {
+          "title": "X Min",
+          "type": "number"
+        },
+        "y_max": {
+          "title": "Y Max",
+          "type": "number"
+        },
+        "y_min": {
+          "title": "Y Min",
+          "type": "number"
+        }
+      },
+      "required": [
+        "aoi_id",
+        "epsg",
+        "x_min",
+        "y_min",
+        "x_max",
+        "y_max",
+        "width",
+        "height"
+      ],
+      "title": "GridSpec",
+      "type": "object"
+    },
+    "RecordMeta": {
+      "additionalProperties": false,
+      "description": "Who wrote a record and whether anyone has reviewed it.",
+      "properties": {
+        "created_by": {
+          "minLength": 1,
+          "title": "Created By",
+          "type": "string"
+        },
+        "created_utc": {
+          "format": "date-time",
+          "title": "Created Utc",
+          "type": "string"
+        },
+        "review_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Utc"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        }
+      },
+      "required": [
+        "created_utc",
+        "created_by"
+      ],
+      "title": "RecordMeta",
+      "type": "object"
+    },
+    "SourceKind": {
+      "description": "What kind of document a `SourceRef` points at.",
+      "enum": [
+        "peer_reviewed",
+        "preprint",
+        "conference_abstract",
+        "usgs_comcat",
+        "agency_official",
+        "dataset",
+        "press_report"
+      ],
+      "title": "SourceKind",
+      "type": "string"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "A document that was actually retrieved, hashed and read in-session.\n\n`sha256` is the digest of the bytes that were retrieved (for a paywalled paper this is the\nlanding page, and `stored_copy` is None). `claims_supported` lists the dotted field paths\nof the record that this source backs.",
+      "properties": {
+        "accessed_utc": {
+          "format": "date-time",
+          "title": "Accessed Utc",
+          "type": "string"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Authors",
+          "type": "array"
+        },
+        "claims_supported": {
+          "items": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:\\[\\d+\\]|\\.[A-Za-z0-9_-]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Claims Supported",
+          "type": "array"
+        },
+        "content_type": {
+          "minLength": 1,
+          "title": "Content Type",
+          "type": "string"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "pattern": "^10\\.\\d{4,9}/\\S+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/SourceKind"
+        },
+        "licence": {
+          "description": "SPDX id or the licence as stated",
+          "minLength": 1,
+          "title": "Licence",
+          "type": "string"
+        },
+        "peer_reviewed": {
+          "title": "Peer Reviewed",
+          "type": "boolean"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publisher"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "stored_copy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Repo-relative path of a stored copy, if the licence allows",
+          "title": "Stored Copy"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "pattern": "^https?://\\S+$",
+          "title": "Url",
+          "type": "string"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 1800,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "title",
+        "url",
+        "accessed_utc",
+        "sha256",
+        "content_type",
+        "licence",
+        "claims_supported",
+        "peer_reviewed"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/aoi.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An area of interest: a source zone plus a downstream corridor.",
+  "properties": {
+    "countries": {
+      "description": "ISO 3166-1 alpha-2 codes",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Countries",
+      "type": "array"
+    },
+    "cube_epsg": {
+      "maximum": 32767,
+      "minimum": 1024,
+      "title": "Cube Epsg",
+      "type": "integer"
+    },
+    "cube_extent_bbox_4326": {
+      "maxItems": 4,
+      "minItems": 4,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Cube Extent Bbox 4326",
+      "type": "array"
+    },
+    "grid": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GridSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Also lists assets named in reporting but not yet sourced",
+      "title": "Notes"
+    },
+    "record": {
+      "$ref": "#/$defs/RecordMeta"
+    },
+    "river_names": {
+      "items": {
+        "type": "string"
+      },
+      "title": "River Names",
+      "type": "array"
+    },
+    "source_refs": {
+      "description": "Sources for the extents",
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Refs",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/SourceRef"
+      },
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "countries",
+    "cube_epsg",
+    "cube_extent_bbox_4326",
+    "source_refs",
+    "sources",
+    "record"
+  ],
+  "title": "AOI",
+  "type": "object"
+}

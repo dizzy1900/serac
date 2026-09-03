@@ -1,0 +1,1025 @@
+{
+  "$defs": {
+    "AssetType": {
+      "enum": [
+        "hydropower_plant",
+        "bridge",
+        "settlement",
+        "border_post",
+        "road",
+        "other"
+      ],
+      "title": "AssetType",
+      "type": "string"
+    },
+    "AttributedEstimate": {
+      "additionalProperties": false,
+      "description": "One published figure, attributed to exactly one source.",
+      "properties": {
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "qualifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. 'order of magnitude', 'preliminary', 'bed erosion only'",
+          "title": "Qualifier"
+        },
+        "source_ref": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_ref"
+      ],
+      "title": "AttributedEstimate",
+      "type": "object"
+    },
+    "EventRole": {
+      "description": "Why the event is in the library.",
+      "enum": [
+        "target",
+        "reference",
+        "negative_control",
+        "evacuation_counterfactual",
+        "co_seismic_reference"
+      ],
+      "title": "EventRole",
+      "type": "string"
+    },
+    "EventTime": {
+      "additionalProperties": false,
+      "description": "Origin time with its uncertainty and the basis for it (e.g. a catalogue origin time).",
+      "properties": {
+        "basis": {
+          "description": "e.g. 'usgs_comcat_origin', 'seismic_onset'",
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        },
+        "datetime_utc": {
+          "format": "date-time",
+          "title": "Datetime Utc",
+          "type": "string"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "uncertainty_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty S"
+        }
+      },
+      "required": [
+        "datetime_utc",
+        "basis",
+        "source_refs"
+      ],
+      "title": "EventTime",
+      "type": "object"
+    },
+    "FailureType": {
+      "description": "Initiation mechanism of the mass movement.",
+      "enum": [
+        "bedrock_rock_ice_avalanche",
+        "glacier_detachment",
+        "hanging_glacier_collapse",
+        "moraine_collapse_glof",
+        "co_seismic_avalanche",
+        "unknown"
+      ],
+      "title": "FailureType",
+      "type": "string"
+    },
+    "FieldNote": {
+      "additionalProperties": false,
+      "description": "Explanation attached to a null field; carries the attributed public estimates, if any.",
+      "properties": {
+        "notes": {
+          "minLength": 20,
+          "title": "Notes",
+          "type": "string"
+        },
+        "public_estimates": {
+          "items": {
+            "$ref": "#/$defs/AttributedEstimate"
+          },
+          "title": "Public Estimates",
+          "type": "array"
+        },
+        "reason": {
+          "$ref": "#/$defs/FieldNoteReason"
+        }
+      },
+      "required": [
+        "reason",
+        "notes"
+      ],
+      "title": "FieldNote",
+      "type": "object"
+    },
+    "FieldNoteReason": {
+      "description": "Why a nullable numeric field is null.",
+      "enum": [
+        "no_peer_reviewed_estimate",
+        "not_applicable",
+        "not_yet_researched",
+        "disputed_beyond_range",
+        "not_public"
+      ],
+      "title": "FieldNoteReason",
+      "type": "string"
+    },
+    "ImpactKind": {
+      "enum": [
+        "destroyed",
+        "damaged",
+        "inundated",
+        "evacuated",
+        "unaffected",
+        "unknown"
+      ],
+      "title": "ImpactKind",
+      "type": "string"
+    },
+    "InfrastructureImpact": {
+      "additionalProperties": false,
+      "description": "What happened to one asset.",
+      "properties": {
+        "asset_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "`ExposedAsset.id` in the AOI",
+          "title": "Asset Id"
+        },
+        "asset_name": {
+          "minLength": 1,
+          "title": "Asset Name",
+          "type": "string"
+        },
+        "asset_type": {
+          "$ref": "#/$defs/AssetType"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "impact": {
+          "$ref": "#/$defs/ImpactKind"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "asset_name",
+        "asset_type",
+        "impact",
+        "source_refs"
+      ],
+      "title": "InfrastructureImpact",
+      "type": "object"
+    },
+    "Precursor": {
+      "additionalProperties": false,
+      "description": "An observation made before failure (monitoring anomaly, rockfall, evacuation order).",
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "kind": {
+          "description": "e.g. 'displacement_acceleration'",
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "lead_time_days": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Days between the observation/order and the failure"
+        },
+        "observed_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Utc"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "source_refs"
+      ],
+      "title": "Precursor",
+      "type": "object"
+    },
+    "Range": {
+      "additionalProperties": false,
+      "description": "A sourced numeric interval. Every number in an event record is one of these.\n\n`best` is optional and may only be set when the owning record can show a qualifying source\n(see `BEST_QUALIFYING_KINDS`); the aggregate enforces that because a `Range` cannot see the\n`sources[]` list on its own.",
+      "properties": {
+        "best": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best"
+        },
+        "disputed": {
+          "default": false,
+          "title": "Disputed",
+          "type": "boolean"
+        },
+        "estimates": {
+          "items": {
+            "$ref": "#/$defs/AttributedEstimate"
+          },
+          "title": "Estimates",
+          "type": "array"
+        },
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_refs"
+      ],
+      "title": "Range",
+      "type": "object"
+    },
+    "RecordMeta": {
+      "additionalProperties": false,
+      "description": "Who wrote a record and whether anyone has reviewed it.",
+      "properties": {
+        "created_by": {
+          "minLength": 1,
+          "title": "Created By",
+          "type": "string"
+        },
+        "created_utc": {
+          "format": "date-time",
+          "title": "Created Utc",
+          "type": "string"
+        },
+        "review_utc": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Utc"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        }
+      },
+      "required": [
+        "created_utc",
+        "created_by"
+      ],
+      "title": "RecordMeta",
+      "type": "object"
+    },
+    "SeismicAttribution": {
+      "additionalProperties": false,
+      "description": "A catalogue entry or seismic study attributed to the event.\n\n`single_force=True` asserts that the signal has been interpreted as a landslide single\nforce; the owning record must then cite a peer-reviewed or ComCat source for it.",
+      "properties": {
+        "agency_range": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Spread of magnitudes reported across agencies"
+        },
+        "mag_type": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mag Type"
+        },
+        "magnitude": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "single_force": {
+          "default": false,
+          "title": "Single Force",
+          "type": "boolean"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "usgs_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Usgs Id"
+        }
+      },
+      "required": [
+        "source_refs"
+      ],
+      "title": "SeismicAttribution",
+      "type": "object"
+    },
+    "SourceKind": {
+      "description": "What kind of document a `SourceRef` points at.",
+      "enum": [
+        "peer_reviewed",
+        "preprint",
+        "conference_abstract",
+        "usgs_comcat",
+        "agency_official",
+        "dataset",
+        "press_report"
+      ],
+      "title": "SourceKind",
+      "type": "string"
+    },
+    "SourceLocation": {
+      "additionalProperties": false,
+      "description": "Where the failure initiated.",
+      "properties": {
+        "basis": {
+          "description": "e.g. 'usgs_comcat_epicentre', 'mapped_scar'",
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        },
+        "lat": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lon": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Lon",
+          "type": "number"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "uncertainty_radius_m": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty Radius M"
+        }
+      },
+      "required": [
+        "lat",
+        "lon",
+        "basis",
+        "source_refs"
+      ],
+      "title": "SourceLocation",
+      "type": "object"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "A document that was actually retrieved, hashed and read in-session.\n\n`sha256` is the digest of the bytes that were retrieved (for a paywalled paper this is the\nlanding page, and `stored_copy` is None). `claims_supported` lists the dotted field paths\nof the record that this source backs.",
+      "properties": {
+        "accessed_utc": {
+          "format": "date-time",
+          "title": "Accessed Utc",
+          "type": "string"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Authors",
+          "type": "array"
+        },
+        "claims_supported": {
+          "items": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:\\[\\d+\\]|\\.[A-Za-z0-9_-]+)*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Claims Supported",
+          "type": "array"
+        },
+        "content_type": {
+          "minLength": 1,
+          "title": "Content Type",
+          "type": "string"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "pattern": "^10\\.\\d{4,9}/\\S+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/SourceKind"
+        },
+        "licence": {
+          "description": "SPDX id or the licence as stated",
+          "minLength": 1,
+          "title": "Licence",
+          "type": "string"
+        },
+        "peer_reviewed": {
+          "title": "Peer Reviewed",
+          "type": "boolean"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publisher"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "stored_copy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Repo-relative path of a stored copy, if the licence allows",
+          "title": "Stored Copy"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "pattern": "^https?://\\S+$",
+          "title": "Url",
+          "type": "string"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "maximum": 2100,
+              "minimum": 1800,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "title",
+        "url",
+        "accessed_utc",
+        "sha256",
+        "content_type",
+        "licence",
+        "claims_supported",
+        "peer_reviewed"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    },
+    "TransectObservation": {
+      "additionalProperties": false,
+      "description": "What was observed at a river transect (arrival time, stage rise).",
+      "properties": {
+        "arrival_time_min": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Minutes after `time.datetime_utc`"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "stage_rise_m": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "transect_id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Transect Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "transect_id",
+        "source_refs"
+      ],
+      "title": "TransectObservation",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/mass-movement-event.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One event-library record (`data/events/<event_id>.json`).",
+  "properties": {
+    "aoi_id": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Aoi Id"
+    },
+    "bulked_volume_m3": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "dammed_river": {
+      "title": "Dammed River",
+      "type": "boolean"
+    },
+    "event_group": {
+      "description": "Groups multi-episode events (e.g. twin detachments)",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Event Group",
+      "type": "string"
+    },
+    "event_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "failure_type": {
+      "$ref": "#/$defs/FailureType"
+    },
+    "fall_height_m": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "fatalities": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "field_notes": {
+      "additionalProperties": {
+        "$ref": "#/$defs/FieldNote"
+      },
+      "description": "Keyed by the dotted path of the null field",
+      "title": "Field Notes",
+      "type": "object"
+    },
+    "infrastructure_impacts": {
+      "items": {
+        "$ref": "#/$defs/InfrastructureImpact"
+      },
+      "title": "Infrastructure Impacts",
+      "type": "array"
+    },
+    "initially_reported_as": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Initially Reported As"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "peak_velocity_ms": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "precursors_observed": {
+      "items": {
+        "$ref": "#/$defs/Precursor"
+      },
+      "title": "Precursors Observed",
+      "type": "array"
+    },
+    "record": {
+      "$ref": "#/$defs/RecordMeta"
+    },
+    "related_seismic": {
+      "items": {
+        "$ref": "#/$defs/SeismicAttribution"
+      },
+      "title": "Related Seismic",
+      "type": "array"
+    },
+    "rock_fraction": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "role": {
+      "$ref": "#/$defs/EventRole"
+    },
+    "runout_km": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schema_version": {
+      "default": "0.1.0",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "secondary_surge": {
+      "title": "Secondary Surge",
+      "type": "boolean"
+    },
+    "seismic": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SeismicAttribution"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_elevation_m": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_location": {
+      "$ref": "#/$defs/SourceLocation"
+    },
+    "source_volume_m3": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/SourceRef"
+      },
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    },
+    "time": {
+      "$ref": "#/$defs/EventTime"
+    },
+    "transect_observations": {
+      "items": {
+        "$ref": "#/$defs/TransectObservation"
+      },
+      "title": "Transect Observations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "event_id",
+    "name",
+    "event_group",
+    "role",
+    "failure_type",
+    "time",
+    "source_location",
+    "dammed_river",
+    "secondary_surge",
+    "sources",
+    "record"
+  ],
+  "title": "MassMovementEvent",
+  "type": "object"
+}

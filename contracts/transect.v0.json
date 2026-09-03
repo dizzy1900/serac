@@ -1,0 +1,211 @@
+{
+  "$defs": {
+    "GeometryQuality": {
+      "description": "How a geometry was obtained; surfaced by validation and the release ledger.",
+      "enum": [
+        "surveyed",
+        "snapped_to_osm_centreline",
+        "osm_centreline",
+        "osm_node",
+        "hand_digitised_approximate"
+      ],
+      "title": "GeometryQuality",
+      "type": "string"
+    },
+    "LineString": {
+      "additionalProperties": false,
+      "description": "GeoJSON LineString with at least two positions.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              }
+            ]
+          },
+          "minItems": 2,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "LineString",
+          "default": "LineString",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "LineString",
+      "type": "object"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "description": "GeoJSON Point.",
+      "properties": {
+        "coordinates": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Coordinates"
+        },
+        "type": {
+          "const": "Point",
+          "default": "Point",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "Point",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/transect.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A river cross-section where arrival times and stages are observed or forecast.",
+  "properties": {
+    "aoi_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Aoi Id",
+      "type": "string"
+    },
+    "chainage_km": {
+      "description": "Along the centreline",
+      "minimum": 0,
+      "title": "Chainage Km",
+      "type": "number"
+    },
+    "cross_section": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LineString"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "geometry_quality": {
+      "$ref": "#/$defs/GeometryQuality"
+    },
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "point": {
+      "$ref": "#/$defs/Point"
+    },
+    "positional_accuracy_m": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Positional Accuracy M"
+    },
+    "source_refs": {
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "aoi_id",
+    "name",
+    "chainage_km",
+    "point",
+    "geometry_quality",
+    "source_refs"
+  ],
+  "title": "Transect",
+  "type": "object"
+}

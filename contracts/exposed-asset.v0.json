@@ -1,0 +1,510 @@
+{
+  "$defs": {
+    "AssetStatus": {
+      "enum": [
+        "operational",
+        "under_construction",
+        "damaged",
+        "destroyed",
+        "evacuated",
+        "decommissioned",
+        "unknown"
+      ],
+      "title": "AssetStatus",
+      "type": "string"
+    },
+    "AssetType": {
+      "enum": [
+        "hydropower_plant",
+        "bridge",
+        "settlement",
+        "border_post",
+        "road",
+        "other"
+      ],
+      "title": "AssetType",
+      "type": "string"
+    },
+    "AttributedEstimate": {
+      "additionalProperties": false,
+      "description": "One published figure, attributed to exactly one source.",
+      "properties": {
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "qualifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. 'order of magnitude', 'preliminary', 'bed erosion only'",
+          "title": "Qualifier"
+        },
+        "source_ref": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_ref"
+      ],
+      "title": "AttributedEstimate",
+      "type": "object"
+    },
+    "GeometryQuality": {
+      "description": "How a geometry was obtained; surfaced by validation and the release ledger.",
+      "enum": [
+        "surveyed",
+        "snapped_to_osm_centreline",
+        "osm_centreline",
+        "osm_node",
+        "hand_digitised_approximate"
+      ],
+      "title": "GeometryQuality",
+      "type": "string"
+    },
+    "LineString": {
+      "additionalProperties": false,
+      "description": "GeoJSON LineString with at least two positions.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "anyOf": [
+              {
+                "maxItems": 2,
+                "minItems": 2,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              }
+            ]
+          },
+          "minItems": 2,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "LineString",
+          "default": "LineString",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "LineString",
+      "type": "object"
+    },
+    "MultiPolygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON MultiPolygon.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  {
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiPolygon",
+          "default": "MultiPolygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "MultiPolygon",
+      "type": "object"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "description": "GeoJSON Point.",
+      "properties": {
+        "coordinates": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "maxItems": 3,
+              "minItems": 3,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            }
+          ],
+          "title": "Coordinates"
+        },
+        "type": {
+          "const": "Point",
+          "default": "Point",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "Point",
+      "type": "object"
+    },
+    "Polygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON Polygon: one exterior ring followed by any number of holes.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "Polygon",
+          "default": "Polygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "Polygon",
+      "type": "object"
+    },
+    "Range": {
+      "additionalProperties": false,
+      "description": "A sourced numeric interval. Every number in an event record is one of these.\n\n`best` is optional and may only be set when the owning record can show a qualifying source\n(see `BEST_QUALIFYING_KINDS`); the aggregate enforces that because a `Range` cannot see the\n`sources[]` list on its own.",
+      "properties": {
+        "best": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Best"
+        },
+        "disputed": {
+          "default": false,
+          "title": "Disputed",
+          "type": "boolean"
+        },
+        "estimates": {
+          "items": {
+            "$ref": "#/$defs/AttributedEstimate"
+          },
+          "title": "Estimates",
+          "type": "array"
+        },
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "source_refs": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "low",
+        "high",
+        "unit",
+        "source_refs"
+      ],
+      "title": "Range",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/exposed-asset.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Something in the corridor that a cascade can reach.",
+  "properties": {
+    "aoi_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Aoi Id",
+      "type": "string"
+    },
+    "asset_type": {
+      "$ref": "#/$defs/AssetType"
+    },
+    "capacity_mw": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Hydropower plants only"
+    },
+    "geometry": {
+      "discriminator": {
+        "mapping": {
+          "LineString": "#/$defs/LineString",
+          "MultiPolygon": "#/$defs/MultiPolygon",
+          "Point": "#/$defs/Point",
+          "Polygon": "#/$defs/Polygon"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Point"
+        },
+        {
+          "$ref": "#/$defs/LineString"
+        },
+        {
+          "$ref": "#/$defs/Polygon"
+        },
+        {
+          "$ref": "#/$defs/MultiPolygon"
+        }
+      ],
+      "title": "Geometry"
+    },
+    "geometry_quality": {
+      "$ref": "#/$defs/GeometryQuality"
+    },
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "population": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Settlements only"
+    },
+    "source_refs": {
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Refs",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/AssetStatus"
+    },
+    "transect_id": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Nearest transect, if any",
+      "title": "Transect Id"
+    }
+  },
+  "required": [
+    "id",
+    "aoi_id",
+    "name",
+    "asset_type",
+    "status",
+    "geometry",
+    "geometry_quality",
+    "source_refs"
+  ],
+  "title": "ExposedAsset",
+  "type": "object"
+}

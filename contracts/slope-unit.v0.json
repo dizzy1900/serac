@@ -1,0 +1,269 @@
+{
+  "$defs": {
+    "GeometryQuality": {
+      "description": "How a geometry was obtained; surfaced by validation and the release ledger.",
+      "enum": [
+        "surveyed",
+        "snapped_to_osm_centreline",
+        "osm_centreline",
+        "osm_node",
+        "hand_digitised_approximate"
+      ],
+      "title": "GeometryQuality",
+      "type": "string"
+    },
+    "MultiPolygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON MultiPolygon.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "items": {
+                "anyOf": [
+                  {
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  {
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "MultiPolygon",
+          "default": "MultiPolygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "MultiPolygon",
+      "type": "object"
+    },
+    "Polygon": {
+      "additionalProperties": false,
+      "description": "GeoJSON Polygon: one exterior ring followed by any number of holes.",
+      "properties": {
+        "coordinates": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "minItems": 1,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "type": {
+          "const": "Polygon",
+          "default": "Polygon",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "Polygon",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/slope-unit.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A terrain unit of the L0 susceptibility inventory (derived from a DEM, so plain floats).",
+  "properties": {
+    "aoi_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Aoi Id",
+      "type": "string"
+    },
+    "area_m2": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Area M2"
+    },
+    "aspect_deg": {
+      "exclusiveMaximum": 360,
+      "minimum": 0,
+      "title": "Aspect Deg",
+      "type": "number"
+    },
+    "elevation_band_m": {
+      "maxItems": 2,
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "title": "Elevation Band M",
+      "type": "array"
+    },
+    "geometry": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Polygon"
+        },
+        {
+          "$ref": "#/$defs/MultiPolygon"
+        }
+      ],
+      "title": "Geometry"
+    },
+    "geometry_quality": {
+      "$ref": "#/$defs/GeometryQuality"
+    },
+    "glacier_cover": {
+      "title": "Glacier Cover",
+      "type": "boolean"
+    },
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "lithology_tag": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lithology Tag"
+    },
+    "mean_slope_deg": {
+      "maximum": 90,
+      "minimum": 0,
+      "title": "Mean Slope Deg",
+      "type": "number"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "permafrost_index": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Permafrost Index"
+    },
+    "source_refs": {
+      "description": "DEM / inventory sources",
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "aoi_id",
+    "geometry",
+    "aspect_deg",
+    "mean_slope_deg",
+    "elevation_band_m",
+    "glacier_cover",
+    "geometry_quality",
+    "source_refs"
+  ],
+  "title": "SlopeUnit",
+  "type": "object"
+}

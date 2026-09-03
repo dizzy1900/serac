@@ -1,0 +1,63 @@
+{
+  "$id": "https://github.com/dizzy1900/serac/contracts/grid-spec.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The fixed raster grid of an AOI's feature cube (projected CRS, pixel edges).\n\n`x_min/y_min` are the outer edges of the lower-left pixel and must be snapped to\n`resolution_m`; `x_max/y_max` follow from `width/height`.",
+  "properties": {
+    "aoi_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "title": "Aoi Id",
+      "type": "string"
+    },
+    "epsg": {
+      "maximum": 32767,
+      "minimum": 1024,
+      "title": "Epsg",
+      "type": "integer"
+    },
+    "height": {
+      "minimum": 1,
+      "title": "Height",
+      "type": "integer"
+    },
+    "resolution_m": {
+      "default": 30.0,
+      "exclusiveMinimum": 0,
+      "title": "Resolution M",
+      "type": "number"
+    },
+    "width": {
+      "minimum": 1,
+      "title": "Width",
+      "type": "integer"
+    },
+    "x_max": {
+      "title": "X Max",
+      "type": "number"
+    },
+    "x_min": {
+      "title": "X Min",
+      "type": "number"
+    },
+    "y_max": {
+      "title": "Y Max",
+      "type": "number"
+    },
+    "y_min": {
+      "title": "Y Min",
+      "type": "number"
+    }
+  },
+  "required": [
+    "aoi_id",
+    "epsg",
+    "x_min",
+    "y_min",
+    "x_max",
+    "y_max",
+    "width",
+    "height"
+  ],
+  "title": "GridSpec",
+  "type": "object"
+}
