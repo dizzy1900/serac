@@ -41,7 +41,9 @@ it lands, run the suite directly:
 
 ```python
 from pathlib import Path
+
 from serac.validation.discriminator import run_suite
+
 run_suite(Path("."))
 ```
 
