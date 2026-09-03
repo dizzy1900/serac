@@ -36,11 +36,24 @@ def entries(repo_root: Path) -> list[ManifestEntry]:
     return found
 
 
+EO_PREFIXES = (
+    "data/fixtures/dem_glo30/",
+    "data/fixtures/sentinel2/",
+    "data/fixtures/asf/",
+    "data/fixtures/cdse/",
+)
+
+
+def is_eo_fixture(path: str) -> bool:
+    """EO-lane fixtures only; seismic/ComCat fixtures are checked by test_fixture_integrity."""
+    return path.startswith(EO_PREFIXES)
+
+
 @pytest.fixture(scope="module")
 def latest_by_path(entries: list[ManifestEntry]) -> dict[str, ManifestEntry]:
     latest: dict[str, ManifestEntry] = {}
     for e in entries:
-        if e.path is not None and e.path.startswith("data/fixtures/"):
+        if e.path is not None and is_eo_fixture(e.path):
             prev = latest.get(e.path)
             if prev is None or e.recorded_at >= prev.recorded_at:
                 latest[e.path] = e
@@ -81,6 +94,7 @@ def test_every_fixture_file_is_recorded(
         p.relative_to(repo_root).as_posix()
         for p in fixtures_dir.rglob("*")
         if p.is_file()
+        and is_eo_fixture(p.relative_to(repo_root).as_posix())
         and p.name not in DOC_FILES
         and not p.name.endswith(".md")
         and p.relative_to(repo_root).as_posix() not in latest_by_path
