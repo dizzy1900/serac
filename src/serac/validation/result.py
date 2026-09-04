@@ -21,6 +21,9 @@ from serac import __version__
 
 VALIDATION_CONTRACT_VERSION = "0.1.0"
 
+EXIT_ERROR = 1
+EXIT_CRITERION_UNMET = 3
+
 
 class Severity(StrEnum):
     """How a failing check should be read.
@@ -77,6 +80,20 @@ class SuiteResult(BaseModel):
     def unmet_criteria(self) -> list[str]:
         """Names of checks reporting an unmet criterion rather than a defect."""
         return [c.name for c in self.checks if not c.ok and c.severity == Severity.criterion_unmet]
+
+    @property
+    def exit_code(self) -> int:
+        """0 passed, 1 something is broken, 3 the code worked and a criterion was not met.
+
+        The distinction is the whole point of `Severity.criterion_unmet`, and a caller that
+        collapses it back to "non-zero" cannot tell a regression from an honest negative
+        result. `EXIT_CRITERION_UNMET` is 3 rather than 2 because `underwriting-check`
+        already spends 2 on a different meaning.
+        """
+        if self.passed:
+            return 0
+        has_error = any(c.failed and c.severity != Severity.criterion_unmet for c in self.checks)
+        return EXIT_ERROR if has_error else EXIT_CRITERION_UNMET
 
     def summary(self) -> str:
         n_unmet = len(self.unmet_criteria)

@@ -29,3 +29,14 @@ jobs:
         run: uv run mypy --strict src
       - name: Offline tests (network blocked)
         run: uv run pytest -n auto -m "not online and not redis"
+      # The gates are the point of this repository, and until now CI ran none of them: a
+      # green tick meant lint, types and tests only. Every suite runs offline from committed
+      # fixtures. `--allow-unmet` names the criteria of the brief that this repository
+      # already reports as unmet in RELEASE_STATUS.md and the M1 model card; any other unmet
+      # criterion, and any broken suite, fails the run.
+      - name: Validation gates
+        run: |
+          uv run serac validate all \
+            --allow-unmet 'forced_groups_detected[loro_hma],forced_groups_detected[time_forward]'
+      - name: Avoided loss computes
+        run: uv run serac underwriting-check

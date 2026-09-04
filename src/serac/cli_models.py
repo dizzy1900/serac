@@ -270,7 +270,7 @@ def validate_discriminator(
     result = run_suite(repo)
     print_result(result)
     write_report(result, repo / "reports" / "validation")
-    raise typer.Exit(0 if result.passed else 1)
+    raise typer.Exit(result.exit_code)
 
 
 @app.command("measure-latency")

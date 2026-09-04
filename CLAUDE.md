@@ -98,9 +98,9 @@ Run `make help` for the live list. As of this file:
 | `validate-ingest` | manifest integrity, checksums re-hashed, no NISAR BETA/PROVISIONAL mixing |
 | `validate-cube` | grid/CRS consistency, monotonic time, provenance attrs per layer |
 | `validate-stream` | replay end-to-end on fixtures; CAP validates against the CAP 1.2 XSD |
-| `validate-serac` | all four suites, then writes a validation stamp |
+| `validate-serac` | every suite, **all of them even when one fails**, then writes a validation stamp. Exit 1 means something is broken; exit 3 means every suite ran and a criterion of the brief was not reached (make reports its own exit 2 for either, so run `serac validate all` directly when the distinction matters) |
 | `promote` | refuses unless `validate-serac` passed on a clean tree at HEAD |
-| `underwriting-check` | `AvoidedLossRequest` schema round-trip, then exits 2 with "not implemented: Prompt 2" |
+| `underwriting-check` | avoided loss on the best available input for the Langtang replay; computes and exits 0. Every asset it cannot cost is reported `undetermined`, never zero |
 | `replay` | `serac replay --event $(EVENT) --speed $(SPEED)` (defaults: `chamoli-2021`, `max`) |
 | `dvc-remote` | writes `$DVC_REMOTE_URL` into the gitignored `.dvc/config.local` |
 | `clean` | removes caches and generated reports |

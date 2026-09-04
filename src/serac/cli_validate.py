@@ -20,7 +20,13 @@ from serac.validation.promote import (
     promote,
     write_stamp,
 )
-from serac.validation.result import SuiteResult, print_result, write_report
+from serac.validation.result import (
+    EXIT_CRITERION_UNMET,
+    EXIT_ERROR,
+    SuiteResult,
+    print_result,
+    write_report,
+)
 
 app = typer.Typer(name="validate", help="Validation harness suites.", no_args_is_help=True)
 
@@ -57,7 +63,7 @@ def _run(name: str, repo: Path, reports_dir: Path, **kwargs: Any) -> None:
     print_result(result)
     typer.echo(f"report: {path}")
     if not result.passed:
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=result.exit_code)
 
 
 @app.command()
@@ -127,9 +133,91 @@ def e2e(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
 
 
 @app.command()
+def discriminator(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
+    """M1: leakage assertions, forced-group detection, F1 against the trivial baseline.
+
+    The same suite `serac models validate-discriminator` runs. It is reachable here too so
+    that every gate is `serac validate <suite>`, which is what lets the aggregate run them
+    in one uniform loop without a special case that could drift.
+    """
+    _run("discriminator", repo, reports_dir)
+
+
+@app.command()
 def contracts(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
     """contracts/*.v0.json match the models and are valid Draft 2020-12."""
     _run("contracts", repo, reports_dir)
+
+
+ALLOW_UNMET_OPTION = typer.Option(
+    None,
+    "--allow-unmet",
+    help=(
+        "Comma-separated check names already known and written up as unmet. Exit 0 when the "
+        "unmet set is exactly these, so CI enforces the gates without being permanently red; "
+        "any other unmet check still fails."
+    ),
+)
+
+
+@app.command("all")
+def run_all(
+    repo: Path = REPO_OPTION,
+    reports_dir: Path = REPORTS_OPTION,
+    allow_unmet: str | None = ALLOW_UNMET_OPTION,
+) -> None:
+    """Every suite, in order, whichever of them fails.
+
+    Deliberately not a set of make prerequisites: make stops at the first failure, so one
+    suite reporting an unmet criterion would hide every suite listed after it, and the
+    reader would learn nothing about the components downstream of it. The exit code keeps
+    the distinction the suites make: 1 means something is broken, 3 means every suite ran
+    and a criterion the brief sets was not reached.
+    """
+    broken: list[str] = []
+    unmet: dict[str, list[str]] = {}
+    for name in REQUIRED_SUITES:
+        result = _load_runner(name)(repo)
+        write_report(result, reports_dir)
+        print_result(result)
+        if result.passed:
+            continue
+        if result.exit_code == EXIT_CRITERION_UNMET:
+            unmet[name] = result.unmet_criteria
+        else:
+            broken.append(name)
+
+    typer.echo("")
+    for name, criteria in unmet.items():
+        typer.echo(f"criterion unmet in {name}: {', '.join(criteria)}")
+
+    allowed = {n.strip() for n in (allow_unmet or "").split(",") if n.strip()}
+    seen = {name for criteria in unmet.values() for name in criteria}
+    for resolved in sorted(allowed - seen):
+        # Good news, and it must not pass unnoticed: the write-up still says it is unmet.
+        typer.echo(
+            f"{resolved} is no longer unmet; drop it from --allow-unmet and update the "
+            "write-up that reports it."
+        )
+
+    if broken:
+        typer.echo(f"validate-serac: FAILED. Broken: {', '.join(broken)}", err=True)
+        typer.echo("  Every suite ran; see reports/validation/ for each one.", err=True)
+        raise typer.Exit(code=EXIT_ERROR)
+    if unmet:
+        typer.echo("validate-serac: every suite ran and none is broken.")
+        typer.echo("  No stamp is written: an unmet criterion is not a pass.")
+        surprises = sorted(seen - allowed)
+        if not allowed or surprises:
+            if surprises:
+                typer.echo(
+                    f"  NOT among the criteria already written up as unmet: {', '.join(surprises)}",
+                    err=True,
+                )
+            raise typer.Exit(code=EXIT_CRITERION_UNMET)
+        typer.echo("  Every unmet criterion above is one this repository already reports.")
+        return
+    stamp(repo=repo, reports_dir=reports_dir)
 
 
 @app.command()

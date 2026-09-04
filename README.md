@@ -51,10 +51,10 @@ Make targets:
 |---|---|
 | `make test` | offline suite; any network socket fails the test |
 | `make smoke-online` | network tests with `SERAC_ONLINE=1`; allowed to skip |
-| `make validate-events` / `validate-ingest` / `validate-cube` / `validate-stream` | individual validation suites |
-| `make validate-serac` | all suites, then a validation stamp |
+| `make validate-events` / `validate-aoi` / `validate-ingest` / `validate-cube` / `validate-stream` / `validate-contracts` / `validate-lfh` / `validate-discriminator` / `validate-runout` / `validate-watch` / `validate-e2e` | the eleven individual suites |
+| `make validate-serac` | every suite, all of them even when one fails, then a validation stamp |
 | `make promote` | refuses unless `validate-serac` passed on a clean tree at HEAD |
-| `make underwriting-check` | `AvoidedLossRequest` schema round-trip; exits 2 "not implemented: Prompt 2" |
+| `make underwriting-check` | avoided loss for the Lhende AOI on the Langtang replay; uncostable assets are `undetermined`, not zero |
 | `make replay EVENT=chamoli-2021 SPEED=max` | replay archived waveforms through the lane; writes `reports/replay/<event>.json` |
 | `make dvc-remote` | configure the DVC remote from `DVC_REMOTE_URL` |
 

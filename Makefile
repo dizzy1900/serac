@@ -46,7 +46,7 @@ validate-lfh: ## Force history: published reproductions, refusals, fixtures, sea
 	$(UV) run serac validate lfh
 
 validate-discriminator: ## M1: leakage assertions, forced-group detection, F1 vs baseline
-	$(UV) run serac models validate-discriminator --repo .
+	$(UV) run serac validate discriminator
 
 validate-runout: ## M4: surrogate gates, frozen design, NOT-r.avaflow disclosure
 	$(UV) run serac validate runout
@@ -57,13 +57,17 @@ validate-watch: ## M3: pre-registration ancestry, causality, no failure date any
 validate-e2e: ## Both replays run to their honest end; latency, CAP XSD, avoided-loss contract
 	$(UV) run serac validate e2e
 
-validate-serac: validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-watch validate-e2e ## All validation suites
-	$(UV) run serac validate stamp
+# Not a list of prerequisites: make stops at the first failing one, so a suite reporting an
+# unmet criterion would hide every suite after it. `serac validate all` runs all of them and
+# reports together. Note that make reports its own exit 2 for any failed recipe, so a caller
+# that needs the 1-vs-3 distinction (CI does) should run `serac validate all` directly.
+validate-serac: ## Every validation suite; runs all of them even when one fails
+	$(UV) run serac validate all
 
 promote: validate-serac ## Refuses unless validate-serac passed on a clean tree at HEAD
 	$(UV) run serac promote
 
-underwriting-check: ## AvoidedLoss schema round-trip; exits 2 "not implemented: Prompt 2"
+underwriting-check: ## Avoided loss on the best available input for the Langtang replay
 	$(UV) run serac underwriting-check
 
 replay: ## serac replay --event $(EVENT) --speed $(SPEED)

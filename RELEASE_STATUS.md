@@ -6,8 +6,8 @@ actually been run and passed on `main`.
 
 ## Gate status — read this first
 
-**`make validate-serac` is RED.** Ten of the eleven suites pass; `validate-discriminator`
-fails on an unmet criterion of the brief:
+**`make validate-serac` is RED.** All eleven suites run — the aggregate no longer stops at the
+first failure — and ten pass. `validate-discriminator` fails on an unmet criterion of the brief:
 
 > the brief requires Langtang and Chamoli both detected. Detected: `['chamoli-2021']`.
 > — `reports/validation/discriminator.json`, `forced_groups_detected[loro_hma]` and
@@ -22,10 +22,17 @@ Consequences, all intended:
 - **`make promote` is blocked.** `validate-serac` never reaches `serac validate stamp`, so
   `reports/validation/latest.json` is stale — it is stamped at `0b70091` and lists only seven
   suites. The most recent promotion record, `reports/promotion/71f3426c….json`, is from before
-  any Prompt 2 component existed. **Nothing has been promoted since.**
-- **CI is green, and that means less than it looks.** `.github/workflows/ci.yml` runs `ruff`,
-  `mypy --strict` and the offline test suite. It tests code health, not model skill. A green
-  CI badge on this repository is not evidence that any model works.
+  any Prompt 2 component existed. **Nothing has been promoted since.** `discriminator` is one of
+  the suites the stamp requires, so no fix to the harness can make `promote` reachable while
+  this criterion is unmet.
+- **CI now runs the gates, and a green tick still means less than it looks.**
+  `.github/workflows/ci.yml` runs `ruff`, `mypy --strict`, the offline test suite, every
+  validation suite and `underwriting-check`. The gate step passes `--allow-unmet` naming the two
+  criteria above, so CI is green while they stay unmet and **fails on any other unmet criterion
+  or any broken suite**. What CI proves is that the harness runs and its results have not moved;
+  it is not evidence that any model works. Until the Prompt 2 components merged, CI ran no
+  validation suite at all, so every "CI green" recorded before 2026-09-04 means lint, types and
+  tests only.
 
 | Suite | Checks | Result |
 |---|---|---|
@@ -404,10 +411,18 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
     on one copy and silently miss the other.
     `tests/contract/test_source_ref_copies_agree.py` now fails loudly on divergence; merging the
     two properly is outstanding.
-63. **`make underwriting-check`'s help string is stale.** The target now runs the Lhende
-    avoided-loss computation and exits 0; the Makefile comment still says
-    `exits 2 "not implemented: Prompt 2"`.
-64. **`reports/validation/latest.json` is stale**, because `validate-serac` fails before
-    stamping. It records `0b70091` and seven suites. Do not read it as current.
+63. ~~**`make underwriting-check`'s help string is stale.**~~ Fixed: the Makefile, `README.md`
+    and `CLAUDE.md` now describe what the target does (the Lhende avoided-loss computation,
+    exit 0) rather than the Prompt 1 stub it replaced.
+64. **`reports/validation/latest.json` is stale**, because `validate-serac` reaches no stamp
+    while a required suite reports an unmet criterion. It records `0b70091` and seven suites.
+    Do not read it as current; the per-suite reports in `reports/validation/` are.
 65. **No GitHub issues can be opened until `gh auth login`.** `TODO`s therefore reference
     entries in this list.
+66. **Running the gates dirties the tree, and `make promote` requires a clean one.**
+    `validate-e2e` rewrites the tracked `reports/e2e/*.json` and `.md` with fresh timestamps and
+    wall-clock timings on every run, so `make validate-serac` leaves the working tree modified
+    and a `promote` immediately afterwards would refuse on `tree_clean: false`. Masked today
+    because promotion is blocked by gap-free reasons above, but it must be resolved — by
+    excluding the volatile fields from the committed artefacts, or by not tracking them — before
+    any component can be promoted.
