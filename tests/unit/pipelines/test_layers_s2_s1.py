@@ -38,7 +38,7 @@ def entries(repo_root: Path) -> list[ManifestEntry]:
     is about the *synthetic* pair and the committed S2 crops, so it excludes anything fetched
     into `data/raw/`.
 
-    TODO(RELEASE_STATUS.md Known gaps 21): the cube's S1 layers would otherwise now prefer the
+    TODO(RELEASE_STATUS.md Known gaps 11): the cube's S1 layers would otherwise now prefer the
     real burst products over the synthetic placeholder, and nothing decides which should win.
     `build_cube` already has a `raw_root` for exactly this, so the fix is for the cube pipeline
     to select by root rather than for this test to filter; until that is settled the exclusion

@@ -157,19 +157,7 @@ Prompt 2.
 ## Known gaps
 
 Numbered so `TODO` comments can reference them (`TODO(RELEASE_STATUS#n)`). Renumbered and
-regrouped by component 2026-09-04.
-
-**Six docstrings and comments in the tree still cite the old numbers.** They were not edited
-(this pass changed documentation only); use this map until they are corrected:
-
-| Cited as | Now | Cited in |
-|---|---|---|
-| Known gaps 1 | **1** (unchanged) | `pipelines/layers/nisar.py` |
-| Known gaps 2 | **2** (unchanged) | `adapters/hydro/icimod_fixture.py` |
-| Known gaps 5 | **58** | `adapters/seismic/seedlink.py` |
-| Known gaps 8 | **6** | `adapters/seismic/usgs_comcat.py` |
-| Known gaps 10 | **3** (ERA5/GACOS) and **11** (synthetic S1/HyP3 layers) | `scripts/make_synthetic_fixtures.py` ×3 |
-| Known gaps 21 | **11** | `tests/unit/pipelines/test_layers_s2_s1.py` |
+regrouped by component 2026-09-04; the eight citations in the tree were updated to match.
 
 ### Data and archives
 

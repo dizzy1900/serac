@@ -52,7 +52,7 @@
   ],
   "event_id": "chamoli-2021",
   "event_name": "Chamoli / Rishiganga, 7 February 2021",
-  "finished_utc": "2026-09-04T03:22:47.252380+00:00",
+  "finished_utc": "2026-09-04T03:23:57.697193+00:00",
   "report_version": "0.1.0",
   "serac_version": "0.1.0",
   "stages": [
@@ -91,7 +91,7 @@
           "batch_600s": {
             "chunks_ingested": 193,
             "class_label": null,
-            "compute_seconds_total": 0.1309,
+            "compute_seconds_total": 0.1018,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -100,7 +100,7 @@
           "sliding_180s": {
             "chunks_ingested": 193,
             "class_label": null,
-            "compute_seconds_total": 0.0748,
+            "compute_seconds_total": 0.0901,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -200,7 +200,7 @@
       "summary": "not reached: the detection stage (M1 discriminator (executed here)) did_not_fire. Measured reason: no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
     }
   ],
-  "started_utc": "2026-09-04T03:22:46.662143+00:00",
+  "started_utc": "2026-09-04T03:23:57.138136+00:00",
   "stopped_at": "detection",
   "stopped_because": "no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
 }

@@ -666,7 +666,7 @@
       "14 of 14 exposed asset(s) could not be costed and are reported as undetermined, not as zero loss: betrawati (no_arrival); chilime-hep (no_arrival); devighat-hep (no_arrival); miteri-bridge (no_flow_depth); rasuwagadhi-hep (no_flow_depth); rasuwagadhi-kerung-border-post (no_flow_depth); sanjen-hep (no_transect); sanjen-upper-hep (no_transect); syabrubesi (no_arrival); timure (no_flow_depth); trishuli-hep (no_arrival); upper-trishuli-1 (no_arrival); upper-trishuli-3a (no_arrival); upper-trishuli-3b (no_arrival)"
     ],
     "by_asset": [],
-    "computed_utc": "2026-09-04T03:22:47.258581Z",
+    "computed_utc": "2026-09-04T03:23:57.698246Z",
     "contract_version": "0.1.0",
     "lives_in_warned_zone": null,
     "losses": [],
@@ -812,7 +812,7 @@
   ],
   "event_id": "langtang-lhende-2026",
   "event_name": "Langtang Lirung / Lhende Khola / Trishuli, 26 August 2026",
-  "finished_utc": "2026-09-04T03:22:47.719036+00:00",
+  "finished_utc": "2026-09-04T03:23:58.153185+00:00",
   "report_version": "0.1.0",
   "serac_version": "0.1.0",
   "stages": [
@@ -851,7 +851,7 @@
           "batch_600s": {
             "chunks_ingested": 194,
             "class_label": null,
-            "compute_seconds_total": 0.0707,
+            "compute_seconds_total": 0.087,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -860,7 +860,7 @@
           "sliding_180s": {
             "chunks_ingested": 194,
             "class_label": null,
-            "compute_seconds_total": 0.1102,
+            "compute_seconds_total": 0.0909,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -881,7 +881,7 @@
       "summary": "no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
     },
     {
-      "artifact_generated_utc": "2026-09-04T03:22:47.707109+00:00",
+      "artifact_generated_utc": "2026-09-04T03:23:58.147656+00:00",
       "artifact_path": null,
       "artifact_sha256": null,
       "blocks_downstream": true,
@@ -901,7 +901,7 @@
         ],
         "status": "failed",
         "variance_reduction": null,
-        "wall_clock_s": 0.159
+        "wall_clock_s": 0.153
       },
       "notes": [
         "M2 produces no mass, so the runout surrogate has no release volume to be given: the cascade forecast for this event cannot be built from serac's own chain.",
@@ -977,7 +977,7 @@
       "summary": "status=not_implemented; costed 0 of 14 exposed asset(s)"
     }
   ],
-  "started_utc": "2026-09-04T03:22:47.258581+00:00",
+  "started_utc": "2026-09-04T03:23:57.698246+00:00",
   "stopped_at": "detection",
   "stopped_because": "no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
 }

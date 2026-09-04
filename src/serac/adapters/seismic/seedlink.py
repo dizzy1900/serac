@@ -6,7 +6,7 @@ same downstream. Sequence numbers count per SNCL from zero for the lifetime of t
 
 The server hostname comes from settings (`SERAC_SEEDLINK_SERVER`, default
 `geofon.gfz.de:18000`). **That endpoint is configuration, not a verified fact**: nothing in
-this repository has connected to it (RELEASE_STATUS.md Known gaps 5). `describe()` is the
+this repository has connected to it (RELEASE_STATUS.md Known gaps 58). `describe()` is the
 dry run and says so. The reconnect loop retries a bounded number of times with a `Clock`
 sleep so tests can drive it without waiting.
 """

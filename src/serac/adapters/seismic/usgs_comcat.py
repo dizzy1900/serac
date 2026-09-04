@@ -3,7 +3,7 @@
 `eventtype=landslide` is the labelled positive set for Prompt 2. It is small: the committed
 fixture (`data/fixtures/usgs_comcat/landslide_2000-01-01_2026-09-03.geojson`) holds 57 events
 since 2000, mostly Alaska ml 1-2, and Chamoli 2021 is **not** among them (RELEASE_STATUS.md
-Known gaps 8). ComCat is not case-consistent about `type` (`landslide` and `Landslide` both
+Known gaps 6). ComCat is not case-consistent about `type` (`landslide` and `Landslide` both
 occur); this adapter lower-cases it.
 
 Pagination follows the fdsnws-event convention: `limit` per page and a 1-based `offset`; a

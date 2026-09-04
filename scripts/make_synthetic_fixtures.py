@@ -2,7 +2,7 @@
 """Generate serac's labelled synthetic placeholders under `tests/fixtures/synthetic/`.
 
 These files stand in for products that could not be fetched in the founding session because
-no Earthdata Login / CDS key was available (RELEASE_STATUS.md Known gaps 10). They are
+no Earthdata Login / CDS key was available (RELEASE_STATUS.md Known gaps 3). They are
 deterministic, obviously artificial patterns, tagged `SERAC_PROVENANCE=synthetic` in the
 files themselves and recorded in `data/manifest.jsonl` with `provenance: synthetic`,
 `status: synthetic` and a `notes` field saying why they exist. Nothing here is, or may be
@@ -53,7 +53,7 @@ PIXEL_M = 80.0
 SHAPE = (32, 32)
 NO_CREDS_NOTE = (
     "SYNTHETIC placeholder, not an observation: no Earthdata credentials in the founding "
-    "session, so no HyP3 job could be submitted (RELEASE_STATUS.md Known gaps 10). Deterministic "
+    "session, so no HyP3 job could be submitted (RELEASE_STATUS.md Known gaps 11). Deterministic "
     "pattern (seed 20260903) over the Sentinel-2 fixture window; the pair name is a real "
     "ASF-listed pair so the cube's time axis is honest, the pixel values are not."
 )
@@ -67,7 +67,7 @@ ERA5_TIMES = np.array(
 )
 ERA5_NOTE = (
     "SYNTHETIC placeholder, not an observation: no CDS API key in the founding session "
-    "(RELEASE_STATUS.md Known gaps 10). A 3x3x4 smooth field in kelvin used only to test the "
+    "(RELEASE_STATUS.md Known gaps 3). A 3x3x4 smooth field in kelvin used only to test the "
     "ERA5 -> 30 m regridding in pipelines/layers/era5.py under a fictional AOI id."
 )
 
