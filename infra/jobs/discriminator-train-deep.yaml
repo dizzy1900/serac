@@ -1,0 +1,89 @@
+# serac — M1 deep-challenger training at scale. Portable container-host manifest, AWS-annotated.
+#
+# This manifest exists because the brief asks for one; it has never been executed, and the
+# honest expectation is that executing it changes nothing. The challenger did not beat the
+# baseline (dF1 -0.016 [-0.205, +0.163]) and the binding constraint is 9 held-out positives,
+# not epochs. See `notes` at the bottom before booking anything.
+apiVersion: serac.dev/v0
+kind: TrainingJob
+metadata:
+  name: discriminator-train-deep
+  component: M1
+  model: cnn-station-transformer
+  model_version: "0.1.0"
+  status: designed
+  disclaimer: >-
+    Training this longer or wider does not enlarge the evaluation. The held-out
+    leave-one-region-out fold has 9 positives in 56 windows and no amount of compute changes
+    that; a wider confidence interval cannot be trained away.
+
+spec:
+  command:
+    [
+      "serac", "models", "train-discriminator", "--repo", "/work",
+      "--scheme", "loro_hma", "--deep", "--epochs", "200",
+    ]
+
+  data:
+    windows: 1925
+    positives: 297
+    input_gib: 2.5
+    basis: >-
+      MEASURED: reports/m1/build.json records 1925 windows written (297 mass_movement) and
+      2,624,616,829 bytes fetched. 265 further windows are recorded not_fetched with their
+      reason and are deliberately absent.
+    working_set_mib: 1200
+    working_set_basis: >-
+      MEASURED locally: 12 receivers x 3 components x 12000 samples float32 per window, loaded
+      as a memory-mapped Zarr store. The transformer sees one event's receiver set per example.
+
+  container:
+    image: ghcr.io/dizzy1900/serac:0.1.0-cuda
+    gpu: 1
+    gpu_type: "NVIDIA L4 or A10G"
+    vcpu: 8
+    memory_gib: 32
+    basis: >-
+      The model is 120,091 parameters (MEASURED, reports/MODEL_CARD_discriminator.md). It does
+      not need a GPU; a GPU is requested only to make a 200-epoch sweep cheap in wall clock.
+
+  compute:
+    gpu_hours: 2
+    basis: >-
+      EXTRAPOLATED, not measured on GPU. MEASURED locally: ~25 min for 13 epochs on this
+      machine's MPS device, best epoch 5. 200 epochs is ~15x that work; 2 GPU-hours assumes a
+      ~3x speed-up over MPS. Early stopping selected epoch 5 of 13 locally, so the realistic
+      outcome is that most of the booked time is never used.
+    cpu_fallback_hours: 12
+    cpu_fallback_basis: "Same extrapolation with no accelerator; CPU training was not timed."
+
+  aws:
+    service: Batch
+    compute_environment: EC2 Spot
+    instance_types: ["g6.xlarge", "g5.xlarge"]
+    checkpointing: "Every 10 epochs to S3; a Spot reclaim costs at most 10 epochs."
+
+  seal:
+    required: true
+    note: >-
+      The anti-tuning seal is recorded at first test evaluation and `validate-discriminator`
+      errors if the configuration moves between scorings. Any run of this job that changes a
+      named constant must bump `seal_version` deliberately and say why in the model card. The
+      seal hashes constants and NOT code, so a behavioural change that moves no constant will
+      not trip it -- that limitation is the reason this block is here rather than assumed.
+
+  gates:
+    - "the challenger becomes default only if the paired-bootstrap 95% lower bound on dF1 > 0"
+    - "no forced test group (chamoli-2021, langtang-lhende-2026) in train or val"
+    - "calibrator fitted on the validation fold only"
+    - "the artifact's training-group hash recomputes from the shipped split"
+
+  preconditions:
+    - "Confirm with a human before launching: this is a negative-result reproduction, not a fix."
+    - "`serac data build-discriminator-set` has been run and data/features/discriminator exists."
+
+  notes: >-
+    What would actually move M1 is more High Mountain Asia positives -- ESEC holds five -- and
+    open archive coverage on the events that exist. The measured leak residual (+1.01 receivers
+    on positives over their matched negatives; n_stations alone gives ROC-AUC 0.587) is also a
+    dataset problem, not a training one. Spend here last.

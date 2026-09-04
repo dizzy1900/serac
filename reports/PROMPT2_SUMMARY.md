@@ -310,8 +310,11 @@ on ten cores should take the warm total from ~75 s to near 20 s.
    sealed model orders the classes the wrong way round on the receivers that exist.
 4. **The ≤ 60 s budget is either abandoned or replaced with a different discriminant.** It is
    unreachable for a 20–100 s band at ≥ 100 km, and no roadmap should carry it forward as-is.
-5. **The stub is actually retired.** `serac replay` and `cli_stream.py` still run
-   `DetectorStub`; M1's classifier is wired only into `serac cascade e2e` and the M1 latency CLI.
+5. **The stub is actually retired.** `serac replay --detector discriminator` now runs the
+   trained model, but `stub` is still the default and `serac stream run` — the live lane —
+   remains hardcoded to `DetectorStub`. On the Chamoli fixture the trained detector emits
+   **0 detections against the stub's 4**, because two receivers are available and it requires
+   three: selectable is not the same as retired.
 6. **Somebody with a mandate would act on the output.** Nothing in this repository can create
    that, and nothing in it should pretend to.
 
@@ -352,4 +355,4 @@ Restated, and extended by what Prompt 2 measured.
 
 ---
 
-*Generated 2026-09-04 at `a287542`. Sources: `reports/MODEL_CARD_{discriminator,lfh,watch,runout,cascade}.md`, `reports/validation/*.json`, `reports/m1/`, `reports/m2/`, `reports/runout/`, `reports/watch/`, `reports/e2e/`, `infra/jobs/*.yaml`.*
+*Generated 2026-09-04, last revised at `3dbe7e7`. Sources: `reports/MODEL_CARD_{discriminator,lfh,watch,runout,cascade}.md`, `reports/validation/*.json`, `reports/m1/`, `reports/m2/`, `reports/runout/`, `reports/watch/`, `reports/e2e/`, `infra/jobs/*.yaml`.*

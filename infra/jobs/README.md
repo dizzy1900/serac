@@ -19,6 +19,10 @@ for comparison).
 | `hyp3-insar-batch.yaml` | submit, watch and download a batch of HyP3 InSAR pairs for an AOI and date range; ledger every product | Earthdata Login |
 | `cube-build.yaml` | build (or rebuild) the Zarr feature cube and STAC catalog for one AOI from `data/raw` | none (reads DVC-pulled data) |
 | `s1-stack.yaml` | list and download a Sentinel-1 SLC/GRD stack for an AOI (the > 5 GB gate applies) | Earthdata Login |
+| `m2-greens-library.yaml` | pre-build the Syngine Green's-function library M2's warm path needs | none (public Syngine) |
+| `runout-ensemble-10k.yaml` | a 10⁴-member `serac-swe-voellmy` Latin-hypercube ensemble over the corridor | none |
+| `fno-train-gpu.yaml` | train the M4 corridor surrogate on a GPU host | none |
+| `discriminator-train-deep.yaml` | train the M1 station-axis transformer at full scale and re-score the sealed test folds | none |
 
 ## Schema
 
@@ -49,8 +53,8 @@ Rules:
 - Any job whose download estimate exceeds 5 GB needs an explicit operator confirmation
   (`preconditions`), matching the CLI gate.
 - Credentials come from the host's secret store (`from: secret:…`); nothing here holds a value.
-- GPU jobs (Prompt 2 training, surrogate ensembles) will add `resources.gpu` and an
-  `aws.instance_family` in the `g`/`p` families; none exist yet.
+- GPU jobs add `resources.gpu` and an `aws.instance_family` in the `g`/`p` families:
+  `fno-train-gpu.yaml` and `discriminator-train-deep.yaml` do.
 
 ## Submitting on AWS Batch (sketch)
 

@@ -49,7 +49,7 @@ Consequences, all intended:
 | `validate-e2e` | 15 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
 | **total** | **385** | |
 
-`make test` passes: **1,242 offline tests**, network blocked.
+`make test` passes: **1,271 offline tests**, network blocked.
 
 **No serac model is validated against events, and none has been promoted.** Four of the five
 components returned a negative or a refusal on the motivating event (Langtang Lirung / Lhende
@@ -249,8 +249,10 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
     other leakage assertion still runs.
 22. **Negatives are not magnitude-matched** (ESEC publishes no magnitude), and the noise class
     means "no catalogued source", not "quiet".
-23. **No job manifest exists for full deep-model training.** The brief asks for one alongside
-    the 10⁴ r.avaflow manifest; `infra/jobs/fno-train-gpu.yaml` covers M4's surrogate only.
+23. ~~**No job manifest exists for full deep-model training.**~~ Fixed:
+    `infra/jobs/discriminator-train-deep.yaml`. It is still `status: designed` and has never
+    been executed, and its own notes say that executing it is expected to change nothing — the
+    binding constraint on M1 is 9 held-out positives, not epochs.
 
 ### M2 — force-history inversion
 
@@ -403,8 +405,9 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
     fakeredis only; the `redis`-marked test has never run.
 60. **Docker Compose untested on the dev machine.** No Docker is installed there.
 61. **No job manifest has ever been executed.** Every `estimated_core_hours` figure is an
-    estimate with a stated basis, and `infra/jobs/README.md`'s manifest table lists only the
-    three Prompt 1 files — the three added in Prompt 2 are missing from it.
+    estimate with a stated basis. The README's table now lists all seven manifests, and
+    `tests/unit/test_job_manifests.py` fails if one is added without being listed, if a cost
+    figure carries no basis, or if a manifest claims to have been executed.
 62. **`SourceRef` exists twice** — `domain/common.py` for the event library and
     `models/lfh/references.py` for the force-history references. The LFH copy carries extra
     resolution provenance, so they are not redundant, but the duplication let a review fix land
