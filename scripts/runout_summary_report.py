@@ -16,6 +16,10 @@ REPO = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")
 REPORTS = REPO / "reports" / "runout"
 
 
+class SummaryReportError(Exception):
+    """The summary generator was pointed at an artefact it cannot render."""
+
+
 def load(name: str) -> dict[str, Any] | None:
     path = REPORTS / name
     if not path.exists():
@@ -102,9 +106,16 @@ def main() -> None:
             f"{fmt(block.get('peak_stage_relative_error'), 3)} |\n"
         )
 
-    mass_error = verification.get("mass_conservation_closed_domain", {}).get(
-        "relative_error", float("nan")
-    )
+    # The artefact records `absolute_relative_error` (and `signed_relative_error`). Reading a
+    # key that does not exist silently rendered `nan` into a verification table, which is the
+    # one place a reader looks to check the solver conserves mass. Fail loudly instead.
+    mass_block = verification.get("mass_conservation_closed_domain", {})
+    if "absolute_relative_error" not in mass_block:
+        raise SummaryReportError(
+            "verification.json has no mass_conservation_closed_domain.absolute_relative_error; "
+            "regenerate it with scripts/runout_verification_report.py"
+        )
+    mass_error = mass_block["absolute_relative_error"]
     lake = verification.get("lake_at_rest", {})
     lake_dev = lake.get("max_surface_deviation_m", float("nan"))
     lake_speed = lake.get("max_speed_m_s", float("nan"))

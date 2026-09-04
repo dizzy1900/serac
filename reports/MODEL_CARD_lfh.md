@@ -166,8 +166,8 @@ passed under, and `validate-lfh` checks that every run carries it.
 
 | Event | Outcome | Geometry | Public figures |
 |---|---|---|---|
-| Langtang / Lhende Khola, 2026 | **REFUSED**: 3 stations, **317° gap** | Signal is clearly present (SNR up to 71 at II.NIL) — the geometry, not the signal, is missing | 100–200 × 10⁶ m³ (ICIMOD via Kathmandu Post, preliminary) |
-| Blatten / Birch Glacier, 2025 | **REFUSED**: VR 0.191 against a floor of 0.20 | 9 stations, 78° gap, SNR 1.82 — good geometry, marginal fit | 9–10 × 10⁶ m³ (EGU 2026 abstracts) |
+| Langtang / Lhende Khola, 2026 | **REFUSED**: 3 stations, **317° gap** | Signal is present: median pre-event SNR **3.52**, and **57.3 at the best channel** (II.NIL) — the geometry, not the signal, is missing | 100–200 × 10⁶ m³ (ICIMOD via Kathmandu Post, preliminary) |
+| Blatten / Birch Glacier, 2025 | **REFUSED**: VR 0.191 against a floor of 0.20 | 9 stations, 78° gap, median SNR 1.82 — good geometry, marginal fit | 9–10 × 10⁶ m³ (EGU 2026 abstracts) |
 
 Blatten is a **marginal refusal** and is reported as one. The floor was set at 0.20 while
 Blatten stood at 0.065, under a press-derived origin time. Correcting the origin to the Swiss

@@ -6,14 +6,14 @@
 > `infra/docker/ravaflow/README.md` for the acquisition record with dates and URLs.
 > **Cross-validation against r.avaflow is outstanding.**
 
-Generated 2026-09-03 from the machine-readable records in this
+Generated 2026-09-04 from the machine-readable records in this
 directory. Nothing here is retyped by hand.
 
 ## 1. Solver verification
 
 | Case | Result |
 |---|---|
-| Mass conservation, closed domain | relative error nan |
+| Mass conservation, closed domain | relative error 1.77e-16 |
 | Lake at rest, random topography | surface deviation 0.0 m, max speed 0.0 m/s over 137 steps |
 
 ### Ritter dam break against the analytic solution
