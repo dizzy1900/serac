@@ -1,0 +1,61 @@
+{
+  "aoi_id": "lhende-khola-trishuli",
+  "status": "ok",
+  "failed_pass": null,
+  "started_at": "2026-09-03T22:39:32.624163+00:00",
+  "finished_at": "2026-09-03T22:58:45.497251+00:00",
+  "prepared_stack": {
+    "aoi_id": "lhende-khola-trishuli",
+    "generated_at": "2026-09-03T22:39:33.062981+00:00",
+    "inputs_dir": "data/interim/watch/mintpy_inputs/lhende-khola-trishuli",
+    "n_pairs_prepared": 0,
+    "n_pairs_skipped": 257,
+    "n_pairs_failed": 0,
+    "failed": [],
+    "geometry_files": {
+      "height": "data/interim/watch/mintpy_inputs/lhende-khola-trishuli/geom_dem/S1_121_000000s1n00-000000s2n00-258660s3n04_IW_20220105_20220117_VV_INT80_2181.hgt",
+      "incidence": "data/interim/watch/mintpy_inputs/lhende-khola-trishuli/geom_inc/S1_121_000000s1n00-000000s2n00-258660s3n04_IW_20220105_20220117_VV_INT80_2181.hgt"
+    },
+    "format": "ROI_PAC two-band BIL float32 (.unw/.cor/.hgt) with .rsc sidecars, because MintPy's hyp3 reader needs GDAL Python bindings that are not installable here"
+  },
+  "path_number": 121,
+  "n_pairs_planned": 257,
+  "grid": {
+    "epsg": 32645,
+    "resolution_m": 80.0,
+    "x_min": 295760.0,
+    "y_max": 3140080.0,
+    "width": 791,
+    "height": 857
+  },
+  "mean_incidence_deg": 45.761,
+  "heading_deg": 192.515,
+  "reference_point": {
+    "row": 414,
+    "col": 608,
+    "temporal_coherence": 1.0,
+    "slope_deg": 7.603,
+    "n_candidates": 2675,
+    "rule": "highest temporal coherence among pixels with temporal coherence >= 0.85, slope < 15 deg, and no layover or shadow on the selected track; ties broken by lowest row then lowest column"
+  },
+  "config_sha256": "6328b629375da527e21803889f532079af34a338eb28a89907fd89fa60475d9b",
+  "config_path": "/Users/resilientagents/Resilient_ClaudeCode/serac-wt/insar-optical/data/interim/watch/mintpy/lhende-khola-trishuli/pass2/serac_smallbaselineApp.cfg",
+  "pass1": {
+    "returncode": 0,
+    "elapsed_s": 427.44,
+    "config_path": "/Users/resilientagents/Resilient_ClaudeCode/serac-wt/insar-optical/data/interim/watch/mintpy/lhende-khola-trishuli/pass1/serac_smallbaselineApp.cfg",
+    "config_sha256": "219f96a287b80da50cf158363a0d3001270d7492eb0011253703d3c117e4577c",
+    "step_timings_s": {}
+  },
+  "pass2": {
+    "returncode": 0,
+    "elapsed_s": 724.82,
+    "config_path": "/Users/resilientagents/Resilient_ClaudeCode/serac-wt/insar-optical/data/interim/watch/mintpy/lhende-khola-trishuli/pass2/serac_smallbaselineApp.cfg",
+    "config_sha256": "6328b629375da527e21803889f532079af34a338eb28a89907fd89fa60475d9b",
+    "step_timings_s": {}
+  },
+  "pass2_stderr_tail": "",
+  "tropospheric_correction": "Tropospheric correction is MintPy height_correlation, not GACOS and not ERA5: GACOS needs an email workflow and ERA5 needs a CDS key, neither of which was available. It removes only the elevation-correlated part of the delay, so turbulent monsoon-season wet delay survives it. This is the largest known error source in these velocities.",
+  "timeseries_path": "data/interim/watch/mintpy/lhende-khola-trishuli/pass2/timeseries.h5",
+  "velocity_path": "data/interim/watch/mintpy/lhende-khola-trishuli/pass2/velocity.h5"
+}

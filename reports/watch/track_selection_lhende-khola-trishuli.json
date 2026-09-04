@@ -1,0 +1,118 @@
+{
+  "aoi_id": "lhende-khola-trishuli",
+  "window_start": "2022-01-01T00:00:00Z",
+  "window_end": "2026-08-26T00:00:00Z",
+  "slope_mask_min_deg": 25.0,
+  "slope_mask_pixels": 3211916,
+  "dem_source_path": "data/raw/dem_glo30/lhende-khola-trishuli/glo30_crop_lhende-khola-trishuli/glo30_crop.tif",
+  "dem_source_sha256": "6d3bdb40f5c6727ffba4fa1037ef45dcfab5ebb56fd8a97e7b81bc1bf0123248",
+  "selection_rule": "Frozen track-selection rule (serac M3, committed before the first run)\n\nMask: all AOI pixels with slope >= 25 degrees on the AOI's own 30 m grid, identical for every\ncandidate track. The mask is not conditioned on any known failure location.\n\nPer candidate relative orbit, over the requested window:\n  sensitivity        = mean over the mask of |downslope . line-of-sight|\n  layover_shadow     = fraction of the mask flagged layover or shadow by the local-slope test\n  n_scenes           = distinct acquisition dates found by the ASF burst search\n  max_gap_days       = largest interval between consecutive acquisition dates\n  coverage           = min(1, n_scenes / (window_days / 12))\n\nEligible if and only if:\n  n_scenes >= 100  AND  max_gap_days <= 90  AND  layover_shadow <= 0.35\n\nScore (eligible tracks only):\n  score = sensitivity * (1 - layover_shadow) * coverage\n\nChoose the eligible track with the highest score. Ties break on lower max_gap_days, then on\nlower path number. If no track is eligible the command selects nothing, reports the reason per\ntrack, and the operator decides; it never relaxes a threshold on its own.\n",
+  "rule_sha256": "d6c159600c5b71f0b1d1cfff177b6e61c99bd321fa23ce5520c6f70db299df06",
+  "candidates": [
+    {
+      "path_number": 19,
+      "flight_direction": "DESCENDING",
+      "subswaths": [
+        "IW1",
+        "IW2"
+      ],
+      "heading_deg": 190.971,
+      "incidence_deg": 35.6,
+      "incidence_basis": "nominal mid-swath Sentinel-1 IW incidence angle (IW1 32.9, IW2 38.3, IW3 43.1 degrees); used for track ranking only, superseded per pixel by the HyP3 lv_theta raster",
+      "n_scenes": 138,
+      "n_bursts": 2974,
+      "first_acquisition": "2022-01-10T00:19:42Z",
+      "last_acquisition": "2026-08-24T00:18:53Z",
+      "max_gap_days": 36.0,
+      "median_gap_days": 12.0,
+      "los_sensitivity": 0.50443,
+      "layover_fraction": 0.097294,
+      "shadow_fraction": 0.004735,
+      "layover_shadow_fraction": 0.102029,
+      "coverage": 0.975265,
+      "score": 0.44176,
+      "eligible": true,
+      "ineligibility_reasons": []
+    },
+    {
+      "path_number": 85,
+      "flight_direction": "ASCENDING",
+      "subswaths": [
+        "IW1",
+        "IW2"
+      ],
+      "heading_deg": 349.424,
+      "incidence_deg": 35.6,
+      "incidence_basis": "nominal mid-swath Sentinel-1 IW incidence angle (IW1 32.9, IW2 38.3, IW3 43.1 degrees); used for track ranking only, superseded per pixel by the HyP3 lv_theta raster",
+      "n_scenes": 138,
+      "n_bursts": 2445,
+      "first_acquisition": "2022-01-02T12:22:28Z",
+      "last_acquisition": "2026-08-16T12:21:39Z",
+      "max_gap_days": 24.0,
+      "median_gap_days": 12.0,
+      "los_sensitivity": 0.465418,
+      "layover_fraction": 0.067275,
+      "shadow_fraction": 0.006885,
+      "layover_shadow_fraction": 0.074161,
+      "coverage": 0.975265,
+      "score": 0.420244,
+      "eligible": true,
+      "ineligibility_reasons": []
+    },
+    {
+      "path_number": 121,
+      "flight_direction": "DESCENDING",
+      "subswaths": [
+        "IW3"
+      ],
+      "heading_deg": 190.147,
+      "incidence_deg": 43.1,
+      "incidence_basis": "nominal mid-swath Sentinel-1 IW incidence angle (IW1 32.9, IW2 38.3, IW3 43.1 degrees); used for track ranking only, superseded per pixel by the HyP3 lv_theta raster",
+      "n_scenes": 136,
+      "n_bursts": 1319,
+      "first_acquisition": "2022-01-05T00:11:34Z",
+      "last_acquisition": "2026-08-19T00:10:45Z",
+      "max_gap_days": 36.0,
+      "median_gap_days": 12.0,
+      "los_sensitivity": 0.492215,
+      "layover_fraction": 0.037252,
+      "shadow_fraction": 0.016788,
+      "layover_shadow_fraction": 0.05404,
+      "coverage": 0.961131,
+      "score": 0.447517,
+      "eligible": true,
+      "ineligibility_reasons": []
+    },
+    {
+      "path_number": 160,
+      "flight_direction": "ASCENDING",
+      "subswaths": [
+        "IW1",
+        "IW2"
+      ],
+      "heading_deg": 349.424,
+      "incidence_deg": 35.6,
+      "incidence_basis": "nominal mid-swath Sentinel-1 IW incidence angle (IW1 32.9, IW2 38.3, IW3 43.1 degrees); used for track ranking only, superseded per pixel by the HyP3 lv_theta raster",
+      "n_scenes": 1,
+      "n_bursts": 18,
+      "first_acquisition": "2026-05-29T12:22:19Z",
+      "last_acquisition": "2026-05-29T12:22:19Z",
+      "max_gap_days": 1609.515,
+      "median_gap_days": null,
+      "los_sensitivity": 0.465418,
+      "layover_fraction": 0.067275,
+      "shadow_fraction": 0.006885,
+      "layover_shadow_fraction": 0.074161,
+      "coverage": 0.007067,
+      "score": 0.0,
+      "eligible": false,
+      "ineligibility_reasons": [
+        "n_scenes 1 < 100",
+        "max_gap_days 1609.5 > 90.0"
+      ]
+    }
+  ],
+  "selected_path": 121,
+  "selected_reason": "highest score 0.447517 among 3 eligible track(s): sensitivity 0.492 x (1 - layover_shadow 0.054) x coverage 0.961",
+  "burst_listing": "data/interim/watch/bursts/lhende-khola-trishuli_20220101_20260826.json"
+}

@@ -1,0 +1,22 @@
+{
+  "aoi_id": "chamoli-rishiganga",
+  "path_number": 56,
+  "plan_sha256": "75a08c3a36e800354b66a931bdc1eba8435d00b787970657c89c1e2e5364189c",
+  "pairs_planned": 260,
+  "jobs_submitted": 260,
+  "succeeded_harvested": 260,
+  "failed": 0,
+  "pending": 0,
+  "bytes_transient_total": 9113436960,
+  "credits_spent": 260,
+  "last_run": {
+    "aoi_id": "chamoli-rishiganga",
+    "harvested": 260,
+    "failed": 0,
+    "pending": 0,
+    "bytes_transient": 9113436960,
+    "bytes_retained": 405868330,
+    "errors": [],
+    "submitted_total": 260
+  }
+}

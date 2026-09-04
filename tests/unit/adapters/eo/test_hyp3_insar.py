@@ -233,10 +233,22 @@ def test_synthetic_pair_is_labelled_everywhere(repo_root: Path, synthetic_dir: P
             arr = ds.read(1)
             assert np.isfinite(arr).all()
     ledger = JsonlManifestLedger(repo_root / "data" / "manifest.jsonl")
-    rows = [e for e in ledger.entries() if e.source is DataSource.hyp3_insar]
+    # Scoped to the synthetic placeholder rows. This used to assert that *every* hyp3_insar row
+    # in the ledger was synthetic, which held only while no real InSAR had ever been ingested;
+    # M3's burst-InSAR network now writes real rows under the same DataSource. The invariant
+    # that matters is the one below: synthetic rows are labelled synthetic and live only under
+    # tests/fixtures/synthetic/, and no real row is ever recorded there.
+    rows = [
+        e
+        for e in ledger.entries()
+        if e.source is DataSource.hyp3_insar and e.provenance is Provenance.synthetic
+    ]
     assert len(rows) >= 2
     for e in rows:
-        assert e.status is ManifestStatus.synthetic and e.provenance is Provenance.synthetic
+        assert e.status is ManifestStatus.synthetic
         assert e.path and e.path.startswith("tests/fixtures/synthetic/hyp3/")
         assert e.notes and "no Earthdata credentials" in e.notes
         assert e.sha256 and (repo_root / e.path).exists()
+    for e in ledger.entries():
+        if e.path and e.path.startswith("tests/fixtures/synthetic/"):
+            assert e.provenance is Provenance.synthetic

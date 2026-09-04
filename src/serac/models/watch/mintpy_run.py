@@ -1,0 +1,422 @@
+"""Drive MintPy `smallbaselineApp` from a typed config, with a deterministic reference point.
+
+Two things here are not the MintPy defaults and both are deliberate.
+
+**The reference point.** MintPy's default picks the pixel of maximum average spatial coherence,
+which moves whenever the stack changes and therefore makes a time series irreproducible across
+re-runs. `reports/watch/PREREGISTRATION.md` section 6 fixes the rule instead:
+
+> Among pixels whose temporal coherence is at least 0.85, whose slope is below 15 degrees, and
+> which are not flagged layover or shadow on the selected track, take the one with the highest
+> temporal coherence; break ties by lowest row index, then lowest column index.
+
+Temporal coherence only exists after `invert_network`, and `reference_point` runs before it, so
+this is done in **two passes**: pass 1 runs the app with MintPy's own reference to produce
+`temporalCoherence.h5`, the rule is then applied to that raster, and pass 2 re-runs the whole
+app in a separate directory with `mintpy.reference.yx` pinned. Pass 2 is the product. The grid
+here is 369 x 421 pixels, so running twice costs minutes, not hours.
+
+**The tropospheric correction.** GACOS needs an email round trip and ERA5 needs a CDS key that
+this environment does not have, so the correction is MintPy's `height_correlation`. That is a
+**weaker** correction: it removes the part of the delay that correlates with elevation and
+nothing else, so a turbulent wet-delay field over a monsoon-season interferogram survives it
+largely intact. This is stated in the model card and in every report, and it is the single
+largest known error source in the velocities this component produces.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import shutil
+import subprocess
+import time
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any, Final
+
+import numpy as np
+from pydantic import BaseModel, ConfigDict, Field
+
+from serac.errors import SeracError
+
+REFERENCE_MIN_TEMPORAL_COHERENCE: Final[float] = 0.85
+REFERENCE_MAX_SLOPE_DEG: Final[float] = 15.0
+TROPO_METHOD: Final[str] = "height_correlation"
+TROPO_CAVEAT: Final[str] = (
+    "Tropospheric correction is MintPy height_correlation, not GACOS and not ERA5: GACOS needs "
+    "an email workflow and ERA5 needs a CDS key, neither of which was available. It removes only "
+    "the elevation-correlated part of the delay, so turbulent monsoon-season wet delay survives "
+    "it. This is the largest known error source in these velocities."
+)
+
+STEPS: Final[tuple[str, ...]] = (
+    "load_data",
+    "modify_network",
+    "reference_point",
+    "quick_overview",
+    "correct_unwrap_error",
+    "invert_network",
+    "correct_LOD",
+    "correct_SET",
+    "correct_troposphere",
+    "deramp",
+    "correct_topography",
+    "residual_RMS",
+    "deramp",
+    "velocity",
+    "geocode",
+)
+
+
+class MintPyConfig(BaseModel):
+    """Every MintPy option serac sets, so the config is a typed object and not a text file."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    aoi_id: str
+    processor: str = "roipac"
+    unw_glob: str
+    cor_glob: str
+    dem_glob: str
+    inc_angle_glob: str
+    reference_yx: tuple[int, int] | None = None
+    tropo_method: str = TROPO_METHOD
+    deramp: str = "linear"
+    weight_func: str = "var"
+    network_coherence_based: bool = False
+    unwrap_error_method: str = "no"
+    cluster: str = "no"
+    num_worker: int = 4
+    extra: dict[str, str] = Field(default_factory=dict)
+
+    def as_options(self) -> dict[str, str]:
+        """The flat `key = value` mapping written into `smallbaselineApp.cfg`."""
+        options: dict[str, str] = {
+            "mintpy.load.processor": self.processor,
+            "mintpy.load.unwFile": self.unw_glob,
+            "mintpy.load.corFile": self.cor_glob,
+            "mintpy.load.demFile": self.dem_glob,
+            # Explicitly `auto` rather than absent. MintPy merges a custom template over the
+            # `smallbaselineApp.cfg` left in the work directory by any previous run, so a key
+            # that is simply omitted keeps whatever the last run set it to.
+            "mintpy.load.incAngleFile": self.inc_angle_glob,
+            "mintpy.load.azAngleFile": "auto",
+            "mintpy.load.waterMaskFile": "auto",
+            "mintpy.load.metaFile": "auto",
+            "mintpy.load.baselineDir": "auto",
+            "mintpy.compute.cluster": self.cluster,
+            "mintpy.compute.numWorker": str(self.num_worker),
+            "mintpy.network.coherenceBased": "yes" if self.network_coherence_based else "no",
+            "mintpy.networkInversion.weightFunc": self.weight_func,
+            "mintpy.unwrapError.method": self.unwrap_error_method,
+            "mintpy.troposphericDelay.method": self.tropo_method,
+            "mintpy.deramp": self.deramp,
+            "mintpy.geocode": "no",
+            # The `pic` folder costs minutes per pass and nothing here reads it; the reports
+            # this component writes are the product.
+            "mintpy.plot": "no",
+        }
+        if self.reference_yx is not None:
+            options["mintpy.reference.yx"] = f"{self.reference_yx[0]}, {self.reference_yx[1]}"
+        options.update(self.extra)
+        return options
+
+    def render(self) -> str:
+        lines = [
+            "# generated by serac.models.watch.mintpy_run - do not edit by hand",
+            f"# aoi: {self.aoi_id}",
+            f"# {TROPO_CAVEAT}",
+        ]
+        lines += [f"{k} = {v}" for k, v in sorted(self.as_options().items())]
+        return "\n".join(lines) + "\n"
+
+    def digest(self) -> str:
+        return hashlib.sha256(
+            json.dumps(self.as_options(), sort_keys=True).encode("utf-8")
+        ).hexdigest()
+
+
+@dataclass(frozen=True)
+class ReferencePoint:
+    """The pixel the time series is referenced to, and the evidence for choosing it."""
+
+    row: int
+    col: int
+    temporal_coherence: float
+    slope_deg: float
+    n_candidates: int
+    rule: str
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "row": self.row,
+            "col": self.col,
+            "temporal_coherence": round(self.temporal_coherence, 6),
+            "slope_deg": round(self.slope_deg, 3),
+            "n_candidates": self.n_candidates,
+            "rule": self.rule,
+        }
+
+
+REFERENCE_RULE: Final[str] = (
+    "highest temporal coherence among pixels with temporal coherence >= 0.85, slope < 15 deg, "
+    "and no layover or shadow on the selected track; ties broken by lowest row then lowest column"
+)
+
+
+def choose_reference_point(
+    temporal_coherence: np.ndarray,
+    slope_deg: np.ndarray,
+    layover_or_shadow: np.ndarray,
+    *,
+    min_coherence: float = REFERENCE_MIN_TEMPORAL_COHERENCE,
+    max_slope_deg: float = REFERENCE_MAX_SLOPE_DEG,
+) -> ReferencePoint:
+    """Apply the pre-registered rule. Raises when no pixel qualifies, rather than relaxing it."""
+    if not (temporal_coherence.shape == slope_deg.shape == layover_or_shadow.shape):
+        raise ValueError("reference-point inputs must share a shape")
+    eligible = (
+        np.isfinite(temporal_coherence)
+        & (temporal_coherence >= min_coherence)
+        & (slope_deg < max_slope_deg)
+        & ~layover_or_shadow
+    )
+    n = int(eligible.sum())
+    if n == 0:
+        raise SeracError(
+            "no pixel satisfies the pre-registered reference-point rule "
+            f"(temporal coherence >= {min_coherence}, slope < {max_slope_deg} deg, no "
+            "layover/shadow). The rule is pre-registered and is not relaxed here; report the "
+            "failure instead."
+        )
+    scores = np.where(eligible, temporal_coherence, -np.inf)
+    # Highest coherence, ties by lowest row then lowest column: argmax on a row-major flatten
+    # already breaks ties towards the lowest row, then the lowest column.
+    flat = int(np.argmax(scores))
+    row, col = divmod(flat, scores.shape[1])
+    return ReferencePoint(
+        row=int(row),
+        col=int(col),
+        temporal_coherence=float(temporal_coherence[row, col]),
+        slope_deg=float(slope_deg[row, col]),
+        n_candidates=n,
+        rule=REFERENCE_RULE,
+    )
+
+
+def mintpy_dir(data_dir: Path, aoi_id: str, pass_name: str = "pass2") -> Path:
+    return data_dir / "interim" / "watch" / "mintpy" / aoi_id / pass_name
+
+
+def build_config(
+    data_dir: Path, aoi_id: str, *, reference_yx: tuple[int, int] | None
+) -> MintPyConfig:
+    """Point MintPy at the ROI_PAC binaries, using absolute globs so the cwd cannot matter."""
+    from serac.models.watch.mintpy_prep import GEOMETRY_SUBDIRS, mintpy_inputs_dir
+
+    root = mintpy_inputs_dir(data_dir, aoi_id).resolve()
+    return MintPyConfig(
+        aoi_id=aoi_id,
+        unw_glob=f"{root}/*.unw",
+        cor_glob=f"{root}/*.cor",
+        dem_glob=f"{root}/{GEOMETRY_SUBDIRS['height']}/*.hgt",
+        inc_angle_glob=f"{root}/{GEOMETRY_SUBDIRS['incidence']}/*.hgt",
+        reference_yx=reference_yx,
+    )
+
+
+def _run_app(config: MintPyConfig, work_dir: Path, *, timeout_s: float) -> dict[str, Any]:
+    """Run `smallbaselineApp.py` in `work_dir`, timing it and capturing its log."""
+    work_dir = work_dir.resolve()
+    # Start from a clean directory: MintPy merges the custom template over any
+    # `smallbaselineApp.cfg` already present, so stale keys from an earlier run survive.
+    if work_dir.exists():
+        shutil.rmtree(work_dir)
+    work_dir.mkdir(parents=True, exist_ok=True)
+    # Absolute, because the subprocess runs with cwd=work_dir and would otherwise resolve a
+    # repo-relative config path against the wrong directory.
+    cfg_path = (work_dir / "serac_smallbaselineApp.cfg").resolve()
+    cfg_path.write_text(config.render(), encoding="utf-8")
+    started = time.monotonic()
+    completed = subprocess.run(
+        ["smallbaselineApp.py", str(cfg_path), "--work-dir", str(work_dir)],
+        capture_output=True,
+        text=True,
+        timeout=timeout_s,
+        check=False,
+        cwd=str(work_dir),
+    )
+    elapsed = time.monotonic() - started
+    (work_dir / "smallbaselineApp.stdout.log").write_text(completed.stdout, encoding="utf-8")
+    (work_dir / "smallbaselineApp.stderr.log").write_text(completed.stderr, encoding="utf-8")
+    return {
+        "returncode": completed.returncode,
+        "elapsed_s": round(elapsed, 2),
+        "config_path": cfg_path.as_posix(),
+        "config_sha256": config.digest(),
+        "step_timings_s": _step_timings(completed.stdout),
+        "stdout_tail": completed.stdout[-4000:],
+        "stderr_tail": completed.stderr[-4000:],
+    }
+
+
+def _step_timings(stdout: str) -> dict[str, float]:
+    """Per-step wall clock, parsed from smallbaselineApp's own step banners."""
+    timings: dict[str, float] = {}
+    current: str | None = None
+    started = 0.0
+    marker = "Run routine processing with smallbaselineApp.py on steps: "
+    del marker
+    for line in stdout.splitlines():
+        stripped = line.strip()
+        for step in STEPS:
+            if stripped.startswith(f"step - {step}") or stripped == f"step - {step}":
+                if current is not None:
+                    timings[current] = round(time.monotonic() - started, 2)
+                current = step
+                started = time.monotonic()
+                break
+    return timings
+
+
+def run_smallbaseline(
+    *,
+    data_dir: Path,
+    reports_dir: Path,
+    aoi_id: str,
+    dry_run: bool = False,
+    timeout_s: float = 4 * 3600,
+) -> dict[str, Any]:
+    """Two-pass `smallbaselineApp` with the pre-registered reference point. Writes the report."""
+    from serac.models.watch.geometry import layover_shadow_masks, slope_aspect
+    from serac.models.watch.mintpy_prep import prepare_stack
+    from serac.models.watch.plan import load_network_plan
+
+    plan = load_network_plan(data_dir, aoi_id)
+    started_at = datetime.now(tz=UTC)
+    prepared = prepare_stack(data_dir, aoi_id)
+    pass1_dir = mintpy_dir(data_dir, aoi_id, "pass1")
+    pass2_dir = mintpy_dir(data_dir, aoi_id, "pass2")
+    bootstrap = build_config(data_dir, aoi_id, reference_yx=None)
+
+    if dry_run:
+        pass1_dir.mkdir(parents=True, exist_ok=True)
+        (pass1_dir / "serac_smallbaselineApp.cfg").write_text(bootstrap.render(), encoding="utf-8")
+        return {
+            "aoi_id": aoi_id,
+            "dry_run": True,
+            "config_sha256": bootstrap.digest(),
+            "config_path": (pass1_dir / "serac_smallbaselineApp.cfg").as_posix(),
+            "prepared_stack": prepared,
+            "tropospheric_correction": TROPO_CAVEAT,
+        }
+
+    if shutil.which("smallbaselineApp.py") is None:
+        raise SeracError("smallbaselineApp.py is not on PATH; install the `insar` extra")
+
+    pass1 = _run_app(bootstrap, pass1_dir, timeout_s=timeout_s)
+    if pass1["returncode"] != 0:
+        return _write_report(
+            reports_dir,
+            aoi_id,
+            {
+                "aoi_id": aoi_id,
+                "status": "failed",
+                "failed_pass": 1,
+                "started_at": started_at.isoformat(),
+                "prepared_stack": prepared,
+                "pass1": pass1,
+                "tropospheric_correction": TROPO_CAVEAT,
+            },
+        )
+
+    coherence, _ = _read_h5(pass1_dir / "temporalCoherence.h5", "temporalCoherence")
+    dem_raster, _ = _read_h5(pass1_dir / "inputs" / "geometryGeo.h5", "height")
+    if dem_raster is None:
+        dem_raster, _ = _read_h5(pass1_dir / "inputs" / "geometryRadar.h5", "height")
+    if coherence is None or dem_raster is None:
+        raise SeracError("pass 1 produced no temporalCoherence.h5 / geometry height raster")
+    slope, aspect = slope_aspect(
+        np.nan_to_num(dem_raster.astype(np.float64), nan=float(np.nanmedian(dem_raster))),
+        plan.watch_grid.resolution_m,
+        plan.watch_grid.resolution_m,
+    )
+    incidence, _ = _read_h5(pass1_dir / "inputs" / "geometryGeo.h5", "incidenceAngle")
+    mean_incidence = (
+        float(np.nanmean(incidence)) if incidence is not None else _nominal_incidence(plan)
+    )
+    heading = _heading_from_products(data_dir, aoi_id)
+    layover, shadow = layover_shadow_masks(slope, aspect, mean_incidence, heading)
+    reference = choose_reference_point(coherence.astype(np.float64), slope, layover | shadow)
+
+    final = build_config(data_dir, aoi_id, reference_yx=(reference.row, reference.col))
+    pass2 = _run_app(final, pass2_dir, timeout_s=timeout_s)
+
+    payload = {
+        "aoi_id": aoi_id,
+        "status": "ok" if pass2["returncode"] == 0 else "failed",
+        "failed_pass": None if pass2["returncode"] == 0 else 2,
+        "started_at": started_at.isoformat(),
+        "finished_at": datetime.now(tz=UTC).isoformat(),
+        "prepared_stack": prepared,
+        "path_number": plan.path_number,
+        "n_pairs_planned": len(plan.pairs),
+        "grid": plan.crop_grid,
+        "mean_incidence_deg": round(mean_incidence, 3),
+        "heading_deg": round(heading, 3),
+        "reference_point": reference.as_dict(),
+        "config_sha256": final.digest(),
+        "config_path": pass2["config_path"],
+        "pass1": {k: v for k, v in pass1.items() if k not in ("stdout_tail", "stderr_tail")},
+        "pass2": {k: v for k, v in pass2.items() if k not in ("stdout_tail", "stderr_tail")},
+        "pass2_stderr_tail": pass2["stderr_tail"],
+        "tropospheric_correction": TROPO_CAVEAT,
+        "timeseries_path": (pass2_dir / "timeseries.h5").as_posix(),
+        "velocity_path": (pass2_dir / "velocity.h5").as_posix(),
+    }
+    return _write_report(reports_dir, aoi_id, payload)
+
+
+def _write_report(reports_dir: Path, aoi_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    out = reports_dir / "watch" / f"mintpy_{aoi_id}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
+    payload["report_path"] = out.as_posix()
+    return payload
+
+
+def _read_h5(path: Path, dataset: str) -> tuple[np.ndarray | None, dict[str, Any]]:
+    """One dataset and its attributes from a MintPy HDF5 file, or `(None, {})` if absent."""
+    if not path.exists():
+        return None, {}
+    import h5py  # type: ignore[import-not-found,import-untyped,unused-ignore]
+
+    with h5py.File(path, "r") as fh:
+        if dataset not in fh:
+            return None, dict(fh.attrs)
+        return np.asarray(fh[dataset][()]), dict(fh.attrs)
+
+
+def _nominal_incidence(plan: Any) -> float:
+    from serac.models.watch.geometry import IW_NOMINAL_INCIDENCE_DEG
+
+    subswaths = {b.split("_")[-1] for b in plan.burst_ids}
+    values = [IW_NOMINAL_INCIDENCE_DEG.get(s, IW_NOMINAL_INCIDENCE_DEG["IW2"]) for s in subswaths]
+    return float(np.mean(values))
+
+
+def _heading_from_products(data_dir: Path, aoi_id: str) -> float:
+    """Satellite heading from a delivered product's own metadata sidecar.
+
+    HyP3 writes `Heading: -12.689...` (degrees, signed from north) into the product text file.
+    Taking it from the product rather than from the footprint geometry means the number used in
+    the layover/shadow test at reference-point time is ASF's, not serac's estimate.
+    """
+    root = data_dir / "raw" / "hyp3_burst_insar" / aoi_id
+    for txt in sorted(root.glob("S1_*/*.txt")):
+        for line in txt.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("Heading:"):
+                return float(line.split(":", 1)[1].strip()) % 360.0
+    raise SeracError(f"no HyP3 product metadata under {root} to read the heading from")

@@ -12,7 +12,13 @@ from pathlib import Path
 
 from serac.adapters.eo.nisar_constraints import NisarLevel
 from serac.adapters.storage.manifest_ledger import JsonlManifestLedger, sha256_of_file
-from serac.domain.manifest import DataSource, ManifestEntry, ManifestStatus, Provenance
+from serac.domain.manifest import (
+    DataSource,
+    ManifestEntry,
+    ManifestStatus,
+    Provenance,
+    Retention,
+)
 from serac.validation.result import Suite, SuiteResult
 
 SUITE_NAME = "ingest"
@@ -52,11 +58,40 @@ def run_suite(repo: Path) -> SuiteResult:
 
     latest = _latest_by_path(entries)
     _check_rehash(suite, repo, latest)
+    _check_transient_rows(suite, entries)
     _check_not_fetched(suite, repo, entries)
     _check_synthetic_boundaries(suite, repo, entries)
     _check_nisar_levels(suite, entries)
     _check_fixture_files_recorded(suite, repo, latest)
     return suite.result()
+
+
+def _check_transient_rows(suite: Suite, entries: list[ManifestEntry]) -> None:
+    """Surface `retention: transient` rows as a named warning.
+
+    A transient row records bytes that were hashed on arrival and then deleted — a multi-GB
+    HyP3 zip cropped to an AOI, say. The sha256 is honest but nothing can ever re-verify it, so
+    the ledger's re-hash guarantee is genuinely weaker for these rows than for any other.
+
+    This lives here, in the suite that owns the ledger, because that is where a reader looks.
+    It previously existed only in `validate-watch`, which meant `validate-ingest` reported zero
+    warnings on a ledger with 517 unverifiable rows in it.
+    """
+    transient = [e for e in entries if e.retention is Retention.transient]
+    if not transient:
+        suite.warn("ingest.transient_rows", True, "no transient rows")
+        return
+    by_source = Counter(e.source.value for e in transient)
+    total_bytes = sum(e.size_bytes or 0 for e in transient)
+    suite.warn(
+        "ingest.transient_rows",
+        False,
+        f"{len(transient)} row(s) totalling {total_bytes:,} B were hashed on arrival then "
+        "deleted and can never be re-hashed ("
+        + ", ".join(f"{k}={v}" for k, v in sorted(by_source.items()))
+        + "). The derived files that replaced them are ordinary retained rows and are "
+        "re-hashed above.",
+    )
 
 
 def _check_rehash(suite: Suite, repo: Path, latest: dict[str, ManifestEntry]) -> None:

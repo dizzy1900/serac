@@ -1,0 +1,46 @@
+{
+  "aoi_id": "chamoli-rishiganga",
+  "generated_at": "2026-09-03T20:06:06.473842+00:00",
+  "method_id": "serac-aspect-elevation-cc-v1",
+  "method_description": "Connected components of (aspect octant, 250 m elevation band) over terrain steeper than 15 degrees, on the AOI's 30 m grid, with a 5x5 circular-mean aspect smoother and small components dissolved into their longest-shared-boundary neighbour. NOT r.slopeunits and not a hydrological half-basin delineation.",
+  "delineation_sha256": "86be481f4eb894b7f14b1ec04afb7eb818211db0153fb554d762327fc5678642",
+  "dem_source_path": "data/raw/dem_glo30/chamoli-rishiganga/glo30_crop_chamoli-rishiganga/glo30_crop.tif",
+  "dem_source_sha256": "8f57f3f47b655a176d0c7d675c90b627bc6d8a41dbbecff35d26ce8d78e8a9f8",
+  "parameters": {
+    "method_id": "serac-aspect-elevation-cc-v1",
+    "min_slope_deg": 15.0,
+    "elevation_band_m": 250.0,
+    "min_area_m2": 40000.0,
+    "aspect_smooth_window": 5,
+    "aspect_octants": 8,
+    "resolution_m": 30.0,
+    "epsg": 32644,
+    "dem_resampling": "bilinear"
+  },
+  "n_units": 6541,
+  "total_area_km2": 920.348,
+  "median_area_km2": 0.1062,
+  "parquet_path": "data/interim/watch/slope_units_chamoli-rishiganga.parquet",
+  "labels_path": "data/interim/watch/slope_unit_labels_chamoli-rishiganga.tif",
+  "glacier_outlines": {
+    "available": true,
+    "version": "RGI2000-v7.0-G",
+    "regions": [
+      "13_central_asia",
+      "14_south_asia_west",
+      "15_south_asia_east"
+    ],
+    "source_urls": [
+      "https://cluster.klima.uni-bremen.de/~fmaussion/misc/rgi7_data/rgi70_official/RGI2000-v7.0-G-global/RGI2000-v7.0-G-13_central_asia.zip",
+      "https://cluster.klima.uni-bremen.de/~fmaussion/misc/rgi7_data/rgi70_official/RGI2000-v7.0-G-global/RGI2000-v7.0-G-14_south_asia_west.zip",
+      "https://cluster.klima.uni-bremen.de/~fmaussion/misc/rgi7_data/rgi70_official/RGI2000-v7.0-G-global/RGI2000-v7.0-G-15_south_asia_east.zip"
+    ],
+    "n_glaciers_in_aoi": 50,
+    "licence": "CC-BY-4.0 (Randolph Glacier Inventory 7.0, RGI Consortium)",
+    "parquet_path": "data/interim/watch/glaciers_rgi7_chamoli-rishiganga.parquet",
+    "reason": null
+  },
+  "slope_unit_records_written": 6541,
+  "slope_unit_records_path": "data/interim/watch/slope_units_chamoli-rishiganga.jsonl",
+  "known_gap": null
+}

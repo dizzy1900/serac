@@ -24,7 +24,13 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar
 
-from serac.domain.manifest import DataSource, ManifestEntry, ManifestStatus, Provenance
+from serac.domain.manifest import (
+    DataSource,
+    ManifestEntry,
+    ManifestStatus,
+    Provenance,
+    Retention,
+)
 from serac.errors import CredentialsMissingError, FetchDeclinedError, IngestRefusedError
 from serac.ports.ingest import (
     ConfirmFn,
@@ -288,6 +294,7 @@ class BaseIngestAdapter(IngestAdapter):
         params: dict[str, Any] | None = None,
         notes: str | None = None,
         product_level: str | None = None,
+        retention: Retention = Retention.retained,
     ) -> ManifestEntry:
         """Build a `ManifestEntry` for `product`; the only constructor the adapters use."""
         now = self._clock()
@@ -314,6 +321,7 @@ class BaseIngestAdapter(IngestAdapter):
             time_start=product.time_start,
             time_end=product.time_end,
             bbox_4326=product.bbox_4326 or request.bbox_4326,
+            retention=retention,
             adapter=self.adapter_name,
             adapter_version=self.adapter_version,
             serac_git_sha=self._git_sha,
