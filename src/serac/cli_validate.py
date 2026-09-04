@@ -121,6 +121,12 @@ def watch(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
 
 
 @app.command()
+def e2e(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
+    """Both replays run to their honest end; latency report, CAP XSD, avoided-loss contract."""
+    _run("e2e", repo, reports_dir)
+
+
+@app.command()
 def contracts(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
     """contracts/*.v0.json match the models and are valid Draft 2020-12."""
     _run("contracts", repo, reports_dir)

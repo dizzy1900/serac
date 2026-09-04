@@ -30,6 +30,12 @@ class SeracSettings(BaseSettings):
     serac_redis_url: str = "redis://localhost:6379/0"
     serac_seedlink_server: str = "geofon.gfz.de:18000"
 
+    # CAP alerting. These are file paths and a URL, not secrets: the private key lives in the
+    # file the first one names, is never read into a setting, and is never printed.
+    serac_cap_signing_key: Path | None = None
+    serac_cap_public_key: Path | None = None
+    serac_alert_http_endpoint: str | None = None
+
     dvc_remote_url: str | None = None
 
     serac_data_dir: Path = Path("data")

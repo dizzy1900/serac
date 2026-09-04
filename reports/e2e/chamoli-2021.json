@@ -1,0 +1,206 @@
+{
+  "aoi_id": "chamoli-rishiganga",
+  "avoided_loss_by_asset": [],
+  "avoided_loss_response": null,
+  "cap_identifier": null,
+  "cap_xml_path": null,
+  "caveats": [
+    "No frozen runout ensemble exists for the chamoli-rishiganga corridor: M4's ensemble was built for the Lhende Khola / Trishuli corridor only. There is therefore no best-available hazard input for this event at all, and the avoided-loss stage has nothing to run on.",
+    "M4's measured surrogate inference latency is 1.72 ms (p95, CPU, batch 1), from reports/runout/surrogate_metrics.json. It is quoted for the latency budget only; the surrogate was never invoked in this run."
+  ],
+  "chain_completed": true,
+  "context": [
+    {
+      "artifact_generated_utc": "2026-09-03T22:07:31.584960Z",
+      "artifact_path": "reports/m1/latency_chamoli-2021.json",
+      "artifact_sha256": "f27486b1a77f058782de3ff0c3d879ccbe0e8311b6cd415d1fba60efe4ba9bce",
+      "blocks_downstream": false,
+      "component": "M1 discriminator",
+      "execution": "artifact",
+      "measured": {
+        "budget_met": false,
+        "modes": {
+          "batch_600s": {
+            "class_label": "mass_movement",
+            "compute_seconds_per_scored_window": 13.637385790934786,
+            "fired": true,
+            "probability": 0.585423759711845,
+            "stream_latency_s": 539.99,
+            "theoretical_floor_s": 573.3333333333334
+          },
+          "sliding_180s": {
+            "class_label": "mass_movement",
+            "compute_seconds_per_scored_window": 9.113665937504265,
+            "fired": true,
+            "probability": 0.5267548717594978,
+            "stream_latency_s": 209.99,
+            "theoretical_floor_s": 153.33333333333334
+          }
+        },
+        "n_receivers": 12,
+        "origin_utc": "2021-02-07T04:51:18Z"
+      },
+      "notes": [
+        "The brief's 60 s budget is NOT met and is not reachable for this architecture. The fastest mode fired 210 s after origin against a theoretical floor of 153 s. The floor is set by travel time to a >=100 km receiver plus the record length a 20-100 s band requires; no amount of compute moves it. Reaching 60 s would need receivers inside 100 km and a shorter-period discriminant, which is a different component with different physics, not a faster version of this one.",
+        "replayed from data/raw/discriminator/waveforms/pos_serac-chamoli-2021.mseed (raw counts, ledgered by the M1 build); the detector's own response removal is inside the timed section",
+        "model lgbm-3class trained under loro_hma; chamoli-2021 is a forced test group and was not in training"
+      ],
+      "outcome": "produced",
+      "stage": "detection",
+      "summary": "fired in 2 of 2 mode(s); fastest sliding_180s at 209.99 s after origin, calibrated p=0.5267548717594978, class mass_movement"
+    }
+  ],
+  "event_id": "chamoli-2021",
+  "event_name": "Chamoli / Rishiganga, 7 February 2021",
+  "finished_utc": "2026-09-04T01:46:21.403445+00:00",
+  "report_version": "0.1.0",
+  "serac_version": "0.1.0",
+  "stages": [
+    {
+      "artifact_generated_utc": null,
+      "artifact_path": "data/fixtures/seismic/chamoli-2021/manifest.json",
+      "artifact_sha256": "9ed1ab9a6bf61b9918d46d6b444841f23b448d511278982931895139f2aba7ba",
+      "blocks_downstream": false,
+      "component": "committed seismic fixture",
+      "execution": "executed",
+      "measured": {
+        "stations": [
+          "NK.KKN..BHZ",
+          "IC.LSA.00.BHZ"
+        ],
+        "window_end_utc": "2021-02-07T04:57:00+00:00",
+        "window_seconds": 480.0,
+        "window_start_utc": "2021-02-07T04:49:00+00:00"
+      },
+      "notes": [
+        "Waveforms are the committed fixture chamoli-2021 (status fetched); licence None, see https://www.earthscope.org/terms-of-service/."
+      ],
+      "outcome": "produced",
+      "stage": "waveform",
+      "summary": "2 receiver(s) over 2021-02-07T04:49:00+00:00 to 2021-02-07T04:57:00+00:00"
+    },
+    {
+      "artifact_generated_utc": null,
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "blocks_downstream": true,
+      "component": "M1 discriminator (executed here)",
+      "execution": "executed",
+      "measured": {
+        "modes": {
+          "batch_600s": {
+            "chunks_ingested": 193,
+            "class_label": null,
+            "compute_seconds_total": 0.0477,
+            "fired": false,
+            "min_contributing_stations": 3,
+            "probability": null,
+            "windows_scored": 0
+          },
+          "sliding_180s": {
+            "chunks_ingested": 193,
+            "class_label": null,
+            "compute_seconds_total": 0.0725,
+            "fired": false,
+            "min_contributing_stations": 3,
+            "probability": null,
+            "windows_scored": 0
+          }
+        },
+        "receivers_in_fixture": [
+          "IC.LSA",
+          "NK.KKN"
+        ],
+        "response": "StationXML loaded from stations.xml; the detector removes the response only when it scores a window, and none was scored here"
+      },
+      "notes": [
+        "The committed replay fixtures are two vertical-component receivers each -- they were assembled in Prompt 1 to exercise the streaming plumbing, not to feed a multi-station discriminator. The M1 build's own waveform set lives under data/raw/ (DVC-tracked, gitignored) and is not present in a fresh clone."
+      ],
+      "outcome": "did_not_fire",
+      "stage": "detection",
+      "summary": "no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
+    },
+    {
+      "artifact_generated_utc": "2026-09-03T21:51:29.990768+00:00",
+      "artifact_path": "reports/m2/chamoli-2021.json",
+      "artifact_sha256": "2e08350c8270c8f7d04a69fb5f9e79fe128824e38cf74618287f62237d3f5aab",
+      "blocks_downstream": true,
+      "component": "M2 single-force inversion",
+      "execution": "artifact",
+      "measured": {
+        "azimuthal_gap_deg": 179.51528076714573,
+        "config_hash": "4762e79e5879b7b2559a0f7d476dddd45fc2dd869858f7a5e023535ff1a0d988",
+        "mass": null,
+        "median_pre_event_snr": 0.696,
+        "n_channels": 27,
+        "n_stations": 7,
+        "stations": [
+          "G.WUS",
+          "IC.LSA",
+          "II.NIL",
+          "KC.ASAI",
+          "XR.BA19",
+          "XR.BA20",
+          "XR.BN08"
+        ],
+        "status": "failed",
+        "variance_reduction": null,
+        "wall_clock_s": 33.798
+      },
+      "notes": [
+        "M2 produces no mass, so the runout surrogate has no release volume to be given: the cascade forecast for this event cannot be built from serac's own chain."
+      ],
+      "outcome": "refused",
+      "stage": "lfh",
+      "summary": "REFUSED: the best-fitting trial location explains only 0.089 of the data variance, below the floor of 0.20; 7 stations / 27 channels, azimuthal gap 180 deg, distance 6.43-11.43 deg, median pre-event SNR 0.70. A least-squares inversion of records that do not contain the signal still returns a smooth force history with a clean envelope, and an amplitude set by noise rather than by the event, so serac reports nothing. serac does not publish a source location it cannot support. No location, no mass and no force history are reported for this event. XR.BA20..LH1: peak amplitude 2.062e-04 m is 24x the median; dropped as a glitch XR.BA20..LH2: peak amplitude 4.838e-04 m is 55x the median; dropped as a glitch"
+    },
+    {
+      "artifact_generated_utc": null,
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "blocks_downstream": true,
+      "component": "M4 runout surrogate",
+      "execution": "unavailable",
+      "measured": {},
+      "notes": [
+        "No substitute input was used. A default mass, location or footprint here would turn an upstream refusal into a forecast."
+      ],
+      "outcome": "not_reached",
+      "stage": "runout",
+      "summary": "not reached: the lfh stage (M2 single-force inversion) refused. Measured reason: REFUSED: the best-fitting trial location explains only 0.089 of the data variance, below the floor of 0.20; 7 stations / 27 channels, azimuthal gap 180 deg, distance 6.43-11.43 deg, median pre-event SNR 0.70. A least-squares inversion of records that do not contain the signal still returns a smooth force history with a clean envelope, and an amplitude set by noise rather than by the event, so serac reports nothing. serac does not publish a source location it cannot support. No location, no mass and no force history are reported for this event. XR.BA20..LH1: peak amplitude 2.062e-04 m is 24x the median; dropped as a glitch XR.BA20..LH2: peak amplitude 4.838e-04 m is 55x the median; dropped as a glitch"
+    },
+    {
+      "artifact_generated_utc": null,
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "blocks_downstream": true,
+      "component": "M5 CAP 1.2 generator",
+      "execution": "unavailable",
+      "measured": {},
+      "notes": [
+        "No substitute input was used. A default mass, location or footprint here would turn an upstream refusal into a forecast."
+      ],
+      "outcome": "not_reached",
+      "stage": "cap",
+      "summary": "not reached: the detection stage (M1 discriminator (executed here)) did_not_fire. Measured reason: no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
+    },
+    {
+      "artifact_generated_utc": null,
+      "artifact_path": null,
+      "artifact_sha256": null,
+      "blocks_downstream": true,
+      "component": "M5 avoided-loss computation",
+      "execution": "unavailable",
+      "measured": {},
+      "notes": [
+        "No substitute input was used. A default mass, location or footprint here would turn an upstream refusal into a forecast."
+      ],
+      "outcome": "not_reached",
+      "stage": "avoided_loss",
+      "summary": "not reached: the detection stage (M1 discriminator (executed here)) did_not_fire. Measured reason: no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
+    }
+  ],
+  "started_utc": "2026-09-04T01:46:20.940045+00:00",
+  "stopped_at": "detection",
+  "stopped_because": "no candidate in either mode: the committed fixture carries 2 receiver(s) against the detector's minimum of 3 contributing stations, and no window was ever scored"
+}
