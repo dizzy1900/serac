@@ -1,6 +1,6 @@
 # End-to-end replay: Langtang Lirung / Lhende Khola / Trishuli, 26 August 2026
 
-`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-04T01:31:04.393472+00:00.
+`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-04T01:33:00.707540+00:00.
 
 ## Verdict
 
@@ -51,7 +51,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "batch_600s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0888,
+      "compute_seconds_total": 0.0931,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -60,7 +60,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "sliding_180s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0751,
+      "compute_seconds_total": 0.0912,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -70,7 +70,8 @@ No stage downstream of that point ran, and nothing was substituted for the missi
   "receivers_in_fixture": [
     "IO.EVN",
     "NK.KKN"
-  ]
+  ],
+  "response": "StationXML loaded from stations.xml; the detector removes the response only when it scores a window, and none was scored here"
 }
 ```
 > The committed replay fixtures are two vertical-component receivers each -- they were assembled in Prompt 1 to exercise the streaming plumbing, not to feed a multi-station discriminator. The M1 build's own waveform set lives under data/raw/ (DVC-tracked, gitignored) and is not present in a fresh clone.
@@ -95,7 +96,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
   ],
   "status": "failed",
   "variance_reduction": null,
-  "wall_clock_s": 0.125
+  "wall_clock_s": 0.168
 }
 ```
 > M2 produces no mass, so the runout surrogate has no release volume to be given: the cascade forecast for this event cannot be built from serac's own chain.
@@ -352,5 +353,10 @@ Missing from the exposure layer:
 
 ## What would have to change
 
-The reason this chain stops is not a defect in the integration. Each stage refused, or failed to fire, for a measured physical reason that its own report states. Fixing the integration cannot move any of them.
+The reason this chain stops is not a defect in the integration. Each stage refused, or failed to fire, for a measured physical reason that its own report states. Fixing the integration cannot move any of them. In the order the chain meets them:
+
+1. **Detection here needs more than two receivers.** The committed replay fixtures carry two vertical-component stations each; they were assembled in Prompt 1 to exercise the streaming plumbing. The discriminator needs three contributing stations before it scores a window at all. Its own multi-station waveform set lives under `data/raw/` (DVC-tracked, absent from a fresh clone), and `reports/m1/latency_*.json` records what it did there.
+2. **The inversion needs station geometry it does not have.** M2's refusals are about how many broadband receivers recorded the event, how they are distributed in azimuth, and whether the long-period signal is above the noise. More compute does not help; more instruments, closer, would.
+3. **The runout model needs a mass.** Without one there is nothing to run the surrogate on, so no footprint, no arrival and no stage exist to alert on or to cost.
+4. **The loss layer needs values and populations.** Even given a forecast, the committed exposure layer carries no replacement value for any asset and no population for any settlement. That gap is independent of the three above and is the cheapest to close.
 

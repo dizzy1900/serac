@@ -276,6 +276,13 @@ def _run_discriminator(repo: Path, source: FixtureReplaySource) -> StageEvidence
         if fired is not None:
             candidates.append(fired)
     receivers = {s.sncl.rsplit(".", 2)[0] for s in source.stations()}
+    response_note = (
+        f"StationXML loaded from {stations_xml.name}; the detector removes the response only "
+        "when it scores a window, and none was scored here"
+        if inventory is not None
+        else "NO StationXML in the fixture: the detector would have run on raw counts, which "
+        "is not what it was trained on"
+    )
     if candidates:
         best = candidates[0]
         return StageEvidence(
@@ -287,7 +294,11 @@ def _run_discriminator(repo: Path, source: FixtureReplaySource) -> StageEvidence
                 f"candidate {best.detection_id} at {best.detected_at_stream_utc.isoformat()}, "
                 f"calibrated p={best.probability}, class {best.class_label}"
             ),
-            measured={"modes": modes, "receivers_in_fixture": sorted(receivers)},
+            measured={
+                "modes": modes,
+                "receivers_in_fixture": sorted(receivers),
+                "response": response_note,
+            },
         )
     return StageEvidence(
         stage="detection",
@@ -299,7 +310,11 @@ def _run_discriminator(repo: Path, source: FixtureReplaySource) -> StageEvidence
             f"receiver(s) against the detector's minimum of {st.MIN_CONTRIBUTING_STATIONS} "
             "contributing stations, and no window was ever scored"
         ),
-        measured={"modes": modes, "receivers_in_fixture": sorted(receivers)},
+        measured={
+            "modes": modes,
+            "receivers_in_fixture": sorted(receivers),
+            "response": response_note,
+        },
         blocks_downstream=True,
         notes=[
             "The committed replay fixtures are two vertical-component receivers each -- they "
@@ -652,7 +667,24 @@ def render_markdown(result: E2EResult) -> str:
         "",
         "The reason this chain stops is not a defect in the integration. Each stage refused, or "
         "failed to fire, for a measured physical reason that its own report states. Fixing the "
-        "integration cannot move any of them.",
+        "integration cannot move any of them. In the order the chain meets them:",
+        "",
+        "1. **Detection here needs more than two receivers.** The committed replay fixtures "
+        "carry two vertical-component stations each; they were assembled in Prompt 1 to "
+        "exercise the streaming plumbing. The discriminator needs three contributing stations "
+        "before it scores a window at all. Its own multi-station waveform set lives under "
+        "`data/raw/` (DVC-tracked, absent from a fresh clone), and `reports/m1/latency_*.json` "
+        "records what it did there.",
+        "2. **The inversion needs station geometry it does not have.** M2's refusals are about "
+        "how many broadband receivers recorded the event, how they are distributed in azimuth, "
+        "and whether the long-period signal is above the noise. More compute does not help; "
+        "more instruments, closer, would.",
+        "3. **The runout model needs a mass.** Without one there is nothing to run the "
+        "surrogate on, so no footprint, no arrival and no stage exist to alert on or to cost.",
+        "4. **The loss layer needs values and populations.** Even given a forecast, the "
+        "committed exposure layer carries no replacement value for any asset and no population "
+        "for any settlement. That gap is independent of the three above and is the cheapest to "
+        "close.",
         "",
     ]
     return "\n".join(lines) + "\n"
