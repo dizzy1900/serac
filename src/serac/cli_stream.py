@@ -162,6 +162,16 @@ def replay(
     event: Annotated[str, typer.Option("--event", help="Fixture event id or synthetic-lp-burst.")],
     speed: Annotated[str, typer.Option("--speed", help="1.0 (paced) or max.")] = "max",
     chunk_seconds: Annotated[float, typer.Option("--chunk-seconds")] = 5.0,
+    detector: Annotated[
+        str,
+        typer.Option(
+            "--detector",
+            help=(
+                "stub (default) or discriminator. The stub remains the default while "
+                "validate-discriminator reports an unmet criterion."
+            ),
+        ),
+    ] = "stub",
     bus: BusOption = "in_memory",
     report_dir: Annotated[Path | None, typer.Option("--report-dir")] = None,
     online: Annotated[
@@ -177,6 +187,7 @@ def replay(
         speed=parse_speed(speed),
         chunk_seconds=chunk_seconds,
         bus="redis" if bus == "redis" else "in_memory",
+        detector_kind="discriminator" if detector == "discriminator" else "stub",
         report_dir=report_dir,
         online=online,
         repo_root=repo,
@@ -191,7 +202,8 @@ def replay(
     typer.echo(
         f"{event}: {report.status}; chunks {c.chunks_published}/{c.chunks_consumed} "
         f"(published/consumed), pending {c.pending_after_drain}, detections "
-        f"{c.detections_emitted}, cap {c.cap_messages_emitted}; stub=True -> {out}"
+        f"{c.detections_emitted}, cap {c.cap_messages_emitted}; "
+        f"detector={report.detector.name} stub={report.detector.is_stub} -> {out}"
     )
     if report.status != "completed":
         typer.echo(f"error: {report.error}", err=True)

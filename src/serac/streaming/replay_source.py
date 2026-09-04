@@ -67,6 +67,10 @@ class ReplaySource(ABC):
     @abstractmethod
     def stations(self) -> list[StationInfo]: ...
 
+    def stationxml_path(self) -> Path | None:
+        """The fixture's StationXML, when it has one; a trained detector needs the response."""
+        return None
+
     def caveats(self) -> list[str]:
         return []
 
@@ -153,6 +157,10 @@ class FixtureReplaySource(ReplaySource):
             )
         pieces.sort(key=lambda c: (c.start_time_utc, c.sncl.key, c.sequence))
         yield from pieces
+
+    def stationxml_path(self) -> Path | None:
+        xml = [f for f in self.manifest.files if f.kind == "stationxml"]
+        return self.fixture_dir / xml[0].path if xml else None
 
     def stations(self) -> list[StationInfo]:
         xml = [f for f in self.manifest.files if f.kind == "stationxml"]

@@ -44,7 +44,9 @@ from serac.domain.replay import (
 from serac.errors import SeracError
 from serac.ports.bus import MessageBus, Received
 from serac.ports.clock import Clock, WallClock
+from serac.ports.detector import Detector
 from serac.streaming.cap_stub import CapStub
+from serac.streaming.detector_stage import DetectorStage
 from serac.streaming.detector_stub import (
     DETECTOR_NAME,
     DETECTOR_VERSION,
@@ -65,6 +67,9 @@ from serac.streaming.replay_source import (
 from serac.streaming.stage import Stage
 
 Speed = float | Literal["max"]
+DetectorKind = Literal["stub", "discriminator"]
+"""Which detector the replay lane runs; `stub` is the default until M1's gate passes."""
+
 BusKind = Literal["in_memory", "redis"]
 
 PRODUCER = "replay"
@@ -113,6 +118,10 @@ class ReplayConfig:
     online: bool = False
     repo_root: Path = field(default_factory=Path.cwd)
     detector: DetectorStubConfig | None = None
+    detector_kind: DetectorKind = "stub"
+    """Which detector the lane runs. The stub stays the default while
+    `validate-discriminator` reports an unmet criterion: the trained model is selectable,
+    not presumed."""
     redis_url: str | None = None
 
     def __post_init__(self) -> None:
@@ -251,6 +260,45 @@ def _station(info: StationInfo, origin: OriginInfo, published: int) -> ReplaySta
     )
 
 
+def build_trained_detector(
+    kind: DetectorKind, *, repo_root: Path, inventory_path: Path | None = None
+) -> Detector:
+    """Load a trained detector for the replay lane.
+
+    The import is local because the discriminator pulls in the `ml` extra: a replay of the
+    stub lane must keep working in an environment that never installed lightgbm. A missing
+    artifact raises rather than silently falling back to the stub, because a run that says
+    it used the trained model must have used it.
+    """
+    if kind != "discriminator":  # pragma: no cover - guarded by the Literal
+        raise ReplayError(f"unknown detector kind {kind!r}")
+    try:
+        from serac.models.discriminator.streaming import DiscriminatorDetector
+    except ImportError as exc:  # pragma: no cover - environment-dependent
+        raise ReplayError(
+            "the discriminator detector needs the `ml` extra: uv sync --all-extras"
+        ) from exc
+    # The leave-one-region-out fold is the model to run: High Mountain Asia was held out
+    # entirely, so it is the only one whose skill on this corridor was not measured on data
+    # it trained against.
+    artifact_dir = repo_root / "baselines" / "discriminator" / "loro_hma"
+    if not (artifact_dir / "model.txt").exists():
+        raise ReplayError(
+            f"no trained discriminator at {artifact_dir}; run `serac models train-discriminator` "
+            "or replay with --detector stub"
+        )
+    inventory = None
+    if inventory_path is not None and inventory_path.exists():
+        from serac.adapters.seismic.fdsn import load_inventory
+
+        inventory = load_inventory(inventory_path)
+    # require_response stays True: without an instrument response the features are computed
+    # on raw counts and the calibrated probability would be confident and meaningless.
+    return DiscriminatorDetector(
+        artifact_dir=artifact_dir, inventory=inventory, require_response=True
+    )
+
+
 def run_replay(
     config: ReplayConfig,
     *,
@@ -277,7 +325,29 @@ def run_replay(
     )
     if source.contains_synthetic and not detector_config.allow_synthetic:
         detector_config = detector_config.model_copy(update={"allow_synthetic": True})
-    detector = DetectorStub(detector_config)
+    detector: Stage
+    if config.detector_kind == "stub":
+        detector = DetectorStub(detector_config)
+        detector_summary = DetectorSummary(
+            name=DETECTOR_NAME,
+            version=DETECTOR_VERSION,
+            params=detector_config.as_params(),
+            is_stub=True,
+        )
+    else:
+        trained = build_trained_detector(
+            config.detector_kind,
+            repo_root=config.repo_root,
+            inventory_path=source.stationxml_path(),
+        )
+        info = trained.info()
+        detector = DetectorStage(trained)
+        detector_summary = DetectorSummary(
+            name=info.name,
+            version=info.version,
+            params=info.params,
+            is_stub=False,
+        )
     xsd_path = config.repo_root / "contracts" / "vendor" / "cap" / "CAP-v1.2.xsd"
     cap = CapStub(xsd_path=xsd_path, clock=clock)
     rec_detector = _Recording(detector)
@@ -403,13 +473,8 @@ def run_replay(
             ),
             total_run_s=max(0.0, (finished_at - started_at).total_seconds()),
         ),
-        detector=DetectorSummary(
-            name=DETECTOR_NAME,
-            version=DETECTOR_VERSION,
-            params=detector_config.as_params(),
-            is_stub=True,
-        ),
-        is_stub=True,
+        detector=detector_summary,
+        is_stub=detector_summary.is_stub,
         started_at_utc=started_at,
         finished_at_utc=finished_at,
         caveats=caveats,
