@@ -57,11 +57,28 @@ def test_schema_errors_reports_paths(tmp_path: Path) -> None:
     assert errors and errors[0].startswith("scenarios/0/intervention:")
 
 
-def test_cli_exits_2_with_exact_message(repo_root: Path) -> None:
-    result = CliRunner().invoke(app, ["--contracts", str(repo_root / "contracts")])
-    assert result.exit_code == 2
-    assert result.stderr.splitlines()[-1] == NOT_IMPLEMENTED_MESSAGE
+def test_cli_round_trip_only_still_passes(repo_root: Path) -> None:
+    """--no-table is the Prompt 1 behaviour minus the exit 2: the round-trip alone."""
+    result = CliRunner().invoke(
+        app, ["--contracts", str(repo_root / "contracts"), "--no-table"]
+    )
+    assert result.exit_code == 0
     assert "ok: AvoidedLossRequest validates against avoided-loss.v0.json" in result.output
+    assert "INPUT PROVENANCE" not in result.output
+
+
+def test_cli_computes_and_prints_the_table(repo_root: Path) -> None:
+    """M5: the command computes rather than exiting 2, and leads with the provenance header."""
+    result = CliRunner().invoke(
+        app, ["--contracts", str(repo_root / "contracts"), "--repo", str(repo_root)]
+    )
+    assert result.exit_code == 0, result.output
+    assert NOT_IMPLEMENTED_MESSAGE not in result.output
+    assert "INPUT PROVENANCE" in result.output
+    assert "NO VALIDATED FORECAST EXISTS FOR THIS EVENT" in result.output
+    assert "COMPUTED:" in result.output
+    # Every asset that could not be costed says so; none of them is reported as a zero.
+    assert "UNDETERMINED" in result.output
 
 
 def test_cli_exits_1_when_contracts_missing(tmp_path: Path) -> None:

@@ -49,3 +49,9 @@ reports/cube/
 .DS_Store
 .idea/
 .vscode/
+# CAP signing keys. A private key must never be committed; serac.alerting.keys refuses to
+# write one to a path git would track, so these patterns are load-bearing, not decorative.
+*.pem
+secrets/
+# CAP messages emitted by a run
+reports/e2e/cap/
