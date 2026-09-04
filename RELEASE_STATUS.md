@@ -49,7 +49,7 @@ Consequences, all intended:
 | `validate-e2e` | 15 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
 | **total** | **385** | |
 
-`make test` passes: **1,225 offline tests**, network blocked.
+`make test` passes: **1,242 offline tests**, network blocked.
 
 **No serac model is validated against events, and none has been promoted.** Four of the five
 components returned a negative or a refusal on the motivating event (Langtang Lirung / Lhende

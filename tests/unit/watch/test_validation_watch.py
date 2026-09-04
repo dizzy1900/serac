@@ -342,3 +342,40 @@ def test_reports_must_disclose_the_unpreregistered_measurability_thresholds(repo
     check_unpreregistered_thresholds_disclosed(suite, repo)
     named = [c for c in suite.checks if c.name.startswith("unpreregistered_thresholds_disclosed")]
     assert named and all(c.ok for c in named), [c.details for c in named]
+
+
+def test_a_shallow_clone_says_ancestry_is_undecidable_not_that_it_was_violated(
+    repo: Path, tmp_path: Path
+) -> None:
+    """The CI failure this test exists for.
+
+    `git log -- <path>` on a shallow clone returns the grafted tip for every path, so the
+    pre-registration and the backtest both resolve to HEAD and the ancestry test used to report
+    "pre-registration X is NOT an ancestor of backtest X" -- an accusation of hindsight, which
+    is the gravest finding this suite can make, caused by nothing worse than a truncated clone.
+    """
+    _commit_prereg(repo)
+    _commit_backtest(repo)
+    shallow = tmp_path / "shallow"
+    subprocess.run(
+        ["git", "clone", "--quiet", "--depth", "1", f"file://{repo}", str(shallow)],
+        check=True,
+        capture_output=True,
+    )
+
+    result = run_suite(shallow)
+
+    complete = _named(result, "git_history_is_complete")
+    assert not complete.ok  # type: ignore[attr-defined]
+    assert "shallow" in complete.details  # type: ignore[attr-defined]
+    assert "NOT a finding about the pre-registration" in complete.details  # type: ignore[attr-defined]
+    # The accusation must not be made at all when it cannot be evaluated.
+    assert not any(c.name == "preregistration_precedes_backtest" for c in result.checks)
+    assert not result.passed
+
+
+def test_a_full_clone_still_decides_ancestry(repo: Path) -> None:
+    _commit_prereg(repo)
+    _commit_backtest(repo)
+    result = run_suite(repo)
+    assert _named(result, "git_history_is_complete").ok  # type: ignore[attr-defined]

@@ -118,8 +118,28 @@ def _is_ancestor(repo: Path, ancestor: str, descendant: str) -> bool:
     return code == 0
 
 
+def _is_shallow(repo: Path) -> bool:
+    code, out = _git(repo, "rev-parse", "--is-shallow-repository")
+    return code == 0 and out.strip() == "true"
+
+
 def check_preregistration_precedes_backtest(suite: Suite, repo: Path) -> None:
     """The anti-hindsight check, done against git history rather than a self-reported date."""
+    if _is_shallow(repo):
+        # `git log -- path` on a shallow clone returns the grafted tip for every path, so both
+        # commits resolve to HEAD and the ancestry test reports a pre-registration violation --
+        # the gravest finding this suite can make -- when the truth is that the history was
+        # truncated. An unevaluable check must say so rather than accuse.
+        suite.check(
+            "git_history_is_complete",
+            False,
+            "this is a shallow clone, so no commit's ancestry can be established. The "
+            "anti-hindsight checks are not evaluated here and this is NOT a finding about the "
+            "pre-registration. Clone with full history (`actions/checkout` with "
+            "`fetch-depth: 0`) and run it again.",
+        )
+        return
+    suite.check("git_history_is_complete", True, "full history: ancestry is decidable")
     prereg_commit = _first_commit_touching(repo, PREREGISTRATION_PATH)
     backtest_commit = _first_commit_touching(repo, BACKTEST_JSON)
     if prereg_commit is None:
