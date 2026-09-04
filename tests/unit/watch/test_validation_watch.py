@@ -66,10 +66,20 @@ def repo(tmp_path: Path) -> Path:
     _git(root, "config", "user.name", "test")
     _write(root, "data/manifest.jsonl", "")
     _write(
-        root, MODEL_CARD, "not a time-of-failure predictor\ndecorrelation layover brittle monsoon\n"
+        root,
+        MODEL_CARD,
+        "not a time-of-failure predictor\ndecorrelation layover brittle monsoon\n"
+        "The segmentation is not `r.slopeunits`; the tracker is not autoRIFT and its numbers "
+        "are not comparable with ITS_LIVE.\n"
+        "MIN_PIXEL_TEMPORAL_COHERENCE is not pre-registered.\n",
     )
-    _write(root, LANGTANG_MD, "## We could not have seen it\n\n## There was no precursor\n")
-    _write(root, BACKTEST_MD, "backtest\n")
+    _write(
+        root,
+        LANGTANG_MD,
+        "## We could not have seen it\n\n## There was no precursor\n"
+        "MIN_PIXEL_TEMPORAL_COHERENCE is not pre-registered.\n",
+    )
+    _write(root, BACKTEST_MD, "backtest\nMIN_PIXEL_TEMPORAL_COHERENCE is not pre-registered.\n")
     _write(root, "tests/unit/watch/test_no_hindsight.py", "x\n")
     _write(
         root,
@@ -204,3 +214,131 @@ def test_recording_the_observed_time_of_a_past_event_is_allowed(tmp_path: Path) 
     suite = Suite("watch", tmp_path)
     check_no_failure_date_anywhere(suite, tmp_path)
     assert suite.checks[0].ok
+
+
+# -- negative labels ------------------------------------------------------------------------
+
+
+def test_a_deleted_method_disclaimer_fails_the_gate(tmp_path: Path) -> None:
+    """The `NOT r.slopeunits` / `NOT autoRIFT` labels are checked, not trusted."""
+    from serac.validation.watch import check_negative_labels
+
+    card = tmp_path / MODEL_CARD
+    card.parent.mkdir(parents=True, exist_ok=True)
+    card.write_text(
+        "Delineated by an aspect-elevation segmentation. Tracking by NCC.\n", encoding="utf-8"
+    )
+    suite = Suite("watch", tmp_path)
+    check_negative_labels(suite, tmp_path)
+    assert all(not c.ok for c in suite.checks)
+
+
+def test_a_disclaimer_flipped_into_a_positive_claim_fails_the_gate(tmp_path: Path) -> None:
+    """Mentioning the method without negating it is the failure mode that matters."""
+    from serac.validation.watch import check_negative_labels
+
+    card = tmp_path / MODEL_CARD
+    card.parent.mkdir(parents=True, exist_ok=True)
+    card.write_text(
+        "Slope units follow r.slopeunits half-basins. Displacements come from autoRIFT and are "
+        "comparable with ITS_LIVE.\n",
+        encoding="utf-8",
+    )
+    suite = Suite("watch", tmp_path)
+    check_negative_labels(suite, tmp_path)
+    assert all(not c.ok for c in suite.checks), [c.details for c in suite.checks]
+
+
+def test_properly_negated_disclaimers_pass(tmp_path: Path) -> None:
+    from serac.validation.watch import check_negative_labels
+
+    card = tmp_path / MODEL_CARD
+    card.parent.mkdir(parents=True, exist_ok=True)
+    card.write_text(
+        "The segmentation is **Not `r.slopeunits`** and not a half-basin delineation. The "
+        "tracker is not autoRIFT and its numbers are not comparable with ITS_LIVE.\n",
+        encoding="utf-8",
+    )
+    suite = Suite("watch", tmp_path)
+    check_negative_labels(suite, tmp_path)
+    assert all(c.ok for c in suite.checks), [c.details for c in suite.checks]
+
+
+def test_negation_near_looks_only_backwards_within_the_window() -> None:
+    from serac.validation.watch import negation_near
+
+    assert negation_near("this is not autoRIFT", "autoRIFT")
+    assert not negation_near("autoRIFT is not mentioned again", "autoRIFT")
+    assert not negation_near("we use autoRIFT" + "x" * 500 + " not really", "autoRIFT")
+
+
+# -- source-zone quantifier -----------------------------------------------------------------
+
+
+def _zone_payload(rows: list[dict[str, object]], reported_ever: int) -> dict[str, object]:
+    payload = json.loads(json.dumps(BACKTEST_PAYLOAD))
+    payload["summary"]["source_zone_neighbourhood"] = rows
+    payload["summary"]["source_zone_summary"] = {"units_ever_measurable": reported_ever}
+    return payload
+
+
+def test_a_source_zone_count_that_contradicts_its_own_rows_fails(tmp_path: Path) -> None:
+    """The exact defect that shipped: 0 reported next to a unit measurable at 38 of 122 steps."""
+    from serac.validation.watch import check_source_zone_quantifiers
+
+    rows = [
+        {"unit_id": "su-1", "steps_measurable": 38, "steps_total": 122},
+        {"unit_id": "su-2", "steps_measurable": 0, "steps_total": 122},
+    ]
+    (tmp_path / "reports" / "watch").mkdir(parents=True)
+    (tmp_path / BACKTEST_JSON).write_text(json.dumps(_zone_payload(rows, 0)), encoding="utf-8")
+    suite = Suite("watch", tmp_path)
+    check_source_zone_quantifiers(suite, tmp_path)
+    failed = [c for c in suite.checks if c.name.startswith("source_zone_ever_measurable")]
+    assert failed and not failed[0].ok
+    assert "recomputed 1" in failed[0].details
+
+
+def test_a_source_zone_count_that_matches_its_rows_passes(tmp_path: Path) -> None:
+    from serac.validation.watch import check_source_zone_quantifiers
+
+    rows = [
+        {"unit_id": "su-1", "steps_measurable": 38, "steps_total": 122},
+        {"unit_id": "su-2", "steps_measurable": 0, "steps_total": 122},
+    ]
+    (tmp_path / "reports" / "watch").mkdir(parents=True)
+    (tmp_path / BACKTEST_JSON).write_text(json.dumps(_zone_payload(rows, 1)), encoding="utf-8")
+    suite = Suite("watch", tmp_path)
+    check_source_zone_quantifiers(suite, tmp_path)
+    assert all(c.ok for c in suite.checks)
+
+
+# -- un-pre-registered thresholds -----------------------------------------------------------
+
+
+def test_reports_must_disclose_the_unpreregistered_measurability_thresholds(repo: Path) -> None:
+    """`MIN_PIXEL_TEMPORAL_COHERENCE` decides measurability and is not in the pre-registration."""
+    from serac.validation.watch import check_unpreregistered_thresholds_disclosed
+
+    _commit_prereg(repo)
+    # Strip the disclosure the scaffold provides: an undisclosed report must fail.
+    _write(repo, MODEL_CARD, "not a time-of-failure predictor\n")
+    _write(repo, BACKTEST_MD, "backtest\n")
+    _write(repo, LANGTANG_MD, "## We could not have seen it\n\n## There was no precursor\n")
+    suite = Suite("watch", repo)
+    check_unpreregistered_thresholds_disclosed(suite, repo)
+    named = [c for c in suite.checks if c.name.startswith("unpreregistered_thresholds_disclosed")]
+    assert named and all(not c.ok for c in named), [c.details for c in named]
+
+    disclosure = "MIN_PIXEL_TEMPORAL_COHERENCE is not pre-registered.\n"
+    _write(repo, MODEL_CARD, "not a time-of-failure predictor\n" + disclosure)
+    _write(repo, BACKTEST_MD, "backtest\n" + disclosure)
+    _write(
+        repo,
+        LANGTANG_MD,
+        "## We could not have seen it\n\n## There was no precursor\n" + disclosure,
+    )
+    suite = Suite("watch", repo)
+    check_unpreregistered_thresholds_disclosed(suite, repo)
+    named = [c for c in suite.checks if c.name.startswith("unpreregistered_thresholds_disclosed")]
+    assert named and all(c.ok for c in named), [c.details for c in named]

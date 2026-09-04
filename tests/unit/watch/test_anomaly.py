@@ -15,6 +15,7 @@ from serac.models.watch.anomaly import (
     WATCH_THRESHOLD,
     InsufficientReason,
     Tier,
+    UnitScore,
     UnitSeries,
     deseasonalise,
     harmonic_design,
@@ -206,12 +207,65 @@ def test_score_step_with_no_history_gives_insufficient_not_a_zero_score() -> Non
 # -- causality -------------------------------------------------------------------------------
 
 
+def _truncate(series: UnitSeries, end: float) -> UnitSeries:
+    """Physically drop every sample after `end`, without going through `UnitSeries.upto`.
+
+    Deliberately independent of the code under test: if `upto` let a sample past the boundary
+    through, comparing `upto`'s output against itself would not notice.
+    """
+    keep = series.t_days <= end
+    return UnitSeries(
+        unit_id=series.unit_id,
+        t_days=series.t_days[keep].copy(),
+        los_mm=series.los_mm[keep].copy(),
+        coherence=series.coherence[keep].copy(),
+        los_sensitivity_signed=series.los_sensitivity_signed,
+        inside_footprint=series.inside_footprint,
+    )
+
+
+def _assert_same_scores(a: dict[str, UnitScore], b: dict[str, UnitScore]) -> None:
+    assert a.keys() == b.keys()
+    for unit_id in a:
+        x, y = a[unit_id], b[unit_id]
+        assert x.tier is y.tier, unit_id
+        assert _same(x.score, y.score), unit_id
+        assert _same(x.velocity_mm_yr, y.velocity_mm_yr), unit_id
+        assert _same(x.acceleration_mm_yr2, y.acceleration_mm_yr2), unit_id
+        assert x.n_samples == y.n_samples, unit_id
+
+
+def _causality_steps(series: UnitSeries) -> list[float]:
+    """Steps running right up to the last base sample.
+
+    This matters more than it looks. An earlier version stopped 400 days short of the end of
+    the record, so every step still had ~35 genuine samples after it and appended "future" data
+    was never anywhere near a step boundary — a one-sample leak past the boundary would have
+    pulled in a real sample and gone unnoticed. Mutating `UnitSeries.upto` to admit one sample
+    past `end` left that version passing.
+    """
+    last = float(series.t_days[-1])
+    return list(np.arange(760.0, last + 1.0, 30.4))
+
+
 def test_appending_future_samples_then_truncating_leaves_scores_identical() -> None:
-    """The pre-registered causality guarantee, checked end to end on the walk-forward."""
+    """The pre-registered causality guarantee, checked end to end on the walk-forward.
+
+    Two independent checks, because either alone is escapable:
+
+    1. Appending a wildly different future and re-running the same steps must not move a single
+       score. The steps now run to the end of the base record, so the appended samples sit
+       immediately after the last step and a boundary that is off by one sample is visible.
+    2. At every step, the score computed from the full record must equal the score computed
+       from an array **physically truncated** at that step. This is the guarantee as
+       `PREREGISTRATION.md` section 3 states it, and it does not rely on `upto` being correct.
+    """
     base = {
         f"su-{i:02d}": _series(f"su-{i:02d}", rate_mm_yr=float(i), noise_mm=1.0) for i in range(20)
     }
-    steps = list(np.arange(760.0, 1500.0, 30.4))
+    steps = _causality_steps(next(iter(base.values())))
+    # The last step must actually reach the end of the record, or check 1 is vacuous.
+    assert steps[-1] >= float(next(iter(base.values())).t_days[-1]) - 30.4
     before = walk_forward(base, steps)
 
     extended: dict[str, UnitSeries] = {}
@@ -226,17 +280,59 @@ def test_appending_future_samples_then_truncating_leaves_scores_identical() -> N
             los_sensitivity_signed=series.los_sensitivity_signed,
         )
     after = walk_forward(extended, steps)
-
     assert len(before) == len(after)
     for step_before, step_after in zip(before, after, strict=True):
-        assert step_before.keys() == step_after.keys()
-        for unit_id in step_before:
-            a, b = step_before[unit_id], step_after[unit_id]
-            assert a.tier is b.tier
-            assert _same(a.score, b.score)
-            assert _same(a.velocity_mm_yr, b.velocity_mm_yr)
-            assert _same(a.acceleration_mm_yr2, b.acceleration_mm_yr2)
-            assert a.n_samples == b.n_samples
+        _assert_same_scores(step_before, step_after)
+
+    # Check 2: recomputation from explicitly pre-truncated arrays, at every step.
+    for k, end in enumerate(steps):
+        truncated = {u: _truncate(s, end) for u, s in extended.items()}
+        recomputed = walk_forward(truncated, steps[: k + 1])
+        _assert_same_scores(before[k], recomputed[-1])
+
+
+def test_a_single_sample_leaking_past_the_step_boundary_is_detected() -> None:
+    """Prove the guarantee is actually enforced, by breaking it and watching it fail.
+
+    `UnitSeries.upto` is the one place the model sees time. This substitutes a version that
+    admits one sample past `end` — the smallest possible leak — and asserts the causality
+    comparison notices. Without this, the causality test could pass for a model that peeks.
+    """
+    base = {
+        f"su-{i:02d}": _series(f"su-{i:02d}", rate_mm_yr=float(i), noise_mm=1.0) for i in range(20)
+    }
+    steps = _causality_steps(next(iter(base.values())))
+
+    def leaky_upto(self: UnitSeries, end: float) -> UnitSeries:
+        keep = self.t_days <= end
+        leaked = int(keep.sum())
+        if leaked < self.t_days.size:
+            keep = keep.copy()
+            keep[leaked] = True  # one sample past the boundary
+        return UnitSeries(
+            unit_id=self.unit_id,
+            t_days=self.t_days[keep],
+            los_mm=self.los_mm[keep],
+            coherence=self.coherence[keep],
+            los_sensitivity_signed=self.los_sensitivity_signed,
+            inside_footprint=self.inside_footprint,
+        )
+
+    honest = walk_forward(base, steps)
+    original = UnitSeries.upto
+    try:
+        UnitSeries.upto = leaky_upto  # type: ignore[method-assign]
+        leaked_scores = walk_forward(base, steps)
+    finally:
+        UnitSeries.upto = original  # type: ignore[method-assign]
+
+    differs = any(
+        not _same(honest[k][u].score, leaked_scores[k][u].score)
+        or honest[k][u].n_samples != leaked_scores[k][u].n_samples
+        for k in range(len(steps))
+        for u in honest[k]
+    )
+    assert differs, "a one-sample leak past the step boundary must change some score"
 
 
 def test_deseasonalise_coefficients_do_not_change_when_the_future_is_appended() -> None:

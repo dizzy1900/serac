@@ -52,7 +52,42 @@ past event, which is a fact, not a prediction. The patterns above are the ones t
 describe a serac output.
 """
 
-SCANNED_GLOBS = ("reports/watch/*.json", "reports/watch/*.md", "contracts/*.json")
+SCANNED_GLOBS = (
+    "reports/watch/*.json",
+    "reports/watch/*.md",
+    "reports/MODEL_CARD_watch.md",
+    "contracts/*.json",
+    "contracts/slope-watch-state*.json",
+)
+"""Everything that could carry a predicted-date field. `MODEL_CARD_watch.md` used to be
+missing from this list, which is exactly the file a reader would check first."""
+
+NEGATIVE_LABELS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+    # Matched on the bare method name rather than on a phrasing of the negation. The model card
+    # writes "**Not `r.slopeunits`**", and a check that insists on one spelling of "not" fails
+    # on formatting while a later edit that dropped the whole sentence would slip through. The
+    # negation itself is checked separately by `_negation_near`.
+    (
+        "not_r_slopeunits",
+        "reports/MODEL_CARD_watch.md",
+        ("r.slopeunits",),
+    ),
+    (
+        "not_autorift",
+        "reports/MODEL_CARD_watch.md",
+        ("autoRIFT",),
+    ),
+    (
+        "not_its_live",
+        "reports/MODEL_CARD_watch.md",
+        ("ITS_LIVE",),
+    ),
+)
+"""Disclaimers the artefacts must actually carry, rather than being trusted to.
+
+The slope units are not `r.slopeunits` half-basins and the optical tracker is not autoRIFT and
+not comparable with ITS_LIVE. Those statements were correct in the model card but nothing
+checked them, so a later edit could have dropped them silently."""
 
 
 def _git(repo: Path, *args: str) -> tuple[int, str]:
@@ -249,6 +284,124 @@ def check_causality_test(suite: Suite, repo: Path) -> None:
     )
 
 
+NEGATION_WINDOW = 140
+NEGATION_WORDS: tuple[str, ...] = ("not ", "never", "no ", "isn't", "rather than")
+
+
+def negation_near(text: str, needle: str, window: int = NEGATION_WINDOW) -> bool:
+    """Is there a negation within `window` characters before some occurrence of `needle`?
+
+    Crude on purpose. Its job is to fail when someone deletes a disclaimer or flips it into a
+    positive claim — not to parse English. Matching the bare method name and then requiring a
+    nearby negation is more robust than matching one spelling of "not autoRIFT", which breaks
+    on formatting (`**Not \\`r.slopeunits\\`**`) while letting a deleted sentence through.
+    """
+    lowered = text.lower()
+    target = needle.lower()
+    start = 0
+    while (index := lowered.find(target, start)) != -1:
+        before = lowered[max(index - window, 0) : index]
+        if any(word in before for word in NEGATION_WORDS):
+            return True
+        start = index + len(target)
+    return False
+
+
+def check_negative_labels(suite: Suite, repo: Path) -> None:
+    """The method-substitution disclaimers are present, not merely believed.
+
+    The slope units are not `r.slopeunits` half-basins and the optical tracker is not autoRIFT
+    and not comparable with ITS_LIVE. Those statements were correct in the model card but
+    nothing checked them, so a later edit could have dropped them silently.
+    """
+    for name, relative, needles in NEGATIVE_LABELS:
+        path = repo / relative
+        text = path.read_text(encoding="utf-8") if path.exists() else ""
+        hits = [n for n in needles if n.lower() in text.lower()]
+        negated = any(negation_near(text, n) for n in hits)
+        suite.check(
+            f"negative_label_{name}",
+            bool(hits) and negated,
+            f"{relative} mentions {hits!r} and negates it"
+            if hits and negated
+            else (
+                f"{relative} mentions {hits!r} but carries no negation near it"
+                if hits
+                else f"{relative} does not mention any of {needles!r}"
+            ),
+        )
+
+
+def check_unpreregistered_thresholds_disclosed(suite: Suite, repo: Path) -> None:
+    """The thresholds that decide measurability are named as un-pre-registered where used.
+
+    `MIN_PIXEL_TEMPORAL_COHERENCE` and `MIN_PIXELS_PER_UNIT` are more decisive for the result
+    than anything in the pre-registration, and the pre-registration does not contain them. The
+    reports must say so, and must carry the sensitivity sweep rather than a bare claim.
+    """
+    prereg_path = repo / PREREGISTRATION_PATH
+    prereg = prereg_path.read_text(encoding="utf-8") if prereg_path.exists() else ""
+    suite.check(
+        "measurability_thresholds_absent_from_preregistration",
+        "MIN_PIXEL_TEMPORAL_COHERENCE" not in prereg and "MIN_PIXELS_PER_UNIT" not in prereg,
+        "the pre-registration does not name them, so the reports must disclose them",
+        Severity.info,
+    )
+    for relative in (BACKTEST_MD, LANGTANG_MD, MODEL_CARD):
+        path = repo / relative
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        disclosed = "not pre-registered" in text and "MIN_PIXEL_TEMPORAL_COHERENCE" in text
+        suite.check(
+            f"unpreregistered_thresholds_disclosed_in_{Path(relative).name}",
+            disclosed,
+            "names MIN_PIXEL_TEMPORAL_COHERENCE as not pre-registered"
+            if disclosed
+            else "does not disclose the un-pre-registered measurability thresholds",
+        )
+
+
+def check_source_zone_quantifiers(suite: Suite, repo: Path) -> None:
+    """The write-ups' source-zone prose must agree with their own JSON.
+
+    A previous version reported "0 of 48 source-zone units measurable at any step" directly
+    above a table showing a unit measurable at 38 of 122 steps, because the count keyed on a
+    field that meant "measurable at *every* step". This recomputes the count from the per-unit
+    rows and compares.
+    """
+    for relative, name in (
+        (BACKTEST_JSON, "chamoli"),
+        ("reports/watch/backtest_langtang.json", "langtang"),
+    ):
+        path = repo / relative
+        if not path.exists():
+            continue
+        summary = json.loads(path.read_text(encoding="utf-8")).get("summary", {})
+        rows = summary.get("source_zone_neighbourhood") or []
+        counts = summary.get("source_zone_summary") or {}
+        if not rows:
+            continue
+        recomputed = sum(1 for r in rows if int(r.get("steps_measurable", 0)) > 0)
+        reported = int(counts.get("units_ever_measurable", -1))
+        suite.check(
+            f"source_zone_ever_measurable_count_{name}",
+            recomputed == reported,
+            f"reported {reported}, recomputed {recomputed} from steps_measurable > 0",
+        )
+        every = sum(
+            1
+            for r in rows
+            if int(r.get("steps_measurable", 0)) == int(r.get("steps_total", 0))
+            and int(r.get("steps_total", 0)) > 0
+        )
+        suite.info(
+            f"source_zone_quantifiers_{name}",
+            f"{recomputed} unit(s) measurable at >=1 step, {every} at every step "
+            f"(of {len(rows)}); the reports must use the former",
+        )
+
+
 def check_model_card(suite: Suite, repo: Path) -> None:
     path = repo / MODEL_CARD
     if not path.exists():
@@ -318,6 +471,9 @@ def run_suite(repo: Path | None = None) -> SuiteResult:
     check_no_failure_date_anywhere(suite, root)
     check_causality_test(suite, root)
     check_model_card(suite, root)
+    check_negative_labels(suite, root)
+    check_unpreregistered_thresholds_disclosed(suite, root)
+    check_source_zone_quantifiers(suite, root)
     check_provenance(suite, root)
     return suite.result()
 

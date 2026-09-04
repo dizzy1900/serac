@@ -89,6 +89,64 @@ def load_series(data_dir: Path, aoi_id: str) -> dict[str, UnitSeries]:
 # -- post-hoc labelling (reporting only) ---------------------------------------------------
 
 
+def source_zone_elevation(data_dir: Path, aoi_id: str) -> dict[str, Any]:
+    """Elevation statistics of the AOI's source zone, from the DEM under its polygon.
+
+    **Post-hoc**, like everything else that reads `source_zone.geojson`, and reporting-only.
+    It exists because the model card previously asserted an elevation span for the Ronti
+    source zone that appeared in no artefact and was derivable from no code: it was in fact
+    the labelled *unit's* band, not the zone's. A load-bearing physical figure has to be
+    computed and committed or not used.
+    """
+    import rasterio.features
+    from shapely.ops import unary_union
+
+    from serac.models.watch.aggregate import ELEVATION_BANDS
+    from serac.models.watch.raster import aoi_dem, grid_transform
+
+    zone_path = data_dir / "aoi" / aoi_id / "source_zone.geojson"
+    if not zone_path.exists():
+        return {"available": False, "reason": f"no source zone at {zone_path}"}
+    import geopandas as gpd
+
+    dem = aoi_dem(data_dir, data_dir / "aoi" / aoi_id, aoi_id)
+    zones = gpd.read_file(zone_path).to_crs(f"EPSG:{dem.grid.epsg}")
+    geometry = unary_union(list(zones.geometry))
+    mask = rasterio.features.rasterize(
+        [(geometry, 1)],
+        out_shape=(dem.grid.height, dem.grid.width),
+        transform=grid_transform(dem.grid),
+        fill=0,
+        dtype="uint8",
+    ).astype(bool)
+    values = dem.elevation_m[mask & np.isfinite(dem.elevation_m)]
+    if values.size == 0:
+        return {"available": False, "reason": "the source zone covers no finite DEM pixel"}
+    bands = []
+    for low, high in ELEVATION_BANDS:
+        inside = int(((values >= low) & (values < high)).sum())
+        if inside:
+            bands.append(
+                {
+                    "elevation_m": [low, high],
+                    "n_pixels": inside,
+                    "area_fraction": round(inside / values.size, 4),
+                }
+            )
+    return {
+        "available": True,
+        "n_pixels": int(values.size),
+        "area_km2": round(float(values.size) * dem.grid.resolution_m**2 / 1e6, 3),
+        "min_m": round(float(values.min()), 1),
+        "median_m": round(float(np.median(values)), 1),
+        "max_m": round(float(values.max()), 1),
+        "p05_m": round(float(np.percentile(values, 5)), 1),
+        "p95_m": round(float(np.percentile(values, 95)), 1),
+        "area_by_elevation_band": bands,
+        "dem_source_sha256": dem.source_sha256,
+    }
+
+
 def source_zone_units(data_dir: Path, aoi_id: str) -> list[dict[str, Any]]:
     """Every slope unit intersecting the AOI source zone, with its overlap and geometry.
 
@@ -262,7 +320,8 @@ def run_backtest(
         "labelling": labelling,
         "source_zone_neighbourhood": neighbourhood,
         "observability": observability_breakdown(scored),
-        "source_zone_insufficient_reasons": _reason_counts(neighbourhood),
+        "source_zone_summary": _neighbourhood_counts(neighbourhood),
+        "source_zone_elevation": source_zone_elevation(data_dir, aoi_id),
         "thresholds": {"elevated": ELEVATED_THRESHOLD, "watch": WATCH_THRESHOLD},
         "reached_watch": first_watch is not None,
         "lead_time_days_to_first_watch": (
@@ -425,6 +484,7 @@ def _source_zone_history(
             (TIER_ORDER[s.tier] for s in history if s is not None),
             default=TIER_ORDER[Tier.insufficient_data],
         )
+        final = history[-1] if history else None
         out.append(
             {
                 **row,
@@ -433,6 +493,12 @@ def _source_zone_history(
                 ),
                 "steps_measurable": len(measurable),
                 "steps_total": len(history),
+                # `ever_measurable` is the honest quantifier. An earlier version reported the
+                # last non-None reason found anywhere in the history and then treated a unit
+                # as measurable only when that was absent, which silently meant "measurable at
+                # EVERY step" while the prose said "at any step". A unit measurable at 38 of
+                # 122 steps was counted as never measurable.
+                "ever_measurable": bool(measurable),
                 "best_tier_reached": next(t.value for t, v in TIER_ORDER.items() if v == best),
                 "first_watch_step": first_watch.date().isoformat() if first_watch else None,
                 "lead_time_days_to_first_watch": (
@@ -440,22 +506,53 @@ def _source_zone_history(
                     if first_watch
                     else None
                 ),
-                "insufficient_reason": next(
-                    (
-                        str(s.reason)
-                        for s in reversed(history)
-                        if s is not None and s.reason is not None
-                    ),
-                    None,
+                "final_step_tier": final.tier.value if final else None,
+                "final_step_reason": (
+                    str(final.reason) if final is not None and final.reason is not None else None
                 ),
             }
         )
     return out
 
 
-def _reason_counts(neighbourhood: list[dict[str, Any]]) -> dict[str, int]:
-    counts: dict[str, int] = {}
-    for row in neighbourhood:
-        key = str(row.get("insufficient_reason") or "measurable")
-        counts[key] = counts.get(key, 0) + 1
-    return counts
+def _neighbourhood_counts(neighbourhood: list[dict[str, Any]]) -> dict[str, Any]:
+    """Split the source zone by whether a unit was **ever** measurable, and by what it showed.
+
+    Two separate questions, kept separate: how many units the sensor could see at all, and what
+    the ones it could see actually did. Collapsing them is what produced a false "0 of 48
+    measurable" headline while the same file's table showed a unit measurable at 38 steps.
+    """
+    ever = [r for r in neighbourhood if r["ever_measurable"]]
+    never = [r for r in neighbourhood if not r["ever_measurable"]]
+    by_reason: dict[str, int] = {}
+    for row in never:
+        key = str(row.get("final_step_reason") or "unknown")
+        by_reason[key] = by_reason.get(key, 0) + 1
+    by_tier: dict[str, int] = {}
+    for row in ever:
+        key = str(row["best_tier_reached"])
+        by_tier[key] = by_tier.get(key, 0) + 1
+    return {
+        "units_total": len(neighbourhood),
+        "units_ever_measurable": len(ever),
+        "units_never_measurable": len(never),
+        "never_measurable_by_final_step_reason": by_reason,
+        "ever_measurable_by_best_tier": by_tier,
+        "ever_measurable_units": [
+            {
+                "unit_id": r["unit_id"],
+                "steps_measurable": r["steps_measurable"],
+                "steps_total": r["steps_total"],
+                "best_tier_reached": r["best_tier_reached"],
+                "los_sensitivity_signed": r["los_sensitivity_signed"],
+                "aspect_deg": r["aspect_deg"],
+                "first_watch_step": r["first_watch_step"],
+            }
+            for r in sorted(
+                ever, key=lambda x: (-TIER_ORDER_BY_NAME[x["best_tier_reached"]], x["unit_id"])
+            )
+        ],
+    }
+
+
+TIER_ORDER_BY_NAME: dict[str, int] = {t.value: v for t, v in TIER_ORDER.items()}

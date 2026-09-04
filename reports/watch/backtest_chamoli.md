@@ -1,6 +1,6 @@
 # Chamoli 2021 — pseudo-prospective backtest of the slope-watch tier
 
-Generated 2026-09-03T23:05:48.085368+00:00 from `reports/watch/backtest_chamoli.json`.
+Generated 2026-09-04T00:13:22.501602+00:00 from `reports/watch/backtest_chamoli.json`.
 Thresholds and protocol were fixed in `reports/watch/PREREGISTRATION.md`, committed before any
 interferogram had been delivered. `make validate-watch` checks that ancestry against git.
 
@@ -57,9 +57,9 @@ Tier of the labelled unit across the walk-forward:
 
 ## The source zone, unit by unit
 
-780 slope units intersect the source zone. **0** of them were measurable at any step; the rest failed a data-adequacy test (229 low los sensitivity, 551 too few samples). A unit that fails one of those tests is not being watched at all, and nothing about its stability follows from its absence from the Watch list.
+780 slope units intersect the source zone. **0** of them were measurable at at least one step; **780** were never measurable at any step (229 low los sensitivity, 551 too few samples). A unit that was never measurable is not being watched at all, and nothing about its stability follows from its absence from the Watch list.
 
-| unit | overlap (m2) | aspect | LOS sens | measurable | best tier | reason |
+| unit | overlap (m2) | aspect | LOS sens | measurable | best tier | final reason |
 |---|---|---|---|---|---|---|
 | `su-05207` | 893,700 | 271 deg | -0.074 | 0/56 | insufficient_data | low_los_sensitivity |
 | `su-05871` | 600,300 | 356 deg | -0.460 | 0/56 | insufficient_data | too_few_samples |
@@ -73,22 +73,51 @@ Tier of the labelled unit across the walk-forward:
 | `su-05682` | 478,130 | 316 deg | -0.374 | 0/56 | insufficient_data | too_few_samples |
 | `su-04560` | 470,700 | 44 deg | -0.829 | 0/56 | insufficient_data | too_few_samples |
 | `su-05119` | 459,000 | 87 deg | -0.888 | 0/56 | insufficient_data | too_few_samples |
-| _... 768 more_ | | | | | | |
+| _... 768 more, none ever measurable_ | | | | | | |
 
-## Why: C-band temporal coherence against elevation
+## Why so little was measurable
 
-The physical limitation this component is most constrained by, measured on this stack rather
-than asserted. MintPy temporal coherence over the 260-pair network, against the HyP3 DEM:
+### 1. Decorrelation across the whole AOI, not only at altitude
+
+MintPy temporal coherence over the interferogram network, against the HyP3 DEM, counting only
+pixels with strictly positive coherence (MintPy writes an exact 0.0 for unimaged pixels and
+those are not a coherence measurement):
 
 | elevation band | pixels | median temporal coherence | fraction >= 0.40 |
 |---|---|---|---|
-| 0 - 3,000 m | 45,878 | 0.134 | 0.061 |
+| 0 - 3,000 m | 45,877 | 0.134 | 0.061 |
 | 3,000 - 4,000 m | 56,710 | 0.147 | 0.063 |
 | 4,000 - 4,500 m | 20,990 | 0.153 | 0.112 |
 | 4,500 - 5,000 m | 15,152 | 0.138 | 0.038 |
 | 5,000 - 5,500 m | 9,600 | 0.133 | 0.000 |
 | 5,500 - 9,000 m | 7,019 | 0.095 | 0.000 |
-| **whole AOI** | 155,349 | 0.139 | 0.060 |
+| **whole AOI** | 155,348 | 0.139 | 0.060 |
+
+Read this carefully, because the obvious reading is wrong. The dominant fact is **AOI-wide**
+decorrelation, not an elevation gradient: the median differs little between the lowest and
+highest bands, and the fraction of pixels clearing the threshold is small everywhere. Altitude
+sharpens an already severe problem rather than creating it.
+
+### 2. Where the source zone actually sits
+
+The source zone covers 115.0 km2 of DEM, spanning 3,304-6,493 m with a median of 4,984 m (5th-95th percentile 3,911-5,970 m). By area it sits in 3,000-4,000 m 6%, 4,000-4,500 m 13%, 4,500-5,000 m 31%, 5,000-5,500 m 31%, 5,500-9,000 m 18%. These figures are computed from the DEM under the source-zone polygon and committed with the backtest JSON; they are not quoted from anywhere.
+
+### 3. How much rests on an un-pre-registered threshold
+
+**These two thresholds are not pre-registered.** `MIN_PIXEL_TEMPORAL_COHERENCE = 0.40` and
+`MIN_PIXELS_PER_UNIT = 5` (`models/watch/aggregate.py`) decide whether a unit is measurable at
+all, and they are more decisive for the result below than any parameter that *was*
+pre-registered. `PREREGISTRATION.md` section 2 fixes `MIN_COHERENCE = 0.30`, which is a
+different, unit-level statistic applied after aggregation.
+
+They were introduced with the aggregation code in commit `0eb2b4e` — after the pre-registration
+was committed and before any backtest ran — and `git log -S` shows neither has been edited
+since, so this is not post-hoc tuning. But 0.40 sits **above** the pre-registered 0.30, in the
+direction that makes fewer units measurable, and a reader is entitled to know that the
+sentence "the thresholds were pre-registered" does not cover the thresholds that generated
+this result. The sweep below shows how much rests on the choice.
+
+_The measurability sweep could not be computed._
 
 ## Step-by-step
 

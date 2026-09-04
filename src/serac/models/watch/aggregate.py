@@ -23,6 +23,7 @@ quiet unit was actually observed.
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -493,6 +494,10 @@ def coherence_by_elevation(
     This is the measurement behind the C-band decorrelation limitation. Stating it as a table
     rather than as a sentence is what turns "C-band decorrelates over snow and ice" from a
     caveat into a number a reader can check.
+
+    Only pixels with **strictly positive** coherence are counted: MintPy's zero-fill for
+    unimaged pixels is not a coherence measurement, and including it makes the statistic
+    describe the burst footprint rather than the ground.
     """
     import rasterio
 
@@ -511,7 +516,12 @@ def coherence_by_elevation(
         elevation = src.read(1).astype(np.float64)
     if elevation.shape != coherence.shape:
         return []
-    usable = np.isfinite(coherence) & np.isfinite(elevation) & (elevation > 0)
+    # `coherence > 0` matters. Outside the processed burst footprint MintPy writes an exact
+    # 0.0 rather than a NaN, and on Langtang that is 74% of the grid. Including those pixels
+    # made the median of several bands come out as 0.000 next to a "fraction >= 0.40" of 0.372
+    # — a coherence table dominated by pixels that were never imaged, published as the physical
+    # explanation of the result. Chamoli was unaffected because its footprint covers the AOI.
+    usable = np.isfinite(coherence) & (coherence > 0.0) & np.isfinite(elevation) & (elevation > 0)
     out: list[dict[str, Any]] = []
     for low, high in ELEVATION_BANDS:
         band = usable & (elevation >= low) & (elevation < high)
@@ -536,6 +546,84 @@ def coherence_by_elevation(
                 "fraction_above_threshold": round(
                     float((coherence[usable] >= threshold).mean()), 4
                 ),
+            }
+        )
+    return out
+
+
+SENSITIVITY_THRESHOLDS: Final[tuple[float, ...]] = (0.20, 0.30, 0.40, 0.50, 0.60)
+"""Coherence thresholds the measurability sweep reports, bracketing the value in use.
+
+`MIN_PIXEL_TEMPORAL_COHERENCE` and `MIN_PIXELS_PER_UNIT` are **not** pre-registered. They are
+aggregation thresholds introduced with the aggregation code, after `PREREGISTRATION.md` was
+committed and before any backtest ran, and never edited since — but the pre-registration fixes
+`MIN_COHERENCE = 0.30` on a different, unit-level statistic, so "the thresholds were
+pre-registered" is not true of the two that decide measurability. 0.40 also sits above 0.30 in
+the direction that yields the more convenient answer. This sweep exists so a reader can see
+exactly how much of the observability result rests on that choice.
+"""
+
+
+def measurability_sensitivity(
+    data_dir: Path,
+    aoi_id: str,
+    *,
+    thresholds: Sequence[float] = SENSITIVITY_THRESHOLDS,
+    min_pixels: int = MIN_PIXELS_PER_UNIT,
+) -> list[dict[str, Any]]:
+    """How many units clear `min_pixels` coherent pixels, as the coherence threshold varies.
+
+    Recomputed from the delivered temporal-coherence raster and the slope-unit labels, so it
+    costs seconds and does not re-run MintPy. It answers one question only: is the finding that
+    almost nothing was measurable an artefact of the 0.40 cut?
+    """
+    import geopandas as gpd
+    import rasterio
+
+    from serac.models.watch.backtest import source_zone_units
+    from serac.models.watch.mintpy_run import mintpy_dir
+    from serac.models.watch.plan import load_network_plan
+    from serac.models.watch.slope_units import labels_path, slope_units_path
+
+    work = mintpy_dir(data_dir, aoi_id, "pass2")
+    coherence = _read_h5(work / "temporalCoherence.h5", "temporalCoherence")
+    if coherence is None:
+        return []
+    plan = load_network_plan(data_dir, aoi_id)
+    with rasterio.open(labels_path(data_dir, aoi_id)) as src:
+        labels = _resample_labels(
+            src.read(1).astype(np.int32), src.transform, src.crs, plan.watch_grid
+        )
+    if labels.shape != coherence.shape:
+        return []
+    frame = gpd.read_parquet(slope_units_path(data_dir, aoi_id))
+    index = {int(r.unit_index): str(r.unit_id) for r in frame.itertuples()}
+    zone_ids = {str(r["unit_id"]) for r in source_zone_units(data_dir, aoi_id)}
+    present = np.unique(labels[labels > 0])
+
+    out: list[dict[str, Any]] = []
+    for threshold in thresholds:
+        good = np.isfinite(coherence) & (coherence >= threshold)
+        measurable = 0
+        zone_measurable = 0
+        for label in present:
+            unit_id = index.get(int(label))
+            if unit_id is None:
+                continue
+            if int((good & (labels == label)).sum()) >= min_pixels:
+                measurable += 1
+                if unit_id in zone_ids:
+                    zone_measurable += 1
+        out.append(
+            {
+                "coherence_threshold": round(float(threshold), 3),
+                "min_pixels_per_unit": min_pixels,
+                "units_measurable": measurable,
+                "units_total": int(present.size),
+                "fraction_measurable": round(measurable / max(int(present.size), 1), 4),
+                "source_zone_units_measurable": zone_measurable,
+                "source_zone_units_total": len(zone_ids),
+                "in_use": bool(abs(threshold - MIN_PIXEL_TEMPORAL_COHERENCE) < 1e-9),
             }
         )
     return out

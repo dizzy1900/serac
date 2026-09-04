@@ -88,40 +88,116 @@ def _coherence_table(context: dict[str, Any]) -> str:
 
 
 def _source_zone_table(summary: dict[str, Any], limit: int = 12) -> str:
+    """Every measurable source-zone unit first, then the largest-overlap unmeasurable ones."""
     rows = summary.get("source_zone_neighbourhood") or []
     if not rows:
         return "_The AOI defines no source zone, so no neighbourhood could be tabulated._"
+    ever = [r for r in rows if r.get("ever_measurable")]
+    never = [r for r in rows if not r.get("ever_measurable")]
+    shown = ever + never[: max(limit - len(ever), 0)]
     lines = [
-        "| unit | overlap (m2) | aspect | LOS sens | measurable | best tier | reason |",
+        "| unit | overlap (m2) | aspect | LOS sens | measurable | best tier | final reason |",
         "|---|---|---|---|---|---|---|",
     ]
-    for row in rows[:limit]:
+    for row in shown:
         sensitivity = row.get("los_sensitivity_signed")
         lines.append(
             f"| `{row['unit_id']}` | {row['overlap_m2']:,.0f} | {row['aspect_deg']:.0f} deg | "
             f"{'n/a' if sensitivity is None else f'{sensitivity:+.3f}'} | "
             f"{row['steps_measurable']}/{row['steps_total']} | {row['best_tier_reached']} | "
-            f"{row.get('insufficient_reason') or '-'} |"
+            f"{row.get('final_step_reason') or '-'} |"
         )
-    if len(rows) > limit:
-        lines.append(f"| _... {len(rows) - limit} more_ | | | | | | |")
+    hidden = len(rows) - len(shown)
+    if hidden > 0:
+        lines.append(f"| _... {hidden} more, none ever measurable_ | | | | | | |")
     return "\n".join(lines)
 
 
 def _observability_paragraph(summary: dict[str, Any]) -> str:
-    counts = summary.get("source_zone_insufficient_reasons") or {}
-    total = sum(counts.values())
+    """Two questions kept apart: what could be seen, and what the seen units did."""
+    counts = summary.get("source_zone_summary") or {}
+    total = int(counts.get("units_total", 0))
     if not total:
         return ""
-    measurable = counts.get("measurable", 0)
-    parts = ", ".join(
-        f"{v} {k.replace('_', ' ')}" for k, v in sorted(counts.items()) if k != "measurable"
+    ever = int(counts.get("units_ever_measurable", 0))
+    never = int(counts.get("units_never_measurable", 0))
+    reasons = counts.get("never_measurable_by_final_step_reason", {})
+    parts = ", ".join(f"{v} {k.replace('_', ' ')}" for k, v in sorted(reasons.items()))
+    head = (
+        f"{total} slope units intersect the source zone. **{ever}** of them were measurable at "
+        f"at least one step; **{never}** were never measurable at any step"
+        + (f" ({parts})" if parts else "")
+        + ". A unit that was never measurable is not being watched at all, and nothing about "
+        "its stability follows from its absence from the Watch list."
+    )
+    if not ever:
+        return head
+    by_tier = counts.get("ever_measurable_by_best_tier", {})
+    tier_parts = ", ".join(f"{v} reached `{k}`" for k, v in sorted(by_tier.items()))
+    detail = [
+        f"\nOf the {ever} that were measurable at least once: {tier_parts}. "
+        "Those units, and only those, carry a statement about the slope rather than about the "
+        "sensor:"
+    ]
+    for row in counts.get("ever_measurable_units", []):
+        sensitivity = row.get("los_sensitivity_signed")
+        detail.append(
+            f"\n- `{row['unit_id']}` — best tier **{row['best_tier_reached']}**, measurable at "
+            f"{row['steps_measurable']}/{row['steps_total']} steps, aspect "
+            f"{row['aspect_deg']:.0f} deg, LOS sensitivity "
+            f"{'n/a' if sensitivity is None else f'{sensitivity:+.3f}'}"
+            + (f", first Watch {row['first_watch_step']}" if row.get("first_watch_step") else "")
+        )
+    return head + "\n" + "".join(detail)
+
+
+UNPREREGISTERED_THRESHOLDS = """\
+**These two thresholds are not pre-registered.** `MIN_PIXEL_TEMPORAL_COHERENCE = 0.40` and
+`MIN_PIXELS_PER_UNIT = 5` (`models/watch/aggregate.py`) decide whether a unit is measurable at
+all, and they are more decisive for the result below than any parameter that *was*
+pre-registered. `PREREGISTRATION.md` section 2 fixes `MIN_COHERENCE = 0.30`, which is a
+different, unit-level statistic applied after aggregation.
+
+They were introduced with the aggregation code in commit `0eb2b4e` — after the pre-registration
+was committed and before any backtest ran — and `git log -S` shows neither has been edited
+since, so this is not post-hoc tuning. But 0.40 sits **above** the pre-registered 0.30, in the
+direction that makes fewer units measurable, and a reader is entitled to know that the
+sentence "the thresholds were pre-registered" does not cover the thresholds that generated
+this result. The sweep below shows how much rests on the choice."""
+
+
+def _sensitivity_table(context: dict[str, Any]) -> str:
+    rows = context.get("measurability_sensitivity") or []
+    if not rows:
+        return "_The measurability sweep could not be computed._"
+    lines = [
+        "| coherence threshold | units measurable | of total | source-zone units measurable |",
+        "|---|---|---|---|",
+    ]
+    for row in rows:
+        mark = " **(in use)**" if row["in_use"] else ""
+        lines.append(
+            f"| {row['coherence_threshold']:.2f}{mark} | {row['units_measurable']:,} | "
+            f"{row['fraction_measurable']:.1%} | "
+            f"{row['source_zone_units_measurable']} / {row['source_zone_units_total']} |"
+        )
+    return "\n".join(lines)
+
+
+def _elevation_paragraph(summary: dict[str, Any]) -> str:
+    zone = summary.get("source_zone_elevation") or {}
+    if not zone.get("available"):
+        return "_Source-zone elevation could not be computed from the DEM._"
+    bands = ", ".join(
+        f"{int(b['elevation_m'][0]):,}-{int(b['elevation_m'][1]):,} m {b['area_fraction']:.0%}"
+        for b in zone.get("area_by_elevation_band", [])
     )
     return (
-        f"{total} slope units intersect the source zone. **{measurable}** of them were "
-        f"measurable at any step; the rest failed a data-adequacy test ({parts}). "
-        "A unit that fails one of those tests is not being watched at all, and nothing about "
-        "its stability follows from its absence from the Watch list."
+        f"The source zone covers {zone['area_km2']:.1f} km2 of DEM, spanning "
+        f"{zone['min_m']:,.0f}-{zone['max_m']:,.0f} m with a median of {zone['median_m']:,.0f} m "
+        f"(5th-95th percentile {zone['p05_m']:,.0f}-{zone['p95_m']:,.0f} m). By area it sits in "
+        f"{bands}. These figures are computed from the DEM under the source-zone polygon and "
+        "committed with the backtest JSON; they are not quoted from anywhere."
     )
 
 
@@ -236,12 +312,30 @@ Tier of the labelled unit across the walk-forward:
 
 {_source_zone_table(summary)}
 
-## Why: C-band temporal coherence against elevation
+## Why so little was measurable
 
-The physical limitation this component is most constrained by, measured on this stack rather
-than asserted. MintPy temporal coherence over the 260-pair network, against the HyP3 DEM:
+### 1. Decorrelation across the whole AOI, not only at altitude
+
+MintPy temporal coherence over the interferogram network, against the HyP3 DEM, counting only
+pixels with strictly positive coherence (MintPy writes an exact 0.0 for unimaged pixels and
+those are not a coherence measurement):
 
 {_coherence_table(context)}
+
+Read this carefully, because the obvious reading is wrong. The dominant fact is **AOI-wide**
+decorrelation, not an elevation gradient: the median differs little between the lowest and
+highest bands, and the fraction of pixels clearing the threshold is small everywhere. Altitude
+sharpens an already severe problem rather than creating it.
+
+### 2. Where the source zone actually sits
+
+{_elevation_paragraph(summary)}
+
+### 3. How much rests on an un-pre-registered threshold
+
+{UNPREREGISTERED_THRESHOLDS}
+
+{_sensitivity_table(context)}
 
 ## Step-by-step
 
@@ -260,6 +354,77 @@ See `reports/MODEL_CARD_watch.md` for the full list. The ones that matter most h
 - A brittle crystalline failure need not have measurable tertiary creep at all. A `quiet` tier
   on competent bedrock is weak evidence of stability.
 """
+
+
+def _mixed_verdict(summary: dict[str, Any]) -> str:
+    """State the result as it is: how much was unobservable, and what the observable part did.
+
+    An earlier version of this write-up chose between "measurable and quiet" and "not
+    measurable" from the labelled unit alone, and reported the whole source zone as
+    unobservable. On Langtang that was false — five units were measurable at 38 of 122 steps
+    and one of them reached Elevated — and the false sentence sat directly above a table
+    showing it.
+    """
+    zone = summary.get("source_zone_summary") or {}
+    total = int(zone.get("units_total", 0))
+    ever = int(zone.get("units_ever_measurable", 0))
+    never = int(zone.get("units_never_measurable", 0))
+    labelled = summary.get("labelled_unit")
+    labelled_reason = summary.get("final_step_reason")
+
+    if total and not ever:
+        return (
+            f"**Purely an observability result.** None of the {total} source-zone units was "
+            "measurable at any step, so this configuration could not have seen a precursor "
+            "there whether or not one existed. Reporting it as 'no precursor found' would be "
+            "wrong, and so would reporting it as a failure of the tier."
+        )
+
+    by_tier = zone.get("ever_measurable_by_best_tier", {})
+    raised = [u for u in zone.get("ever_measurable_units", []) if u["best_tier_reached"] != "quiet"]
+    quiet = int(by_tier.get("quiet", 0))
+    lines = [
+        "**The result is mixed, and the mixture is the finding.** "
+        f"Of {total} source-zone units, {never} were never measurable at any step — for those, "
+        "this configuration could not have seen a precursor whether or not one existed, and "
+        f"nothing follows about the slope. The remaining {ever} *were* measurable, so they "
+        "carry a statement about the ground."
+    ]
+    if quiet:
+        lines.append(
+            f"\n\n{quiet} of them stayed `quiet` throughout. For those units, and only those, "
+            "this is a genuine null: within the sensitivity this configuration achieves, no "
+            "kinematic precursor was resolvable. That is not the same as no precursor existing "
+            "— it means none was resolvable at 80 m pixels, on one track, with a "
+            "height-correlation tropospheric correction, over a window that begins well after "
+            "the Sentinel-1 record does."
+        )
+    for unit in raised:
+        lines.append(
+            f"\n\n**`{unit['unit_id']}` reached `{unit['best_tier_reached']}`** — measurable at "
+            f"{unit['steps_measurable']}/{unit['steps_total']} steps, aspect "
+            f"{unit['aspect_deg']:.0f} degrees, LOS sensitivity "
+            f"{unit['los_sensitivity_signed']:+.3f}"
+            + (
+                f", first Watch {unit['first_watch_step']}. "
+                if unit.get("first_watch_step")
+                else ". "
+            )
+            + "This is the one part of the source zone that both could be watched and showed "
+            "something. It is a single unit at a single tier from an uncalibrated ordinal "
+            "score with no validated positive, so it is evidence for looking harder at that "
+            "slope and for nothing else. It is **not** a detection, and it carries no date."
+        )
+    if labelled_reason:
+        lines.append(
+            f"\n\nThe pre-registered labelled unit `{labelled}` is not among them: it was "
+            f"`insufficient_data` at every step (final reason `{labelled_reason}`). The "
+            "pre-registration names one unit — the largest overlap with the source zone — and "
+            "that rule is not revised here; the neighbourhood is reported alongside it because "
+            "a source zone spans several aspects and one track's sensitivity varies enormously "
+            "between them."
+        )
+    return "".join(lines)
 
 
 def langtang_markdown(
@@ -334,9 +499,21 @@ measurable.
 | did it ever reach Watch | {summary.get("reached_watch")} |
 | did it ever reach Elevated | {summary.get("reached_elevated")} |
 
-## Why: C-band temporal coherence against elevation
+## Why so little was measurable
+
+MintPy temporal coherence against the HyP3 DEM, counting only pixels with strictly positive
+coherence — MintPy's exact 0.0 for pixels outside the burst footprint is not a coherence
+measurement, and on this AOI that is most of the grid:
 
 {_coherence_table(context)}
+
+{_elevation_paragraph(summary)}
+
+### How much rests on an un-pre-registered threshold
+
+{UNPREREGISTERED_THRESHOLDS}
+
+{_sensitivity_table(context)}
 
 ## The source zone, unit by unit
 
@@ -346,22 +523,9 @@ measurable.
 
 ## Reading this honestly
 
-{
-        "The source-zone unit was measurable and stayed below the Watch threshold. That is a "
-        "genuine null result: within the sensitivity this configuration achieves, no "
-        "kinematic precursor was resolvable in the Sentinel-1 archive processed here. It does "
-        "**not** mean no precursor existed — it means none was resolvable at 80 m pixels, on "
-        "one ascending-or-descending track, with a height-correlation tropospheric correction, "
-        "over a window that begins well after the Sentinel-1 record does."
-        if summary.get("final_step_reason") is None
-        else "The source-zone unit was **not measurable** at the final step (reason: "
-        f"`{summary.get('final_step_reason')}`). This is an observability result, not a "
-        "statement about precursors: this configuration could not have seen a precursor there "
-        "whether or not one existed. Reporting it as 'no precursor found' would be wrong."
-    }
+{_mixed_verdict(summary)}
 
-A null result is a valid and important output of this component, and it is the honest one to
-publish. What it costs to do better is stated in the model card: a second track for the
+What it would cost to do better is stated in the model card: a second track for the
 opposite-facing slopes, a real tropospheric correction (GACOS or ERA5), finer looks, and
 ground truth on at least one instrumented slope to calibrate anything at all.
 

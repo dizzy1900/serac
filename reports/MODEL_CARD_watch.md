@@ -95,31 +95,69 @@ numbers. A result there is a description of one event, not a performance estimat
 | archive span | 2016-01-08 - 2021-01-29 | 2022-01-05 - 2026-08-19 |
 | epochs | 134 | 130 |
 | slope units | 6,541 | 26,935 |
-| units observable at any step | 375 (5.7%) | 3,879 (14.4%) |
+| units measurable at >= 1 step | 375 (5.7%) | 3,879 (14.4%) |
 | source-zone units | 780 | 48 |
-| source-zone units observable | **0** | **0** |
+| source-zone units measurable at >= 1 step | **0** | **5** (1 Elevated, 4 Quiet) |
 | labelled unit's tier | `insufficient_data` at all 56 steps | `insufficient_data` at all 122 steps |
-| lead time to first Watch | n/a — never entered the tier | n/a — never entered the tier |
+| lead time to first Watch | n/a — never entered the tier | n/a — no unit reached Watch |
 | other units at Watch, median / max per step | 1 / 35 | 0 / 271 |
+| AOI median temporal coherence (imaged pixels) | 0.139 | 0.622 |
 
-**Both events came out the same way, and it is the third of the three outcomes the
-pre-registration named in advance: an observability result.** In neither AOI was any part of
-the source zone measurable at any step, so the tier was never in a position to be asked. This
-is not "no precursor was detected" and it is not a failure of the thresholds.
+**Chamoli is purely an observability result. Langtang is mixed, and the mixture is the more
+interesting finding.**
 
-Why, measured rather than asserted:
+- **Chamoli**: no part of the source zone was measurable at any step, so the tier was never in
+  a position to be asked. This is not "no precursor was detected" and it is not a failure of
+  the thresholds.
+- **Langtang**: 43 of 48 source-zone units were never measurable — same observability limit.
+  But **5 were measurable at 38 of 122 steps**, and of those **four stayed Quiet** (a genuine
+  null, for those units) and **one, `su-03644`, reached Elevated**. A single unit at a single
+  tier, from an uncalibrated ordinal score with no validated positive, is evidence for looking
+  harder at that slope and for nothing else. It is not a detection and it carries no date.
 
-- **Chamoli**: the labelled unit is west-facing (aspect 271 degrees) and its signed LOS
-  sensitivity on the chosen ascending track is **-0.074** — the horizontal approach to the
-  satellite almost exactly cancels the vertical recession. 229 of the 780 source-zone units
-  fall below the sensitivity floor for that reason. The other 551 have no pixel clearing the
-  temporal-coherence floor at any epoch: median temporal coherence falls from 0.153 in the
-  4000-4500 m band to 0.133 above 5000 m, where the fraction of pixels above 0.40 is
-  **0.000**. The Ronti source zone spans 4749-5036 m.
-- **Langtang**: 19,385 units (72%) lie outside the processed burst footprint, because a
-  Sentinel-1 subswath is ~85 km wide and this AOI is a 100 km corridor; the plan records 25%
-  AOI coverage independently. Of the 48 source-zone units — all inside the footprint — 39 had
-  too few samples, 5 too little walk-forward history and 4 too little LOS sensitivity.
+Why so little was measurable, measured rather than asserted:
+
+- **Chamoli** is decorrelated **across the whole AOI**, not only at altitude. Median temporal
+  coherence over imaged pixels is 0.139 AOI-wide, and only 6.0% of pixels clear 0.40; the
+  median barely moves between the 0-3000 m band (0.134) and the 5000-5500 m band (0.133).
+  Altitude sharpens an already severe problem rather than creating it. The source zone spans
+  3,305-6,493 m (median 4,984 m), computed from the DEM under the source-zone polygon and
+  committed in `backtest_chamoli.json`; by area 31.5% lies in 4500-5000 m where 3.8% of pixels
+  clear the threshold, 30.7% in 5000-5500 m and 18.2% above 5500 m where 0.0% do, and 19.6%
+  below 4500 m where 6-11% do. Separately, the labelled
+  unit is west-facing (aspect 271 degrees) with a signed LOS sensitivity of **-0.074** on the
+  chosen ascending track — the horizontal approach to the satellite almost exactly cancels the
+  vertical recession — and 229 of the 780 source-zone units fall below the sensitivity floor
+  for the same reason.
+- **Langtang** is *not* coherence-limited in the area it images: median temporal coherence over
+  imaged pixels is 0.622 and 83.9% clear 0.40. Its limit is **footprint**: 19,385 units (72%)
+  lie outside the processed burst footprint, because a Sentinel-1 subswath is ~85 km wide and
+  this AOI is a 100 km corridor. The plan records 25% AOI coverage independently. Within the
+  source zone the binding constraint is sample count at altitude (39 of 43) — the 5500 m+ band
+  is the one place Langtang does decorrelate (median 0.170, 14.1% above 0.40).
+
+**The measurability thresholds are not pre-registered.** `MIN_PIXEL_TEMPORAL_COHERENCE = 0.40`
+and `MIN_PIXELS_PER_UNIT = 5` decide whether a unit is measurable at all and are more decisive
+than any pre-registered parameter. They were introduced with the aggregation code, after
+`PREREGISTRATION.md` was committed and before any backtest ran, and have never been edited —
+so this is not post-hoc tuning — but 0.40 sits above the pre-registered unit-level
+`MIN_COHERENCE = 0.30`, in the direction that makes fewer units measurable. The result is
+materially sensitive to it, and the sweep is committed in both backtest reports:
+
+| coherence threshold | Chamoli units measurable | Chamoli source-zone | Langtang units measurable | Langtang source-zone |
+|---|---|---|---|---|
+| 0.20 | 1,902 (29.1%) | 111 / 780 | 7,199 (26.7%) | 31 / 48 |
+| 0.30 | 642 (9.8%) | 1 / 780 | 6,968 (25.9%) | 16 / 48 |
+| **0.40 (in use)** | **433 (6.6%)** | **0 / 780** | **6,407 (23.8%)** | **7 / 48** |
+| 0.50 | 325 (5.0%) | 0 / 780 | 5,561 (20.6%) | 1 / 48 |
+| 0.60 | 232 (3.5%) | 0 / 780 | 4,475 (16.6%) | 0 / 48 |
+
+At 0.20 the Chamoli source zone would have had 111 nominally measurable units instead of none.
+The headline "nothing in the Chamoli source zone was measurable" is therefore a statement about
+this configuration **including its un-pre-registered coherence cut**, not a threshold-free fact
+about C-band InSAR. Lowering the cut would not have made those units *trustworthy* — the point
+of a coherence floor is that low-coherence phase is unreliable — but the reader is owed the
+number rather than a bare claim.
 
 The single most useful thing this component produced is therefore a quantified statement of
 what one Sentinel-1 track cannot see, which is a prerequisite for arguing for the second track

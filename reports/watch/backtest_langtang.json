@@ -2,7 +2,7 @@
   "summary": {
     "aoi_id": "lhende-khola-trishuli",
     "event_id": "langtang-lhende-2026",
-    "generated_at": "2026-09-03T23:07:16.040763+00:00",
+    "generated_at": "2026-09-04T00:14:00.479962+00:00",
     "failure_time_utc": "2026-08-26T02:52:10+00:00",
     "n_steps": 122,
     "first_step": "2016-07-01",
@@ -48,10 +48,12 @@
         "los_sensitivity_signed": -0.9119,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04438",
@@ -63,10 +65,12 @@
         "los_sensitivity_signed": -0.9008,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-03644",
@@ -78,10 +82,12 @@
         "los_sensitivity_signed": -0.9861,
         "steps_measurable": 38,
         "steps_total": 122,
+        "ever_measurable": true,
         "best_tier_reached": "elevated",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_little_history"
+        "final_step_tier": "quiet",
+        "final_step_reason": null
       },
       {
         "unit_id": "su-04928",
@@ -93,10 +99,12 @@
         "los_sensitivity_signed": -0.6376,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04200",
@@ -108,10 +116,12 @@
         "los_sensitivity_signed": -0.9865,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04018",
@@ -123,10 +133,12 @@
         "los_sensitivity_signed": -0.9884,
         "steps_measurable": 38,
         "steps_total": 122,
+        "ever_measurable": true,
         "best_tier_reached": "quiet",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_little_history"
+        "final_step_tier": "quiet",
+        "final_step_reason": null
       },
       {
         "unit_id": "su-04328",
@@ -138,10 +150,12 @@
         "los_sensitivity_signed": -0.4451,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04417",
@@ -153,10 +167,12 @@
         "los_sensitivity_signed": -0.9041,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04737",
@@ -168,10 +184,12 @@
         "los_sensitivity_signed": -0.8436,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04891",
@@ -183,10 +201,12 @@
         "los_sensitivity_signed": -0.6722,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04619",
@@ -198,10 +218,12 @@
         "los_sensitivity_signed": -0.6097,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04748",
@@ -213,10 +235,12 @@
         "los_sensitivity_signed": -0.5908,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04862",
@@ -228,10 +252,12 @@
         "los_sensitivity_signed": -0.7124,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04941",
@@ -243,10 +269,12 @@
         "los_sensitivity_signed": -0.8755,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04708",
@@ -258,10 +286,12 @@
         "los_sensitivity_signed": -0.8967,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04508",
@@ -273,10 +303,12 @@
         "los_sensitivity_signed": -0.8813,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04736",
@@ -288,10 +320,12 @@
         "los_sensitivity_signed": -0.5672,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04066",
@@ -303,10 +337,12 @@
         "los_sensitivity_signed": -0.481,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04285",
@@ -318,10 +354,12 @@
         "los_sensitivity_signed": -0.9907,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04534",
@@ -333,10 +371,12 @@
         "los_sensitivity_signed": -0.2413,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "low_los_sensitivity"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "low_los_sensitivity"
       },
       {
         "unit_id": "su-04307",
@@ -348,10 +388,12 @@
         "los_sensitivity_signed": -0.9119,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04585",
@@ -363,10 +405,12 @@
         "los_sensitivity_signed": -0.9774,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04698",
@@ -378,10 +422,12 @@
         "los_sensitivity_signed": -0.9263,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04271",
@@ -393,10 +439,12 @@
         "los_sensitivity_signed": -0.7912,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04584",
@@ -408,10 +456,12 @@
         "los_sensitivity_signed": -0.4469,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04816",
@@ -423,10 +473,12 @@
         "los_sensitivity_signed": -0.8639,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04890",
@@ -438,10 +490,12 @@
         "los_sensitivity_signed": -0.8509,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04082",
@@ -453,10 +507,12 @@
         "los_sensitivity_signed": -0.9115,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-03863",
@@ -468,10 +524,12 @@
         "los_sensitivity_signed": -0.9995,
         "steps_measurable": 38,
         "steps_total": 122,
+        "ever_measurable": true,
         "best_tier_reached": "quiet",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_little_history"
+        "final_step_tier": "quiet",
+        "final_step_reason": null
       },
       {
         "unit_id": "su-04053",
@@ -483,10 +541,12 @@
         "los_sensitivity_signed": -0.9091,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04825",
@@ -498,10 +558,12 @@
         "los_sensitivity_signed": -0.734,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04873",
@@ -513,10 +575,12 @@
         "los_sensitivity_signed": -0.7286,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-05025",
@@ -528,10 +592,12 @@
         "los_sensitivity_signed": -0.7374,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04201",
@@ -543,10 +609,12 @@
         "los_sensitivity_signed": -0.9536,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-03821",
@@ -558,10 +626,12 @@
         "los_sensitivity_signed": -0.1284,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "low_los_sensitivity"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "low_los_sensitivity"
       },
       {
         "unit_id": "su-03907",
@@ -573,10 +643,12 @@
         "los_sensitivity_signed": -0.9892,
         "steps_measurable": 38,
         "steps_total": 122,
+        "ever_measurable": true,
         "best_tier_reached": "quiet",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_little_history"
+        "final_step_tier": "quiet",
+        "final_step_reason": null
       },
       {
         "unit_id": "su-05024",
@@ -588,10 +660,12 @@
         "los_sensitivity_signed": -0.713,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04247",
@@ -603,10 +677,12 @@
         "los_sensitivity_signed": -0.9348,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-03979",
@@ -618,10 +694,12 @@
         "los_sensitivity_signed": -0.9823,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04974",
@@ -633,10 +711,12 @@
         "los_sensitivity_signed": -0.6758,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-04618",
@@ -648,10 +728,12 @@
         "los_sensitivity_signed": -0.3022,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-05010",
@@ -663,10 +745,12 @@
         "los_sensitivity_signed": -0.5973,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-05080",
@@ -678,10 +762,12 @@
         "los_sensitivity_signed": -0.6908,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-03883",
@@ -693,10 +779,12 @@
         "los_sensitivity_signed": -0.7777,
         "steps_measurable": 38,
         "steps_total": 122,
+        "ever_measurable": true,
         "best_tier_reached": "quiet",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_little_history"
+        "final_step_tier": "quiet",
+        "final_step_reason": null
       },
       {
         "unit_id": "su-04497",
@@ -708,10 +796,12 @@
         "los_sensitivity_signed": -0.2271,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "low_los_sensitivity"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "low_los_sensitivity"
       },
       {
         "unit_id": "su-05081",
@@ -723,10 +813,12 @@
         "los_sensitivity_signed": -0.7342,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       },
       {
         "unit_id": "su-03514",
@@ -738,10 +830,12 @@
         "los_sensitivity_signed": -0.0469,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "low_los_sensitivity"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "low_los_sensitivity"
       },
       {
         "unit_id": "su-05087",
@@ -753,10 +847,12 @@
         "los_sensitivity_signed": -0.3008,
         "steps_measurable": 0,
         "steps_total": 122,
+        "ever_measurable": false,
         "best_tier_reached": "insufficient_data",
         "first_watch_step": null,
         "lead_time_days_to_first_watch": null,
-        "insufficient_reason": "too_few_samples"
+        "final_step_tier": "insufficient_data",
+        "final_step_reason": "too_few_samples"
       }
     ],
     "observability": {
@@ -776,10 +872,118 @@
       "final_step_elevated": 212,
       "final_step_watch": 198
     },
-    "source_zone_insufficient_reasons": {
-      "too_few_samples": 39,
-      "too_little_history": 5,
-      "low_los_sensitivity": 4
+    "source_zone_summary": {
+      "units_total": 48,
+      "units_ever_measurable": 5,
+      "units_never_measurable": 43,
+      "never_measurable_by_final_step_reason": {
+        "too_few_samples": 39,
+        "low_los_sensitivity": 4
+      },
+      "ever_measurable_by_best_tier": {
+        "elevated": 1,
+        "quiet": 4
+      },
+      "ever_measurable_units": [
+        {
+          "unit_id": "su-03644",
+          "steps_measurable": 38,
+          "steps_total": 122,
+          "best_tier_reached": "elevated",
+          "los_sensitivity_signed": -0.9861,
+          "aspect_deg": 271.0,
+          "first_watch_step": null
+        },
+        {
+          "unit_id": "su-03863",
+          "steps_measurable": 38,
+          "steps_total": 122,
+          "best_tier_reached": "quiet",
+          "los_sensitivity_signed": -0.9995,
+          "aspect_deg": 281.5,
+          "first_watch_step": null
+        },
+        {
+          "unit_id": "su-03883",
+          "steps_measurable": 38,
+          "steps_total": 122,
+          "best_tier_reached": "quiet",
+          "los_sensitivity_signed": -0.7777,
+          "aspect_deg": 233.8,
+          "first_watch_step": null
+        },
+        {
+          "unit_id": "su-03907",
+          "steps_measurable": 38,
+          "steps_total": 122,
+          "best_tier_reached": "quiet",
+          "los_sensitivity_signed": -0.9892,
+          "aspect_deg": 270.7,
+          "first_watch_step": null
+        },
+        {
+          "unit_id": "su-04018",
+          "steps_measurable": 38,
+          "steps_total": 122,
+          "best_tier_reached": "quiet",
+          "los_sensitivity_signed": -0.9884,
+          "aspect_deg": 273.8,
+          "first_watch_step": null
+        }
+      ]
+    },
+    "source_zone_elevation": {
+      "available": true,
+      "n_pixels": 4824,
+      "area_km2": 4.342,
+      "min_m": 3767.9,
+      "median_m": 4863.3,
+      "max_m": 6136.6,
+      "p05_m": 3994.4,
+      "p95_m": 5866.1,
+      "area_by_elevation_band": [
+        {
+          "elevation_m": [
+            3000.0,
+            4000.0
+          ],
+          "n_pixels": 263,
+          "area_fraction": 0.0545
+        },
+        {
+          "elevation_m": [
+            4000.0,
+            4500.0
+          ],
+          "n_pixels": 1208,
+          "area_fraction": 0.2504
+        },
+        {
+          "elevation_m": [
+            4500.0,
+            5000.0
+          ],
+          "n_pixels": 1372,
+          "area_fraction": 0.2844
+        },
+        {
+          "elevation_m": [
+            5000.0,
+            5500.0
+          ],
+          "n_pixels": 1194,
+          "area_fraction": 0.2475
+        },
+        {
+          "elevation_m": [
+            5500.0,
+            9000.0
+          ],
+          "n_pixels": 787,
+          "area_fraction": 0.1631
+        }
+      ],
+      "dem_source_sha256": "6d3bdb40f5c6727ffba4fa1037ef45dcfab5ebb56fd8a97e7b81bc1bf0123248"
     },
     "thresholds": {
       "elevated": 2.0,
