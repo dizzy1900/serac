@@ -829,8 +829,8 @@
   "description": "Hazard footprint + arrival lead time per transect + exposure -> request for expected loss.",
   "properties": {
     "contract_version": {
-      "const": "0.0.0",
-      "default": "0.0.0",
+      "const": "0.1.0",
+      "default": "0.1.0",
       "title": "Contract Version",
       "type": "string"
     },

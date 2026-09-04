@@ -18,7 +18,7 @@ from serac.domain.common import DOMAIN_CONFIG, Range, Slug
 from serac.domain.events import AssetType
 from serac.domain.forecast import CascadeForecast, ForecastModel
 
-AVOIDED_LOSS_CONTRACT_VERSION: Final = "0.0.0"
+AVOIDED_LOSS_CONTRACT_VERSION: Final = "0.1.0"
 
 
 class MoneyRange(BaseModel):
@@ -90,7 +90,7 @@ class AvoidedLossRequest(BaseModel):
 
     model_config = DOMAIN_CONFIG
 
-    contract_version: Literal["0.0.0"] = AVOIDED_LOSS_CONTRACT_VERSION
+    contract_version: Literal["0.1.0"] = AVOIDED_LOSS_CONTRACT_VERSION
     request_id: Slug
     requested_utc: AwareDatetime
     requester: str | None = None
@@ -117,8 +117,25 @@ class AvoidedLossRequest(BaseModel):
 
 
 class AvoidedLossStatus(StrEnum):
+    """Why a response carries the numbers it does.
+
+    `insufficient_input` is the honest outcome when the computation ran but its upstream
+    inputs did not arrive: no arrival time at a transect, no flow depth, no valuation. It is
+    distinct from `computed` with a zero loss, which would assert that nothing is at risk.
+    """
+
     not_implemented = "not_implemented"
+    insufficient_input = "insufficient_input"
     computed = "computed"
+
+
+class LossBlockedBy(StrEnum):
+    """The specific missing input that stopped one asset from being costed."""
+
+    no_transect = "no_transect"
+    no_arrival = "no_arrival"
+    no_flow_depth = "no_flow_depth"
+    no_replacement_value = "no_replacement_value"
 
 
 class ScenarioLoss(BaseModel):
@@ -132,24 +149,74 @@ class ScenarioLoss(BaseModel):
     avoided_vs_baseline: MoneyRange | None = None
 
 
+class AssetScenarioLoss(BaseModel):
+    """One asset under one scenario: either costed, or explicitly blocked and why.
+
+    `determined=False` says serac could not cost this asset. That is not a zero loss, and the
+    validator refuses to let it carry one: an undetermined asset with a number attached is
+    exactly how an unassessable exposure comes to look safe.
+    """
+
+    model_config = DOMAIN_CONFIG
+
+    asset_id: Slug
+    scenario_id: Slug
+    determined: bool
+    blocked_by: LossBlockedBy | None = None
+    blocked_detail: str | None = None
+    arrival_time_min: Range | None = None
+    lead_time_min: Range | None = None
+    flow_depth_m: Range | None = None
+    replacement_value: MoneyRange | None = None
+    expected_loss: MoneyRange | None = None
+    avoided_vs_baseline: MoneyRange | None = None
+
+    @model_validator(mode="after")
+    def _determined_and_evidence_agree(self) -> Self:
+        if self.determined:
+            if self.blocked_by is not None:
+                raise ValueError("a determined asset cannot also be blocked")
+            if self.expected_loss is None:
+                raise ValueError("a determined asset requires an expected_loss")
+        else:
+            if self.blocked_by is None:
+                raise ValueError("an undetermined asset must name the input it lacks")
+            if self.expected_loss is not None or self.avoided_vs_baseline is not None:
+                raise ValueError(
+                    "an undetermined asset must not carry a loss: undetermined is not zero"
+                )
+        return self
+
+
 class AvoidedLossResponse(BaseModel):
     """Expected loss with and without warning. `not_implemented` responses carry no numbers."""
 
     model_config = DOMAIN_CONFIG
 
-    contract_version: Literal["0.0.0"] = AVOIDED_LOSS_CONTRACT_VERSION
+    contract_version: Literal["0.1.0"] = AVOIDED_LOSS_CONTRACT_VERSION
     request_id: Slug
     status: AvoidedLossStatus
     computed_utc: AwareDatetime
     model: ForecastModel | None = None
     assumptions: list[str] = Field(min_length=1)
     losses: list[ScenarioLoss] = Field(default_factory=list)
+    by_asset: list[AssetScenarioLoss] = Field(default_factory=list)
+    lives_in_warned_zone: Range | None = Field(
+        default=None, description="Null when no exposure carries a population; never 0 by default."
+    )
     notes: str | None = None
 
     @model_validator(mode="after")
     def _status_consistency(self) -> Self:
         if self.status == AvoidedLossStatus.not_implemented and self.losses:
             raise ValueError("losses: must be empty when status=not_implemented")
+        if self.status == AvoidedLossStatus.insufficient_input:
+            if self.losses:
+                raise ValueError("losses: must be empty when status=insufficient_input")
+            if self.by_asset and any(a.determined for a in self.by_asset):
+                raise ValueError(
+                    "status=insufficient_input contradicts a determined asset in by_asset"
+                )
         if self.status == AvoidedLossStatus.computed:
             if not self.losses:
                 raise ValueError("losses: must be non-empty when status=computed")
@@ -161,4 +228,5 @@ class AvoidedLossResponse(BaseModel):
 CONTRACTS: dict[str, type[BaseModel]] = {
     "avoided-loss": AvoidedLossRequest,
     "avoided-loss-response": AvoidedLossResponse,
+    "asset-scenario-loss": AssetScenarioLoss,
 }

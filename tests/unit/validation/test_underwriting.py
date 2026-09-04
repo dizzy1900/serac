@@ -20,7 +20,7 @@ from serac.validation.underwriting import (
 
 def test_example_request_is_labelled_fictional_and_has_baseline() -> None:
     req = example_request()
-    assert req.contract_version == "0.0.0"
+    assert req.contract_version == "0.1.0"
     assert req.forecast.model.provenance is ModelProvenance.stub
     assert FICTIONAL_NOTICE in req.forecast.assumptions
     assert any(s.intervention is InterventionKind.none for s in req.scenarios)

@@ -31,4 +31,4 @@ def test_every_contract_is_a_valid_2020_12_schema(repo_root: Path) -> None:
 
 def test_public_avoided_loss_contract_is_pinned_to_0_0_0(repo_root: Path) -> None:
     schema = json.loads((repo_root / "contracts" / "avoided-loss.v0.json").read_text())
-    assert schema["properties"]["contract_version"]["const"] == "0.0.0"
+    assert schema["properties"]["contract_version"]["const"] == "0.1.0"

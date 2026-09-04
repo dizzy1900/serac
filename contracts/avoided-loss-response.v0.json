@@ -1,5 +1,121 @@
 {
   "$defs": {
+    "AssetScenarioLoss": {
+      "additionalProperties": false,
+      "description": "One asset under one scenario: either costed, or explicitly blocked and why.\n\n`determined=False` says serac could not cost this asset. That is not a zero loss, and the\nvalidator refuses to let it carry one: an undetermined asset with a number attached is\nexactly how an unassessable exposure comes to look safe.",
+      "properties": {
+        "arrival_time_min": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "asset_id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "avoided_vs_baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MoneyRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "blocked_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LossBlockedBy"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "blocked_detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Blocked Detail"
+        },
+        "determined": {
+          "title": "Determined",
+          "type": "boolean"
+        },
+        "expected_loss": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MoneyRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "flow_depth_m": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "lead_time_min": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Range"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "replacement_value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MoneyRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "scenario_id": {
+          "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+          "title": "Scenario Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "scenario_id",
+        "determined"
+      ],
+      "title": "AssetScenarioLoss",
+      "type": "object"
+    },
     "AttributedEstimate": {
       "additionalProperties": false,
       "description": "One published figure, attributed to exactly one source.",
@@ -46,8 +162,10 @@
       "type": "object"
     },
     "AvoidedLossStatus": {
+      "description": "Why a response carries the numbers it does.\n\n`insufficient_input` is the honest outcome when the computation ran but its upstream\ninputs did not arrive: no arrival time at a transect, no flow depth, no valuation. It is\ndistinct from `computed` with a zero loss, which would assert that nothing is at risk.",
       "enum": [
         "not_implemented",
+        "insufficient_input",
         "computed"
       ],
       "title": "AvoidedLossStatus",
@@ -91,6 +209,17 @@
       ],
       "title": "ForecastModel",
       "type": "object"
+    },
+    "LossBlockedBy": {
+      "description": "The specific missing input that stopped one asset from being costed.",
+      "enum": [
+        "no_transect",
+        "no_arrival",
+        "no_flow_depth",
+        "no_replacement_value"
+      ],
+      "title": "LossBlockedBy",
+      "type": "string"
     },
     "ModelProvenance": {
       "description": "What produced the numbers.",
@@ -286,16 +415,35 @@
       "title": "Assumptions",
       "type": "array"
     },
+    "by_asset": {
+      "items": {
+        "$ref": "#/$defs/AssetScenarioLoss"
+      },
+      "title": "By Asset",
+      "type": "array"
+    },
     "computed_utc": {
       "format": "date-time",
       "title": "Computed Utc",
       "type": "string"
     },
     "contract_version": {
-      "const": "0.0.0",
-      "default": "0.0.0",
+      "const": "0.1.0",
+      "default": "0.1.0",
       "title": "Contract Version",
       "type": "string"
+    },
+    "lives_in_warned_zone": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Range"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Null when no exposure carries a population; never 0 by default."
     },
     "losses": {
       "items": {

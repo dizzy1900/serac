@@ -114,9 +114,9 @@ def _request(make_range: RangeFactory, **overrides: Any) -> AvoidedLossRequest:
 
 def test_request_valid_and_pinned_version(make_range: RangeFactory) -> None:
     req = _request(make_range)
-    assert req.contract_version == "0.0.0"
+    assert req.contract_version == "0.1.0"
     with pytest.raises(ValidationError, match="contract_version"):
-        _request(make_range, contract_version="0.1.0")
+        _request(make_range, contract_version="0.0.0")
     again = AvoidedLossRequest.model_validate(req.model_dump(mode="json"))
     assert again == req
 
@@ -173,4 +173,5 @@ def test_contracts_table() -> None:
     assert {
         "avoided-loss": AvoidedLossRequest,
         "avoided-loss-response": AvoidedLossResponse,
+        "asset-scenario-loss": avoided_loss.AssetScenarioLoss,
     } == avoided_loss.CONTRACTS
