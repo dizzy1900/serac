@@ -7,7 +7,7 @@ message `Test` rather than `Actual`, and what makes an `area` appear.
 from __future__ import annotations
 
 import json
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -246,3 +246,35 @@ def test_http_sink_posts_when_enabled_and_reports_transport_failures(
     ).deliver(build.message)
     assert not failed.delivered
     assert "TimeoutError" in failed.detail
+
+
+def test_a_public_alert_with_no_area_is_refused() -> None:
+    """The worst message this generator could send is the one it must not build.
+
+    CAP consumers route on `scope` and `responseType`. An `Actual`/`Public` alert carrying
+    `Evacuate` with no `<area>` is a public evacuation instruction with no geographic extent
+    and nothing to instruct about. `area_for` already declines to invent geometry; refusing
+    to publish is the other half of that rule.
+    """
+    bare = check_forecast(
+        provenance=ModelProvenance.simulator,
+        confidence_tier=ConfidenceTier.high,
+        with_footprint=False,
+    )
+    bare = bare.model_copy(update={"transect_arrivals": []})
+    status, _ = status_for(bare)
+    assert status == "Actual", "this test is only meaningful while a high tier maps to Actual"
+    with pytest.raises(CapGenerationError, match="no area"):
+        build_alert(bare, sent=datetime(2026, 8, 26, 12, tzinfo=UTC))
+
+
+def test_a_test_status_alert_may_still_carry_no_area() -> None:
+    # Refusing the public case must not block the honest one: a Test message with no area is
+    # exactly what serac emits today, because no component produces a footprint.
+    bare = check_forecast(
+        provenance=ModelProvenance.stub,
+        confidence_tier=ConfidenceTier.unqualified,
+        with_footprint=False,
+    ).model_copy(update={"transect_arrivals": []})
+    built = build_alert(bare, sent=datetime(2026, 8, 26, 12, tzinfo=UTC))
+    assert built.message.status == "Test"

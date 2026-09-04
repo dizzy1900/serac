@@ -56,11 +56,15 @@ def _fraction(low: float | None, high: float | None) -> str:
     return f"{low:.1%} to {high:.1%}"
 
 
+PRIOR_MODEL_NAME = "serac-swe-voellmy-ensemble-prior"
+"""Renaming the prior must not silently drop its disclosure from the header."""
+
+
 def provenance_header(result: CascadeLossResult, exposure: ExposureBundle) -> list[str]:
     """The block that must precede any number this module prints."""
     response = result.response
     model = response.model
-    is_prior = model is not None and "prior" in model.name
+    is_prior = model is not None and model.name == PRIOR_MODEL_NAME
     lines = [
         "=" * 78,
         "INPUT PROVENANCE — read before reading a single figure below",

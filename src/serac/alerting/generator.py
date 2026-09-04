@@ -335,6 +335,16 @@ def build_alert(
     urgency, urgency_rule = urgency_for(forecast)
     certainty = CERTAINTY_BY_TIER[forecast.confidence_tier]
     area, area_rule = area_for(forecast, aoi_name)
+    if status == "Actual" and area is None:
+        # A public alert that names no area is the worst message this generator could send:
+        # CAP consumers route on scope and responseType, so an Actual/Public alert carrying
+        # Evacuate would broadcast an evacuation instruction with no geographic extent and
+        # nothing to broadcast it about. area_for already refuses to invent geometry; refusing
+        # to publish is the other half of that. A Test-status message may still carry no area.
+        raise CapGenerationError(
+            "refusing to build an Actual alert with no area: "
+            f"{area_rule} A public alert must name where it applies."
+        )
 
     parameters: list[CAPKeyValue] = [
         CAPKeyValue(value_name="serac:generator", value=f"{GENERATOR_NAME} v{GENERATOR_VERSION}"),

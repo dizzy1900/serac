@@ -1,6 +1,6 @@
 # End-to-end replay: Langtang Lirung / Lhende Khola / Trishuli, 26 August 2026
 
-`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-04T01:34:52.802208+00:00.
+`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-04T01:46:21.405112+00:00.
 
 ## Verdict
 
@@ -51,7 +51,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "batch_600s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0723,
+      "compute_seconds_total": 0.0847,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -60,7 +60,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "sliding_180s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0731,
+      "compute_seconds_total": 0.1129,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -96,7 +96,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
   ],
   "status": "failed",
   "variance_reduction": null,
-  "wall_clock_s": 0.146
+  "wall_clock_s": 0.168
 }
 ```
 > M2 produces no mass, so the runout surrogate has no release volume to be given: the cascade forecast for this event cannot be built from serac's own chain.

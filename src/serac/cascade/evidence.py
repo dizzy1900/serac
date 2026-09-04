@@ -18,10 +18,10 @@ A guard on the M4 reader
 `reports/runout/langtang_sanity.json` exists to compare the ensemble with **press-reported**
 timings. Reading a press figure into a forecast, or picking the member closest to one, would
 be tuning toward published figures -- explicitly forbidden. `ensemble_arrivals` therefore
-reads a whitelist of keys (`all_members[].run_id`, `.modelled_arrival_min`, `.parameters`)
-and raises if it is ever pointed at `public_timings_min`, `closest_member` or any
-`mismatch_min`. `FORBIDDEN_SANITY_KEYS` names them and a unit test asserts the guard fires.
-"""
+reads only `modelled_arrival_min` from each ensemble member, so a member dict
+    carrying `public_timings_min`, `closest_member` or `mismatch_min` contributes none of
+    them: they are ignored by construction rather than rejected. `read_sanity_key` is the
+    one that raises, and it guards direct access to those keys."""
 
 from __future__ import annotations
 
