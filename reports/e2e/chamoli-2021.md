@@ -1,6 +1,6 @@
 # End-to-end replay: Chamoli / Rishiganga, 7 February 2021
 
-`serac cascade e2e --event chamoli-2021` on serac 0.1.0, run 2026-09-04T01:28:27.291830+00:00.
+`serac cascade e2e --event chamoli-2021` on serac 0.1.0, run 2026-09-04T01:31:03.848747+00:00.
 
 ## Verdict
 
@@ -51,7 +51,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "batch_600s": {
       "chunks_ingested": 193,
       "class_label": null,
-      "compute_seconds_total": 0.0944,
+      "compute_seconds_total": 0.0942,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -60,7 +60,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "sliding_180s": {
       "chunks_ingested": 193,
       "class_label": null,
-      "compute_seconds_total": 0.1,
+      "compute_seconds_total": 0.1059,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
