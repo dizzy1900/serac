@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from serac.cascade.compute import AssetLoss, BlockReason, CascadeLossResult
 from serac.cascade.exposure import ExposureBundle
-from serac.domain.avoided_loss import AvoidedLossStatus, InterventionKind
+from serac.domain.avoided_loss import AvoidedLossStatus
 from serac.domain.common import Range
 from serac.domain.forecast import ModelProvenance
 
@@ -109,11 +109,6 @@ def _asset_rows(result: CascadeLossResult, scenario_id: str) -> list[AssetLoss]:
     return [a for a in result.by_asset if a.scenario_id == scenario_id]
 
 
-def _baseline_scenario_id(result: CascadeLossResult) -> str | None:
-    ids = {a.scenario_id for a in result.by_asset}
-    return sorted(ids)[0] if ids else None
-
-
 def render_loss_table(result: CascadeLossResult, exposure: ExposureBundle) -> str:
     """The whole table as markdown: header block, per-asset rows, per-scenario totals."""
     lines = ["```", *provenance_header(result, exposure), "```", ""]
@@ -201,15 +196,3 @@ def print_loss_table(result: CascadeLossResult, exposure: ExposureBundle) -> lis
     out += ["", f"ASSUMPTIONS ({len(result.response.assumptions)}):"]
     out += [f"  {n:2d}. {a}" for n, a in enumerate(result.response.assumptions, start=1)]
     return out
-
-
-def scenario_kind(result: CascadeLossResult, scenario_id: str) -> InterventionKind | None:
-    """Convenience for a report that needs to say which scenario is the baseline."""
-    for loss in result.response.losses:
-        if loss.scenario_id == scenario_id:
-            return (
-                InterventionKind.none
-                if loss.avoided_vs_baseline is None
-                else InterventionKind.warning
-            )
-    return None

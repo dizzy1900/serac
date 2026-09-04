@@ -54,8 +54,6 @@ SHA256_DIGEST = "http://www.w3.org/2001/04/xmlenc#sha256"
 ED25519_SIGNATURE = "http://www.w3.org/2021/04/xmldsig-more#eddsa-ed25519"
 """RFC 9231 identifier for Ed25519 in XML Security."""
 
-SIGNATURE_PROFILE = "serac-cap-ed25519-enveloped-v1"
-
 
 class CapSignatureError(SeracError):
     """A CAP document could not be signed, or its signature could not be checked."""
