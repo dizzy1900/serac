@@ -25,7 +25,7 @@ Four operational layers, built in order:
 
 This repository is the **foundations** phase (contracts, event library, ingestion
 adapters, feature cube, streaming skeleton with replay, validation harness). Models come later.
-See `RELEASE_STATUS.md` for what is real, what is stubbed and what is missing.
+See `RELEASE_STATUS.md` for what is real, what is stubbed and what is missing. If you are picking this up to continue it, start at its **Deferred** section: everything there was found and understood, and deliberately not fixed.
 
 ## What serac is not
 

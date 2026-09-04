@@ -56,6 +56,52 @@ components returned a negative or a refusal on the motivating event (Langtang Li
 Khola, 26 August 2026) for four unrelated physical reasons; the fifth had no input to run on.
 `reports/PROMPT2_SUMMARY.md` is the write-up.
 
+## Deferred — read this before starting new work
+
+Everything below was **found, understood and deliberately not fixed** in the time available. It
+is recorded here rather than left in a conversation. Each entry points at its full Known-gaps
+entry. Ordered by what blocks the most.
+
+**Blocks the release mechanics**
+
+- **Gap 66 — the gates dirty the tree that `promote` requires clean.** `validate-e2e` rewrites
+  tracked `reports/e2e/*` with fresh timestamps on every run, so `make validate-serac` always
+  leaves the working tree modified. Nothing can ever be promoted until the volatile fields are
+  excluded from the committed artefacts or those artefacts stop being tracked. Masked today only
+  because promotion is blocked for other reasons.
+- **Gap 64 — `reports/validation/latest.json` is stale** (stamped at `0b70091`, seven suites).
+  Do not read it as current; the per-suite reports are.
+
+**Changes what a number means**
+
+- **Gap 17 — a demonstrated leak vector survives all ten leakage assertions.** Positives realise
+  ~1 more receiver than their matched negatives and `n_stations` alone scores ROC-AUC 0.587, so
+  some of M1's reported skill may be archive density rather than source physics. This is a
+  dataset fix, not a training one, and it is the single most important open item on M1.
+- **Gap 42 — the surrogate fails one of its five gates** (5–95 % arrival coverage 0.794 against
+  a 0.85–0.95 target), and the arrival gate that *passes* rests on 3 held-out members at one
+  transect. Three of four transects scored nothing.
+- **Gap 39 — no independent simulator.** `serac-swe-voellmy` has never been cross-validated
+  against r.avaflow or any other code, so its structural bias cannot be separated from
+  implementation error.
+
+**Half-finished work**
+
+- **Gap 56 — the live stream lane is still the stub.** Replay can select the trained detector;
+  `serac stream run` cannot.
+- **Gap 62 — `SourceRef` exists twice.** A contract test now fails on divergence, but the two
+  copies have not been merged.
+- **Gap 61 — no job manifest in `infra/jobs/` has ever been executed.** Every core-hour and
+  storage figure in them is an estimate with a stated basis, never a measurement.
+
+**Cheap and worth doing**
+
+- M2's 200-draw bootstrap is serial and embarrassingly parallel; ~90 % of the warm inversion
+  cost. Ten cores should take the warm total from ~75 s to near 20 s.
+- Exposure valuation and population figures. 14 of 14 Lhende assets carry no replacement value
+  and 3 of 3 settlements carry `population: null`, which is the single reason every M5 output is
+  `undetermined`. This is the cheapest gap in the project.
+
 ## Component matrix
 
 Columns: **designed** (an ADR, architecture entry or model card exists), **implemented** (code
@@ -99,7 +145,7 @@ Prompt 2.
 | RGI 7.0 glacier outlines (Bremen mirror) | yes | yes | yes | fetched live 2026-09-03 | n/a | no |
 | Detector **stub** (`detector_stub.py`) | yes | yes (placeholder LP/SP ratio, threshold 10 untuned) | yes (golden on chamoli-2021) | n/a | **no — fires on pre-event background noise in both real fixtures** | no |
 | CAP 1.2 renderer + **stub** + XSD validation | yes | yes | yes (offline XSD) | n/a | n/a | no |
-| Replay + latency report (`serac replay`) | yes | yes | yes (chamoli-2021, langtang-2026, synthetic-lp-burst) | no | plumbing only — **still runs `DetectorStub`** | no |
+| Replay + latency report (`serac replay`) | yes | yes | yes (chamoli-2021, langtang-2026, synthetic-lp-burst) | no | plumbing only — **defaults to `DetectorStub`**; `--detector discriminator` runs the real model, `serac stream run` cannot | no |
 | Validation harness (`validate-*`, `validate-serac`, `promote`) | yes | yes | yes (**11 suites, 385 checks**) | n/a | n/a | no |
 | `underwriting-check` (runs the Lhende avoided-loss table) | yes | yes | yes | n/a | n/a | no |
 | Ingest port + `BaseIngestAdapter` (dry-run, 5 GiB gate, credentials path, ledger) | yes | yes | yes | n/a | n/a | no |
@@ -390,11 +436,13 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
 
 ### Streaming, infrastructure and process
 
-56. **`serac replay` still runs `DetectorStub`.** M1's `DiscriminatorDetector` is wired into
-    `serac cascade e2e` and the M1 latency CLI, but `pipelines/replay.py` and `cli_stream.py`
-    still import the placeholder. The brief's "replace `detector_stub` with the baseline
-    classifier" is therefore only half done, and `validate-stream`'s 33 checks are checks on the
-    stub.
+56. **The live stream lane still runs `DetectorStub`, and replay still defaults to it.**
+    `serac replay --detector discriminator` now runs the trained model, but `stub` is the
+    default and `cli_stream.py` — the lane a real deployment would use — still imports the
+    placeholder unconditionally. `validate-stream`'s 33 checks are therefore checks on the stub.
+    Note what selecting the real detector shows: on the Chamoli fixture it emits **0 detections
+    against the stub's 4**, because two receivers are available and it needs three. Selectable
+    is not retired.
 57. **The detector stub fires on pre-event background noise.** On both real fixtures the
     placeholder LP/SP ratio exceeds the placeholder threshold in the first evaluable window
     (Chamoli `NK.KKN..BHZ`, 2021-02-07T04:49:59Z, ratio 233; `IC.LSA.00.BHZ` ratio 2056). The
