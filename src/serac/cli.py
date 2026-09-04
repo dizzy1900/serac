@@ -9,7 +9,9 @@ import typer
 
 from serac import (
     __version__,
+    cli_alerting,
     cli_aoi,
+    cli_cascade,
     cli_cube,
     cli_data,
     cli_events,
@@ -38,6 +40,8 @@ for _name in ("fdsn", "comcat", "hydro"):
 app.add_typer(
     cli_events.app, name="events", help="Event library: add, validate, build-index, report."
 )
+app.add_typer(cli_cascade.app, name="cascade", help="M5: avoided loss and end-to-end replays.")
+app.add_typer(cli_alerting.app, name="alerting", help="CAP 1.2: signing keys, messages, sinks.")
 app.add_typer(cli_cube.app, name="cube", help="Build and inspect per-AOI feature cubes.")
 app.add_typer(cli_sources.app, name="sources", help="Fetch, hash and ledger source documents.")
 app.add_typer(cli_aoi.app, name="aoi", help="AOI library: build, validate, describe.")

@@ -3,7 +3,7 @@ UV ?= uv
 EVENT ?= chamoli-2021
 SPEED ?= max
 
-.PHONY: help sync lint typecheck test smoke-online validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-watch validate-serac promote underwriting-check replay dvc-remote clean
+.PHONY: help sync lint typecheck test smoke-online validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-watch validate-e2e validate-serac promote underwriting-check replay dvc-remote clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -54,7 +54,10 @@ validate-runout: ## M4: surrogate gates, frozen design, NOT-r.avaflow disclosure
 validate-watch: ## M3: pre-registration ancestry, causality, no failure date anywhere
 	$(UV) run serac validate watch
 
-validate-serac: validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-watch ## All validation suites
+validate-e2e: ## Both replays run to their honest end; latency, CAP XSD, avoided-loss contract
+	$(UV) run serac validate e2e
+
+validate-serac: validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-watch validate-e2e ## All validation suites
 	$(UV) run serac validate stamp
 
 promote: validate-serac ## Refuses unless validate-serac passed on a clean tree at HEAD
