@@ -14,7 +14,7 @@
           "batch_600s": {
             "chunks_ingested": 193,
             "class_label": null,
-            "compute_seconds_total": 0.0321,
+            "compute_seconds_total": 0.0944,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -23,7 +23,7 @@
           "sliding_180s": {
             "chunks_ingested": 193,
             "class_label": null,
-            "compute_seconds_total": 0.0323,
+            "compute_seconds_total": 0.1,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -75,7 +75,7 @@
           "batch_600s": {
             "chunks_ingested": 194,
             "class_label": null,
-            "compute_seconds_total": 0.0327,
+            "compute_seconds_total": 0.0918,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -84,7 +84,7 @@
           "sliding_180s": {
             "chunks_ingested": 194,
             "class_label": null,
-            "compute_seconds_total": 0.0329,
+            "compute_seconds_total": 0.0756,
             "fired": false,
             "min_contributing_stations": 3,
             "probability": null,
@@ -118,12 +118,12 @@
       "lfh": {
         "execution": "executed",
         "outcome": "refused",
-        "wall_clock_s": 0.04
+        "wall_clock_s": 0.129
       },
       "stopped_at": "detection",
       "surrogate_inference_p95_s": 0.00172
     }
   },
-  "generated_utc": "2026-09-04T01:23:14.266877+00:00",
+  "generated_utc": "2026-09-04T01:28:28.284074+00:00",
   "report_version": "0.1.0"
 }

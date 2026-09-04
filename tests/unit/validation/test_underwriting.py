@@ -59,9 +59,7 @@ def test_schema_errors_reports_paths(tmp_path: Path) -> None:
 
 def test_cli_round_trip_only_still_passes(repo_root: Path) -> None:
     """--no-table is the Prompt 1 behaviour minus the exit 2: the round-trip alone."""
-    result = CliRunner().invoke(
-        app, ["--contracts", str(repo_root / "contracts"), "--no-table"]
-    )
+    result = CliRunner().invoke(app, ["--contracts", str(repo_root / "contracts"), "--no-table"])
     assert result.exit_code == 0
     assert "ok: AvoidedLossRequest validates against avoided-loss.v0.json" in result.output
     assert "INPUT PROVENANCE" not in result.output

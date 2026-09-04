@@ -1,6 +1,6 @@
 # End-to-end replay: Langtang Lirung / Lhende Khola / Trishuli, 26 August 2026
 
-`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-04T01:23:14.105980+00:00.
+`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-04T01:28:27.838251+00:00.
 
 ## Verdict
 
@@ -17,7 +17,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
 | 3 | `lfh` | M2 single-force inversion (executed here, offline) | executed | **refused** |
 | 4 | `runout` | M4 runout surrogate | unavailable | **not_reached** |
 | 5 | `cap` | M5 CAP 1.2 generator | unavailable | **not_reached** |
-| 6 | `avoided_loss` | M5 avoided-loss computation | executed | **refused** |
+| 6 | `avoided_loss` | M5 avoided-loss computation | executed | **insufficient_input** |
 
 ## Stage detail
 
@@ -51,7 +51,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "batch_600s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0327,
+      "compute_seconds_total": 0.0918,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -60,7 +60,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "sliding_180s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0329,
+      "compute_seconds_total": 0.0756,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -95,7 +95,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
   ],
   "status": "failed",
   "variance_reduction": null,
-  "wall_clock_s": 0.04
+  "wall_clock_s": 0.129
 }
 ```
 > M2 produces no mass, so the runout surrogate has no release volume to be given: the cascade forecast for this event cannot be built from serac's own chain.
@@ -115,7 +115,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
 
 ### `avoided_loss` — M5 avoided-loss computation
 
-- outcome: **refused** (executed)
+- outcome: **insufficient_input** (executed)
 - summary: status=not_implemented; costed 0 of 14 exposed asset(s)
 
 ```json

@@ -460,7 +460,9 @@ def run_e2e(
             StageEvidence(
                 stage="avoided_loss",
                 component="M5 avoided-loss computation",
-                outcome=(StageOutcome.produced if loss.computed else StageOutcome.refused),
+                outcome=(
+                    StageOutcome.produced if loss.computed else StageOutcome.insufficient_input
+                ),
                 execution=Execution.executed,
                 summary=(
                     f"status={loss.response.status}; costed {len(loss.determined_asset_ids)} of "
