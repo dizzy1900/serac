@@ -20,6 +20,9 @@ WINDOW = (datetime(2021, 1, 1, tzinfo=UTC), datetime(2021, 2, 15, tzinfo=UTC))
 
 @pytest.fixture(scope="module")
 def dem_entries(repo_root: Path) -> list[ManifestEntry]:
+    # The ledger records both the committed fixture crop and any real ingest under
+    # `data/raw/`, which is DVC-tracked and therefore absent on a fresh clone and in CI.
+    # Select only entries whose bytes are actually present, which is what a fresh clone has.
     ledger = JsonlManifestLedger(repo_root / "data" / "manifest.jsonl")
     return [
         e
@@ -27,6 +30,8 @@ def dem_entries(repo_root: Path) -> list[ManifestEntry]:
         if e.source is DataSource.dem_glo30
         and e.aoi_id == "chamoli-rishiganga"
         and e.status is ManifestStatus.fetched
+        and e.path is not None
+        and (repo_root / e.path).exists()
     ]
 
 

@@ -28,6 +28,7 @@ REQUIRED_SUITES: tuple[str, ...] = (
     "contracts",
     "lfh",
     "runout",
+    "watch",
 )
 
 

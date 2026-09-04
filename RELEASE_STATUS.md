@@ -126,3 +126,8 @@ Numbered so `TODO` comments can reference them (`TODO(RELEASE_STATUS#n)`).
     unvalidated. `make validate-serac` is therefore red and `make promote` is blocked, which
     is the intended behaviour. CI remains green because it checks code health (lint, types,
     tests), not model targets.
+21. **The cube's S1 layers still prefer the synthetic placeholder over real burst products.**
+    `tests/unit/pipelines/test_layers_s2_s1.py` excludes `data/raw/hyp3_burst_insar/` to keep
+    that behaviour pinned. The fix is for the cube pipeline to select by `raw_root` rather
+    than scanning the ledger; until then the layer is not reading the 517 real interferograms
+    M3 fetched.

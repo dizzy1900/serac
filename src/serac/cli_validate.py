@@ -115,6 +115,12 @@ def lfh(
 
 
 @app.command()
+def watch(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
+    """Slope watch: pre-registration ancestry, causality, no failure date anywhere."""
+    _run("watch", repo, reports_dir)
+
+
+@app.command()
 def contracts(repo: Path = REPO_OPTION, reports_dir: Path = REPORTS_OPTION) -> None:
     """contracts/*.v0.json match the models and are valid Draft 2020-12."""
     _run("contracts", repo, reports_dir)
