@@ -111,7 +111,7 @@ Confusion matrix:
 | tectonic | 11 | 25 | 3 |
 | noise | 3 | 0 | 5 |
 
-Per-region confusion matrices (denominators are small; they are printed because hiding them would be worse, not because a region with one positive means anything):
+Per-region confusion matrices (denominators are small; they are printed because hiding them would be worse, not because a region with one positive means anything). The one region below reproduces the matrix above exactly, and must: this scheme holds High Mountain Asia out, so the test fold is that region.
 
 **High Mountain Asia**
 

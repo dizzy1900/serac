@@ -312,12 +312,26 @@ def render(repo: Path) -> str:
         add("")
         add(_confusion(result["confusion"]))
         add("")
-        add(
+        by_region = result["confusion_by_region"]
+        note = (
             "Per-region confusion matrices (denominators are small; they are printed because "
-            "hiding them would be worse, not because a region with one positive means anything):"
+            "hiding them would be worse, not because a region with one positive means anything)"
         )
+        if len(by_region) == 1:
+            # Leave-one-region-out holds a single region out, so the test fold *is* that region
+            # and its matrix reproduces the overall one exactly. Said here, because an
+            # unexplained duplicate table reads as a copy-paste error in a document whose whole
+            # purpose is to be checked.
+            (only,) = by_region
+            note += (
+                f". The one region below reproduces the matrix above exactly, and must: this "
+                f"scheme holds {region_label(only)} out, so the test fold is that region."
+            )
+        else:
+            note += ":"
+        add(note)
         add("")
-        for region, matrix in sorted(result["confusion_by_region"].items()):
+        for region, matrix in sorted(by_region.items()):
             add(f"**{region_label(region)}**")
             add("")
             add(_confusion(matrix))
