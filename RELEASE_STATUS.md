@@ -63,6 +63,35 @@ Khola, 26 August 2026) for four unrelated physical reasons; the fifth had no inp
 
 ## Deferred — read this before starting new work
 
+**A coverage audit on 2026-09-04 left 36 findings open — see `reports/AUDIT_2026-09-04.md`.**
+Both briefs were audited area by area and every finding independently re-verified; six were
+closed in `f592b28`. Ten of the remainder are major, and most of those are the same shape: a
+document, model card or ledger entry claiming something the tree does not support. In a project
+whose premise is that its reports can be trusted, that is the more serious half of the list.
+
+The ten majors, in the order I would take them:
+
+1. **The ledger misdescribes what the detector stub does on Langtang.** It says pre-event
+   background noise; the stub actually fires 45 s after origin. A factual error about a result.
+2. **`serac watch` is not a registered CLI command**, so M3's documented reproduction sequence
+   cannot be run as written.
+3. **The M3 measurability-threshold sensitivity sweep** that the model card and ledger say is
+   committed is not in the tree.
+4. **`cap_stub` is still wired into the replay and stream lanes** — the real CAP v1.2 generator
+   reaches only `serac cascade e2e`.
+5. **The avoided-loss engine does not honour its own `0.1.0` contract**, including the per-asset
+   losses the response type declares.
+6. **M2's "≤120 s met warm (~75 s)" latency claim traces to no committed artefact**, and the
+   timings that are committed contradict it.
+7. **`validate-lfh`'s pass criterion is weaker than the brief's** "within stated uncertainty".
+8. **DVC tracking is nominal**: no `dvc.lock` is committed, so 5,606 `fetched` ledger rows are
+   not recoverable from the repository alone.
+9. **The cube's `s1_coherence_t` / `s1_los_velocity_t` layers cannot consume the 517 real HyP3
+   products**, and Known gap 11 misstates the reason.
+10. **The v1 self-supervised autoencoder interface over the feature cube** was never designed;
+    the brief asks for the interface, not the model.
+
+
 Everything below was **found, understood and deliberately not fixed** in the time available. It
 is recorded here rather than left in a conversation. Each entry points at its full Known-gaps
 entry. Ordered by what blocks the most.
