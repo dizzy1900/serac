@@ -16,7 +16,8 @@ Langtang Lirung / Lhende Khola / Bhote Koshi / Trishuli cascade of 26 August 202
 Blatten 2025 and Kolka 2002.
 
 serac has four operational layers, built in this order across two prompts (Prompt 1 =
-foundations, this repository as it stands; Prompt 2 = models):
+foundations; Prompt 2 = the five v0 model components, all of which are now in the tree
+and none of which is validated against events):
 
 | Layer | Horizon | Feasibility (settled science) | serac component |
 |---|---|---|---|
@@ -46,7 +47,7 @@ never import `serac` internals. serac never depends on a particular consumer.
 2. **Unknowns are `null`, not guesses.** The Langtang 2026 source volume has no peer-reviewed estimate as of September 2026. Store it as `null` with a `notes` field and the range of public estimates, each attributed. The same rule applies everywhere.
 3. **Provenance on every record.** Source URL, retrieval timestamp, checksum, licence.
 4. **Tests run offline.** All tests must pass with no network using committed fixtures (small, real, licence-clean samples). Network-dependent behaviour is exercised by `make smoke-online`, which is allowed to skip.
-5. **Self-contained repo conventions.** serac depends on no private repo, internal package or hosted platform. Establish and document its own conventions here: DVC-versioned `data/` and `baselines/`, `src/validation/` suites, Makefile targets `validate-*`, `promote`, `underwriting-check`, an honest `RELEASE_STATUS.md`, and a plain Docker image as the deployment unit. Any downstream consumer integrates through the versioned JSON-Schema contracts in `contracts/`, never by importing serac internals.
+5. **Self-contained repo conventions.** serac depends on no private repo, internal package or hosted platform. Establish and document its own conventions here: DVC-versioned `data/` and `baselines/`, `src/serac/validation/` suites, Makefile targets `validate-*`, `promote`, `underwriting-check`, an honest `RELEASE_STATUS.md`, and a plain Docker image as the deployment unit. Any downstream consumer integrates through the versioned JSON-Schema contracts in `contracts/`, never by importing serac internals.
 6. **Compute targets are portable.** Local dev is Docker Compose; scaled runs (large simulation ensembles, model training) are described as job manifests in `infra/jobs/*.yaml` with core-hour and storage estimates, written for a generic container host and annotated for AWS (Batch / EC2 GPU) as the assumed target. No managed-platform lock-in.
 7. **Ask before any download > 5 GB** or any credentialed API call that costs money. Read credentials from `.env` (never commit); document every required credential in `docs/CREDENTIALS.md`.
 8. **Small commits, conventional messages, working tree green at every commit.**
@@ -72,11 +73,15 @@ src/serac/ports/                abstract interfaces (ABCs)
 src/serac/adapters/{eo,seismic,bus,storage,hydro,cap}/
 src/serac/pipelines/            ingest_*, build_cube, replay
 src/serac/streaming/            seedlink_ingestor, detector_stub, cap_stub
+src/serac/models/{discriminator,lfh,watch,runout}/  M1-M4 model components
+src/serac/cascade/              M5 avoided-loss accounting
+src/serac/alerting/             CAP 1.2 generation, Ed25519 signing, sinks
 src/serac/validation/           validate-* suites
 src/serac/cli.py                `serac` (typer)
 tests/unit/ integration/ contract/
 tests/fixtures/synthetic/       the ONLY place synthetic data may live
-infra/docker/                   dev compose (redis; grass placeholder for Prompt 2)
+infra/docker/Dockerfile         the deployment image (ADR-0014); never pushed anywhere
+infra/docker/                   dev compose (redis; a commented-out grass service no code uses)
 infra/jobs/                     portable job manifests for scaled runs (AWS-annotated)
 ```
 
@@ -99,7 +104,7 @@ Run `make help` for the live list. As of this file:
 | `validate-cube` | grid/CRS consistency, monotonic time, provenance attrs per layer |
 | `validate-stream` | replay end-to-end on fixtures; CAP validates against the CAP 1.2 XSD |
 | `validate-serac` | every suite, **all of them even when one fails**, then writes a validation stamp. Exit 1 means something is broken; exit 3 means every suite ran and a criterion of the brief was not reached (make reports its own exit 2 for either, so run `serac validate all` directly when the distinction matters) |
-| `promote` | refuses unless `validate-serac` passed on a clean tree at HEAD |
+| `promote` | refuses unless `validate-serac` passed on a clean tree at HEAD **and** `PROMOTE_APPROVED_BY` names the human approving it. Nothing defaults it — not the Makefile, not CI — and the name is written into `reports/promotion/<sha>.json` |
 | `underwriting-check` | avoided loss on the best available input for the Langtang replay; computes and exits 0. Every asset it cannot cost is reported `undetermined`, never zero |
 | `replay` | `serac replay --event $(EVENT) --speed $(SPEED)` (defaults: `chamoli-2021`, `max`) |
 | `dvc-remote` | writes `$DVC_REMOTE_URL` into the gitignored `.dvc/config.local` |

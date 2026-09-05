@@ -1,8 +1,8 @@
 """Reading the upstream components' artifacts, the ensemble prior, and the printed table.
 
-`test_the_press_timings_are_unreadable_downstream` is the one that matters to a reviewer: the
-M4 sanity artifact carries press-reported timings, and nothing that feeds a forecast may read
-them.
+`test_the_observed_timings_are_unreadable_downstream` is the one that matters to a reviewer:
+the M4 sanity artifact carries the transect arrival times the event record holds, and nothing
+that feeds a forecast may read them.
 """
 
 from __future__ import annotations
@@ -34,12 +34,12 @@ from serac.cascade.prior import (
 from serac.cascade.table import NO_VALIDATED_FORECAST, print_loss_table, render_loss_table
 from serac.cascade.underwriting import UNDERWRITING_AOI, UNDERWRITING_EVENT, underwriting_table
 
-# -- the guard on the press-derived keys ----------------------------------------------------------
+# -- the guard on the observation-derived keys ----------------------------------------------
 
 
 @pytest.mark.parametrize("key", sorted(FORBIDDEN_SANITY_KEYS))
-def test_the_press_timings_are_unreadable_downstream(repo_root: Path, key: str) -> None:
-    with pytest.raises(EvidenceError, match="press-reported timings"):
+def test_the_observed_timings_are_unreadable_downstream(repo_root: Path, key: str) -> None:
+    with pytest.raises(EvidenceError, match="observed timings"):
         read_sanity_key(repo_root, key)
 
 

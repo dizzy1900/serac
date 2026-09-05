@@ -4,10 +4,15 @@ Sentinel-1 burst granules are the input vocabulary of HyP3's burst InSAR jobs, a
 is public — no credential is needed to discover them, only to process them. As elsewhere in
 serac the library call sits behind a Protocol so tests read a committed listing instead.
 
-Listings are cached under `data/interim/watch/bursts/<aoi>_<start>_<end>.json` and ledgered,
-because a five-year listing is several megabytes of JSON that the planner, the submitter and
-the poller all re-read, and because the network plan is only reproducible if the listing it
-was derived from is on disk with a checksum.
+Listings are cached under `data/interim/watch/bursts/<aoi>_<start>_<end>.json`, because a
+five-year listing is several megabytes of JSON that the planner, the submitter and the poller
+all re-read, and because the network plan is only reproducible if the listing it was derived
+from is on disk with a checksum.
+
+The cache carries **no** `ManifestEntry`, which this docstring used to claim it did. Nothing
+should be written under `data/` without a ledger row (CLAUDE.md, fixture policy), so that is a
+real gap and it is recorded as one: `RELEASE_STATUS.md` known gap 71, and the `SLC-BURST`
+section of `docs/DATA_SOURCES.md`.
 """
 
 from __future__ import annotations

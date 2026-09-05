@@ -1,13 +1,16 @@
 # serac local development dependencies.
 #
-# UNTESTED on the machine that wrote it (no Docker installed there); see infra/docker/README.md
-# and RELEASE_STATUS.md Known gaps #7. Run:
+# NEVER BROUGHT UP. It was written on a machine with no Docker installed; Docker is available
+# there now (the deployment image was built and run on it on 2026-09-04) but this file has still
+# never been started, so the Redis service, its healthcheck and its volume are all unverified.
+# See infra/docker/README.md and RELEASE_STATUS.md Known gap 60. Run:
 #
 #   docker compose -f infra/docker/compose.yaml up -d
 #   SERAC_REDIS_URL=redis://localhost:6379/0 make smoke-online
 #
 # The serac application itself runs from the host with `uv run serac ...`; the deployment unit
-# (a plain Docker image containing the package) is a separate Dockerfile, not part of this file.
+# (a plain Docker image containing the package) is infra/docker/Dockerfile, not part of this
+# file.
 
 name: serac
 

@@ -33,6 +33,7 @@ Before doing either of the following, stop and ask the human running the session
 | `SERAC_ALERT_HTTP_ENDPOINT` | where the outbound HTTP alert sink would POST | **you supply it.** There is no default and serac ships none | free | `adapters/alerting/http_sink.py` |
 | `DVC_REMOTE_URL` | DVC remote (e.g. an S3 URL) | your own bucket or storage; written to the gitignored `.dvc/config.local` by `make dvc-remote` | storage costs are yours, not an API charge | DVC only; never read by `serac` code |
 | `SERAC_ONLINE` | `1` enables network tests in `make smoke-online` | n/a | free | `tests/conftest.py` |
+| `PROMOTE_APPROVED_BY` | **not a credential.** The name of the person approving a promotion. `make promote` refuses without it, and the name is recorded in `reports/promotion/<sha>.json`. Never set it in `.env`, a Makefile or CI: it exists to make promotion a person's act, so it belongs on the command line of the person doing it (`PROMOTE_APPROVED_BY='A. Name' make promote`). Boolean-ish or job-shaped values (`1`, `yes`, `ci`, `bot`) are refused | n/a | free | `validation/promote.py`, `serac promote` |
 
 Not credentials but read from the environment by `SeracSettings`: `SERAC_DATA_DIR`
 (default `data`), `SERAC_REPORTS_DIR` (default `reports`).

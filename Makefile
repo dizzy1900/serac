@@ -3,7 +3,7 @@ UV ?= uv
 EVENT ?= chamoli-2021
 SPEED ?= max
 
-.PHONY: help sync lint typecheck test smoke-online validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-watch validate-e2e validate-serac promote underwriting-check replay dvc-remote clean
+.PHONY: help sync lint typecheck test smoke-online validate-events validate-aoi validate-ingest validate-cube validate-stream validate-contracts validate-lfh validate-discriminator validate-runout validate-watch validate-e2e validate-serac require-approval promote underwriting-check replay dvc-remote clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
@@ -64,7 +64,13 @@ validate-e2e: ## Both replays run to their honest end; latency, CAP XSD, avoided
 validate-serac: ## Every validation suite; runs all of them even when one fails
 	$(UV) run serac validate all
 
-promote: validate-serac ## Refuses unless validate-serac passed on a clean tree at HEAD
+# PROMOTE_APPROVED_BY is deliberately not defaulted anywhere: promotion is a person's
+# decision and the promotion record has to name the person who made it. `serac promote` is
+# what enforces this; the prerequisite below only fails fast, before spending the gate run.
+require-approval:
+	@test -n "$$PROMOTE_APPROVED_BY" || (echo "PROMOTE_APPROVED_BY is not set: promotion needs a named human approver, e.g. PROMOTE_APPROVED_BY='A. Name' make promote"; exit 1)
+
+promote: require-approval validate-serac ## Refuses unless validate-serac passed on a clean tree at HEAD and $$PROMOTE_APPROVED_BY names a human
 	$(UV) run serac promote
 
 underwriting-check: ## Avoided loss on the best available input for the Langtang replay

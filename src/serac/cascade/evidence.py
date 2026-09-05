@@ -15,13 +15,13 @@ sha256, so a reader can tell "serac ran this just now" from "serac is quoting a 
 
 A guard on the M4 reader
 ------------------------
-`reports/runout/langtang_sanity.json` exists to compare the ensemble with **press-reported**
-timings. Reading a press figure into a forecast, or picking the member closest to one, would
-be tuning toward published figures -- explicitly forbidden. `ensemble_arrivals` therefore
-reads only `modelled_arrival_min` from each ensemble member, so a member dict
-    carrying `public_timings_min`, `closest_member` or `mismatch_min` contributes none of
-    them: they are ignored by construction rather than rejected. `read_sanity_key` is the
-    one that raises, and it guards direct access to those keys."""
+`reports/runout/langtang_sanity.json` exists to compare the ensemble with the transect arrival
+times the **event record** holds for 26 August 2026. Reading an observed figure into a forecast,
+or picking the member closest to one, would be tuning toward published figures -- explicitly
+forbidden. `ensemble_arrivals` therefore reads only `modelled_arrival_min` from each ensemble
+    member, so a member dict carrying `transect_targets`, `closest_member` or `mismatch_min`
+    contributes none of them: they are ignored by construction rather than rejected.
+    `read_sanity_key` is the one that raises, and it guards direct access to those keys."""
 
 from __future__ import annotations
 
@@ -37,9 +37,18 @@ from typing import Any
 from serac.errors import SeracError
 
 FORBIDDEN_SANITY_KEYS: frozenset[str] = frozenset(
-    {"public_timings_min", "closest_member", "mismatch_min", "public_timing_min"}
+    {
+        "closest_member",
+        "mismatch_min",
+        "transect_targets",
+        "recorded_arrival_min",
+        # the names this artifact used before the comparison targets were read from the event
+        # record; an older committed artifact must stay just as unreadable
+        "public_timings_min",
+        "public_timing_min",
+    }
 )
-"""Keys in the M4 sanity artifact that carry, or are derived from, press-reported timings.
+"""Keys in the M4 sanity artifact that carry, or are derived from, the *observed* timings.
 
 Nothing downstream of the ensemble may read these. They exist so a human can read the
 mismatch; a model that consumed them would be selecting on the answer.
@@ -304,7 +313,7 @@ def _percentile(values: list[float], q: float) -> float:
 def ensemble_arrivals(repo: Path) -> tuple[list[TransectArrivalStats], StageEvidence]:
     """Per-transect arrival statistics over the frozen ensemble's own solver output.
 
-    Reads only `all_members[].modelled_arrival_min`. Never the press timings, never the
+    Reads only `all_members[].modelled_arrival_min`. Never the recorded arrivals, never the
     closest member, never a mismatch -- see `FORBIDDEN_SANITY_KEYS`.
     """
     path = repo / "reports" / "runout" / "langtang_sanity.json"
@@ -391,8 +400,9 @@ def read_sanity_key(repo: Path, key: str) -> Any:
     """Deliberate accessor for the M4 sanity artifact that refuses the press-derived keys."""
     if key in FORBIDDEN_SANITY_KEYS:
         raise EvidenceError(
-            f"{key!r} carries or derives from press-reported timings; nothing downstream of the "
-            "ensemble may read it (tuning toward published figures is forbidden)"
+            f"{key!r} carries or derives from the observed timings the event record holds; "
+            "nothing downstream of the ensemble may read it (tuning toward published figures "
+            "is forbidden)"
         )
     return _load(repo / "reports" / "runout" / "langtang_sanity.json").get(key)
 

@@ -465,11 +465,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 20.94,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 20.94,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -491,7 +491,7 @@
         "xi_m_s2": 951.8331577889014
       },
       "run_id": "m0002-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -755,11 +755,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 18.96,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 18.96,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -781,7 +781,7 @@
         "xi_m_s2": 492.2754471168559
       },
       "run_id": "m0022-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1045,11 +1045,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 10.93,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 10.93,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1071,7 +1071,7 @@
         "xi_m_s2": 2070.369621462623
       },
       "run_id": "m0023-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1132,11 +1132,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 11.72,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 11.72,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1158,7 +1158,7 @@
         "xi_m_s2": 622.984125596936
       },
       "run_id": "m0033-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1190,11 +1190,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 14.21,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 14.21,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1216,7 +1216,7 @@
         "xi_m_s2": 2094.8904979770123
       },
       "run_id": "m0020-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1248,11 +1248,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 10.26,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 10.26,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1274,7 +1274,7 @@
         "xi_m_s2": 1190.4638021547414
       },
       "run_id": "m0032-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1422,11 +1422,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 17.94,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 17.94,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1448,7 +1448,7 @@
         "xi_m_s2": 458.6987258429289
       },
       "run_id": "m0048-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1480,11 +1480,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 14.43,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 14.43,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1506,7 +1506,7 @@
         "xi_m_s2": 1045.8474738384316
       },
       "run_id": "m0042-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1596,11 +1596,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 12.89,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 12.89,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1622,7 +1622,7 @@
         "xi_m_s2": 442.7792017653087
       },
       "run_id": "m0047-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1770,11 +1770,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 8.59,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 8.59,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1796,7 +1796,7 @@
         "xi_m_s2": 307.3764320005383
       },
       "run_id": "m0049-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -1828,11 +1828,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 9.82,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 9.82,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -1854,7 +1854,7 @@
         "xi_m_s2": 498.1058193000076
       },
       "run_id": "m0053-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -2031,11 +2031,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 11.36,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 11.36,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -2057,7 +2057,7 @@
         "xi_m_s2": 257.61370351609537
       },
       "run_id": "m0064-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -2205,11 +2205,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 7.36,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 7.36,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -2231,7 +2231,7 @@
         "xi_m_s2": 349.8794280098329
       },
       "run_id": "m0067-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -2640,11 +2640,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 26.71,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 26.71,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -2666,7 +2666,7 @@
         "xi_m_s2": 1437.2464303433912
       },
       "run_id": "m0082-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -2727,11 +2727,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 17.43,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 17.43,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -2753,7 +2753,7 @@
         "xi_m_s2": 417.46494361210245
       },
       "run_id": "m0090-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -2843,11 +2843,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 8.98,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 8.98,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -2869,7 +2869,7 @@
         "xi_m_s2": 1323.5402614795375
       },
       "run_id": "m0070-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -3220,11 +3220,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 31.78,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 31.78,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -3246,7 +3246,7 @@
         "xi_m_s2": 322.1991022957733
       },
       "run_id": "m0109-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -3481,11 +3481,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 13.81,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 13.81,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -3507,7 +3507,7 @@
         "xi_m_s2": 432.47432796190714
       },
       "run_id": "m0115-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -3713,11 +3713,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 40.85,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 40.85,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -3739,7 +3739,7 @@
         "xi_m_s2": 1339.2159007359883
       },
       "run_id": "m0128-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -3771,11 +3771,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 8.25,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 8.25,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -3797,7 +3797,7 @@
         "xi_m_s2": 660.7606652130714
       },
       "run_id": "m0111-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -3829,11 +3829,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 31.14,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 31.14,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -3855,7 +3855,7 @@
         "xi_m_s2": 2499.5563431266496
       },
       "run_id": "m0125-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -3974,11 +3974,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 13.17,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 13.17,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4000,14 +4000,14 @@
         "xi_m_s2": 341.73662604968416
       },
       "run_id": "m0137-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 8.54,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 8.54,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4029,7 +4029,7 @@
         "xi_m_s2": 464.1314247663972
       },
       "run_id": "m0130-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -4119,11 +4119,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 42.03,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 42.03,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4145,14 +4145,14 @@
         "xi_m_s2": 1542.4527892773638
       },
       "run_id": "m0145-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 21.15,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 21.15,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4174,7 +4174,7 @@
         "xi_m_s2": 326.01513800192885
       },
       "run_id": "m0142-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -4351,11 +4351,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 9.28,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 9.28,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4377,7 +4377,7 @@
         "xi_m_s2": 2845.1867240425586
       },
       "run_id": "m0112-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -4438,11 +4438,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 8.13,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 8.13,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4464,7 +4464,7 @@
         "xi_m_s2": 2022.185565864461
       },
       "run_id": "m0119-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -4554,11 +4554,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 10.56,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 10.56,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4580,7 +4580,7 @@
         "xi_m_s2": 2119.7017928682926
       },
       "run_id": "m0143-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -4960,11 +4960,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 37.19,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 37.19,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -4986,14 +4986,14 @@
         "xi_m_s2": 1308.0481069516995
       },
       "run_id": "m0173-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 26.03,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 26.03,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5015,14 +5015,14 @@
         "xi_m_s2": 1755.7380575085547
       },
       "run_id": "m0172-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 14.45,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 14.45,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5044,7 +5044,7 @@
         "xi_m_s2": 897.4156282866438
       },
       "run_id": "m0164-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5134,11 +5134,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 8.63,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 8.63,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5160,7 +5160,7 @@
         "xi_m_s2": 2384.5650247321073
       },
       "run_id": "m0138-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5308,11 +5308,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 21.23,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 21.23,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5334,7 +5334,7 @@
         "xi_m_s2": 2982.3906874836703
       },
       "run_id": "m0170-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5366,11 +5366,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 17.65,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 17.65,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5392,7 +5392,7 @@
         "xi_m_s2": 1122.4034508788798
       },
       "run_id": "m0180-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5453,11 +5453,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 22.35,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 22.35,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5479,14 +5479,14 @@
         "xi_m_s2": 1735.1869899747835
       },
       "run_id": "m0182-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 18.74,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 18.74,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5508,7 +5508,7 @@
         "xi_m_s2": 362.45886705362705
       },
       "run_id": "m0190-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5569,11 +5569,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 12.54,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 12.54,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5595,14 +5595,14 @@
         "xi_m_s2": 1797.5732785717755
       },
       "run_id": "m0174-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 13.36,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 13.36,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5624,7 +5624,7 @@
         "xi_m_s2": 412.57847993236163
       },
       "run_id": "m0187-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5772,11 +5772,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 7.6,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 7.6,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5798,7 +5798,7 @@
         "xi_m_s2": 337.7365689508046
       },
       "run_id": "m0192-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5888,11 +5888,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 21.34,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 21.34,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5914,7 +5914,7 @@
         "xi_m_s2": 615.6920419157417
       },
       "run_id": "m0197-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -5946,11 +5946,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 14.61,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 14.61,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -5972,7 +5972,7 @@
         "xi_m_s2": 1058.2341976837906
       },
       "run_id": "m0198-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -6091,11 +6091,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 17.84,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 17.84,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -6117,7 +6117,7 @@
         "xi_m_s2": 566.9822439241227
       },
       "run_id": "m0203-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -6410,11 +6410,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 16.0,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 16.0,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -6436,7 +6436,7 @@
         "xi_m_s2": 475.19061476028725
       },
       "run_id": "m0212-r060",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -6584,11 +6584,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 16.24,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 16.24,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -6610,7 +6610,7 @@
         "xi_m_s2": 210.8824686020939
       },
       "run_id": "m0226-r030",
-      "transects_reached": 1
+      "transects_reached": 0
     },
     {
       "mean_abs_mismatch_min": null,
@@ -6642,11 +6642,11 @@
       "transects_reached": 0
     },
     {
-      "mean_abs_mismatch_min": 8.31,
+      "mean_abs_mismatch_min": null,
       "mismatch_min": {
         "betrawati": null,
         "galchhi": null,
-        "rasuwagadhi-gyirong": 8.31,
+        "rasuwagadhi-gyirong": null,
         "syabrubesi": null
       },
       "modelled_arrival_min": {
@@ -6668,86 +6668,75 @@
         "xi_m_s2": 469.628467050617
       },
       "run_id": "m0225-r030",
-      "transects_reached": 1
+      "transects_reached": 0
     }
   ],
-  "closest_member": {
-    "mean_abs_mismatch_min": 7.36,
-    "mismatch_min": {
-      "betrawati": null,
-      "galchhi": null,
-      "rasuwagadhi-gyirong": 7.36,
-      "syabrubesi": null
-    },
-    "modelled_arrival_min": {
-      "betrawati": null,
-      "galchhi": null,
-      "rasuwagadhi-gyirong": 14.86,
-      "syabrubesi": null
-    },
-    "parameters": {
-      "critical_shear_pa": 500.0,
-      "entrainment_coefficient": 0.0009670823467262679,
-      "ice_fraction": 0.39434782608695657,
-      "mu": 0.04808186389857888,
-      "release_elevation_band_m": [
-        3645.6521739130435,
-        4433.478260869565
-      ],
-      "release_volume_m3": 272019630.62978584,
-      "xi_m_s2": 349.8794280098329
-    },
-    "run_id": "m0067-r060",
-    "transects_reached": 1
-  },
+  "closest_member": null,
   "frozen_design_hash": "ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac4943777f28484dae183",
   "frozen_solver_version": "0.2.0",
-  "generated_utc": "2026-09-03T23:26:52.497720+00:00",
+  "generated_utc": "2026-09-05T06:25:28.361067+00:00",
+  "member_arrivals_source": "modelled_arrival_min recorded in reports/runout/langtang_sanity.json (the per-member rasters were not on disk; no modelled number was recomputed)",
+  "n_comparison_targets": 1,
   "n_members": 230,
+  "observation_source": "data/events/langtang-lhende-2026.json",
   "per_transect": {
     "betrawati": {
       "fraction_reaching": 0.0,
+      "is_comparison_target": false,
       "members_reaching": 0,
       "members_total": 230,
       "mismatch_min": null,
-      "public_timing_min": 45.0
+      "modelled_arrival_min": null,
+      "no_recorded_arrival_reason": "Kathmandu Post (27 Aug 2026): 'Bridges and other infrastructure between Rasuwa and Dhading were swept away'. An arrival time of about 45 minutes after the origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null.",
+      "recorded_arrival_min": null
     },
     "galchhi": {
       "fraction_reaching": 0.0,
+      "is_comparison_target": false,
       "members_reaching": 0,
       "members_total": 230,
       "mismatch_min": null,
-      "public_timing_min": 30.0
+      "modelled_arrival_min": null,
+      "no_recorded_arrival_reason": "Stage rise of up to 9 m within 30 minutes at the DHM Galchhi station (ICIMOD; Kathmandu Post); Malekhu downstream rose about 7 m over a similar period. The arrival clock time at Galchhi was not read, so arrival_time_min is null.",
+      "recorded_arrival_min": null
     },
     "rasuwagadhi-gyirong": {
       "fraction_reaching": 0.1957,
+      "is_comparison_target": false,
       "members_reaching": 45,
       "members_total": 230,
-      "mismatch_min": {
-        "closest_absolute": 7.36,
-        "max": 42.03,
-        "median": 14.43,
-        "min": 7.36,
-        "p25": 10.26,
-        "p75": 20.94
+      "mismatch_min": null,
+      "modelled_arrival_min": {
+        "closest_absolute": 14.86,
+        "max": 49.53,
+        "median": 21.93,
+        "min": 14.86,
+        "p25": 17.76,
+        "p75": 28.44
       },
-      "public_timing_min": 7.5
+      "no_recorded_arrival_reason": "USGS: the Rasuwagadhi border post was impacted; Kathmandu Post (27 Aug 2026): 'The Bhotekoshi rose with extraordinary speed at the Rasuwagadhi border crossing on Wednesday morning'. An arrival time of about 7.5 minutes after the ComCat origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null.",
+      "recorded_arrival_min": null
     },
     "syabrubesi": {
       "fraction_reaching": 0.0,
+      "is_comparison_target": true,
       "members_reaching": 0,
       "members_total": 230,
       "mismatch_min": null,
-      "public_timing_min": 13.5
+      "modelled_arrival_min": null,
+      "no_recorded_arrival_reason": null,
+      "recorded_arrival_min": {
+        "best": null,
+        "high": 13.0,
+        "low": 13.0,
+        "source_refs": [
+          "kp-2026-09-02-alert"
+        ],
+        "unit": "min"
+      }
     }
   },
   "production_cfl": 0.45,
-  "public_timings_min": {
-    "betrawati": 45.0,
-    "galchhi": 30.0,
-    "rasuwagadhi-gyirong": 7.5,
-    "syabrubesi": 13.5
-  },
   "solver": {
     "name": "serac-swe-voellmy",
     "version": "0.2.0"
@@ -6763,5 +6752,59 @@
     "segments": 499,
     "threshold_deg": 4.574,
     "threshold_mu": 0.08
-  }
+  },
+  "transect_targets": [
+    {
+      "absent_reason": "USGS: the Rasuwagadhi border post was impacted; Kathmandu Post (27 Aug 2026): 'The Bhotekoshi rose with extraordinary speed at the Rasuwagadhi border crossing on Wednesday morning'. An arrival time of about 7.5 minutes after the ComCat origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null.",
+      "arrival_best_min": null,
+      "arrival_high_min": null,
+      "arrival_low_min": null,
+      "arrival_notes": null,
+      "arrival_source_refs": [],
+      "arrival_unit": null,
+      "is_comparison_target": false,
+      "other_observations": [],
+      "transect_id": "rasuwagadhi-gyirong"
+    },
+    {
+      "absent_reason": null,
+      "arrival_best_min": null,
+      "arrival_high_min": 13.0,
+      "arrival_low_min": 13.0,
+      "arrival_notes": "Kathmandu Post (2 Sep 2026): 'the glacier collapsed at 8:37 AM on August 26' and 'at 8:50 AM, the flash flood swept away the gauge in the Bhotekoshi river in Rasuwa, at the Syabrubesi hydrological station' \u2014 the 13 minutes are the difference of the two stated clock times (Nepal time); press-only, no best",
+      "arrival_source_refs": [
+        "kp-2026-09-02-alert"
+      ],
+      "arrival_unit": "min",
+      "is_comparison_target": true,
+      "other_observations": [],
+      "transect_id": "syabrubesi"
+    },
+    {
+      "absent_reason": "Kathmandu Post (27 Aug 2026): 'Bridges and other infrastructure between Rasuwa and Dhading were swept away'. An arrival time of about 45 minutes after the origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null.",
+      "arrival_best_min": null,
+      "arrival_high_min": null,
+      "arrival_low_min": null,
+      "arrival_notes": null,
+      "arrival_source_refs": [],
+      "arrival_unit": null,
+      "is_comparison_target": false,
+      "other_observations": [],
+      "transect_id": "betrawati"
+    },
+    {
+      "absent_reason": "Stage rise of up to 9 m within 30 minutes at the DHM Galchhi station (ICIMOD; Kathmandu Post); Malekhu downstream rose about 7 m over a similar period. The arrival clock time at Galchhi was not read, so arrival_time_min is null.",
+      "arrival_best_min": null,
+      "arrival_high_min": null,
+      "arrival_low_min": null,
+      "arrival_notes": null,
+      "arrival_source_refs": [],
+      "arrival_unit": null,
+      "is_comparison_target": false,
+      "other_observations": [
+        "stage_rise_m 9 m (sources: icimod-2026-08-26-press-release, kp-2026-08-27-what-happened; best null)"
+      ],
+      "transect_id": "galchhi"
+    }
+  ]
 }

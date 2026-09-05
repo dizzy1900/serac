@@ -15,7 +15,10 @@ metadata:
     infra/docker/ravaflow/README.md. Cross-validation against r.avaflow is outstanding.
 
 spec:
-  command: ["serac", "runout", "run", "--repo", "/work", "--workers", "$(NPROC)"]
+  # Literal, not "$(NPROC)": the image entrypoint is exec-form (ENTRYPOINT ["serac"]), so no
+  # shell expands anything and a substitution token would reach the CLI as an argument. 8
+  # matches container.vcpu below and the per-worker memory basis beside it.
+  command: ["serac", "runout", "run", "--repo", "/work", "--workers", "8"]
   parallelism:
     members: 10000
     array_shards: 200          # 50 members per shard
@@ -24,7 +27,10 @@ spec:
       scheduling choice only. 50 keeps a shard under ~8 h at the measured 30 m cost.
 
   container:
-    image: ghcr.io/dizzy1900/serac:0.1.0     # built from infra/docker/Dockerfile
+    # Built from infra/docker/Dockerfile at the commit being run. Deliberately
+    # unresolvable: no serac image has been pushed to any registry, so there is no tag to
+    # pull. Build and tag it yourself (RELEASE_STATUS.md Known gap 68).
+    image: "<registry>/serac:<git-sha>"
     vcpu: 8
     memory_gib: 16
     basis: >-

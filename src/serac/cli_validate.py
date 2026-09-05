@@ -14,6 +14,7 @@ from typing import Any
 import typer
 
 from serac.validation.promote import (
+    APPROVAL_ENV_VAR,
     REQUIRED_SUITES,
     PromotionRefusedError,
     make_stamp,
@@ -41,6 +42,14 @@ REPLAY_DIR_OPTION = typer.Option(
     Path("reports/replay"), "--report-dir", help="Where replay reports are written."
 )
 PROMOTIONS_OPTION = typer.Option(Path("reports/promotion"), "--promotions-dir")
+# Promotion is a human decision. The env var is the channel `make promote` uses; the flag is
+# the same attestation typed directly. Neither has a default, so nothing can approve itself.
+APPROVED_BY_OPTION = typer.Option(
+    None,
+    "--approved-by",
+    envvar=APPROVAL_ENV_VAR,
+    help=f"Name of the person approving this promotion (or ${APPROVAL_ENV_VAR}).",
+)
 M2_REPORTS_OPTION = typer.Option(
     Path("reports/m2"), "--m2-dir", help="Where `serac lfh invert` wrote its run artefacts."
 )
@@ -238,12 +247,13 @@ def promote_command(
     repo: Path = REPO_OPTION,
     reports_dir: Path = REPORTS_OPTION,
     promotions_dir: Path = PROMOTIONS_OPTION,
+    approved_by: str | None = APPROVED_BY_OPTION,
 ) -> None:
-    """Refuse unless validate-serac passed at HEAD on a clean tree; write a promotion record."""
+    """Refuse unless the gates passed at HEAD on a clean tree and a human approved it."""
     try:
-        record = promote(repo, reports_dir, promotions_dir)
+        record = promote(repo, reports_dir, promotions_dir, approved_by)
     except PromotionRefusedError as exc:
         for blocker in exc.blockers:
             typer.echo(f"refused: {blocker}", err=True)
         raise typer.Exit(code=1) from exc
-    typer.echo(f"promotable: {record.git_sha}")
+    typer.echo(f"promotable: {record.git_sha} approved_by={record.approved_by}")

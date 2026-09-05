@@ -1,4 +1,4 @@
-# Langtang 2026 — comparison against public timings
+# Langtang 2026 — comparison against the recorded transect arrivals
 
 > NOT r.avaflow: flow depths, velocities and arrival times come from serac-swe-voellmy v0.2.0, a single-phase depth-averaged Voellmy-Salm solver implemented in this repository. r.avaflow could not be obtained (see infra/docker/ravaflow/README.md); cross-validation against r.avaflow is outstanding.
 
@@ -8,59 +8,54 @@ comparison ran (design hash `ce679a8f93002433a4ca8d8e4608e53208fba023ea1ac494377
 was selected, weighted or removed on the basis of these numbers. `validate-runout` greps this
 file for the vocabulary that would describe it otherwise.
 
-## The public figures
+## What the event record holds
 
-The four timings below are **press-attributed** figures for an event with no peer-reviewed
-source as of September 2026. In `data/events/langtang-lhende-2026.json` the corresponding
-fields carry `best: null` for exactly that reason. They are quoted here as the comparison
-target.
+Every observed figure below is read from `data/events/langtang-lhende-2026.json` and none is written
+in the code that produced this file. The record holds an arrival time for
+**1 of 4 transects**, and that is what the comparison
+compares against. Modelled arrivals come from modelled_arrival_min recorded in reports/runout/langtang_sanity.json (the per-member rasters were not on disk; no modelled number was recomputed).
 
-| Transect | Public timing (min after detachment) |
-|---|---|
-| `rasuwagadhi-gyirong` | ~7.5 |
-| `syabrubesi` | ~13-14 (midpoint 13.5 used) |
-| `betrawati` | ~45 |
-| `galchhi` | +9 m stage in ~30 |
+| Transect | Recorded arrival (min after detachment) | `best` | Sources |
+|---|---|---|---|
+| `syabrubesi` | 13 | null | `kp-2026-09-02-alert` |
 
-## Mismatch across the whole ensemble
+`best` is `null` for every one of them: the record carries the figure and its sources without asserting a preferred value, because no source qualifies to set one. The comparison uses the recorded `low`-`high` interval, not a midpoint of it.
 
-Positive means the model arrives **later** than the public figure.
+### Transects with no recorded arrival time
 
-| Transect | Public | Reaching | Mismatch range (min) | Median | Closest abs |
+These are **not** comparison targets. The event library examined the figures that circulate for
+them and declined to record them; the reason below is the record's own sentence. Quoting one of
+these numbers here as a target would be asserting a provenance the record refuses.
+
+| Transect | What the record does hold | Why there is no arrival time |
+|---|---|---|
+| `rasuwagadhi-gyirong` | — | USGS: the Rasuwagadhi border post was impacted; Kathmandu Post (27 Aug 2026): 'The Bhotekoshi rose with extraordinary speed at the Rasuwagadhi border crossing on Wednesday morning'. An arrival time of about 7.5 minutes after the ComCat origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null. |
+| `betrawati` | — | Kathmandu Post (27 Aug 2026): 'Bridges and other infrastructure between Rasuwa and Dhading were swept away'. An arrival time of about 45 minutes after the origin circulates publicly without attribution; no retrieved source states it, so arrival_time_min is null. |
+| `galchhi` | stage_rise_m 9 m (sources: icimod-2026-08-26-press-release, kp-2026-08-27-what-happened; best null) | Stage rise of up to 9 m within 30 minutes at the DHM Galchhi station (ICIMOD; Kathmandu Post); Malekhu downstream rose about 7 m over a similar period. The arrival clock time at Galchhi was not read, so arrival_time_min is null. |
+
+## Modelled arrivals across the whole ensemble
+
+Solver output over 230 members. No observation enters this table.
+
+| Transect | Reaching | Modelled arrival range (min) | Median | Compared |
+|---|---|---|---|---|
+| `betrawati` | 0 / 230 | not reached by any member | — | no (no recorded arrival) |
+| `galchhi` | 0 / 230 | not reached by any member | — | no (no recorded arrival) |
+| `rasuwagadhi-gyirong` | 45 / 230 | 14.86 to 49.53 | 21.93 | no (no recorded arrival) |
+| `syabrubesi` | 0 / 230 | not reached by any member | — | yes |
+
+## Mismatch against the recorded arrivals
+
+Positive means the model arrives **later** than the recorded interval; a modelled arrival inside
+the recorded interval scores 0. Only the transects above with a recorded arrival appear here.
+
+| Transect | Recorded | Reaching | Mismatch range (min) | Median | Closest abs |
 |---|---|---|---|---|---|
-| `rasuwagadhi-gyirong` | 7.5 | 45 / 230 | +7.36 to +42.03 | +14.43 | 7.36 |
-| `syabrubesi` | 13.5 | 0 / 230 | not reached by any member | — | — |
-| `betrawati` | 45.0 | 0 / 230 | not reached by any member | — | — |
-| `galchhi` | 30.0 | 0 / 230 | not reached by any member | — | — |
+| `syabrubesi` | 13 | 0 / 230 | not reached by any member | — | — |
 
 ## Closest member
 
-Run `m0067-r060`, which reached 1 of the four transects
-with a mean absolute mismatch of 7.36 minutes.
-
-| Transect | Modelled arrival (min) | Mismatch (min) |
-|---|---|---|
-| `rasuwagadhi-gyirong` | 14.86 | +7.36 |
-| `syabrubesi` | not reached | — |
-| `betrawati` | not reached | — |
-| `galchhi` | not reached | — |
-
-Its parameters, for the record and for no other purpose:
-
-```json
-{
-  "critical_shear_pa": 500.0,
-  "entrainment_coefficient": 0.0009670823467262679,
-  "ice_fraction": 0.39434782608695657,
-  "mu": 0.04808186389857888,
-  "release_elevation_band_m": [
-    3645.6521739130435,
-    4433.478260869565
-  ],
-  "release_volume_m3": 272019630.62978584,
-  "xi_m_s2": 349.8794280098329
-}
-```
+**No member reached a transect the event record holds an arrival time for** (`syabrubesi`), so there is no closest member and no mismatch to report. A member that reaches a transect with no recorded arrival has produced nothing to compare: the modelled arrivals for those transects are in the table above, and they are the model's own output, not a match to an observation.
 
 ## What the mismatch is telling you
 

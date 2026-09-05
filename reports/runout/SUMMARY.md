@@ -139,5 +139,7 @@ Splits are by `run_id` and disjoint: True
 inside the published range for rock-ice avalanches and debris flows. The figure is read from
 `terrain.json`, never written here. A single-phase Voellmy rheology
 therefore stops far short of the ~100 km the 26 August 2026 cascade is reported to have
-travelled. The comparison against the public timings, and the full mismatch distribution, are in
+travelled. The comparison against the transect arrival times the **event record** holds — one of
+the four transects; the other three carry `arrival_time_min: null` and the record's reason for
+refusing the figures that circulate for them — and the full mismatch distribution, are in
 `langtang_sanity.md`; nothing was adjusted as a result of it.

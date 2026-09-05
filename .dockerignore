@@ -1,0 +1,11 @@
+# Build context for infra/docker/Dockerfile. The image needs pyproject.toml, uv.lock, README.md,
+# LICENSE and src/ and nothing else; data/ and baselines/ are DVC-managed and are mounted at
+# /work at run time, never baked in.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+!src/
+src/**/__pycache__/
+src/**/*.pyc

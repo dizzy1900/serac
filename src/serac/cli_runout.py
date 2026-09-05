@@ -176,7 +176,9 @@ def train_command(
     aoi: AoiOpt = DEFAULT_AOI,
     reports_dir: ReportsOpt = None,
     epochs: Annotated[int, typer.Option()] = 300,
-    device: Annotated[str, typer.Option(help="cpu or mps.")] = "cpu",
+    device: Annotated[
+        str, typer.Option(help="Any torch device: cpu, mps, or cuda on a GPU host.")
+    ] = "cpu",
 ) -> None:
     """Train the corridor FNO and transect regressor; write `surrogate_metrics.json`."""
     from serac.models.runout.training import train_and_evaluate
@@ -198,11 +200,27 @@ def langtang_command(
     repo: RepoOpt = Path("."),
     aoi: AoiOpt = DEFAULT_AOI,
     reports_dir: ReportsOpt = None,
+    from_artifact: Annotated[
+        bool,
+        typer.Option(
+            "--from-artifact",
+            help=(
+                "Re-derive the comparison from the modelled arrivals already recorded in "
+                "langtang_sanity.json, for a clone without the DVC-tracked per-member rasters. "
+                "Recomputes no modelled number."
+            ),
+        ),
+    ] = False,
 ) -> None:
     """Write the Langtang sanity check: the closest member and the full mismatch distribution."""
     from serac.models.runout.langtang import write_sanity_check
 
-    path = write_sanity_check(repo, aoi_id=aoi, reports_dir=_reports(repo, reports_dir))
+    path = write_sanity_check(
+        repo,
+        aoi_id=aoi,
+        reports_dir=_reports(repo, reports_dir),
+        from_artifact=from_artifact,
+    )
     typer.echo(f"report: {path}")
 
 

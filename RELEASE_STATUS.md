@@ -24,7 +24,11 @@ Consequences, all intended:
   suites. The most recent promotion record, `reports/promotion/71f3426c….json`, is from before
   any Prompt 2 component existed. **Nothing has been promoted since.** `discriminator` is one of
   the suites the stamp requires, so no fix to the harness can make `promote` reachable while
-  this criterion is unmet.
+  this criterion is unmet. **`promote` now also refuses without a named human**: it takes an
+  approver from `PROMOTE_APPROVED_BY` (or `--approved-by`), writes that name into the promotion
+  record, and rejects placeholders such as `1`, `yes`, `ci` or `bot`. Nothing defaults it — not
+  the Makefile, not `.env.example`, not CI — so no automated path can promote anything. The
+  gates say a tree *may* be promoted; only a person says it *is*.
 - **CI now runs the gates, and a green tick still means less than it looks.**
   `.github/workflows/ci.yml` runs `ruff`, `mypy --strict`, the offline test suite, every
   validation suite and `underwriting-check`. The gate step passes `--allow-unmet` naming the two
@@ -44,12 +48,13 @@ Consequences, all intended:
 | `validate-contracts` | 26 | pass (22 contracts) |
 | `validate-lfh` | 22 | pass |
 | **`validate-discriminator`** | **24** | **FAIL — 2 unmet criteria, 4 warnings** |
-| `validate-runout` | 27 | pass (1 warning: arrival coverage 0.794) |
+| `validate-runout` | 30 | pass (1 warning: arrival coverage 0.794) |
 | `validate-watch` | 36 | pass (1 warning: transient rows) |
 | `validate-e2e` | 15 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
-| **total** | **385** | |
+| **total** | **388** | |
 
-`make test` passes: **1,271 offline tests**, network blocked.
+`make test` passes: **1,418 offline tests**, network blocked (1,316 before the documentation
+checks of gap 72; 1,388 before the provenance checks of gap 73).
 
 **No serac model is validated against events, and none has been promoted.** Four of the five
 components returned a negative or a refusal on the motivating event (Langtang Lirung / Lhende
@@ -93,6 +98,10 @@ entry. Ordered by what blocks the most.
   copies have not been merged.
 - **Gap 61 — no job manifest in `infra/jobs/` has ever been executed.** Every core-hour and
   storage figure in them is an estimate with a stated basis, never a measurement.
+- **Gap 68 — the deployment image is unpublished and single-architecture.**
+  `infra/docker/Dockerfile` now exists, builds and runs, but only on `linux/arm64` and only in
+  its base form; nothing has been pushed to any registry and no GPU variant has ever been
+  built, so submitting any manifest still needs an operator to build and tag the image first.
 
 **Cheap and worth doing**
 
@@ -146,15 +155,16 @@ Prompt 2.
 | Detector **stub** (`detector_stub.py`) | yes | yes (placeholder LP/SP ratio, threshold 10 untuned) | yes (golden on chamoli-2021) | n/a | **no — fires on pre-event background noise in both real fixtures** | no |
 | CAP 1.2 renderer + **stub** + XSD validation | yes | yes | yes (offline XSD) | n/a | n/a | no |
 | Replay + latency report (`serac replay`) | yes | yes | yes (chamoli-2021, langtang-2026, synthetic-lp-burst) | no | plumbing only — **defaults to `DetectorStub`**; `--detector discriminator` runs the real model, `serac stream run` cannot | no |
-| Validation harness (`validate-*`, `validate-serac`, `promote`) | yes | yes | yes (**11 suites, 385 checks**) | n/a | n/a | no |
+| Validation harness (`validate-*`, `validate-serac`, `promote`) | yes | yes | yes (**11 suites, 385 checks**; `promote` additionally requires a named human in `PROMOTE_APPROVED_BY`) | n/a | n/a | no |
 | `underwriting-check` (runs the Lhende avoided-loss table) | yes | yes | yes | n/a | n/a | no |
 | Ingest port + `BaseIngestAdapter` (dry-run, 5 GiB gate, credentials path, ledger) | yes | yes | yes | n/a | n/a | no |
 | Seismic contracts (`SeismicTrace`, `Envelope`+codec, `DetectionCandidate`, `ForceHistory`, `CAPMessage`, `ReplayReport`) | yes | yes | yes | n/a | no | no |
 | ObsPy MiniSEED codec + `Stage`/`Pipeline`/`Clock` skeleton | yes | yes | yes (round-trips the 4 real fixtures) | n/a | no | no |
 | Fixtures: seismic, ComCat, CAP XSDs, DEM crops, S2 crops, S1/NISAR/CDSE listings, ESEC, LFH LH? sets | fetched 2026-09-03, sha256 in ledger | real | integrity tests | n/a | n/a | n/a |
 | Docker Compose (`infra/docker/compose.yaml`) | yes | yes (file) | no | no | n/a | no |
-| Job manifests (`infra/jobs/*.yaml`, 6 files) | ADR-0014 | yes (files) | n/a | **no — none has ever been executed** | n/a | no |
-| Governance docs (CLAUDE.md, ARCHITECTURE, ADRs, CREDENTIALS, DATA_SOURCES, EVENT_LIBRARY) | yes | yes | n/a | n/a | n/a | n/a |
+| Deployment image (`infra/docker/Dockerfile`) | ADR-0014 | yes | yes (`tests/unit/test_deployment_image.py`: frozen lockfile, `serac` entrypoint, Python pin, build context, manifest image references) | **built and run 2026-09-04 — `linux/arm64` only; `serac --version` and a contracts drift check pass inside the container; never pushed to any registry** | n/a | no |
+| Job manifests (`infra/jobs/*.yaml`, 7 files) | ADR-0014 | yes (files) | yes (`tests/unit/test_job_manifests.py`: every `command` resolves against the `serac` CLI, the `aws:` sketch is the same argv, README listing, cost bases, `status: designed`) | **no — none has ever been executed** | n/a | no |
+| Governance docs (CLAUDE.md, ARCHITECTURE, ADRs, CREDENTIALS, DATA_SOURCES, EVENT_LIBRARY) | yes | yes | yes — every prose document (`tests/unit/test_docs_consistency.py`: paths resolve, no false absence claim, nothing in the tree deferred), plus DATA_SOURCES against the ledger (`tests/unit/test_data_sources_doc.py`) and ARCHITECTURE against the tree, the CLI and the latency report (`tests/unit/test_architecture_doc.py`) | n/a | n/a | n/a |
 
 ### M1 — seismic mass-movement discriminator
 
@@ -192,10 +202,10 @@ Prompt 2.
 |---|---|---|---|---|---|---|
 | `serac-swe-voellmy` v0.2.0 solver (**NOT r.avaflow**) | yes (card) | yes | yes (9 verification cases: mass 1.8e-16, lake-at-rest exact, Ritter L1 falls monotonically) | n/a | **no — no independent simulator exists to cross-validate against; r.avaflow unobtainable** | no |
 | r.avaflow Docker image (`infra/docker/ravaflow/`) | yes | **no — acquisition failed, recorded with dates and URLs** | n/a | n/a | n/a | no |
-| Frozen 230-member ensemble (222 at 60 m, 8 at 30 m; design hash `ce679a8f…`) | yes (card) | yes | yes (`validate-runout` 27 checks) | n/a | **no — 45 of 230 members reach `rasuwagadhi-gyirong`; 0 of 230 reach `syabrubesi`, `betrawati` or `galchhi`** | no |
+| Frozen 230-member ensemble (222 at 60 m, 8 at 30 m; design hash `ce679a8f…`) | yes (card) | yes | yes (`validate-runout` 30 checks) | n/a | **no — 45 of 230 members reach `rasuwagadhi-gyirong`; 0 of 230 reach `syabrubesi`, `betrawati` or `galchhi`** | no |
 | Corridor FNO surrogate + transect regressor v0.1.0 | yes (card) | yes | yes | n/a | **no — 4 of 5 gates pass; 5–95 % arrival coverage 0.794 against a 0.85–0.95 target** | no |
 | Cascade rules v0 (damming index, parametric breach) | yes (card) | yes | yes | n/a | **no — logistic midpoint and scale were chosen, not estimated; no dam inventory for this corridor** | no |
-| Langtang sanity comparison against public timings | yes (card) | yes | yes | n/a | **comparison only, never a calibration — closest member arrives at 14.86 min against a reported ~7.5 min at the one transect reached** | no |
+| Langtang sanity comparison against the recorded transect arrivals | yes (card) | yes | yes | n/a | **comparison only, never a calibration — and there is nothing to compare: the event record holds an arrival time for one of the four transects (`syabrubesi`, 13 min) and no member reaches it. 45 of 230 members reach `rasuwagadhi-gyirong`, where the record holds no arrival time** | no |
 
 ### M5 — avoided loss and alerting
 
@@ -236,8 +246,20 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
    **zero** of those 57 events are in the built M1 store. The bug is fixed; the store predates
    the fix and was deliberately not rebuilt (`reports/m1/build.json`, note 1).
 7. **Langtang 2026 figures are largely press-attributed.** No peer-reviewed source exists yet;
-   volume is `null`, and press-derived ranges carry `best: null`. The four public transect
-   timings M4 compares against are in this class.
+   volume is `null`, and press-derived ranges carry `best: null`. ~~The four public transect
+   timings M4 compares against are in this class.~~ **Corrected 2026-09-04:** that sentence was
+   wrong, and in the direction that flattered the repository. The record holds an arrival time
+   for **one** of the four transects — `syabrubesi`, 13 min, the difference between two clock
+   times the Kathmandu Post states, `best: null`. `rasuwagadhi-gyirong` and `betrawati` carry
+   `arrival_time_min: null` because the ~7.5 min and ~45 min figures that circulate publicly
+   have no retrievable source (`docs/EVENT_LIBRARY.md`, "Figures seen and deliberately not
+   entered"), and `galchhi` holds a **+9 m stage rise over 30 minutes**, which is not an arrival
+   time. M4 nevertheless held all four as a `PUBLIC_TIMINGS_MIN` literal in
+   `src/serac/models/runout/langtang.py` and described them as press-attributed. The literal is
+   gone: `serac.models.runout.observed` derives every comparison target from the record, and
+   `validate-runout` re-derives them and fails if a committed artifact carries anything the
+   record does not (`langtang_targets_come_from_the_event_record`,
+   `langtang_sanity_md_renders_from_its_json`).
 8. **The seismic and ComCat fixture ledger rows carry no `event_id`/`aoi_id`**, so those
    columns show `-` in `serac events report`; the ledger is append-only and was not rewritten.
 9. **517 HyP3 ledger rows are transient.** 20.05 GB of product zips were hashed on arrival,
@@ -451,11 +473,18 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
     endpoint. No live SeedLink stream has ever reached this code.
 59. **Redis Streams untested against a live server.** `RedisStreamsBus` is unit-tested with
     fakeredis only; the `redis`-marked test has never run.
-60. **Docker Compose untested on the dev machine.** No Docker is installed there.
+60. **Docker Compose has never been run.** This entry previously read "no Docker is installed
+    on the dev machine"; that stopped being true on 2026-09-04, when the deployment image was
+    built and run there (Docker Engine 29.7.2). `compose.yaml` itself has still never been
+    brought up, so the Redis service, its healthcheck and its volume are all unverified and
+    `RedisStreamsBus` remains fakeredis-only (gap 59).
 61. **No job manifest has ever been executed.** Every `estimated_core_hours` figure is an
     estimate with a stated basis. The README's table now lists all seven manifests, and
     `tests/unit/test_job_manifests.py` fails if one is added without being listed, if a cost
-    figure carries no basis, or if a manifest claims to have been executed.
+    figure carries no basis, or if a manifest claims to have been executed. Since gap 69 the
+    same test also resolves every manifest's argv against the installed CLI, so "never
+    executed" no longer implies "never checked": the commands are known to parse, and what is
+    unknown is what they cost and produce when run.
 62. **`SourceRef` exists twice** — `domain/common.py` for the event library and
     `models/lfh/references.py` for the force-history references. The LFH copy carries extra
     resolution provenance, so they are not redundant, but the duplication let a review fix land
@@ -477,3 +506,158 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
     because promotion is blocked by gap-free reasons above, but it must be resolved — by
     excluding the volatile fields from the committed artefacts, or by not tracking them — before
     any component can be promoted.
+67. **The one promotion record on disk names no approver.**
+    `reports/promotion/71f3426c0d2316448647e4b9233c10fbed08dc5a.json` was written on
+    2026-09-03, before `promote` required `PROMOTE_APPROVED_BY`, so it has no `approved_by`
+    field. It is left exactly as written: filling one in now would be inventing a fact about
+    who approved that tree. `PromotionRecord` requires the field, so this is the last record
+    that can ever lack one, and any reader of that file should treat its promotion as
+    unattributed rather than as approved by anybody in particular.
+68. **The deployment image has never been published, and has been built for one
+    architecture.** Until 2026-09-04 the tree had no `Dockerfile` at all: CLAUDE.md
+    non-negotiable 5, ADR-0014 and `docs/ARCHITECTURE.md` all named a plain Docker image as the
+    deployment unit, `infra/docker/README.md` said the `Dockerfile` was "not part of Prompt 1",
+    and three Prompt 2 manifests named `ghcr.io/dizzy1900/serac:0.1.0`, one of them annotated
+    "built from infra/docker/Dockerfile" — a tag nobody had pushed, built from a file that did
+    not exist. `infra/docker/Dockerfile` now exists and was built and exercised (see the build
+    record in `infra/docker/README.md`): `serac --version` reports `serac 0.1.0` inside the
+    container, and `schema export --check` in the container reproduces all 22 committed
+    contracts. What is still **not** true, and is what this entry is about:
+
+    * **Nothing has been pushed to any registry.** No job manifest can be submitted without an
+      operator building and tagging the image first. The manifests therefore name the
+      unresolvable placeholder `<registry>/serac:<git-sha>` rather than a tag that would fail
+      with `manifest unknown`.
+    * **Only `linux/arm64` was built.** Every `aws:` annotation in `infra/jobs/` assumes amd64,
+      and the arm64 build already had to compile `obspy` from its sdist for want of a wheel; an
+      amd64 build has never been attempted.
+    * **The ML variant has not been built.** The two GPU manifests want the image with
+      `--extra ml --extra surrogate`; only the base image exists, and no GPU host has run it.
+
+    `tests/unit/test_deployment_image.py` fails if the `Dockerfile` disappears, if it installs
+    anything outside `uv sync --frozen`, if the entrypoint stops being `serac`, if a manifest
+    names a resolvable image reference without `image_published:` provenance beside it, or if
+    any `infra/` file points at a repository path that does not exist.
+69. ~~**Two job manifests named CLI flags that never existed.**~~ Fixed 2026-09-04.
+    `hyp3-insar-batch.yaml` told an operator to run `serac ingest hyp3 --watch --confirm-bytes
+    N` and `s1-stack.yaml` to run `serac ingest s1 --product GRD --confirm-bytes N`, and both
+    repeated the same argv in their `aws.batch_job_definition` sketches. The CLI has never had
+    `--watch`, `--product` or `--confirm-bytes`, and neither command carried `--yes`, so all
+    four would have exited non-zero on start; `s1-stack.yaml` also passed `--relative-orbit ""`
+    to an integer option, and `runout-ensemble-10k.yaml` passed `--workers "$(NPROC)"`, which
+    the exec-form `ENTRYPOINT ["serac"]` never expands. Both EO files opened with `# NOTE: the
+    CLI flags below are PROPOSED; reconcile with serac ingest when the adapters land`; the
+    adapters landed in Prompt 1 and the note stayed. The commands are now the real ones, the
+    notes are gone, and `tests/unit/test_job_manifests.py` resolves every `command` and
+    `followup_command` in every manifest against the installed CLI — sub-command, flags and
+    the manifest's own parameter values — requires the `aws:` sketch to be that same argv with
+    `${param}` written `Ref::param`, rejects a substitution no shell is there to expand, and
+    requires an ingest job to carry exactly one of `--dry-run`/`--yes`. The manifests remain
+    unexecuted (gap 61): this establishes that they would start, not that they would finish.
+
+    Two consequences of the real CLI are now written into the manifests rather than papered
+    over by the invented flag. `--confirm-bytes` was standing in for a non-interactive way past
+    the 5 GiB ask-first gate; there is none, and adding one would weaken non-negotiable 7. So
+    `s1-stack.yaml` records that a task must be sharded until its estimate is under the gate or
+    be run with a stdin attached, and `hyp3-insar-batch.yaml` records that HyP3 publishes no
+    product size before a job completes — the plan's estimate is `null`, the gate therefore
+    asks on **every** run, and only its `followup_command` (`--poll`, which submits nothing and
+    downloads jobs already confirmed at submission) can run unattended.
+70. ~~**`docs/DATA_SOURCES.md` described a tree that had moved on.**~~ Fixed 2026-09-04. Four
+    ledger sources had no section at all — `iris_syngine` (419 rows), `esec_spud` (6),
+    `rgi_glaciers` (11) and `simulation_output` (1,591) — as did the burst-InSAR adapter behind
+    3,619 fetched `hyp3_insar` rows, and `vendored_schema`. Two of the five FDSN data centres
+    serac fetched from (RESIF, INGV) and a third that appears only in the ledger (ORFEUS) were
+    absent from the FDSN heading, which named EarthScope and GEOFON only. Nine cells still
+    tagged modules and fixtures "(planned)" that had been committed for weeks — the FDSN,
+    SeedLink, ComCat, Overpass and `sources fetch` adapters, and the DEM, seismic, ComCat and
+    Overpass fixtures. Two sentences said `h5py` was absent from the locked environment while
+    `h5py` 3.16.0 was installed (gap 13 had already been corrected and the data-source document
+    had not). One cell said "no real HyP3 product in the tree" beside 3,102 retained AOI crops,
+    and the Sentinel-1 cell explained the synthetic cube layers by "until someone fetches"
+    rather than by gap 11, which is the real reason.
+
+    The document is now checked rather than trusted. `tests/unit/test_data_sources_doc.py`
+    fails if a `source` or an `adapter` value that has written a ledger row has no section, if
+    `DataSource` and the documented `Ledger source` rows differ in either direction, if a host
+    serac fetched bytes from is not named, if a module under `adapters/eo`, `adapters/seismic`
+    or `adapters/hydro` is neither documented nor listed as reading no source, if a repository
+    path cited there does not exist, if something already in the tree is still tagged as future
+    work, or if a claim that the environment lacks a package names one that imports. Every one
+    of the failures above is caught by one of those nine checks. What the test cannot check is
+    whether prose is *true* — only whether it is consistent with the ledger and the tree.
+71. **The `SLC-BURST` listing cache is written under `data/` with no ledger row.**
+    `src/serac/adapters/eo/asf_bursts.py` writes
+    `data/interim/watch/bursts/<aoi>_<start>_<end>.json` and appends no `ManifestEntry`, while
+    CLAUDE.md's fixture policy says nothing may be written under `data/` without one. Its
+    docstring claimed the listings were ledgered; that sentence was wrong and has been
+    corrected rather than the ledger backfilled, because the listing is the input to the frozen
+    M3 track-selection rule and a row written now would carry a retrieval time and a checksum
+    for bytes fetched on 2026-09-03. Found while reconciling `docs/DATA_SOURCES.md` against the
+    ledger (gap 70). The listing files themselves are DVC-tracked and are not in git.
+72. ~~**`docs/ARCHITECTURE.md` described the tree of the previous prompt.**~~ Fixed 2026-09-04.
+    Dated 2026-09-03 and never revised when M1–M5 merged, it said the LFH inversion and the
+    cascade surrogate were `planned (P2)` with their "module path decided in Prompt 2" while
+    `src/serac/models/lfh/`, `src/serac/models/runout/` and `src/serac/cascade/` were on `main`;
+    that there were 18 contracts (22) and 6 validation suites (11); that `ForceHistory` was
+    interfaces only with `status: not_implemented` and avoided loss would be "populated in P2",
+    after M2 and M5 had populated both; that NetCDF-4 reads need `h5py`, "not in the lock",
+    which ships `h5py` 3.16.0; that HyP3 had been "exercised with a fake HyP3 only" against
+    4,136 real ledger rows and 517 jobs submitted to the live service; and that "Prompt 2 owns"
+    a latency measurement Prompt 2 had made. Nine packages — `src/serac/models/` and its four
+    component packages, `src/serac/cascade/`, `src/serac/alerting/`,
+    `src/serac/adapters/alerting/`, `src/serac/adapters/tracking/` and
+    `src/serac/pipelines/layers/` — had no row at all, and six CLI sub-apps were missing from
+    the entrypoint's list.
+
+    The document now carries a dated revision, a new section 3.4 for the five model components,
+    a rewritten section 4.2 for the lane as it actually runs, and a section 4.3 that reports the
+    **measured** detection latency (210 s `sliding_180s`, 540 s `batch_600s`, against a 60 s
+    budget and floors of 153 s and 573 s, gap 20) instead of promising the measurement.
+
+    The deeper failure was that gap 70's fix was written for one document. Three of its checks
+    were never specific to `docs/DATA_SOURCES.md` — paths resolve, nothing already in the tree
+    is tagged as future work, no claim that the environment lacks a package it imports — and
+    `docs/ARCHITECTURE.md` drifted all three ways because nothing generic existed. Those three
+    now live in `tests/unit/doc_claims.py` and run against **every** prose document from
+    `tests/unit/test_docs_consistency.py`, which also fails if a new document appears under
+    `docs/` and is not listed. ADRs and model cards are dated records and are checked for paths
+    and absence claims but never for deferrals; this file is checked for paths only, because it
+    quotes the wording of the claims it has corrected and a checker cannot tell a quoted mistake
+    from a fresh one. On top of those, `tests/unit/test_architecture_doc.py` asserts that every
+    package under `src/serac/` and every command on the `serac` app is named, that the stated
+    contract and suite counts equal `contracts/` and `REQUIRED_SUITES`, that every `Status` cell
+    carries a tag the document's own legend defines, that nothing the ledger shows has fetched
+    real bytes is described as exercised against a fake, and that the latency figures match
+    `reports/m1/latency_chamoli-2021.json`. Running the same checks over the rest of the tree
+    also caught a CLAUDE.md path that pointed at src/validation/ rather than
+    `src/serac/validation/`, README's "Models come later" and
+    its `ADR-0001 … ADR-0015` range, and a README bullet still calling the detector "planned".
+    What none of it checks is whether the prose is true — only whether it is consistent with the
+    tree.
+
+73. ~~**M4 compared against four transect timings the event record does not hold.**~~ Fixed
+    2026-09-04. `src/serac/models/runout/langtang.py` held
+    `PUBLIC_TIMINGS_MIN = {rasuwagadhi-gyirong: 7.5, syabrubesi: 13.5, betrawati: 45.0,
+    galchhi: 30.0}` with a docstring saying the same figures carried `best: null` in
+    `data/events/langtang-lhende-2026.json`, `reports/runout/langtang_sanity.md` called them
+    "press-attributed figures", and Known gap 7 above said the four timings M4 compares against
+    are press-derived ranges. The record holds **one** of them. Rasuwagadhi and Betrawati carry
+    `arrival_time_min: null` with the record's own sentence — the figures circulate publicly
+    without attribution and no retrieved source states them — Galchhi's 30 minutes is the window
+    of a +9 m stage rise rather than an arrival, and 13.5 was a midpoint of a span the record
+    does not carry either (it holds 13). Two unattributed numbers were being reported as
+    provenanced observations, and the mismatch table quoted a distance from one of them.
+
+    The literal is gone rather than corrected, because a literal cannot be checked against
+    anything. `src/serac/models/runout/observed.py` derives every comparison target from the
+    event record through `MassMovementEvent`: a transect becomes a target only where the record
+    holds an `arrival_time_min` `Range`, the mismatch is the signed distance from the recorded
+    `low`–`high` interval rather than from a midpoint nobody published, and a transect the
+    record leaves `null` carries the record's reason into the report instead of a number. Two
+    new gates in `validate-runout` keep it that way: `langtang_targets_come_from_the_event_record`
+    re-derives the targets and fails on any bound or `source_ref` the record does not hold, and
+    `langtang_sanity_md_renders_from_its_json` re-renders the write-up from its own artifact, so
+    the prose cannot drift from the gated payload by hand. The comparison now has one target
+    (`syabrubesi`, 13 min) that **no member reaches**, which is a weaker result than the one the
+    report used to state; `reports/runout/langtang_sanity.md` says so.

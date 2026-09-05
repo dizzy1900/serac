@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -260,3 +261,95 @@ def test_a_missing_frozen_solver_version_fails_the_gate(repo: Path) -> None:
     result = run_suite(repo, reports_dir=reports)
 
     assert _check(result, "ensemble_solver_version_matches").failed
+
+
+# -- the comparison targets must be the event record's ----------------------------------------
+#
+# M4 used to hold four transect timings as a literal in its own source, two of which the event
+# record explicitly refuses (no retrievable source states them) and one of which is a stage-rise
+# window rather than an arrival. Nothing in the suite could see that, because nothing compared
+# the artifact with the record. These two gates do.
+
+
+@pytest.fixture
+def repo_with_record(repo: Path, repo_root: Path) -> Path:
+    """The passing repository plus the committed event record and its committed comparison."""
+    events = repo / "data" / "events"
+    events.mkdir(parents=True)
+    shutil.copy(repo_root / "data" / "events" / "langtang-lhende-2026.json", events)
+    for name in ("langtang_sanity.json", "langtang_sanity.md"):
+        shutil.copy(repo_root / "reports" / "runout" / name, repo / "reports" / "runout" / name)
+    return repo
+
+
+def test_a_comparison_that_matches_its_record_passes(repo_with_record: Path) -> None:
+    result = run_suite(repo_with_record, reports_dir=repo_with_record / "reports" / "runout")
+
+    assert _check(result, "langtang_targets_come_from_the_event_record").ok
+    assert _check(result, "langtang_sanity_md_renders_from_its_json").ok
+    assert result.passed, [c.name for c in result.checks if c.failed]
+
+
+def test_a_target_the_record_refuses_fails_the_gate(repo_with_record: Path) -> None:
+    """The original defect: ~7.5 min at Rasuwagadhi, which the record records as unattributed."""
+    reports = repo_with_record / "reports" / "runout"
+    payload = json.loads((reports / "langtang_sanity.json").read_text(encoding="utf-8"))
+    payload["transect_targets"].append(
+        {
+            "transect_id": "rasuwagadhi-gyirong",
+            "is_comparison_target": True,
+            "arrival_low_min": 7.5,
+            "arrival_high_min": 7.5,
+            "arrival_best_min": None,
+            "arrival_unit": "min",
+            "arrival_source_refs": ["kp-2026-08-27-what-happened"],
+            "arrival_notes": None,
+            "absent_reason": None,
+            "other_observations": [],
+        }
+    )
+    (reports / "langtang_sanity.json").write_text(json.dumps(payload), encoding="utf-8")
+
+    result = run_suite(repo_with_record, reports_dir=reports)
+
+    assert not result.passed
+    failed = _check(result, "langtang_targets_come_from_the_event_record")
+    assert failed.failed
+    assert "rasuwagadhi-gyirong" in failed.details
+
+
+def test_prose_that_drifts_from_the_artifact_fails_the_gate(repo_with_record: Path) -> None:
+    """The write-up is a pure function of the payload, so any hand-edit is caught."""
+    path = repo_with_record / "reports" / "runout" / "langtang_sanity.md"
+    path.write_text(
+        path.read_text(encoding="utf-8")
+        + "\nThe four timings above are press-attributed figures.\n",
+        encoding="utf-8",
+    )
+
+    result = run_suite(repo_with_record, reports_dir=repo_with_record / "reports" / "runout")
+
+    assert not result.passed
+    assert _check(result, "langtang_sanity_md_renders_from_its_json").failed
+
+
+def test_an_artifact_in_the_old_shape_fails_the_gate(repo_with_record: Path) -> None:
+    """An artifact with no `transect_targets` block cannot show where its figures came from."""
+    reports = repo_with_record / "reports" / "runout"
+    payload = json.loads((reports / "langtang_sanity.json").read_text(encoding="utf-8"))
+    payload.pop("transect_targets")
+    payload["public_timings_min"] = {"rasuwagadhi-gyirong": 7.5, "syabrubesi": 13.5}
+    (reports / "langtang_sanity.json").write_text(json.dumps(payload), encoding="utf-8")
+
+    result = run_suite(repo_with_record, reports_dir=reports)
+
+    assert _check(result, "langtang_targets_come_from_the_event_record").failed
+
+
+def test_a_repository_without_the_event_record_warns_rather_than_passing(repo: Path) -> None:
+    """No record means nothing to check the comparison against, and the suite must say so."""
+    result = run_suite(repo, reports_dir=repo / "reports" / "runout")
+
+    warning = _check(result, "langtang_event_record_present")
+    assert not warning.ok
+    assert warning.severity == "warning"

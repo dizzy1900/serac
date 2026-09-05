@@ -168,8 +168,9 @@ sentence arguing about mu = 0.08 — so it overstated in the direction that stre
 card's own conclusion. Every write-up now renders the number from the committed measurement.
 A single-phase Voellmy rheology stops far short of the ~100 km the 26 August 2026 cascade is
 reported to have travelled. That is a finding about the rheology, reported in
-`reports/runout/langtang_sanity.md` as a comparison against public timings and **not** used to
-adjust anything.
+`reports/runout/langtang_sanity.md` as a comparison against the arrival times
+`data/events/langtang-lhende-2026.json` holds — one transect of four, the rest `null` — and
+**not** used to adjust anything.
 
 ## Change log
 

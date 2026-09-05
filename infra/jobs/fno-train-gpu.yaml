@@ -25,7 +25,12 @@ spec:
       The whole training set fits in GPU memory, so there is no data-loading bottleneck.
 
   container:
-    image: ghcr.io/dizzy1900/serac:0.1.0-cuda
+    # Built from infra/docker/Dockerfile with
+    #   --build-arg EXTRAS="--extra ml --extra surrogate"
+    # The locked torch wheel carries the CUDA runtime on linux, so this differs from the
+    # base image only by those extras; the host still supplies the driver. Deliberately
+    # unresolvable: nothing has been pushed to any registry (Known gap 68).
+    image: "<registry>/serac:<git-sha>-cuda"
     gpu: 1
     gpu_type: "NVIDIA L4 or A10G"
     vcpu: 8

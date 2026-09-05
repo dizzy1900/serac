@@ -13,6 +13,11 @@ Checks, in the order they matter:
 5. **Ensemble size recorded**, with the valid count and the flagged-but-retained count.
 6. **The surrogate gates**: IoU >= 0.70 at 1 m, arrival MAE <= 90 s per transect, p95 latency
    <= 2 s, 5-95% coverage in [0.85, 0.95].
+7. **The Langtang comparison compares only against the event record.** Every comparison target
+   in `langtang_sanity.json` is re-derived from `data/events/langtang-lhende-2026.json` and must
+   match it in bounds and in `source_refs`, and no transect the record leaves `null` may carry
+   one. The write-up is then re-rendered from that payload and must equal the committed file, so
+   the prose cannot describe a figure the record does not hold.
 
 A gate that fails is an `error` and the suite fails. A gate whose *inputs* do not exist yet is a
 `warning`, so that a fresh clone with no ensemble reports honestly rather than passing silently.
@@ -32,7 +37,13 @@ from serac.models.runout.ensemble import (
     design_from_payload,
     read_frozen_design,
 )
-from serac.models.runout.langtang import FORBIDDEN_VOCABULARY, SANITY_FILENAME
+from serac.models.runout.langtang import (
+    FORBIDDEN_VOCABULARY,
+    SANITY_FILENAME,
+    SANITY_JSON,
+    render,
+)
+from serac.models.runout.observed import record_path, verify_targets_against_record
 from serac.models.runout.params import NOT_RAVAFLOW, SOLVER_VERSION
 from serac.models.runout.summary import SUMMARY_FILENAME
 from serac.models.runout.training import (
@@ -275,5 +286,47 @@ def run_suite(repo: Path = Path("."), reports_dir: Path | None = None) -> SuiteR
             "not an adjustment" in text.lower(),
             "the comparison must state that nothing was adjusted",
         )
+
+    # -- every observed figure in the comparison is one the event record holds -----------------
+    # The comparison used to hold four transect timings as a literal in its own source, three of
+    # which the event record does not carry (two unattributed public figures it explicitly
+    # refused, and one stage-rise window that is not an arrival time), and described all four as
+    # press-attributed. These two gates make that unsayable: the targets are re-derived from
+    # `data/events/` and compared with the artifact, and the write-up is re-rendered from the
+    # artifact and compared with the committed file.
+    sanity_json = reports / SANITY_JSON
+    record = record_path(repo)
+    suite.warn("langtang_event_record_present", record.exists(), str(record))
+    if not sanity_json.exists():
+        suite.warn("langtang_sanity_json_present", False, str(sanity_json))
+    elif record.exists():
+        sanity_payload = _load(sanity_json)
+        if sanity_payload is None:
+            suite.check("langtang_sanity_json_readable", False, f"{sanity_json} is not JSON")
+        else:
+            problems = verify_targets_against_record(sanity_payload, repo)
+            suite.check(
+                "langtang_targets_come_from_the_event_record",
+                not problems,
+                (
+                    f"{sanity_payload.get('n_comparison_targets')} comparison target(s), matching "
+                    f"{record} in bounds and sources"
+                    if not problems
+                    else "; ".join(problems)
+                ),
+            )
+            if sanity.exists():
+                advice = (
+                    f"{SANITY_FILENAME} must be exactly render({SANITY_JSON}); regenerate with "
+                    "`serac runout langtang` so the prose cannot claim what the gated payload "
+                    "does not hold"
+                )
+                try:
+                    matches = render(sanity_payload) == sanity.read_text(encoding="utf-8")
+                    details = advice
+                except (KeyError, TypeError, ValueError) as exc:
+                    matches = False
+                    details = f"{SANITY_JSON} cannot be re-rendered ({exc!r}). {advice}"
+                suite.check("langtang_sanity_md_renders_from_its_json", matches, details)
 
     return suite.result()
