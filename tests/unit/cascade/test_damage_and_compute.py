@@ -209,15 +209,36 @@ def test_a_forecast_with_no_depths_produces_an_insufficient_input_response() -> 
         }
     )
     result = compute_avoided_loss(check_request(depthless))
-    assert result.response.status is AvoidedLossStatus.not_implemented
+    # `insufficient_input`, which is what this test has always been named for. It asserted
+    # `not_implemented` until 2026-09-10 — the engine ran, and said it did not exist.
+    assert result.response.status is AvoidedLossStatus.insufficient_input
     assert result.response.losses == []
     assert (result.response.notes or "").startswith(INSUFFICIENT_INPUT_PREFIX)
+    assert "Contract 0.0.0" not in (result.response.notes or "")
     assert set(result.undetermined.values()) == {
         BlockReason.no_flow_depth,
         BlockReason.no_arrival,
     }
     # The hazard input is still named, so a reader knows what produced nothing.
     assert result.response.model is not None
+    # Every asset reaches the published contract with the input that stopped it. An empty
+    # `by_asset` does not read as "not reported", it reads as "no assets exposed".
+    assert result.response.by_asset
+    assert not any(a.determined for a in result.response.by_asset)
+    assert all(a.blocked_by is not None for a in result.response.by_asset)
+    assert {a.asset_id for a in result.response.by_asset} == set(result.undetermined)
+
+
+def test_a_computed_response_publishes_its_per_asset_detail() -> None:
+    """Contract 0.1.0 declared `by_asset` and nothing populated it until 2026-09-10."""
+    result = compute_avoided_loss(check_request())
+    assert result.response.status is AvoidedLossStatus.computed
+    assert result.response.by_asset, "a computed response must publish the rows behind its total"
+    assert len(result.response.by_asset) == len(result.by_asset)
+    determined = [a for a in result.response.by_asset if a.determined]
+    assert determined, "the fictional check request costs at least one asset"
+    assert all(a.expected_loss is not None for a in determined)
+    assert all(a.blocked_by is None for a in determined)
 
 
 def test_an_asset_with_no_transect_is_blocked_on_that_first() -> None:

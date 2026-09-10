@@ -98,9 +98,13 @@ def test_no_manifest_names_a_registry_host_while_no_image_is_published(manifest:
     )
 
 
-# `data/` paths in a manifest are the job's DVC outputs — directories a run creates, which by
-# design do not exist on a fresh clone. Everything else named in an `infra/` file is a
-# repository artefact and has to be there.
+# A manifest's own `outputs:` are what a run creates, so they do not exist on a fresh clone and
+# naming one is not a dangling reference. That was true of `data/` paths by accident — the path
+# pattern below never matched them — and false of `reports/cube/${aoi_id}.json`, which
+# `infra/jobs/cube-build.yaml` declares as an output and which failed this check for as long as
+# it has existed. The exemption now follows the manifest's declaration rather than the prefix, so
+# it covers exactly the paths a run is supposed to create and nothing else. Everything else named
+# in an `infra/` file is a repository artefact and has to be there.
 _REPO_PATH = re.compile(
     r"(?<![\w./-])((?:src|tests|infra|docs|reports|scripts|contracts|baselines)/[\w./-]*[\w/])"
 )
@@ -109,14 +113,41 @@ _INFRA_FILES = sorted(
 )
 
 
+def _declared_outputs(infra_file: Path, text: str) -> set[str]:
+    """Paths the manifest itself declares as outputs of the job, normalised of placeholders."""
+    if infra_file.suffix not in {".yaml", ".yml"}:
+        return set()
+    try:
+        loaded = yaml.safe_load(text)
+    except yaml.YAMLError:
+        return set()
+    if not isinstance(loaded, dict):
+        return set()
+    outputs = loaded.get("outputs") or []
+    if not isinstance(outputs, list):
+        return set()
+    return {str(entry).strip() for entry in outputs if isinstance(entry, str)}
+
+
+def _is_declared_output(token: str, outputs: set[str]) -> bool:
+    """True when ``token`` is, or lies under, a declared output."""
+    for output in outputs:
+        stem = output.split("${", 1)[0].rstrip("/")
+        if stem and (token == output or token.rstrip("/") == stem or token.startswith(stem + "/")):
+            return True
+    return False
+
+
 @pytest.mark.parametrize("infra_file", _INFRA_FILES, ids=lambda p: str(p.relative_to(ROOT)))
 def test_every_repository_path_named_in_infra_exists(infra_file: Path) -> None:
     text = infra_file.read_text(encoding="utf-8")
+    outputs = _declared_outputs(infra_file, text)
     dangling = sorted(
         {
             token
             for token in _REPO_PATH.findall(text)
             if not any(c in token for c in "*<>")
+            if not _is_declared_output(token, outputs)
             if not (ROOT / token).exists()
         }
     )

@@ -43,18 +43,50 @@ Consequences, all intended:
 | `validate-events` | 64 | pass |
 | `validate-aoi` | 100 | pass (3 warnings: hand-digitised geometry) |
 | `validate-ingest` | 15 | pass (1 warning: 517 transient rows) |
-| `validate-cube` | 23 | pass |
+| `validate-cube` | 24 | pass |
 | `validate-stream` | 33 | pass |
 | `validate-contracts` | 26 | pass (22 contracts) |
 | `validate-lfh` | 22 | pass |
 | **`validate-discriminator`** | **24** | **FAIL — 2 unmet criteria, 4 warnings** |
 | `validate-runout` | 30 | pass (1 warning: arrival coverage 0.794) |
-| `validate-watch` | 36 | pass (1 warning: transient rows) |
-| `validate-e2e` | 15 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
-| **total** | **388** | |
+| `validate-watch` | 37 | pass (1 warning: transient rows) |
+| `validate-e2e` | 23 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
+| **total** | **398** | |
 
-`make test` passes: **1,418 offline tests**, network blocked (1,316 before the documentation
-checks of gap 72; 1,388 before the provenance checks of gap 73).
+Check counts are from a measured `make validate-serac` on 2026-09-10. Three rows moved: `validate-e2e` 15 -> 23 (the committed-record checks of Gap 66), and `validate-cube` 23 -> 24 and `validate-watch` 36 -> 37, which were already stale and are corrected here rather than left to be rediscovered.
+
+`make test` passes: **1,466 offline tests** as of 2026-09-10, network blocked (1,418 before the
+drift, CLI-mounting and per-asset-contract checks below; 1,316 before the documentation checks of
+gap 72; 1,388 before the provenance checks of gap 73). Two of the 1,418 were **red**; see the
+correction below.
+
+**Correction, 2026-09-10: `make test` did not pass, and had not for some time.** Two tests were
+red on `main` — `test_every_repository_path_named_in_infra_exists[infra/jobs/cube-build.yaml]`
+and `test_cited_repository_paths_exist[RELEASE_STATUS.md]` — and both were red for the same
+reason, which is worth more than the fix. They are the checks that stop a document pointing at a
+file that is not there, and they were failing on **this ledger**, because the evidence it quotes
+for its own headline claim (`reports/validation/discriminator.json`, the promotion record) is
+produced by a run and excluded by `.gitignore`. A reader on a fresh clone who followed those
+citations found nothing.
+
+Both are fixed, and the checks came out stronger rather than looser:
+
+- A path a job's own manifest declares under `outputs:` is no longer required to exist before the
+  job has run. The exemption follows the declaration instead of the `data/` prefix, so it covers
+  exactly the paths a run creates. A genuinely dangling `src/` path still fails.
+- A path git does not carry is no longer counted as a typo — but a document that cites one must
+  now name the command that produces it — the `GENERATED_ROOTS` map in
+  `tests/unit/doc_claims.py`, checked by `test_a_cited_run_output_says_how_it_is_produced` in
+  `tests/unit/test_docs_consistency.py`. That keeps the protection the old check was giving the
+  reader without asserting that generated output is committed. (This sentence originally cited
+  the check in pytest node-id form, `path.py::NAME`, and the path checker rejected it — which is
+  the check doing its job on the first document it was asked about.)
+
+The alternative — commit `reports/validation/` so the ledger's evidence survives a clone — was
+considered and not taken. It would put the churn of Gap 66 back into the tree for files whose
+timestamps are part of their meaning, and `.gitignore`'s own comment ("validation stamps are
+regenerated") records the opposite intent. If that intent changes, `serac.validation.drift` is
+the machinery that would make it safe.
 
 **No serac model is validated against events, and none has been promoted.** Four of the five
 components returned a negative or a refusal on the motivating event (Langtang Lirung / Lhende
@@ -73,14 +105,29 @@ The ten majors, in the order I would take them:
 
 1. **The ledger misdescribes what the detector stub does on Langtang.** It says pre-event
    background noise; the stub actually fires 45 s after origin. A factual error about a result.
-2. **`serac watch` is not a registered CLI command**, so M3's documented reproduction sequence
-   cannot be run as written.
+2. ~~**`serac watch` is not a registered CLI command**, so M3's documented reproduction sequence
+   cannot be run as written.~~ **Closed 2026-09-10.** `cli_watch.app` is mounted, all eleven
+   commands are reachable, and `tests/unit/test_cli_mounting.py` now fails if any `cli_*` module
+   defines a Typer app that `serac` never mounts — which is how 460 lines went unreachable
+   without anything noticing.
 3. **The M3 measurability-threshold sensitivity sweep** that the model card and ledger say is
    committed is not in the tree.
 4. **`cap_stub` is still wired into the replay and stream lanes** — the real CAP v1.2 generator
    reaches only `serac cascade e2e`.
-5. **The avoided-loss engine does not honour its own `0.1.0` contract**, including the per-asset
-   losses the response type declares.
+5. ~~**The avoided-loss engine does not honour its own `0.1.0` contract**, including the per-asset
+   losses the response type declares.~~ **Closed 2026-09-10.** Three things were wrong and they
+   compounded. A computation that *ran* reported `status=not_implemented`, so a working engine
+   published itself as unbuilt. It explained that with a note reading "Contract 0.0.0 has no
+   'insufficient_input' status" — untrue of the contract it was emitting under, which has carried
+   that status since 0.1.0. And `by_asset` was declared on the response, computed in full, and
+   never passed in, so every published response said `by_asset: []` while the sidecar held 28
+   rows — and an empty list there does not read as "not reported", it reads as "no assets
+   exposed", which is the difference between an exposure nobody could cost and one that is safe.
+   The Langtang response now says `insufficient_input` and carries all 28 rows, each with the
+   input that stopped it (`no_transect`, `no_arrival`, `no_flow_depth`). The two module
+   docstrings that described contract 0.0.0 are corrected, and the unit test named
+   `test_a_forecast_with_no_depths_produces_an_insufficient_input_response` — which asserted
+   `not_implemented` — now asserts what its name always said.
 6. **M2's "≤120 s met warm (~75 s)" latency claim traces to no committed artefact**, and the
    timings that are committed contradict it.
 7. **`validate-lfh`'s pass criterion is weaker than the brief's** "within stated uncertainty".
@@ -98,11 +145,17 @@ entry. Ordered by what blocks the most.
 
 **Blocks the release mechanics**
 
-- **Gap 66 — the gates dirty the tree that `promote` requires clean.** `validate-e2e` rewrites
-  tracked `reports/e2e/*` with fresh timestamps on every run, so `make validate-serac` always
-  leaves the working tree modified. Nothing can ever be promoted until the volatile fields are
-  excluded from the committed artefacts or those artefacts stop being tracked. Masked today only
-  because promotion is blocked for other reasons.
+- ~~**Gap 66 — the gates dirty the tree that `promote` requires clean.**~~ **Closed
+  2026-09-10.** `validate-e2e` now replays into `reports/validation/e2e-runs/` (untracked) and
+  *checks* the committed `reports/e2e/*` against what it just ran, rather than overwriting it.
+  `make validate-e2e` leaves the tree clean. The second half of that change matters more than the
+  first: a gate that rewrites its own evidence makes the committed report agree with the code by
+  construction, however far apart they have drifted, so the old suite could not have detected a
+  divergence it was nominally there to prevent. `serac.validation.drift` draws the line —
+  timestamps and wall-clock durations are excluded from the comparison and reported separately as
+  measurements, everything else is a finding — and a seeded change to `stopped_because` is
+  correctly refused with the command that re-records the evidence. The suite went from 15 checks
+  to 23. Re-recording is `serac cascade e2e --event <id>`, a deliberate act.
 - **Gap 64 — `reports/validation/latest.json` is stale** (stamped at `0b70091`, seven suites).
   Do not read it as current; the per-suite reports are.
 

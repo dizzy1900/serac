@@ -1,6 +1,6 @@
 # End-to-end replay: Langtang Lirung / Lhende Khola / Trishuli, 26 August 2026
 
-`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-05T06:35:06.381148+00:00.
+`serac cascade e2e --event langtang-lhende-2026` on serac 0.1.0, run 2026-09-10T18:43:07.639701+00:00.
 
 ## Verdict
 
@@ -51,7 +51,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "batch_600s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0347,
+      "compute_seconds_total": 0.0444,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -60,7 +60,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
     "sliding_180s": {
       "chunks_ingested": 194,
       "class_label": null,
-      "compute_seconds_total": 0.0346,
+      "compute_seconds_total": 0.0444,
       "fired": false,
       "min_contributing_stations": 3,
       "probability": null,
@@ -96,7 +96,7 @@ No stage downstream of that point ran, and nothing was substituted for the missi
   ],
   "status": "failed",
   "variance_reduction": null,
-  "wall_clock_s": 0.043
+  "wall_clock_s": 0.431
 }
 ```
 > M2 produces no mass, so the runout surrogate has no release volume to be given: the cascade forecast for this event cannot be built from serac's own chain.
@@ -117,13 +117,13 @@ No stage downstream of that point ran, and nothing was substituted for the missi
 ### `avoided_loss` — M5 avoided-loss computation
 
 - outcome: **insufficient_input** (executed)
-- summary: status=not_implemented; costed 0 of 14 exposed asset(s)
+- summary: status=insufficient_input; costed 0 of 14 exposed asset(s)
 
 ```json
 {
   "determined": [],
   "lives_in_warned_zone": null,
-  "status": "not_implemented",
+  "status": "insufficient_input",
   "undetermined": {
     "betrawati": "no_arrival",
     "chilime-hep": "no_arrival",
@@ -272,7 +272,7 @@ Warning benefit    : ASSUMPTION — stated ramps, no effectiveness study fetched
 Lives in warned zone: NULL — no sourced population for any settlement in this AOI
 ------------------------------------------------------------------------------
 NO VALIDATED FORECAST EXISTS FOR THIS EVENT. serac has no model validated against events (RELEASE_STATUS.md), and for this event the chain produced no forecast at all.
-RESULT: INSUFFICIENT INPUT: the computation ran and costed 0 of 14 exposed assets. betrawati: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe; chilime-hep: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe; devighat-hep: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe; miteri-bridge: the arrival at this asset's transect carries no peak stage, so there is no depth to put into a damage function; rasuwagadhi-hep: the arrival at this asset's transect carries no peak stage, so there is no depth to put into a damage function; rasuwagadhi-kerung-border-post: the arrival at this asset's transect carries no peak stage, so there is no depth to put into a damage function; sanjen-hep: the exposure record names no transect, so no arrival in the forecast can be attached to this asset; sanjen-upper-hep: the exposure record names no transect, so no arrival in the forecast can be attached to this asset; syabrubesi: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe; timure: the arrival at this asset's transect carries no peak stage, so there is no depth to put into a damage function; trishuli-hep: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe; upper-trishuli-1: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe; upper-trishuli-3a: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe; upper-trishuli-3b: the forecast carries no arrival at this asset's transect: the model does not reach it. That is a model output, NOT a statement that the asset is safe. Contract 0.0.0 has no 'insufficient_input' status, so this response uses 'not_implemented'; the computation is implemented and produced no numbers because it was given no usable input.
+RESULT: costed 0 of 14 asset(s); 14 undetermined (NOT zero).
 Missing from the exposure layer:
   - 14 of 14 exposed asset(s) carry no replacement value: the AOI exposure layer has no monetary field, so a value can only come from the caller or, for hydropower, be derived from installed capacity under a stated assumption.
   - 3 of 3 settlement(s) carry population=null (timure, syabrubesi, betrawati); no qualifying population source was fetched, so lives in a warned zone cannot be counted.

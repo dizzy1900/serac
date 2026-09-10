@@ -37,6 +37,20 @@ from pathlib import Path
 # checkable either way: it can neither fail family 1 nor satisfy a deferral in family 3.
 UNCHECKABLE_ROOTS = ("data/raw/", "data/interim/", "data/features/")
 
+# Roots that hold what a *run* produces. `.gitignore` excludes them, so a fresh clone has none of
+# them and citing one is not a typo — but a reader who follows the citation still finds nothing.
+# The value is the command that makes the file, and `undocumented_generated_paths` requires a
+# document that cites such a path to name that command somewhere in itself. That is the
+# protection the plain existence check was giving, kept, without asserting that generated output
+# is committed.
+GENERATED_ROOTS: dict[str, str] = {
+    "reports/validation/": "make validate-serac",
+    "reports/promotion/": "make promote",
+    "reports/replay/": "serac replay",
+    "reports/cube/": "serac cube build",
+    "reports/e2e/cap/": "serac cascade e2e",
+}
+
 REPO_PREFIXES = (
     "src/",
     "tests/",
@@ -190,7 +204,33 @@ def repo_paths(text: str) -> list[str]:
 
 
 def is_uncheckable(token: str) -> bool:
-    return token.startswith(UNCHECKABLE_ROOTS)
+    return token.startswith(UNCHECKABLE_ROOTS) or generated_root_of(token) is not None
+
+
+def generated_root_of(token: str) -> str | None:
+    """The `GENERATED_ROOTS` prefix ``token`` sits under, if any."""
+    for root in GENERATED_ROOTS:
+        if token.startswith(root) or token.rstrip("/") + "/" == root:
+            return root
+    return None
+
+
+def undocumented_generated_paths(doc: str) -> list[tuple[str, str]]:
+    """Cited run outputs whose producing command the document never names.
+
+    Returns `(path, command)` pairs. A document may cite `reports/validation/latest.json` — it is
+    the evidence for the ledger's headline claim — but it has to tell the reader that the file is
+    produced rather than committed, and by what.
+    """
+    offenders: list[tuple[str, str]] = []
+    for token in sorted(set(repo_paths(doc))):
+        root = generated_root_of(token)
+        if root is None:
+            continue
+        command = GENERATED_ROOTS[root]
+        if command not in doc:
+            offenders.append((token, command))
+    return offenders
 
 
 def path_missing(repo_root: Path, token: str) -> bool:

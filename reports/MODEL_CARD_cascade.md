@@ -15,7 +15,7 @@
 |---|---|
 | Component | M5 — avoided-loss accounting and alerting |
 | Code | `src/serac/cascade/`, `src/serac/alerting/`, `src/serac/adapters/alerting/`, `src/serac/pipelines/e2e.py` |
-| Contracts | `AvoidedLossRequest` / `AvoidedLossResponse` v0.0.0, `CAPMessage` v0.1.0 |
+| Contracts | `AvoidedLossRequest` / `AvoidedLossResponse` v0.1.0 (three statuses, `by_asset` populated since 2026-09-10), `CAPMessage` v0.1.0 |
 | Gate | `make validate-e2e` (`src/serac/validation/e2e.py`) |
 | Alerting | CAP 1.2, enveloped Ed25519 XML-Signature (RFC 9231), file and HTTP POST sinks |
 | Reports | `reports/e2e/{chamoli-2021,langtang-lhende-2026}.{md,json}`, `reports/e2e/latency.json` |

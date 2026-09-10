@@ -105,8 +105,9 @@ def avoided_loss(
         f"{len(result.undetermined)} undetermined (never zero)"
     )
     typer.echo(
-        "The 'by_asset' key is NOT part of contract 0.0.0; it is a sidecar. See "
-        "serac.cascade.compute for the contract change that would carry it."
+        "'by_asset' is part of contract 0.1.0 and is carried on the response itself; the "
+        "sidecar JSON keeps the engine's wider per-asset row (asset_type, transect, damage "
+        "fractions, components), which the contract does not publish."
     )
 
 

@@ -25,6 +25,7 @@ from serac import (
     cli_stream,
     cli_underwriting,
     cli_validate,
+    cli_watch,
 )
 
 app = typer.Typer(
@@ -49,6 +50,7 @@ app.add_typer(cli_data.app, name="data", help="Assemble model training sets.")
 app.add_typer(cli_models.app, name="models", help="Train and evaluate model components.")
 app.add_typer(cli_runout.app, name="runout", help="M4: runout ensemble and neural surrogate.")
 app.add_typer(cli_lfh.app, name="lfh", help="Landslide force-history inversion (M2).")
+app.add_typer(cli_watch.app, name="watch", help="M3 slope watch: InSAR/optical anomalies.")
 app.add_typer(cli_validate.app, name="validate")
 app.command("promote")(cli_validate.promote_command)
 app.add_typer(cli_schema.app, name="schema", help="Export/check the JSON-Schema contracts.")

@@ -131,7 +131,8 @@ def test_cascade_underwriting_table_prints_the_header(repo_root: Path, tmp_path:
     assert result.exit_code == 0, result.output
     assert "INPUT PROVENANCE" in result.output
     payload = json.loads(out.read_text(encoding="utf-8"))
-    assert payload["status"] == "not_implemented"
+    # The Lhende run costs nothing: the computation ran and its inputs did not arrive.
+    assert payload["status"] == "insufficient_input"
     assert payload["by_asset"], "the sidecar per-asset table must be written"
 
 
@@ -157,4 +158,7 @@ def test_cascade_avoided_loss_evaluates_a_supplied_request(repo_root: Path, tmp_
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert payload["status"] == "computed"
     assert payload["losses"]
-    assert "NOT part of contract 0.0.0" in result.output
+    # The CLI says where each per-asset view lives. It claimed `by_asset` was outside the
+    # contract until 2026-09-10, when the contract had declared it since 0.1.0.
+    assert "part of contract 0.1.0" in result.output
+    assert payload["by_asset"], "a computed response carries the rows behind its total"

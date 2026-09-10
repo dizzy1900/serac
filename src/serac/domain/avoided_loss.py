@@ -2,9 +2,16 @@
 
 `AvoidedLossRequest` carries a hazard forecast, the exposure it threatens and a set of
 warning/intervention scenarios (always including the `none` baseline);
-`AvoidedLossResponse` returns expected loss per scenario. The computation is not implemented
-in Prompt 1: a response may be issued only with `status == "not_implemented"` and no losses.
-`contract_version` is pinned to `"0.0.0"` until the schema is populated in Prompt 2.
+`AvoidedLossResponse` returns expected loss per scenario, and `by_asset` returns the rows
+behind that total, each either costed or explicitly blocked with the input that stopped it.
+
+`contract_version` is `"0.1.0"`. The three statuses are distinct on purpose:
+`not_implemented` means no computation was attempted, `insufficient_input` means it ran and
+its upstream inputs did not arrive, and `computed` carries numbers. Collapsing the middle one
+into either of the others is how an engine that works comes to look unbuilt, or how an
+exposure nobody could cost comes to look safe. This docstring described the Prompt 1 state —
+"not implemented", `contract_version` "0.0.0" — until 2026-09-10, long after both stopped
+being true.
 """
 
 from __future__ import annotations
