@@ -41,6 +41,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from serac.models.discriminator.balance import balance_report
 from serac.models.discriminator.baseline import ARTIFACT_DIR, CLASSES, group_hash
 from serac.models.discriminator.baseline import load as load_baseline
 from serac.models.discriminator.catalog import (
@@ -294,6 +295,36 @@ def run_suite(repo: Path) -> SuiteResult:
         "No feature counts receivers directly, but the cross-receiver aggregates (`*_mad`, "
         "`*_p90`, `lp_envelope_coherence`) are functions of how many traces contributed, so "
         "this is a live residual and is reported in the model card, not dismissed.",
+    )
+
+    # The size of that residual as a classifier, and what the balancing rule would do to it.
+    report = balance_report(index)
+    suite.info(
+        "receiver_count_as_a_classifier",
+        f"`n_stations` alone separates mass_movement from tectonic at ROC-AUC "
+        f"{report.auc_before:.4f}. A model given nothing but how many stations recorded a window "
+        "beats chance, and every leakage assertion above passes on it (Gap 17).",
+    )
+    suite.info(
+        "receiver_balancing_rule_effect",
+        f"serac.models.discriminator.balance would close it: {report.render()}. Identity "
+        f"agreement within the kept slots is "
+        f"{report.mean_station_identity_agreement:.1%}. NOT APPLIED to any trained model: the "
+        "store's samples are not in this repository, so nothing has been refitted under the rule "
+        "and its effect on M1's reported skill is unknown.",
+    )
+    suite.warn(
+        "every_matched_window_has_its_positive",
+        not report.orphan_ids,
+        (
+            f"{len(report.orphan_ids)} window(s) name a matched positive that is not in the "
+            f"index, so they inherit a split group from an absent parent and cannot be balanced "
+            f"against anything. Their presence is why the balanced AUC is "
+            f"{report.auc_after:.4f} rather than {report.auc_after_excluding_orphans:.4f}. "
+            f"e.g. {list(report.orphan_ids[:5])}"
+        )
+        if report.orphan_ids
+        else "every negative and noise window's matched positive is present in the index",
     )
 
     # --- leakage 3 and 4: splits -----------------------------------------------------------

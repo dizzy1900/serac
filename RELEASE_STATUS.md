@@ -47,18 +47,18 @@ Consequences, all intended:
 | `validate-stream` | 33 | pass |
 | `validate-contracts` | 26 | pass (22 contracts) |
 | `validate-lfh` | 22 | pass |
-| **`validate-discriminator`** | **24** | **FAIL — 2 unmet criteria, 4 warnings** |
+| **`validate-discriminator`** | **27** | **FAIL — 2 unmet criteria, 5 warnings** |
 | `validate-runout` | 30 | pass (1 warning: arrival coverage 0.794) |
 | `validate-watch` | 37 | pass (1 warning: transient rows) |
 | `validate-e2e` | 23 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
-| **total** | **398** | |
+| **total** | **401** | |
 
-Check counts are from a measured `make validate-serac` on 2026-09-10. Three rows moved: `validate-e2e` 15 -> 23 (the committed-record checks of Gap 66), and `validate-cube` 23 -> 24 and `validate-watch` 36 -> 37, which were already stale and are corrected here rather than left to be rediscovered.
+Check counts are from a measured `make validate-serac` on 2026-09-10. Four rows moved: `validate-e2e` 15 -> 23 (the committed-record checks of Gap 66), `validate-discriminator` 24 -> 27 (the receiver-count leak, the balancing rule's effect, and the orphaned-window check of Gap 17), and `validate-cube` 23 -> 24 and `validate-watch` 36 -> 37, which were already stale and are corrected here rather than left to be rediscovered.
 
-`make test` passes: **1,466 offline tests** as of 2026-09-10, network blocked (1,418 before the
-drift, CLI-mounting and per-asset-contract checks below; 1,316 before the documentation checks of
-gap 72; 1,388 before the provenance checks of gap 73). Two of the 1,418 were **red**; see the
-correction below.
+`make test` passes: **1,483 offline tests** as of 2026-09-10, network blocked (1,466 before the
+receiver-balancing and live-detector work; 1,418 before the drift, CLI-mounting and
+per-asset-contract checks below; 1,316 before the documentation checks of gap 72; 1,388 before
+the provenance checks of gap 73). Two of the 1,418 were **red**; see the correction below.
 
 **Correction, 2026-09-10: `make test` did not pass, and had not for some time.** Two tests were
 red on `main` — `test_every_repository_path_named_in_infra_exists[infra/jobs/cube-build.yaml]`
@@ -165,6 +165,38 @@ entry. Ordered by what blocks the most.
   ~1 more receiver than their matched negatives and `n_stations` alone scores ROC-AUC 0.587, so
   some of M1's reported skill may be archive density rather than source physics. This is a
   dataset fix, not a training one, and it is the single most important open item on M1.
+  **Fix implemented and measured 2026-09-10; no model retrained under it.**
+  `serac.models.discriminator.balance` gives each event group a receiver quota — the smallest
+  realised count over the positive and every window matched to it — and keeps the first *k*
+  occupied slots of each. Measured on the committed index (`serac models receiver-balance`):
+
+  | | before | after |
+  |---|---|---|
+  | `n_stations`-alone ROC-AUC | **0.6077** | **0.5083** (0.5008 excluding orphans, below) |
+  | receivers on a positive | 8.38 | 5.72 |
+  | receiver-windows dropped | — | 3,861 |
+  | groups lost entirely | — | 0 |
+  | station-identity agreement within kept slots | 83.5 % (full sets) | 83.1 % |
+
+  Two alternatives were measured and are worse: intersecting realised station *sets* group-wise
+  costs 8.38 → 4.60 receivers and four whole groups, and doing it pairwise costs only 8.38 → 7.02
+  but gives a positive a different mask per negative, which one row in the store cannot carry.
+
+  **The measured AUC here is 0.6077, not the 0.587 this entry has always quoted.** The older
+  figure came from a narrower window set; both are computed the same way and the difference is
+  scope, not method. The gate now prints the number it computed rather than citing one.
+
+  **What is still open:** the store's samples are not in this repository, so **nothing has been
+  refitted** and the effect on M1's reported skill is unknown. That is the question Gap 17 asks;
+  closing the leak is the precondition for asking it, not the answer.
+- **NEW — 34 windows name a matched positive that is not in the index.** Found while measuring the
+  above. `CatalogEntry` validates that a negative *carries* a `matched_positive_id`; nothing
+  checked that the positive is present. 33 tectonic windows and one noise window inherit a split
+  group from an absent parent (12 distinct missing positives, e.g. `pos/esec-9`, which was
+  dropped for thin receiver coverage while its negatives were kept). Their mean realised receiver
+  count is 3.56 against 7.37 for tectonics generally, which is why the balanced AUC is 0.5083
+  rather than 0.5008. `validate-discriminator` now warns on them by name; they are not removed,
+  because dropping windows changes split composition and that is a data decision.
 - **Gap 42 — the surrogate fails one of its five gates** (5–95 % arrival coverage 0.794 against
   a 0.85–0.95 target), and the arrival gate that *passes* rests on 3 held-out members at one
   transect. Three of four transects scored nothing.
@@ -174,8 +206,14 @@ entry. Ordered by what blocks the most.
 
 **Half-finished work**
 
-- **Gap 56 — the live stream lane is still the stub.** Replay can select the trained detector;
-  `serac stream run` cannot.
+- ~~**Gap 56 — the live stream lane is still the stub.** Replay can select the trained detector;
+  `serac stream run` cannot.~~ **Closed 2026-09-10.** Both lanes now call the same
+  `build_trained_detector` factory: `serac stream run detector --detector discriminator` mounts
+  the LORO-HMA model and reports `is_stub=False`. The **stub stays the default** while
+  `validate-discriminator` reports an unmet criterion, a missing artifact is an error rather than
+  a silent fall back to the stub, and the command prints that the CAP stage downstream is still
+  `cap_stub` and still emits `status=Test`. **The lane is not an alert system and mounting a real
+  detector did not make it one** — that is major #4, still open.
 - **Gap 62 — `SourceRef` exists twice.** A contract test now fails on divergence, but the two
   copies have not been merged.
 - **Gap 61 — no job manifest in `infra/jobs/` has ever been executed.** Every core-hour and

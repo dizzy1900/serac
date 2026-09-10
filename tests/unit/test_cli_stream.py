@@ -131,3 +131,50 @@ def test_unknown_bus_is_rejected() -> None:
         app, ["run", "detector", "--bus", "carrier-pigeon", "--max-seconds", "0"]
     )
     assert result.exit_code != 0
+
+
+def test_the_live_detector_stage_defaults_to_the_stub() -> None:
+    """The default stays the stub while validate-discriminator reports an unmet criterion."""
+    result = runner.invoke(app, ["run", "detector", "--max-seconds", "0.1"])
+    assert result.exit_code == 0
+    assert "detector-stub" in result.output or "stub" in result.output
+    assert "discriminator-lgbm" not in result.output
+
+
+def test_the_live_detector_stage_can_mount_the_trained_model() -> None:
+    """Gap 56: the replay lane could select the trained detector and the live lane could not."""
+    result = runner.invoke(
+        app,
+        ["run", "detector", "--detector", "discriminator", "--max-seconds", "0.1"],
+    )
+    assert result.exit_code == 0, result.output
+    assert "is_stub=False" in result.output
+    assert "discriminator-lgbm" in result.output
+    # Mounting a real detector does not make the lane an alert system, and the command says so.
+    assert "status=Test" in result.output
+
+
+def test_an_unknown_detector_is_refused_rather_than_defaulted() -> None:
+    result = runner.invoke(app, ["run", "detector", "--detector", "magic", "--max-seconds", "0.1"])
+    assert result.exit_code == 1
+    assert "unknown detector" in result.output
+
+
+def test_a_missing_artifact_is_an_error_not_a_silent_fallback(tmp_path: Path) -> None:
+    """A lane that says it ran the trained model must have run it."""
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "detector",
+            "--detector",
+            "discriminator",
+            "--repo",
+            str(tmp_path),
+            "--max-seconds",
+            "0.1",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "no trained discriminator" in result.output
+    assert "stub" not in result.output.split("no trained discriminator")[0]
