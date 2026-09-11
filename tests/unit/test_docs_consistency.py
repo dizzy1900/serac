@@ -37,6 +37,7 @@ from tests.unit.doc_claims import (
     false_absence_claims,
     read_doc,
     stale_deferrals,
+    undocumented_generated_paths,
 )
 
 LIVING_DOCS = (
@@ -83,6 +84,22 @@ def test_every_markdown_doc_is_covered(repo_root: Path) -> None:
 def test_cited_repository_paths_exist(repo_root: Path, doc_path: str) -> None:
     broken = broken_paths(repo_root, read_doc(repo_root, doc_path))
     assert not broken, f"{doc_path} cites paths that do not exist: {broken}"
+
+
+@pytest.mark.parametrize("doc_path", ALL_PATH_CHECKED)
+def test_a_cited_run_output_says_how_it_is_produced(repo_root: Path, doc_path: str) -> None:
+    """`reports/validation/` and friends are not committed, so a citation must not read as one.
+
+    RELEASE_STATUS quotes `reports/validation/discriminator.json` as the evidence for its headline
+    claim. That file is produced by a run and `.gitignore` excludes it, so a reader on a fresh
+    clone finds nothing there. Citing it is legitimate; citing it without saying what makes it is
+    not.
+    """
+    offenders = undocumented_generated_paths(read_doc(repo_root, doc_path))
+    assert not offenders, (
+        f"{doc_path} cites run output without naming the command that produces it: "
+        + "; ".join(f"{path} (produced by `{command}`)" for path, command in offenders)
+    )
 
 
 @pytest.mark.parametrize("doc_path", LIVING_DOCS)

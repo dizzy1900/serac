@@ -121,7 +121,12 @@ def test_the_reports_carry_the_refusal_and_the_stopping_point(
     assert payload["chain_completed"] is True
     assert payload["cap_identifier"] is None
     assert len(payload["stages"]) == len(CHAIN_STAGES)
-    assert payload["avoided_loss_response"]["status"] == "not_implemented"
+    # The engine ran and its inputs did not arrive, which contract 0.1.0 has a status for.
+    assert payload["avoided_loss_response"]["status"] == "insufficient_input"
+    assert payload["avoided_loss_response"]["by_asset"], (
+        "the published response must carry the rows behind its refusal, not an empty list that "
+        "reads as 'no assets exposed'"
+    )
 
 
 def test_the_validation_suite_passes_and_records_the_early_stops(repo_root: Path) -> None:

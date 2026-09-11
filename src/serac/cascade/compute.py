@@ -22,13 +22,17 @@ interval. It is not a convolution of independent uncertainties and does not pret
 
 Contract note
 -------------
-`AvoidedLossResponse` (contract 0.0.0) has two statuses, `computed` and `not_implemented`, and
-no per-asset breakdown. A run with no usable input is therefore emitted as
-`status=not_implemented` with `notes` beginning `INSUFFICIENT INPUT:` and every reason in
-`assumptions[]` -- honest under the committed schema, but the wrong word. The per-asset table
-lives on `CascadeLossResult` and is written to the sidecar JSON. `docs`/the M5 report carry
-the exact contract change (`insufficient_input` status, `by_asset` list) that would let the
-response say this in one field instead of two.
+`AvoidedLossResponse` is at contract 0.1.0 and has three statuses -- `computed`,
+`insufficient_input`, `not_implemented` -- and a `by_asset` list. A run with no usable input is
+emitted as `status=insufficient_input`, with `notes` beginning `INSUFFICIENT INPUT:`, every
+reason in `assumptions[]`, and every asset in `by_asset` carrying the input that stopped it.
+
+This paragraph described contract 0.0.0 until 2026-09-10, and the code matched the paragraph
+rather than the contract: a computation that ran reported `not_implemented`, `by_asset` was
+never populated on any response, and the note explained itself by citing a version of the
+schema that had not been current for a phase. The per-asset table still lives on
+`CascadeLossResult` and is still written to the sidecar JSON; it now also reaches the public
+response, which is where a downstream consumer looks.
 """
 
 from __future__ import annotations
@@ -51,11 +55,13 @@ from serac.cascade.damage import (
     damage_function_for,
 )
 from serac.domain.avoided_loss import (
+    AssetScenarioLoss,
     AvoidedLossRequest,
     AvoidedLossResponse,
     AvoidedLossStatus,
     ExposureItem,
     InterventionKind,
+    LossBlockedBy,
     MoneyRange,
     ScenarioLoss,
     WarningScenario,
@@ -96,6 +102,31 @@ BLOCK_DETAIL: dict[BlockReason, str] = {
         "input (installed capacity, span, building count) from which to derive one"
     ),
 }
+
+
+def _as_contract_asset(loss: AssetLoss) -> AssetScenarioLoss:
+    """Project the engine's per-asset row onto the public contract's subset of it.
+
+    `AvoidedLossResponse.by_asset` has existed since contract 0.1.0 and nothing ever populated
+    it, so every published response said `by_asset: []` while the engine held a full row per
+    asset per scenario. An empty list there does not read as "not reported" — it reads as "no
+    assets", which is the difference between an exposure nobody could cost and an exposure that
+    is safe. `BlockReason` and `LossBlockedBy` carry identical members; the two names exist
+    because one is internal and one is published.
+    """
+    return AssetScenarioLoss(
+        asset_id=loss.asset_id,
+        scenario_id=loss.scenario_id,
+        determined=loss.determined,
+        blocked_by=None if loss.blocked_by is None else LossBlockedBy(loss.blocked_by.value),
+        blocked_detail=loss.blocked_detail,
+        arrival_time_min=loss.arrival_time_min,
+        lead_time_min=loss.lead_time_min,
+        flow_depth_m=loss.flow_depth_m,
+        replacement_value=loss.replacement_value,
+        expected_loss=loss.expected_loss,
+        avoided_vs_baseline=loss.avoided_vs_baseline,
+    )
 
 
 class AssetLoss(BaseModel):
@@ -405,13 +436,20 @@ def compute_avoided_loss(
     if not determined_ids:
         response = AvoidedLossResponse(
             request_id=request.request_id,
-            status=AvoidedLossStatus.not_implemented,
+            # `insufficient_input`, not `not_implemented`: the computation *is* implemented and
+            # it ran. It produced no numbers because it was given no usable input, and the
+            # contract has carried a status for exactly that since 0.1.0. This response said
+            # `not_implemented` until 2026-09-10, and explained itself with a note claiming
+            # "Contract 0.0.0 has no 'insufficient_input' status" — untrue of the contract it
+            # was being emitted under, and it made a working engine look unbuilt.
+            status=AvoidedLossStatus.insufficient_input,
             computed_utc=stamp,
-            # The contract permits a model on a not_implemented response, and naming the
+            # The contract permits a model on a response that carries no losses, and naming the
             # hazard input that produced nothing is more use to a reader than omitting it.
             model=forecast.model,
             assumptions=assumptions,
             losses=[],
+            by_asset=[_as_contract_asset(x) for x in by_asset],
             notes=(
                 f"{INSUFFICIENT_INPUT_PREFIX}: the computation ran and costed 0 of "
                 f"{len(request.exposure)} exposed assets. "
@@ -419,9 +457,8 @@ def compute_avoided_loss(
                     f"{asset_id}: {BLOCK_DETAIL[reason]}"
                     for asset_id, reason in sorted(undetermined.items())
                 )
-                + ". Contract 0.0.0 has no 'insufficient_input' status, so this response uses "
-                "'not_implemented'; the computation is implemented and produced no numbers "
-                "because it was given no usable input."
+                + ". Every asset appears in by_asset with the input that stopped it, so a "
+                "reader can see which are unassessable rather than inferring zero loss."
             ),
         )
         return CascadeLossResult(
@@ -437,6 +474,7 @@ def compute_avoided_loss(
         request_id=request.request_id,
         status=AvoidedLossStatus.computed,
         computed_utc=stamp,
+        by_asset=[_as_contract_asset(x) for x in by_asset],
         model=forecast.model,
         assumptions=assumptions,
         losses=losses,

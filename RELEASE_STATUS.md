@@ -43,18 +43,50 @@ Consequences, all intended:
 | `validate-events` | 64 | pass |
 | `validate-aoi` | 100 | pass (3 warnings: hand-digitised geometry) |
 | `validate-ingest` | 15 | pass (1 warning: 517 transient rows) |
-| `validate-cube` | 23 | pass |
+| `validate-cube` | 24 | pass |
 | `validate-stream` | 33 | pass |
 | `validate-contracts` | 26 | pass (22 contracts) |
 | `validate-lfh` | 22 | pass |
-| **`validate-discriminator`** | **24** | **FAIL — 2 unmet criteria, 4 warnings** |
+| **`validate-discriminator`** | **27** | **FAIL — 2 unmet criteria, 5 warnings** |
 | `validate-runout` | 30 | pass (1 warning: arrival coverage 0.794) |
-| `validate-watch` | 36 | pass (1 warning: transient rows) |
-| `validate-e2e` | 15 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
-| **total** | **388** | |
+| `validate-watch` | 37 | pass (1 warning: transient rows) |
+| `validate-e2e` | 23 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
+| **total** | **401** | |
 
-`make test` passes: **1,418 offline tests**, network blocked (1,316 before the documentation
-checks of gap 72; 1,388 before the provenance checks of gap 73).
+Check counts are from a measured `make validate-serac` on 2026-09-10. Four rows moved: `validate-e2e` 15 -> 23 (the committed-record checks of Gap 66), `validate-discriminator` 24 -> 27 (the receiver-count leak, the balancing rule's effect, and the orphaned-window check of Gap 17), and `validate-cube` 23 -> 24 and `validate-watch` 36 -> 37, which were already stale and are corrected here rather than left to be rediscovered.
+
+`make test` passes: **1,483 offline tests** as of 2026-09-10, network blocked (1,466 before the
+receiver-balancing and live-detector work; 1,418 before the drift, CLI-mounting and
+per-asset-contract checks below; 1,316 before the documentation checks of gap 72; 1,388 before
+the provenance checks of gap 73). Two of the 1,418 were **red**; see the correction below.
+
+**Correction, 2026-09-10: `make test` did not pass, and had not for some time.** Two tests were
+red on `main` — `test_every_repository_path_named_in_infra_exists[infra/jobs/cube-build.yaml]`
+and `test_cited_repository_paths_exist[RELEASE_STATUS.md]` — and both were red for the same
+reason, which is worth more than the fix. They are the checks that stop a document pointing at a
+file that is not there, and they were failing on **this ledger**, because the evidence it quotes
+for its own headline claim (`reports/validation/discriminator.json`, the promotion record) is
+produced by a run and excluded by `.gitignore`. A reader on a fresh clone who followed those
+citations found nothing.
+
+Both are fixed, and the checks came out stronger rather than looser:
+
+- A path a job's own manifest declares under `outputs:` is no longer required to exist before the
+  job has run. The exemption follows the declaration instead of the `data/` prefix, so it covers
+  exactly the paths a run creates. A genuinely dangling `src/` path still fails.
+- A path git does not carry is no longer counted as a typo — but a document that cites one must
+  now name the command that produces it — the `GENERATED_ROOTS` map in
+  `tests/unit/doc_claims.py`, checked by `test_a_cited_run_output_says_how_it_is_produced` in
+  `tests/unit/test_docs_consistency.py`. That keeps the protection the old check was giving the
+  reader without asserting that generated output is committed. (This sentence originally cited
+  the check in pytest node-id form, `path.py::NAME`, and the path checker rejected it — which is
+  the check doing its job on the first document it was asked about.)
+
+The alternative — commit `reports/validation/` so the ledger's evidence survives a clone — was
+considered and not taken. It would put the churn of Gap 66 back into the tree for files whose
+timestamps are part of their meaning, and `.gitignore`'s own comment ("validation stamps are
+regenerated") records the opposite intent. If that intent changes, `serac.validation.drift` is
+the machinery that would make it safe.
 
 **No serac model is validated against events, and none has been promoted.** Four of the five
 components returned a negative or a refusal on the motivating event (Langtang Lirung / Lhende
@@ -73,14 +105,29 @@ The ten majors, in the order I would take them:
 
 1. **The ledger misdescribes what the detector stub does on Langtang.** It says pre-event
    background noise; the stub actually fires 45 s after origin. A factual error about a result.
-2. **`serac watch` is not a registered CLI command**, so M3's documented reproduction sequence
-   cannot be run as written.
+2. ~~**`serac watch` is not a registered CLI command**, so M3's documented reproduction sequence
+   cannot be run as written.~~ **Closed 2026-09-10.** `cli_watch.app` is mounted, all eleven
+   commands are reachable, and `tests/unit/test_cli_mounting.py` now fails if any `cli_*` module
+   defines a Typer app that `serac` never mounts — which is how 460 lines went unreachable
+   without anything noticing.
 3. **The M3 measurability-threshold sensitivity sweep** that the model card and ledger say is
    committed is not in the tree.
 4. **`cap_stub` is still wired into the replay and stream lanes** — the real CAP v1.2 generator
    reaches only `serac cascade e2e`.
-5. **The avoided-loss engine does not honour its own `0.1.0` contract**, including the per-asset
-   losses the response type declares.
+5. ~~**The avoided-loss engine does not honour its own `0.1.0` contract**, including the per-asset
+   losses the response type declares.~~ **Closed 2026-09-10.** Three things were wrong and they
+   compounded. A computation that *ran* reported `status=not_implemented`, so a working engine
+   published itself as unbuilt. It explained that with a note reading "Contract 0.0.0 has no
+   'insufficient_input' status" — untrue of the contract it was emitting under, which has carried
+   that status since 0.1.0. And `by_asset` was declared on the response, computed in full, and
+   never passed in, so every published response said `by_asset: []` while the sidecar held 28
+   rows — and an empty list there does not read as "not reported", it reads as "no assets
+   exposed", which is the difference between an exposure nobody could cost and one that is safe.
+   The Langtang response now says `insufficient_input` and carries all 28 rows, each with the
+   input that stopped it (`no_transect`, `no_arrival`, `no_flow_depth`). The two module
+   docstrings that described contract 0.0.0 are corrected, and the unit test named
+   `test_a_forecast_with_no_depths_produces_an_insufficient_input_response` — which asserted
+   `not_implemented` — now asserts what its name always said.
 6. **M2's "≤120 s met warm (~75 s)" latency claim traces to no committed artefact**, and the
    timings that are committed contradict it.
 7. **`validate-lfh`'s pass criterion is weaker than the brief's** "within stated uncertainty".
@@ -98,11 +145,17 @@ entry. Ordered by what blocks the most.
 
 **Blocks the release mechanics**
 
-- **Gap 66 — the gates dirty the tree that `promote` requires clean.** `validate-e2e` rewrites
-  tracked `reports/e2e/*` with fresh timestamps on every run, so `make validate-serac` always
-  leaves the working tree modified. Nothing can ever be promoted until the volatile fields are
-  excluded from the committed artefacts or those artefacts stop being tracked. Masked today only
-  because promotion is blocked for other reasons.
+- ~~**Gap 66 — the gates dirty the tree that `promote` requires clean.**~~ **Closed
+  2026-09-10.** `validate-e2e` now replays into `reports/validation/e2e-runs/` (untracked) and
+  *checks* the committed `reports/e2e/*` against what it just ran, rather than overwriting it.
+  `make validate-e2e` leaves the tree clean. The second half of that change matters more than the
+  first: a gate that rewrites its own evidence makes the committed report agree with the code by
+  construction, however far apart they have drifted, so the old suite could not have detected a
+  divergence it was nominally there to prevent. `serac.validation.drift` draws the line —
+  timestamps and wall-clock durations are excluded from the comparison and reported separately as
+  measurements, everything else is a finding — and a seeded change to `stopped_because` is
+  correctly refused with the command that re-records the evidence. The suite went from 15 checks
+  to 23. Re-recording is `serac cascade e2e --event <id>`, a deliberate act.
 - **Gap 64 — `reports/validation/latest.json` is stale** (stamped at `0b70091`, seven suites).
   Do not read it as current; the per-suite reports are.
 
@@ -112,6 +165,38 @@ entry. Ordered by what blocks the most.
   ~1 more receiver than their matched negatives and `n_stations` alone scores ROC-AUC 0.587, so
   some of M1's reported skill may be archive density rather than source physics. This is a
   dataset fix, not a training one, and it is the single most important open item on M1.
+  **Fix implemented and measured 2026-09-10; no model retrained under it.**
+  `serac.models.discriminator.balance` gives each event group a receiver quota — the smallest
+  realised count over the positive and every window matched to it — and keeps the first *k*
+  occupied slots of each. Measured on the committed index (`serac models receiver-balance`):
+
+  | | before | after |
+  |---|---|---|
+  | `n_stations`-alone ROC-AUC | **0.6077** | **0.5083** (0.5008 excluding orphans, below) |
+  | receivers on a positive | 8.38 | 5.72 |
+  | receiver-windows dropped | — | 3,861 |
+  | groups lost entirely | — | 0 |
+  | station-identity agreement within kept slots | 83.5 % (full sets) | 83.1 % |
+
+  Two alternatives were measured and are worse: intersecting realised station *sets* group-wise
+  costs 8.38 → 4.60 receivers and four whole groups, and doing it pairwise costs only 8.38 → 7.02
+  but gives a positive a different mask per negative, which one row in the store cannot carry.
+
+  **The measured AUC here is 0.6077, not the 0.587 this entry has always quoted.** The older
+  figure came from a narrower window set; both are computed the same way and the difference is
+  scope, not method. The gate now prints the number it computed rather than citing one.
+
+  **What is still open:** the store's samples are not in this repository, so **nothing has been
+  refitted** and the effect on M1's reported skill is unknown. That is the question Gap 17 asks;
+  closing the leak is the precondition for asking it, not the answer.
+- **NEW — 34 windows name a matched positive that is not in the index.** Found while measuring the
+  above. `CatalogEntry` validates that a negative *carries* a `matched_positive_id`; nothing
+  checked that the positive is present. 33 tectonic windows and one noise window inherit a split
+  group from an absent parent (12 distinct missing positives, e.g. `pos/esec-9`, which was
+  dropped for thin receiver coverage while its negatives were kept). Their mean realised receiver
+  count is 3.56 against 7.37 for tectonics generally, which is why the balanced AUC is 0.5083
+  rather than 0.5008. `validate-discriminator` now warns on them by name; they are not removed,
+  because dropping windows changes split composition and that is a data decision.
 - **Gap 42 — the surrogate fails one of its five gates** (5–95 % arrival coverage 0.794 against
   a 0.85–0.95 target), and the arrival gate that *passes* rests on 3 held-out members at one
   transect. Three of four transects scored nothing.
@@ -121,8 +206,14 @@ entry. Ordered by what blocks the most.
 
 **Half-finished work**
 
-- **Gap 56 — the live stream lane is still the stub.** Replay can select the trained detector;
-  `serac stream run` cannot.
+- ~~**Gap 56 — the live stream lane is still the stub.** Replay can select the trained detector;
+  `serac stream run` cannot.~~ **Closed 2026-09-10.** Both lanes now call the same
+  `build_trained_detector` factory: `serac stream run detector --detector discriminator` mounts
+  the LORO-HMA model and reports `is_stub=False`. The **stub stays the default** while
+  `validate-discriminator` reports an unmet criterion, a missing artifact is an error rather than
+  a silent fall back to the stub, and the command prints that the CAP stage downstream is still
+  `cap_stub` and still emits `status=Test`. **The lane is not an alert system and mounting a real
+  detector did not make it one** — that is major #4, still open.
 - **Gap 62 — `SourceRef` exists twice.** A contract test now fails on divergence, but the two
   copies have not been merged.
 - **Gap 61 — no job manifest in `infra/jobs/` has ever been executed.** Every core-hour and

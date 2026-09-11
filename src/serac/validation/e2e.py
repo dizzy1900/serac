@@ -21,6 +21,14 @@ instruction: an early stop is the outcome to record, not a reason for the harnes
 Every early stop is recorded as a non-failing `warning` so it appears in the report, and the
 `chain_produced_a_forecast` warning is the one to read first. Do not read a green
 `validate-e2e` as evidence that serac forecast anything.
+
+**The suite no longer rewrites `reports/e2e/`.** It replays into a scratch directory under
+`reports/validation/` and checks the committed record against what it just ran, ignoring
+timestamps and measured durations (`serac.validation.drift`). That closes Known gap 66 -- the
+gate used to dirty the tree `make promote` requires clean, so nothing could ever be promoted --
+and it closes something worse: a gate that overwrites its own evidence makes the committed
+report agree with the code by construction, however far apart they have drifted. Re-recording is
+now a deliberate act, `serac cascade e2e --event <id>`, and the failure detail says so.
 """
 
 from __future__ import annotations
@@ -39,6 +47,11 @@ from serac.cascade.evidence import Execution, StageOutcome
 from serac.domain.avoided_loss import AvoidedLossStatus
 from serac.pipelines.e2e import CHAIN_STAGES, EVENTS, E2EResult, run_e2e
 from serac.validation.cap import CapValidator
+from serac.validation.drift import (
+    drift,
+    measured_values,
+    stable_text,
+)
 from serac.validation.result import Suite, SuiteResult
 from serac.validation.underwriting import (
     RESPONSE_CONTRACT,
@@ -48,6 +61,9 @@ from serac.validation.underwriting import (
 
 SUITE_NAME = "e2e"
 LATENCY_FILENAME = "latency.json"
+RUN_SUBDIR = "e2e-runs"
+"""Where a gate run puts its replays. Under reports/validation/, which is not tracked."""
+RERECORD = "serac cascade e2e --event {event_id}"
 
 
 def _latency_report(repo: Path, results: list[E2EResult]) -> dict[str, Any]:
@@ -97,11 +113,13 @@ def run_suite(repo: Path, reports_dir: Path | None = None) -> SuiteResult:
     """Run both replays, write the latency report, and validate the CAP and loss outputs."""
     suite = Suite(SUITE_NAME, repo)
     e2e_dir = repo / "reports" / "e2e"
+    run_dir = (reports_dir or (repo / "reports" / "validation")) / RUN_SUBDIR
+    run_dir.mkdir(parents=True, exist_ok=True)
     results: list[E2EResult] = []
 
     for event_id in sorted(EVENTS):
         try:
-            result = run_e2e(repo, event_id, write=True)
+            result = run_e2e(repo, event_id, write=True, reports_dir=run_dir)
         except Exception as exc:
             suite.check(f"replay_{event_id}", False, f"{type(exc).__name__}: {exc}")
             continue
@@ -124,9 +142,10 @@ def run_suite(repo: Path, reports_dir: Path | None = None) -> SuiteResult:
         )
         suite.check(
             f"replay_{event_id}_reports_written",
-            (e2e_dir / f"{event_id}.md").exists() and (e2e_dir / f"{event_id}.json").exists(),
-            f"reports/e2e/{event_id}.{{md,json}}",
+            (run_dir / f"{event_id}.md").exists() and (run_dir / f"{event_id}.json").exists(),
+            f"{run_dir.relative_to(repo)}/{event_id}.{{md,json}}",
         )
+        _check_committed_record(suite, repo, e2e_dir, run_dir, event_id)
         suite.warn(
             f"replay_{event_id}_chain_produced_a_forecast",
             False,
@@ -147,16 +166,23 @@ def run_suite(repo: Path, reports_dir: Path | None = None) -> SuiteResult:
             )
 
     # -- latency report ------------------------------------------------------------------------
-    e2e_dir.mkdir(parents=True, exist_ok=True)
-    latency_path = e2e_dir / LATENCY_FILENAME
+    fresh_latency = _latency_report(repo, results)
+    latency_path = run_dir / LATENCY_FILENAME
     latency_path.write_text(
-        json.dumps(_latency_report(repo, results), indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+        json.dumps(fresh_latency, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     suite.check(
         "latency_report_generated",
         latency_path.exists(),
         f"{latency_path.relative_to(repo)} ({latency_path.stat().st_size} bytes)",
+    )
+    _check_committed_json(
+        suite,
+        name="latency_report_matches_the_committed_record",
+        committed_path=e2e_dir / LATENCY_FILENAME,
+        fresh=fresh_latency,
+        repo=repo,
+        rerecord="serac cascade e2e --event <id> for each event, then re-run this suite",
     )
 
     # -- CAP against the XSD -------------------------------------------------------------------
@@ -231,3 +257,113 @@ def run_suite(repo: Path, reports_dir: Path | None = None) -> SuiteResult:
         "that it forecast anything.",
     )
     return suite.result()
+
+
+def _check_committed_record(
+    suite: Suite, repo: Path, e2e_dir: Path, run_dir: Path, event_id: str
+) -> None:
+    """Does the committed evidence for this event still describe what the chain does?"""
+    fresh_json = json.loads((run_dir / f"{event_id}.json").read_text(encoding="utf-8"))
+    _check_committed_json(
+        suite,
+        name=f"replay_{event_id}_matches_the_committed_record",
+        committed_path=e2e_dir / f"{event_id}.json",
+        fresh=fresh_json,
+        repo=repo,
+        rerecord=RERECORD.format(event_id=event_id),
+    )
+    _check_committed_markdown(
+        suite,
+        name=f"replay_{event_id}_committed_markdown_matches",
+        committed_path=e2e_dir / f"{event_id}.md",
+        fresh_path=run_dir / f"{event_id}.md",
+        repo=repo,
+        rerecord=RERECORD.format(event_id=event_id),
+    )
+
+
+def _check_committed_json(
+    suite: Suite,
+    *,
+    name: str,
+    committed_path: Path,
+    fresh: Any,
+    repo: Path,
+    rerecord: str,
+) -> None:
+    relative = committed_path.relative_to(repo)
+    if not committed_path.exists():
+        suite.check(
+            name,
+            False,
+            f"{relative} is not committed, so there is no record to check this run against. "
+            f"Record one with `{rerecord}` and commit it.",
+        )
+        return
+    committed = json.loads(committed_path.read_text(encoding="utf-8"))
+    differences = drift(committed, fresh)
+    suite.check(
+        name,
+        not differences,
+        (
+            f"{relative} still describes this run (timestamps and measured durations excluded)"
+            if not differences
+            else (
+                f"{relative} disagrees with this run in {len(differences)} place(s): "
+                + "; ".join(differences[:5])
+                + (f"; and {len(differences) - 5} more" if len(differences) > 5 else "")
+                + f". The published evidence and the code have diverged. If the code is right, "
+                f"re-record with `{rerecord}` and commit the result."
+            )
+        ),
+    )
+    _report_measurements(suite, name, committed, fresh, relative)
+
+
+def _check_committed_markdown(
+    suite: Suite, *, name: str, committed_path: Path, fresh_path: Path, repo: Path, rerecord: str
+) -> None:
+    relative = committed_path.relative_to(repo)
+    if not committed_path.exists():
+        suite.check(name, False, f"{relative} is not committed; record one with `{rerecord}`")
+        return
+    committed = stable_text(committed_path.read_text(encoding="utf-8"))
+    fresh = stable_text(fresh_path.read_text(encoding="utf-8"))
+    if committed == fresh:
+        suite.check(name, True, f"{relative} renders identically once the clock is masked")
+        return
+    committed_lines = committed.splitlines()
+    fresh_lines = fresh.splitlines()
+    first = next(
+        (i for i, (a, b) in enumerate(zip(committed_lines, fresh_lines, strict=False)) if a != b),
+        min(len(committed_lines), len(fresh_lines)),
+    )
+    suite.check(
+        name,
+        False,
+        f"{relative} differs from this run at line {first + 1}; re-record with `{rerecord}`",
+    )
+
+
+def _report_measurements(
+    suite: Suite, name: str, committed: Any, fresh: Any, relative: Path
+) -> None:
+    """The durations the comparison drops are still the measurement. Report them."""
+    was = measured_values(committed)
+    now = measured_values(fresh)
+    shared = sorted(set(was) & set(now))
+    if not shared:
+        return
+    moved = [(k, was[k], now[k]) for k in shared if was[k] != now[k]]
+    if not moved:
+        suite.info(f"{name}_timings", f"{relative}: {len(shared)} measured duration(s) unchanged")
+        return
+    worst = max(moved, key=lambda row: abs(row[2] - row[1]) / max(row[1], 1e-9))
+    suite.info(
+        f"{name}_timings",
+        (
+            f"{relative}: {len(moved)} of {len(shared)} measured duration(s) moved between the "
+            f"committed record and this run, which is machine speed, not behaviour. Largest "
+            f"relative change {worst[0]}: {worst[1]:g}s -> {worst[2]:g}s"
+        ),
+    )

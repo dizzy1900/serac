@@ -510,3 +510,58 @@ def case_study(
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     typer.echo(json.dumps(record, indent=2))
+
+
+@app.command("receiver-balance")
+def receiver_balance(
+    store: Annotated[Path, typer.Option(help="Discriminator window store.")] = Path(
+        "data/features/discriminator"
+    ),
+    out: Annotated[
+        Path | None, typer.Option("--out", help="Also write the report as JSON here.")
+    ] = None,
+) -> None:
+    """Measure the receiver-count leak (Gap 17) and what the balancing rule would do to it.
+
+    Reads the committed window index only — no waveform samples — so it runs on a fresh clone.
+    """
+    from dataclasses import asdict
+
+    from serac.models.discriminator.balance import balance_report
+    from serac.models.discriminator.dataset import load_index
+
+    report = balance_report(load_index(store))
+    typer.echo(f"`n_stations` alone, mass_movement vs tectonic: ROC-AUC {report.auc_before:.4f}")
+    typer.echo("  0.5 would mean the receiver count says nothing about the class.")
+    typer.echo("")
+    typer.echo("With the group count-quota applied:")
+    typer.echo(f"  ROC-AUC              {report.auc_before:.4f} -> {report.auc_after:.4f}")
+    typer.echo(
+        f"  excluding orphans    {report.auc_before:.4f} -> "
+        f"{report.auc_after_excluding_orphans:.4f}"
+    )
+    for label in sorted(report.mean_receivers_before):
+        was = report.mean_receivers_before[label]
+        now = report.mean_receivers_after.get(label, 0.0)
+        typer.echo(f"  receivers, {label:<14} {was:.2f} -> {now:.2f}")
+    typer.echo(f"  receiver-windows dropped   {report.receivers_dropped}")
+    typer.echo(f"  groups emptied             {report.n_groups_emptied}")
+    typer.echo(
+        f"  station identity kept      {report.mean_station_identity_agreement:.1%} "
+        "(agreement between a positive's kept stations and a member's)"
+    )
+    if report.orphan_ids:
+        typer.echo(
+            f"  {len(report.orphan_ids)} window(s) name a matched positive absent from the "
+            "index; they cannot be balanced and are the residual above."
+        )
+    typer.echo("")
+    typer.echo(
+        "NOT APPLIED to any trained model: the store's samples are not in this repository, so "
+        "nothing has been refitted under this rule and its effect on M1's reported skill is "
+        "unknown. Closing the leak is the precondition for asking that question."
+    )
+    if out is not None:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(asdict(report), indent=2, sort_keys=True) + "\n", "utf-8")
+        typer.echo(f"wrote {out}")

@@ -115,11 +115,66 @@ def run_detector(
     bus: BusOption = "in_memory",
     max_seconds: Annotated[float | None, typer.Option("--max-seconds")] = None,
     allow_synthetic: Annotated[bool, typer.Option("--allow-synthetic")] = False,
+    detector: Annotated[
+        str,
+        typer.Option(
+            "--detector",
+            help=(
+                "stub (default) or discriminator. The stub stays the default while "
+                "validate-discriminator reports an unmet criterion; the same rule the replay "
+                "lane follows."
+            ),
+        ),
+    ] = "stub",
+    repo: RepoOption = Path("."),
+    inventory: Annotated[
+        Path | None,
+        typer.Option(
+            "--inventory",
+            help="StationXML for instrument response. Required by the trained detector.",
+        ),
+    ] = None,
 ) -> None:
-    """Run the STUB detector (serac.waveforms -> serac.detections)."""
-    _run_stage(
-        DetectorStub(DetectorStubConfig(allow_synthetic=allow_synthetic)), _bus(bus), max_seconds
+    """Run the detector stage (serac.waveforms -> serac.detections).
+
+    Until 2026-09-10 this command could only run the stub, so the live lane and the replay lane
+    disagreed about what serac could do: `serac replay --detector discriminator` mounted the
+    trained model and `serac stream run detector` had no way to. Both now call the same factory.
+
+    Selecting `discriminator` mounts a real model and **does not** make this an alert system: the
+    CAP stage downstream is still `cap_stub` and still emits `status=Test`, and the model itself
+    has never been promoted.
+    """
+    if detector not in {"stub", "discriminator"}:
+        typer.echo(
+            f"serac stream run detector: unknown detector {detector!r}; use stub or discriminator",
+            err=True,
+        )
+        raise typer.Exit(1)
+    if detector == "stub":
+        _run_stage(
+            DetectorStub(DetectorStubConfig(allow_synthetic=allow_synthetic)),
+            _bus(bus),
+            max_seconds,
+        )
+        return
+
+    from serac.pipelines.replay import ReplayError, build_trained_detector
+    from serac.streaming.detector_stage import DetectorStage
+
+    try:
+        trained = build_trained_detector("discriminator", repo_root=repo, inventory_path=inventory)
+    except ReplayError as exc:
+        # A missing artifact is an error, never a quiet fall back to the stub: a lane that says
+        # it ran the trained model must have run it.
+        typer.echo(f"serac stream run detector: {exc}", err=True)
+        raise typer.Exit(1) from exc
+    info = trained.info()
+    typer.echo(
+        f"detector={info.name} version={info.version} is_stub={info.is_stub}; the CAP stage "
+        "downstream remains the stub and emits status=Test"
     )
+    _run_stage(DetectorStage(trained), _bus(bus), max_seconds)
 
 
 @run_app.command("cap")

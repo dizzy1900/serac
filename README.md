@@ -34,7 +34,7 @@ See `RELEASE_STATUS.md` for what is real, what is stubbed and what is missing. I
 
 - serac does **not** predict the day or hour of a bedrock collapse from satellites. That is not a
   goal and it is not a claim anywhere in this code, documentation or output.
-- The live stream lane runs a **stub** detector and emits test-status CAP messages only. The trained discriminator exists and can be selected in a replay, but `serac stream run` does not mount it; see `RELEASE_STATUS.md` for what exists.
+- The live stream lane emits **test-status CAP messages only**: the CAP stage is still `cap_stub`. The trained discriminator can now be selected in the live lane as well as in a replay (`serac stream run detector --detector discriminator`, 2026-09-10), and the **stub remains the default** while `validate-discriminator` reports an unmet criterion. Mounting a real detector does not make this an alert system and the command says so. See `RELEASE_STATUS.md` for what exists.
 - Numbers in the event library that have no reliable published estimate are `null`.
 - The ≤ 180 s detachment-to-alert figure is a design budget, not a measured result: no end-to-end latency has ever been measured. The detection stage alone was measured at 210 s on Chamoli against a 60 s budget, and the budget is unreachable for that component (`docs/ARCHITECTURE.md` §4.3).
 - serac owns no satellites and no seismic network: the constellation is bought, not built.
