@@ -130,7 +130,32 @@ The ten majors, in the order I would take them:
    `not_implemented` — now asserts what its name always said.
 6. **M2's "≤120 s met warm (~75 s)" latency claim traces to no committed artefact**, and the
    timings that are committed contradict it.
-7. **`validate-lfh`'s pass criterion is weaker than the brief's** "within stated uncertainty".
+7. ~~**`validate-lfh`'s pass criterion is weaker than the brief's** "within stated
+   uncertainty".~~ **Closed 2026-09-10, and the gate went red as a result — which is the point.**
+   The suite compared reproductions by interval *overlap*, and overlap is a weaker relation than
+   the brief's: two intervals can overlap while each one's centre sits outside the other. The
+   criterion is now mutual containment — serac's median inside the published interval **and** the
+   published centre inside serac's 5–95 % — and the same rule is applied to published peak force
+   and duration, which were previously judged by a factor-of-two band invented at the gate and by
+   nothing at all.
+
+   What that changes: `lfh.reproductions_within_stated_uncertainty` reports **1 of 4** where
+   overlap reported 3 of 4, and `lfh.duration_within_stated_uncertainty` is unmet because serac's
+   296 s disagrees with Higman's published 90 s — a disagreement `reports/MODEL_CARD_lfh.md`
+   already described in prose and the gate could not see. `validate-lfh` now fails with **2 unmet
+   criteria**, and unmet criteria are `criterion_unmet`, not `error`: the code worked and a
+   criterion of the brief was not met.
+
+   **A defect found in review, in the fix itself.** The new checks raised their criterion over a
+   list built only from targets that had both a published value and a loadable run, so with zero
+   comparisons the criterion passed — green precisely where it knew least, which is the disease
+   this suite was audited for, reintroduced one level up. The checks now refuse on an empty
+   comparison set, distinguish "no publication states this quantity" from "no computed run to
+   compare against", and report their coverage (`1 of 1 published duration value(s) compared`).
+
+   **Still open on this suite:** `_check_runout_bearing` retains an invented 45-degree band, and
+   `reports/validation/lfh.json` was deliberately not rewritten, so the stale report still reads
+   `passed` until the suite is re-run on a sealed tree.
 8. **DVC tracking is nominal**: no `dvc.lock` is committed, so 5,606 `fetched` ledger rows are
    not recoverable from the repository alone.
 9. **The cube's `s1_coherence_t` / `s1_los_velocity_t` layers cannot consume the 517 real HyP3
