@@ -40,6 +40,11 @@ from serac.models.runout.cascade import (
     damming_index,
     index_to_probability,
 )
+from serac.models.runout.conformal import (
+    ConformalCalibration,
+    ConformalMode,
+    apply_correction,
+)
 from serac.models.runout.params import (
     NOT_RAVAFLOW,
     RESOLUTION_LIMITATION,
@@ -134,6 +139,40 @@ class RunoutSurrogate:
     name = f"{SOLVER_NAME}-surrogate"
     version = SURROGATE_VERSION
 
+    calibration: dict[str, ConformalCalibration] = {}
+    """Conformal corrections loaded from the checkpoint, keyed by target. Empty means the
+    checkpoint predates calibration and `infer` returns the raw quantile heads."""
+
+    @property
+    def calibration_applied(self) -> tuple[str, ...]:
+        """Targets whose published interval carries a conformal correction."""
+        return tuple(sorted(self.calibration))
+
+    def _calibrated(self, quantiles: NDArray[np.float32], target: str) -> NDArray[np.float32]:
+        """Widen (or narrow) the 5th and 95th columns; the median is left exactly as predicted.
+
+        A quantile head's median is a point estimate and conformal calibration says nothing about
+        it. Only the interval is corrected, which is what the coverage gate is about.
+        """
+        calibration = self.calibration.get(target)
+        if calibration is None or quantiles.shape[-1] < 3:
+            return quantiles
+        out = np.array(quantiles, dtype=np.float64, copy=True)  # correct in float64
+        low, high = apply_correction(
+            out[..., 0],
+            out[..., 2],
+            calibration.correction,
+            mode=calibration.mode,
+            non_negative=calibration.non_negative,
+        )
+        out[..., 0] = low
+        out[..., 2] = high
+        # The median must stay inside its own interval after a narrowing correction.
+        out[..., 1] = np.clip(out[..., 1], out[..., 0], out[..., 2])
+        # Back to the dtype the prediction contract declares; the correction is a scalar and a
+        # round-trip through float64 changes nothing a float32 field could hold.
+        return np.asarray(out, dtype=quantiles.dtype)
+
     def __init__(
         self,
         fno: CorridorFNO,
@@ -180,7 +219,7 @@ class RunoutSurrogate:
             n_parameters=config["n_parameters"], n_transects=len(blob["transect_ids"])
         )
         regressor.load_state_dict(blob["regressor"])
-        return cls(
+        surrogate = cls(
             fno,
             regressor,
             Standardiser(**blob["standardiser"]),
@@ -193,6 +232,24 @@ class RunoutSurrogate:
             design_hash=design_hash,
             device=device,
         )
+        # A checkpoint written before conformal calibration existed has no `calibration` key.
+        # That is not an error and must not be one: it loads with no correction, `infer` returns
+        # the raw quantile heads, and `calibration_applied` says so to anything that asks.
+        surrogate.calibration = {
+            target: ConformalCalibration(
+                target=str(entry["target"]),
+                mode=ConformalMode(entry["mode"]),
+                level=float(entry["level"]),
+                correction=float(entry["correction"]),
+                n_calibration=int(entry["n_calibration"]),
+                coverage_before=float(entry["coverage_before"]),
+                coverage_after=float(entry["coverage_after"]),
+                non_negative=bool(entry["non_negative"]),
+                version=str(entry.get("version", "")),
+            )
+            for target, entry in (blob.get("calibration") or {}).items()
+        }
+        return surrogate
 
     # -- inference -------------------------------------------------------------------------------
 
@@ -208,8 +265,12 @@ class RunoutSurrogate:
         latency = _time.perf_counter() - start
         return SurrogatePrediction(
             chainage_m=self.chainage_m,
-            max_depth_q=depth_q[0].cpu().numpy() * self.depth_scale,
-            arrival_q=arrival_q[0].cpu().numpy() * self.arrival_scale,
+            max_depth_q=self._calibrated(
+                depth_q[0].cpu().numpy() * self.depth_scale, "max_depth_m"
+            ),
+            arrival_q=self._calibrated(
+                arrival_q[0].cpu().numpy() * self.arrival_scale, "arrival_time_s"
+            ),
             reach_probability=torch.sigmoid(reach)[0].cpu().numpy(),
             transect_arrival_q=t_arrival[0].cpu().numpy() * self.arrival_scale,
             transect_stage_q=t_stage[0].cpu().numpy() * self.depth_scale,

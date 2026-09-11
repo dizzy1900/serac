@@ -162,6 +162,15 @@ class BootstrapConfig(BaseModel):
     n_draws: int = Field(default=200, ge=20)
     seed: int = 20260903
     resample_stations: bool = True
+    max_workers: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "Threads used to re-invert draws. None uses the machine's CPU count. Draws are "
+            "independent by construction (each has its own spawned RNG stream), so this changes "
+            "the wall clock and not the numbers; `max_workers=1` runs them in order."
+        ),
+    )
     #: Multiplicative jitter applied to each band corner, drawn log-uniformly.
     band_jitter: float = Field(default=1.25, ge=1.0)
     #: Multiplicative jitter applied to lambda, drawn log-uniformly.

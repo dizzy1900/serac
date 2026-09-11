@@ -200,6 +200,38 @@ entry. Ordered by what blocks the most.
 - **Gap 42 — the surrogate fails one of its five gates** (5–95 % arrival coverage 0.794 against
   a 0.85–0.95 target), and the arrival gate that *passes* rests on 3 held-out members at one
   transect. Three of four transects scored nothing.
+  **A fix is implemented and has not been fitted on real data (2026-09-10).** The interval is
+  mis-calibrated, not under-trained — training longer cannot move it — so
+  `serac.models.runout.conformal` adds conformalized quantile regression (Romano, Patterson &
+  Candès 2019): score each held-out point by how far outside its own predicted interval the
+  truth fell, take the conservative `ceil((n+1)(1−α))/n` quantile of those scores, and widen by
+  it. `train()` now fits the correction on the **val** split (never test, and disjoint by
+  `run_id`), stores it in the checkpoint, and `RunoutSurrogate.infer` applies it, so the
+  intervals reaching the cascade and alerting layers are the calibrated ones. The correction is
+  two-sided: an over-covering interval is *narrowed* rather than left needlessly wide.
+  `evaluate()` reports calibrated and uncalibrated coverage side by side, so a gate cannot be
+  passed by calibration alone without the size of the calibration being visible.
+
+  **Not fitted here.** The ensemble member directories are not in this repository, so no
+  correction has been computed from the frozen ensemble and `reports/runout/surrogate_metrics.json`
+  is unchanged — 0.794 is still the committed number and the gate still fails. The next rebuild
+  produces the real figure. Three limits travel with the method and are in the module docstring:
+  exchangeability is assumed and the ensemble was drawn to a design rather than at random; the
+  guarantee is marginal, not per transect, while the gate also scores per transect; and arrival
+  time is clamped at zero, which only ever removes coverage.
+- **The M2 bootstrap's draws were not independent of each other's failures (fixed 2026-09-10).**
+  All 200 draws shared one generator consumed in loop order, so a draw that raised before
+  reaching its friction sample consumed fewer numbers and shifted every later draw onto different
+  values. The seed was pinned and the result still was not reproducible across anything that
+  changed the failure pattern — a different station set, a new ObsPy release. Draws now take
+  independent streams spawned from the seed, so draw *k* is a pure function of `(seed, k)`;
+  verified by planning draw 4 with draws 0–3 skipped entirely and getting the same plan. The same
+  change makes them safe to run concurrently (`BootstrapConfig.max_workers`, threads, because the
+  cost is numpy linear algebra that releases the GIL and the Green's cache would have to be
+  pickled to cross a process boundary). **The published M2 numbers were produced under the old
+  scheme and have not been regenerated**: the draws are differently *placed*, not differently
+  *distributed*, so the intervals should move by resampling noise and that is a claim nobody has
+  checked, because the waveform inputs are not in this clone.
 - **Gap 39 — no independent simulator.** `serac-swe-voellmy` has never been cross-validated
   against r.avaflow or any other code, so its structural bias cannot be separated from
   implementation error.
