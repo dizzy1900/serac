@@ -11,6 +11,7 @@ from lxml import etree
 from serac.adapters.cap.cap12 import CAP_NS, render
 from serac.domain.detection import DetectionCandidate
 from serac.domain.seismic import Sncl
+from serac.streaming.cap_stage import cap_message_for_detection
 from serac.streaming.cap_stub import cap_message_for
 from serac.validation.cap import CapValidationError, CapValidator, verify_vendor_manifest
 
@@ -57,6 +58,24 @@ def test_vendor_manifest_checksums_match(cap_dir: Path) -> None:
 def test_valid_message_passes(validator: CapValidator, valid_xml: bytes) -> None:
     assert validator.errors(valid_xml) == []
     validator.validate(valid_xml)
+
+
+def test_detection_path_generator_message_passes(validator: CapValidator) -> None:
+    """Default-lane XML (not CapStub) must also validate offline against the vendored XSD."""
+    det = DetectionCandidate(
+        detection_id="d1",
+        sncl=Sncl(network="NK", station="KKN", location="", channel="BHZ"),
+        detector="lp-sp-ratio-stub",
+        detector_version="0.1.0",
+        window_start_utc=T0,
+        window_end_utc=T0,
+        detected_at_stream_utc=T0,
+        score=1.0,
+        threshold=0.5,
+    )
+    xml = render(cap_message_for_detection(det, sent=T0))
+    assert validator.errors(xml) == []
+    validator.validate(xml)
 
 
 def _mutate(xml: bytes, path: str, text: str | None) -> bytes:
