@@ -134,6 +134,7 @@ def test_ledger_rows_for_fixtures_are_real_and_hashed(
                 DataSource.usgs_comcat,
                 DataSource.vendored_schema,
                 DataSource.hydrometric_icimod,
+                DataSource.geoglows_ecmwf,
             }
             or entry.adapter != "fixture-fetch"
         )

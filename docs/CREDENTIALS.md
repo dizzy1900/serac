@@ -21,10 +21,11 @@ Before doing either of the following, stop and ask the human running the session
 
 | Variable | What it is | Where to obtain it | Cost | Adapters that need it |
 |---|---|---|---|---|
-| `EARTHDATA_USERNAME`, `EARTHDATA_PASSWORD` | NASA Earthdata Login | `https://urs.earthdata.nasa.gov` (free account) | free | Sentinel-1 downloads via ASF (`adapters/eo/asf.py`), HyP3 InSAR jobs (`adapters/eo/hyp3.py`), NISAR products (`adapters/eo/nisar.py`). ASF **search** is public and needs no login. |
-| `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET` | Copernicus Data Space Ecosystem OAuth client credentials | register at `https://dataspace.copernicus.eu`, then create an OAuth client in the account settings | free | Sentinel-2 L2A downloads via CDSE (`adapters/eo/cdse.py`). CDSE STAC **search** is public. |
-| `CDSAPI_URL` | Copernicus Climate Data Store API endpoint | default `https://cds.climate.copernicus.eu/api` | free | ERA5 (`adapters/eo/era5.py`) |
-| `CDSAPI_KEY` | CDS API key | `https://cds.climate.copernicus.eu` account page (free account; dataset licences must be accepted on the site once) | free | ERA5 (`adapters/eo/era5.py`) |
+| `EARTHDATA_TOKEN` | NASA Earthdata Login bearer token | `https://urs.earthdata.nasa.gov/profile` (free account; tokens expire) | free | Sentinel-1 downloads via ASF (`adapters/eo/asf_sentinel1.py`; alternative to username/password), HyP3 burst InSAR (`adapters/eo/hyp3_burst.py`). ASF **search** is public and needs no login. |
+| `EARTHDATA_USERNAME`, `EARTHDATA_PASSWORD` | NASA Earthdata Login | `https://urs.earthdata.nasa.gov` (free account) | free | Sentinel-1 downloads via ASF (`adapters/eo/asf_sentinel1.py`; username+password or token), HyP3 full-frame InSAR jobs (`adapters/eo/hyp3_insar.py`), NISAR products (`adapters/eo/nisar.py`). ASF **search** is public and needs no login. |
+| `CDSE_CLIENT_ID`, `CDSE_CLIENT_SECRET` | Copernicus Data Space Ecosystem OAuth client credentials | register at `https://dataspace.copernicus.eu`, then create an OAuth client in the account settings | free | Sentinel-2 L2A downloads via CDSE (`adapters/eo/cdse_sentinel2.py`). CDSE STAC **search** is public. |
+| `CDSAPI_URL` | Copernicus Climate Data Store API endpoint | default `https://cds.climate.copernicus.eu/api` | free | ERA5 (`adapters/eo/era5_cds.py`) |
+| `CDSAPI_KEY` | CDS API key | `https://cds.climate.copernicus.eu` account page (free account; dataset licences must be accepted on the site once) | free | ERA5 (`adapters/eo/era5_cds.py`) |
 | `GACOS_EMAIL` | email address used for GACOS requests | any address you control; GACOS delivers corrections by email after a web-form request | free | GACOS request/poll (`adapters/eo/gacos.py`) |
 | `SERAC_REDIS_URL` | Redis connection URL for the Streams bus | default `redis://localhost:6379/0`; provided by `infra/docker/compose.yaml` | free | `adapters/bus/redis_streams.py`; tests marked `redis` |
 | `SERAC_SEEDLINK_SERVER` | SeedLink `host:port` | default `geofon.gfz.de:18000` (unverified live; see `RELEASE_STATUS.md`) | free | `streaming/seedlink_ingestor.py`, `adapters/seismic/seedlink.py` |
@@ -98,6 +99,7 @@ fingerprint as unverified from that moment. Recipients should pin the fingerprin
 - USGS ComCat.
 - OSM Overpass (ODbL attribution required).
 - Crossref API (for resolving DOIs).
+- GEOGLOWS ECMWF streamflow REST (`https://geoglows.ecmwf.int/api/`).
 
 ## What happens when a credential is missing
 

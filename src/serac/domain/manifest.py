@@ -35,6 +35,7 @@ class DataSource(StrEnum):
     seedlink = "seedlink"
     usgs_comcat = "usgs_comcat"
     hydrometric_icimod = "hydrometric_icimod"
+    geoglows_ecmwf = "geoglows_ecmwf"
     osm_overpass = "osm_overpass"
     source_document = "source_document"
     vendored_schema = "vendored_schema"

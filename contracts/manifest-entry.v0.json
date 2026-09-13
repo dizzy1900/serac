@@ -15,6 +15,7 @@
         "seedlink",
         "usgs_comcat",
         "hydrometric_icimod",
+        "geoglows_ecmwf",
         "osm_overpass",
         "source_document",
         "vendored_schema",
