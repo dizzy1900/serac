@@ -24,6 +24,7 @@ from serac.alerting.keys import (
     generate_keypair,
     load_private_key,
     load_public_key,
+    load_signing_key_if_present,
     public_key_fingerprint,
     resolve_key_location,
     write_private_key,
@@ -106,6 +107,27 @@ def test_resolve_key_location_reads_the_environment(tmp_path: Path) -> None:
     assert location.private_path == tmp_path / "a.pem"
     assert location.public_path == tmp_path / "a.pub.pem"
     assert location.can_sign is False  # nothing on disk
+
+
+def test_load_signing_key_if_present_returns_none_when_missing(tmp_path: Path) -> None:
+    assert load_signing_key_if_present(env={SIGNING_KEY_ENV: str(tmp_path / "nope.pem")}) is None
+    assert load_signing_key_if_present(env={}) is None
+
+
+def test_load_signing_key_if_present_loads_a_readable_key(keypair_dir: Path) -> None:
+    key = generate_keypair()
+    path = write_private_key(key, keypair_dir / "cap.pem", allow_tracked=True)
+    loaded = load_signing_key_if_present(env={SIGNING_KEY_ENV: str(path)})
+    assert loaded is not None
+    assert public_key_fingerprint(loaded.public_key()) == public_key_fingerprint(key.public_key())
+
+
+def test_load_signing_key_if_present_treats_a_world_readable_key_as_absent(
+    keypair_dir: Path,
+) -> None:
+    path = write_private_key(generate_keypair(), keypair_dir / "cap.pem", allow_tracked=True)
+    path.chmod(0o644)
+    assert load_signing_key_if_present(env={SIGNING_KEY_ENV: str(path)}) is None
 
 
 # -- signatures ---------------------------------------------------------------------------------

@@ -30,6 +30,8 @@ def test_replay_chamoli_at_speed_max_writes_report(repo_root: Path, tmp_path: Pa
     assert result.exit_code == 0, result.output
     assert "chamoli-2021: completed" in result.output
     assert "stub=True" in result.output
+    assert "status=Test" in result.output
+    assert "not an operational alert system" in result.output
     report = json.loads((tmp_path / "chamoli-2021.json").read_text())
     assert report["is_stub"] is True
     assert report["counts"]["pending_after_drain"] == 0
@@ -54,6 +56,26 @@ def test_replay_synthetic_lane(repo_root: Path, tmp_path: Path) -> None:
     assert report["contains_synthetic"] is True
     assert report["counts"]["detections_emitted"] >= 1
     assert report["counts"]["cap_messages_emitted"] >= 1
+
+
+def test_replay_cap_stub_flag(repo_root: Path, tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        [
+            "replay",
+            "--event",
+            "synthetic-lp-burst",
+            "--cap",
+            "stub",
+            "--report-dir",
+            str(tmp_path),
+            "--repo",
+            str(repo_root),
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "CAP stage=cap-stub" in result.output
+    assert "status=Test" in result.output
 
 
 def test_replay_missing_fixture_exits_2(repo_root: Path, tmp_path: Path) -> None:
@@ -123,7 +145,39 @@ def test_run_cap_on_in_memory_bus(repo_root: Path) -> None:
         app, ["run", "cap", "--bus", "in_memory", "--max-seconds", "0", "--repo", str(repo_root)]
     )
     assert result.exit_code == 0, result.output
+    assert "cap: processed 0" in result.output
+    assert "status=Test" in result.output
+    assert "not an operational alert system" in result.output
+
+
+def test_run_cap_stub_flag_uses_cap_stub(repo_root: Path) -> None:
+    result = runner.invoke(
+        app,
+        [
+            "run",
+            "cap",
+            "--cap",
+            "stub",
+            "--bus",
+            "in_memory",
+            "--max-seconds",
+            "0",
+            "--repo",
+            str(repo_root),
+        ],
+    )
+    assert result.exit_code == 0, result.output
     assert "cap-stub: processed 0" in result.output
+    assert "status=Test" in result.output
+
+
+def test_run_cap_rejects_an_unknown_kind(repo_root: Path) -> None:
+    result = runner.invoke(
+        app,
+        ["run", "cap", "--cap", "live", "--max-seconds", "0", "--repo", str(repo_root)],
+    )
+    assert result.exit_code == 1
+    assert "xsd" in result.output and "stub" in result.output
 
 
 def test_unknown_bus_is_rejected() -> None:

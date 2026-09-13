@@ -20,7 +20,7 @@ from serac.adapters.bus.in_memory import InMemoryBus
 from serac.pipelines.replay import ReplayConfig, parse_speed, run_replay
 from serac.ports.bus import MessageBus
 from serac.settings import get_settings
-from serac.streaming.cap_stub import CapStub
+from serac.streaming.cap_stage import build_cap_stage, cap_lane_banner, parse_cap_kind
 from serac.streaming.detector_stub import DetectorStub, DetectorStubConfig
 from serac.streaming.golden import (
     DEFAULT_EVENT,
@@ -49,7 +49,7 @@ RepoOption = Annotated[Path, typer.Option("--repo", help="Repository root.")]
 
 @app.callback()
 def _group() -> None:
-    """Real-time seismic lane (stub detector, Test-only CAP)."""
+    """Real-time seismic lane (Test-only CAP; not an alert system)."""
 
 
 def _bus(name: str) -> MessageBus:
@@ -142,8 +142,8 @@ def run_detector(
     trained model and `serac stream run detector` had no way to. Both now call the same factory.
 
     Selecting `discriminator` mounts a real model and **does not** make this an alert system: the
-    CAP stage downstream is still `cap_stub` and still emits `status=Test`, and the model itself
-    has never been promoted.
+    CAP stage downstream still emits `status=Test` (research output, not an operational alert),
+    and the model itself has never been promoted.
     """
     if detector not in {"stub", "discriminator"}:
         typer.echo(
@@ -172,7 +172,7 @@ def run_detector(
     info = trained.info()
     typer.echo(
         f"detector={info.name} version={info.version} is_stub={info.is_stub}; the CAP stage "
-        "downstream remains the stub and emits status=Test"
+        "downstream emits status=Test (research output, not an alert system)"
     )
     _run_stage(DetectorStage(trained), _bus(bus), max_seconds)
 
@@ -182,10 +182,26 @@ def run_cap(
     bus: BusOption = "in_memory",
     max_seconds: Annotated[float | None, typer.Option("--max-seconds")] = None,
     repo: RepoOption = Path("."),
+    cap: Annotated[
+        str,
+        typer.Option(
+            "--cap",
+            help=(
+                "xsd (default): real CAP 1.2 generator via serac.adapters.cap.cap12.render. "
+                "stub: CapStub, for golden fixtures that pin stub XML."
+            ),
+        ),
+    ] = "xsd",
 ) -> None:
-    """Run the CAP stub (serac.detections -> serac.alerts, status=Test)."""
+    """Render detections to CAP 1.2 (status=Test). This is not an alert system."""
+    try:
+        kind = parse_cap_kind(cap)
+    except ValueError as exc:
+        typer.echo(f"serac stream run cap: {exc}", err=True)
+        raise typer.Exit(1) from exc
     xsd = repo / "contracts" / "vendor" / "cap" / "CAP-v1.2.xsd"
-    _run_stage(CapStub(xsd_path=xsd), _bus(bus), max_seconds)
+    typer.echo(cap_lane_banner(kind))
+    _run_stage(build_cap_stage(kind, xsd_path=xsd), _bus(bus), max_seconds)
 
 
 @app.command("golden")
@@ -227,6 +243,16 @@ def replay(
             ),
         ),
     ] = "stub",
+    cap: Annotated[
+        str,
+        typer.Option(
+            "--cap",
+            help=(
+                "xsd (default): real CAP 1.2 generator. stub: CapStub, for fixtures that "
+                "pin stub XML."
+            ),
+        ),
+    ] = "xsd",
     bus: BusOption = "in_memory",
     report_dir: Annotated[Path | None, typer.Option("--report-dir")] = None,
     online: Annotated[
@@ -234,15 +260,24 @@ def replay(
     ] = False,
     repo: RepoOption = Path("."),
 ) -> None:
-    """Replay an event window through the lane and write reports/replay/<event>.json."""
+    """Replay an event window through the lane and write reports/replay/<event>.json.
+
+    CAP messages are status=Test. This is not an alert system.
+    """
     if bus not in ("in_memory", "redis"):
         raise typer.BadParameter(f"unknown bus {bus!r}; use in_memory or redis")
+    try:
+        cap_kind = parse_cap_kind(cap)
+    except ValueError as exc:
+        typer.echo(f"serac replay: {exc}", err=True)
+        raise typer.Exit(1) from exc
     config = ReplayConfig(
         event_id=event,
         speed=parse_speed(speed),
         chunk_seconds=chunk_seconds,
         bus="redis" if bus == "redis" else "in_memory",
         detector_kind="discriminator" if detector == "discriminator" else "stub",
+        cap_kind=cap_kind,
         report_dir=report_dir,
         online=online,
         repo_root=repo,
@@ -260,6 +295,7 @@ def replay(
         f"{c.detections_emitted}, cap {c.cap_messages_emitted}; "
         f"detector={report.detector.name} stub={report.detector.is_stub} -> {out}"
     )
+    typer.echo(cap_lane_banner(cap_kind))
     if report.status != "completed":
         typer.echo(f"error: {report.error}", err=True)
         raise typer.Exit(code=1)
