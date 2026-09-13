@@ -8,7 +8,8 @@ committed listings without importing the library at test time:
 * `EarthdataDownloader.download(url, dest)` streams one granule with an Earthdata Login
   session and returns (sha256, size).
 
-Search is public; downloads need `EARTHDATA_USERNAME/PASSWORD` (docs/CREDENTIALS.md).
+Search is public; downloads need Earthdata Login as either `EARTHDATA_USERNAME` +
+`EARTHDATA_PASSWORD` or a bearer `EARTHDATA_TOKEN` (docs/CREDENTIALS.md).
 """
 
 from __future__ import annotations
@@ -17,9 +18,10 @@ import hashlib
 from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 from serac.ports.ingest import Bbox4326, CredentialSpec
+from serac.settings import SeracSettings
 
 ASF_SEARCH_URL = "https://api.daac.asf.alaska.edu/services/search/param"
 NASA_DATA_POLICY_URL = (
@@ -33,6 +35,28 @@ EARTHDATA_CREDENTIAL = CredentialSpec(
     env_vars=("EARTHDATA_USERNAME", "EARTHDATA_PASSWORD"),
     purpose="download granules from ASF / NASA Earthdata Cloud (search is public)",
 )
+EARTHDATA_TOKEN_CREDENTIAL = CredentialSpec(
+    name="Earthdata Login bearer token",
+    env_vars=("EARTHDATA_TOKEN",),
+    purpose="download granules from ASF / NASA Earthdata Cloud (search is public)",
+)
+
+
+def earthdata_auth_mode(settings: SeracSettings) -> Literal["creds", "token"] | None:
+    """Which Earthdata auth the process can use; `None` if neither pair nor token is set."""
+    user = settings.earthdata_username
+    password = settings.earthdata_password
+    token = settings.earthdata_token
+    if user is not None and password is not None:
+        return "creds"
+    if token is not None:
+        return "token"
+    return None
+
+
+def missing_earthdata_credentials() -> list[CredentialSpec]:
+    """Both advertised specs, for dry-run when neither username/password nor token is set."""
+    return [EARTHDATA_CREDENTIAL, EARTHDATA_TOKEN_CREDENTIAL]
 
 
 class AsfSearchClient(Protocol):
@@ -101,18 +125,33 @@ class EarthdataDownloader(Protocol):
 
 
 class AsfSessionDownloader:
-    """`EarthdataDownloader` over `asf_search.ASFSession().auth_with_creds`."""
+    """`EarthdataDownloader` over `asf_search.ASFSession` creds or bearer token."""
 
-    def __init__(self, username: str, password: str) -> None:
+    def __init__(
+        self,
+        username: str | None = None,
+        password: str | None = None,
+        token: str | None = None,
+    ) -> None:
+        has_creds = bool(username) and bool(password)
+        has_token = bool(token)
+        if not has_creds and not has_token:
+            raise ValueError("Earthdata username+password or EARTHDATA_TOKEN is required")
         self._username = username
         self._password = password
+        self._token = token
         self._session: Any = None
 
     def _open(self) -> Any:
         if self._session is None:
             import asf_search
 
-            self._session = asf_search.ASFSession().auth_with_creds(self._username, self._password)
+            session = asf_search.ASFSession()
+            if self._username and self._password:
+                self._session = session.auth_with_creds(self._username, self._password)
+            else:
+                assert self._token is not None
+                self._session = session.auth_with_token(self._token)
         return self._session
 
     def download(self, url: str, dest: Path) -> tuple[str, int]:
@@ -132,6 +171,23 @@ class AsfSessionDownloader:
             part.unlink(missing_ok=True)
             raise
         return digest.hexdigest(), size
+
+
+def asf_downloader_from_settings(settings: SeracSettings) -> AsfSessionDownloader:
+    """Build a session downloader from whichever Earthdata secret is present."""
+    mode = earthdata_auth_mode(settings)
+    if mode == "creds":
+        user = settings.earthdata_username
+        password = settings.earthdata_password
+        assert user is not None and password is not None
+        return AsfSessionDownloader(
+            username=user.get_secret_value(), password=password.get_secret_value()
+        )
+    if mode == "token":
+        token = settings.earthdata_token
+        assert token is not None
+        return AsfSessionDownloader(token=token.get_secret_value())
+    raise RuntimeError("Earthdata credentials missing; fetch() should have refused")
 
 
 def bbox_wkt(bbox: Bbox4326) -> str:

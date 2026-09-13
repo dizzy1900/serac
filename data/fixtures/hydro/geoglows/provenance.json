@@ -1,0 +1,21 @@
+{
+  "fixture_truncated": true,
+  "fixture_window": [
+    "2026-08-01T00:00:00+00:00",
+    "2026-09-07T00:00:00+00:00"
+  ],
+  "full_payload_sha256": "b5365cda5ab11bdd17b25af4731ac541675cf949e4a17e6250a57cb8728633a0",
+  "full_payload_size_bytes": 1053631,
+  "getriverid_url": "https://geoglows.ecmwf.int/api/v2/getriverid?lat=27.81&lon=85.00",
+  "licence": "CC-BY-4.0 as stated at https://geoglows.ecmwf.int/license (GEOGLOWS ECMWF Streamflow Service Data). Retrospective is ERA5-driven; ERA5 is a Copernicus C3S product under the Licence to Use Copernicus Products.",
+  "licence_source_url": "https://geoglows.ecmwf.int/license",
+  "notes": "The committed JSON is a cut of the full retrospective daily series (1940-01-01 to 2026-09-07 as delivered; 1 053 631 bytes). full_payload_sha256 is of those bytes before cutting. Values are GEOGLOWS modelled discharge (m^3/s), not DHM gauge observations.",
+  "query": {
+    "lat": 27.81,
+    "lon": 85.0,
+    "place": "Trishuli at Galchhi (approximate; the ICIMOD-reported gauge, not a DHM API)"
+  },
+  "reach_id": 441020026,
+  "retrieved_at": "2026-09-13T07:56:00Z",
+  "url": "https://geoglows.ecmwf.int/api/v2/retrospectivedaily/441020026?format=json"
+}

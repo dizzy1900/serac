@@ -20,7 +20,8 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 - No calibrated pre-Langtang NISAR series exists (constraints below).
 - The USGS ComCat `eventtype=landslide` set is sparse and does not contain Chamoli 2021.
 - No open broadband seismic station lies within 300 km of Chamoli.
-- No open real-time hydrometric feed exists for the Nepal/China corridor.
+- No Nepal DHM API exists for the Nepal/China corridor; GEOGLOWS ECMWF streamflow is the
+  open modelled global substitute, not a gauge.
 
 ## Sentinel-1 SLC/GRD via ASF (search) and Earthdata (download)
 
@@ -30,12 +31,12 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Licence | to be recorded at fetch time |
 | Cadence | 6–12 d (brief) |
 | Latency | to be recorded at fetch time |
-| Credentials | search: none; download: `EARTHDATA_USERNAME/PASSWORD` |
+| Credentials | search: none; download: `EARTHDATA_USERNAME`/`EARTHDATA_PASSWORD` **or** `EARTHDATA_TOKEN` |
 | Adapter | `src/serac/adapters/eo/asf_sentinel1.py` (`Sentinel1AsfAdapter`; `serac ingest s1`) |
 | Ledger source | `sentinel1_asf` |
 | Fixture | `data/fixtures/asf/chamoli_s1_2021-01-01_2021-02-28.geojson` (real ASF listing, 53 IW granules: 29 SLC / 24 GRD_HD on paths 56, 63, 129, 165) |
 | Ledger state | 1 row, `status: listed`. No SLC or GRD bytes have ever been downloaded through this adapter |
-| Known gaps | the SLC/GRD download path has never run: `Sentinel1AsfAdapter` reads `EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD` only, and no such pair was available in any session (the Earthdata credential in this environment is a bearer token, which this adapter does not accept). The Sentinel-1 signal serac actually holds is HyP3 burst InSAR (below), not SLC or GRD scenes |
+| Known gaps | the SLC/GRD download path has never run against live Earthdata: this session did not fetch granules (the 5 GB confirmation gate still applies). The adapter now accepts a bearer `EARTHDATA_TOKEN` as well as username/password. The Sentinel-1 signal serac actually holds is HyP3 burst InSAR (below), not SLC or GRD scenes |
 
 ## Sentinel-1 `SLC-BURST` listings via ASF
 
@@ -80,7 +81,7 @@ Cross-cutting gaps (repeated in `RELEASE_STATUS.md`):
 | Ledger source | `hyp3_insar` |
 | Fixture | none synthetic of its own; the offline tests drive the adapter with fakes and use the crops under `data/raw/hyp3_burst_insar/` when present |
 | Ledger state | 4,136 rows on 2026-09-03: 517 `requested` (260 chamoli-rishiganga, 257 lhende-khola-trishuli), 517 `fetched` product zips with `retention: transient`, and 3,102 `fetched` AOI crops with `retention: retained` under `data/raw/hyp3_burst_insar/<aoi>/<pair>/` (1,560 chamoli-rishiganga, 1,542 lhende-khola-trishuli) |
-| Known gaps | **the 517 delivered zips were hashed on arrival, cropped to the AOI and deleted** (20.05 GB); those rows carry `retention: transient` and `validate-ingest` reports them as a named warning because they can never be re-hashed. `data/raw/` is DVC-tracked and absent from a fresh git clone. The cube's `s1_coherence_t` / `s1_los_velocity_t` layers still prefer the synthetic placeholder over these real interferograms (`RELEASE_STATUS.md` known gap 11): the layer builder scans the ledger rather than selecting by `raw_root`, and `tests/unit/pipelines/test_layers_s2_s1.py` pins that behaviour until it is fixed |
+| Known gaps | **the 517 delivered zips were hashed on arrival, cropped to the AOI and deleted** (20.05 GB); those rows carry `retention: transient` and `validate-ingest` reports them as a named warning because they can never be re-hashed. `data/raw/` is DVC-tracked and absent from a fresh git clone. This session did not re-fetch those interferograms. The cube prefers real burst crops under the cube's `raw_root` when those files are on disk; on a fresh clone the committed synthetic pair still fills `s1_coherence_t` / `s1_los_velocity_t` and stays `status: synthetic` |
 
 ## Sentinel-2 L2A via CDSE (production path)
 
@@ -294,7 +295,27 @@ granule whose level cannot be established (`NisarLevel.unknown`) is always refus
 | Ledger source | `hydrometric_icimod` |
 | Fixture | `data/fixtures/hydro/icimod_trishuli_2026-08-26.json`: Galchhi (+9 m in 30 min) and Malekhu (+7 m) stage changes transcribed from the ICIMOD media advisory of 26 Aug 2026, each observation quoting its sentence; no clock time is stated in the source, so `time_utc` is null; the page is all-rights-reserved and cited only |
 | Ledger state | 1 row, `fetched` |
-| Known gaps | **no open real-time Nepal/China hydrometric feed**; anything not in the fixture is `status: not_fetched` and raises `DatasetNotFetchedError` |
+| Known gaps | **no Nepal DHM API**; anything not in this fixture is `status: not_fetched` and raises `DatasetNotFetchedError`. GEOGLOWS (next section) is modelled discharge on TDX-Hydro reaches, not a DHM gauge record |
+
+## GEOGLOWS ECMWF streamflow (open modelled hydrometric feed)
+
+Nepal DHM gauges have no stable open API. GEOGLOWS v2 at `https://geoglows.ecmwf.int/api/` is
+the honest global substitute: modelled daily discharge on TDX-Hydro reaches, free, no key.
+Retrospective values are ERA5-driven simulations, not gauge observations. The adapter fetches
+or fails; it never synthesises discharges.
+
+| | |
+|---|---|
+| URL | `https://geoglows.ecmwf.int/api/v2/` (REST; host `geoglows.ecmwf.int`). Reach identification via `getriverid`; daily series via `retrospectivedaily/<river_id>?format=json` |
+| Licence | CC-BY-4.0 as stated at `https://geoglows.ecmwf.int/license` (GEOGLOWS ECMWF Streamflow Service Data). Retrospective is ERA5-driven; ERA5 is a Copernicus C3S product under the Licence to Use Copernicus Products (`https://apps.ecmwf.int/datasets/licences/copernicus/`) |
+| Cadence | retrospective daily (ERA5-driven); forecast endpoints exist on the same API and are not the committed fixture |
+| Latency | public REST; the committed cut was retrieved 2026-09-13 |
+| Credentials | none |
+| Adapter | `src/serac/adapters/hydro/geoglows.py` (`GeoglowsHydrometric`, adapter `geoglows_ecmwf`) |
+| Ledger source | `geoglows_ecmwf` |
+| Fixture | `data/fixtures/hydro/geoglows/reach_441020026_retrospectivedaily.json`: truncated real retrospective daily JSON for TDX-Hydro reach `441020026` (Trishuli near Galchhi query point 27.81°N, 85.00°E), 2026-08-01 .. 2026-09-07 (38 days). `provenance.json` records the live URL, `retrieved_at`, sha256 and size of the **full** payload before cutting, and that the committed file is a cut |
+| Ledger state | 2 rows, both `fetched` (the cut JSON and its provenance sidecar) |
+| Known gaps | **modelled streamflow, not a DHM gauge**. A `not_fetched` fixture raises `DatasetNotFetchedError` on every call. No Nepal/China real-time gauge API is wired |
 
 ## OSM Overpass
 

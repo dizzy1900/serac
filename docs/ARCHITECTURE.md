@@ -33,7 +33,7 @@ gated; where a row here is qualified, it names the RELEASE_STATUS entry that exp
  |  FDSN / SeedLink       | -----> |                            |        |                        |
  |  IRIS Syngine, ESEC    |        |  model components M1-M5    |        |  integrate ONLY via    |
  |  USGS ComCat           |        |  event library + AOIs      |        |  contracts/*.json      |
- |  OSM, ICIMOD, Crossref |        |  provenance ledger         |        |                        |
+ |  OSM, ICIMOD, GEOGLOWS, Crossref |        |  provenance ledger         |        |                        |
  +------------------------+        +----------------------------+        +------------------------+
 ```
 
@@ -118,7 +118,7 @@ Local development uses Docker Compose (`infra/docker/`); scaled runs are job man
 | Zarr store | `src/serac/adapters/storage/zarr_store.py` (Zarr v3, `ZARR_FORMAT` constant, 1×512×512 chunks, zstd; roundtrip test) | `present` |
 | GeoParquet index | `src/serac/pipelines/events_index.py` (writes `data/events/events.parquet`) | `present` |
 | STAC catalog | `src/serac/adapters/storage/stac_catalog.py` (pystac 1.1.0 Collection per AOI, Item per slice; schemas vendored under `tests/fixtures/stac_schemas/` for offline validation) | `present` |
-| Cube builder | `src/serac/pipelines/build_cube.py` + `pipelines/grid.py` + `src/serac/pipelines/layers/` (`LayerBuilder`, `build_empty()` for missing layers), `src/serac/cli_cube.py` (`serac cube build / describe`) | `present`; the S1 layers still prefer the synthetic placeholder over the real burst products (gap 11) |
+| Cube builder | `src/serac/pipelines/build_cube.py` + `pipelines/grid.py` + `src/serac/pipelines/layers/` (`LayerBuilder`, `build_empty()` for missing layers), `src/serac/cli_cube.py` (`serac cube build / describe`) | `present`; S1 layers prefer real HyP3 burst crops under the cube `raw_root` when those files are on disk; a fresh clone without DVC uses the committed synthetic pair |
 | AOI + coverage pipelines | `src/serac/pipelines/aoi_build.py`, `aoi_specs.py`, `coverage.py`, `_geojson_io.py`, `sources.py`, `event_entry.py` | `present` |
 | DVC pipeline | `dvc.yaml`, `.dvc/config` (no URL), `.dvcignore`, `make dvc-remote` | `present`; no `dvc.lock` (needs a network run of the DEM stage) |
 
@@ -160,7 +160,7 @@ synthetic `s1_coherence_t/s1_los_velocity_t` (flagged, `contains_synthetic: true
 | USGS ComCat | `src/serac/adapters/seismic/usgs_comcat.py` (`ComCatCatalog`, `eventtype=landslide`) | `present`; the catalogue is sparse and contributed nothing to M1 (gap 6) |
 | ESEC catalogue | `src/serac/adapters/seismic/esec.py` (`EsecSpudCatalog`, the M1 positive set) | `present` |
 | Green's-function library | `src/serac/ports/greens.py` (`GreensLibrary`, `EarthModel`, `GreensRequest.cache_key`), `src/serac/adapters/seismic/syngine.py` (IRIS Syngine; modelled physics, ledgered `provenance: derived`) | `present`; the endpoint proved intermittent and a local library is a deployment prerequisite (gap 29, `infra/jobs/m2-greens-library.yaml`) |
-| Hydrometric | `HydrometricSource` in `src/serac/ports/seismic.py`, `src/serac/adapters/hydro/icimod_fixture.py` (fixture-only; no live feed) | `present`; no open real-time Nepal/China feed exists (gap 2) |
+| Hydrometric | `HydrometricSource` in `src/serac/ports/seismic.py`, `src/serac/adapters/hydro/icimod_fixture.py` (ICIMOD cited figures), `src/serac/adapters/hydro/geoglows.py` (GEOGLOWS ECMWF modelled streamflow) | `present`; no Nepal DHM API (gap 2); GEOGLOWS is the open modelled substitute |
 | SeedLink ingestor | `src/serac/streaming/seedlink_ingestor.py` → topic `serac.waveforms` | `present` |
 | Detector port + stages | `src/serac/ports/detector.py` (`Detector`: `info`/`ingest`/`poll`/`reset`), `src/serac/streaming/detector_stage.py`, `stage.py`, `pipeline.py`, `replay_source.py`, `synthetic.py`, `golden.py` | `present` |
 | Detector stub | `src/serac/streaming/detector_stub.py` → topic `serac.detections` | `present`; still the default, and it fires on pre-event background noise (gaps 56, 57) |
