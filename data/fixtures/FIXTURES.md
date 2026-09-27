@@ -111,8 +111,12 @@ window; two pre-event and one post-event scene around 2021-02-07
 - Copernicus Sentinel data: Copernicus Sentinel data: free, full and open access under the Legal Notice on the use of Copernicus Sentinel Data and Service Information (attribution 'Contains modified Copernicus Sentinel data [year]'). Legal notice: https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice
 - NASA NISAR listing metadata: NASA Earth science data: free and open (NASA data and information policy). Policy: https://www.earthdata.nasa.gov/engage/open-data-services-software-policies/data-information-guidance
 | `data/fixtures/hydro/icimod_trishuli_2026-08-26.json` | https://www.icimod.org/press-release/major-flash-flood-sweeps-through-nepals-rasuwa-district-raising-fears-of-further-downstream-flooding/ | 2026-09-03T10:09:30+00:00 | `d8e9945741f283e26ec4d007936437253efae15dafe7c128a9fea29ef8d80014` | 4159 | ICIMOD (c) 2026. All rights reserved; cited-only (page not stored) |
+| `data/fixtures/hydro/geoglows/reach_441020026_retrospectivedaily.json` | https://geoglows.ecmwf.int/api/v2/retrospectivedaily/441020026?format=json | 2026-09-13T07:56:00+00:00 | `a5ce064fce18db03f6a006479716388e184de89c830786b3ae19b22bb8500df5` | 1560 | CC-BY-4.0 (GEOGLOWS ECMWF Streamflow Service Data); ERA5/Copernicus C3S terms for retrospective inputs |
+| `data/fixtures/hydro/geoglows/provenance.json` | https://geoglows.ecmwf.int/api/v2/retrospectivedaily/441020026?format=json | 2026-09-13T07:56:00+00:00 | `2120d2ef552eb7c1029fffcbeb409738c10450b46884397f2cc53896534127a3` | 1197 | CC-BY-4.0 (GEOGLOWS ECMWF Streamflow Service Data); ERA5/Copernicus C3S terms for retrospective inputs |
 
 The hydrometric fixture is a hand transcription of figures published on the linked ICIMOD page (page sha256 recorded inside the file and in the ledger `params`), not a gauge record; every observation carries the sentence it was read from. The page is all-rights-reserved and is not stored.
+
+The GEOGLOWS fixture is a **truncated real** retrospective daily JSON for TDX-Hydro reach `441020026` (Trishuli near Galchhi). `provenance.json` records the live URL, `retrieved_at`, and sha256/size of the full payload before cutting. Values are modelled streamflow, not DHM gauge observations.
 
 ## Green's-function convention fixtures (`data/fixtures/greens/convention/`)
 

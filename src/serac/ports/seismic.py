@@ -2,7 +2,8 @@
 
 Adapters (Prompt 1 phase 2): `FdsnWaveformArchive` (ObsPy fdsnws client), `SeedLinkFeed`
 (ObsPy EasySeedLinkClient), `ComCatCatalog` (USGS event service, `eventtype=landslide`),
-`IcimodReportedHydrometric` (fixture of cited figures). This module holds only the ABCs and
+`IcimodReportedHydrometric` (fixture of cited figures), `GeoglowsHydrometric` (GEOGLOWS ECMWF
+modelled streamflow). This module holds only the ABCs and
 their request/result value objects; nothing here imports obspy or numpy.
 """
 

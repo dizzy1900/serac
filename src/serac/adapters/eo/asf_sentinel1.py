@@ -3,8 +3,9 @@
 Search is public and returns one GeoJSON feature per granule. The adapter lists IW SLC (the
 InSAR input) or GRD_HD, groups granules by relative orbit (`pathNumber`) so the HyP3 pair
 planner can pick same-track pairs, and estimates a fetch from the catalogue's own `bytes`
-field. Downloading needs Earthdata Login: without it `fetch` records `not_fetched` for every
-granule and raises `CredentialsMissingError` (the base adapter's rule).
+field. Downloading needs Earthdata Login as username/password or `EARTHDATA_TOKEN`: without
+either, `fetch` records `not_fetched` for every granule and raises `CredentialsMissingError`
+(the base adapter's rule).
 """
 
 from __future__ import annotations
@@ -17,12 +18,15 @@ from typing import Any, ClassVar
 from serac.adapters.eo._asf import (
     ASF_SEARCH_URL,
     EARTHDATA_CREDENTIAL,
+    EARTHDATA_TOKEN_CREDENTIAL,
     AsfSearchClient,
     AsfSearchLibClient,
-    AsfSessionDownloader,
     EarthdataDownloader,
+    asf_downloader_from_settings,
     bbox_wkt,
+    earthdata_auth_mode,
     feature_bbox,
+    missing_earthdata_credentials,
     parse_asf_time,
 )
 from serac.adapters.eo._base import BaseIngestAdapter, FetchedFile
@@ -92,7 +96,10 @@ class Sentinel1AsfAdapter(BaseIngestAdapter):
     adapter_version: ClassVar[str] = "0.1.0"
     licence: ClassVar[str] = SENTINEL_LICENCE
     licence_source_url: ClassVar[str | None] = SENTINEL_LICENCE_URL
-    credentials: ClassVar[tuple[CredentialSpec, ...]] = (EARTHDATA_CREDENTIAL,)
+    credentials: ClassVar[tuple[CredentialSpec, ...]] = (
+        EARTHDATA_CREDENTIAL,
+        EARTHDATA_TOKEN_CREDENTIAL,
+    )
 
     def __init__(
         self,
@@ -105,17 +112,17 @@ class Sentinel1AsfAdapter(BaseIngestAdapter):
         self.search_client: AsfSearchClient = search_client or AsfSearchLibClient()
         self._downloader = downloader
 
+    def missing_credentials(self) -> list[CredentialSpec]:
+        """Username+password *or* bearer token; advertise both when neither is set."""
+        if earthdata_auth_mode(self.settings) is not None:
+            return []
+        return missing_earthdata_credentials()
+
     @property
     def downloader(self) -> EarthdataDownloader:
         """Built lazily from settings so a missing credential never reaches this line."""
         if self._downloader is None:
-            user = self.settings.earthdata_username
-            password = self.settings.earthdata_password
-            if user is None or password is None:
-                raise RuntimeError("Earthdata credentials missing; fetch() should have refused")
-            self._downloader = AsfSessionDownloader(
-                user.get_secret_value(), password.get_secret_value()
-            )
+            self._downloader = asf_downloader_from_settings(self.settings)
         return self._downloader
 
     # -- request parameters -----------------------------------------------------------------

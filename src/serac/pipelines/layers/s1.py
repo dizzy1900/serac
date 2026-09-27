@@ -1,10 +1,15 @@
 """Sentinel-1 InSAR layers from HyP3 products: `s1_coherence_t` and `s1_los_velocity_t`.
 
 One slice per interferometric pair, timed at the secondary acquisition. Coherence comes from
-`*_corr.tif`; LOS velocity is `*_los_disp.tif` (metres over the pair) divided by the temporal
-baseline in years. Rows labelled `provenance: synthetic` (the only kind in the tree while no
-Earthdata credentials exist) make the layer `status: synthetic` and flip the cube's
-`contains_synthetic`.
+`*_corr.tif` (INSAR_GAMMA full-frame or INSAR_ISCE_MULTI_BURST crops). LOS velocity is
+`*_los_disp.tif` (metres over the pair) divided by the temporal baseline in years, when that
+raster exists.
+
+Selection honours the cube's `raw_root` (callers pass the entries `build_cube.select_entries`
+already filtered) and then prefers real fetched pairs over labelled synthetic placeholders
+when both are present, so a burst crop under `data/raw/hyp3_burst_insar/` is not shadowed by
+the Chamoli synthetic pair. Rows whose files are not on disk (DVC not pulled) are skipped.
+A cube built from only the committed synthetic pair stays `status: synthetic`.
 """
 
 from __future__ import annotations
@@ -19,7 +24,7 @@ import xarray as xr
 from rasterio.enums import Resampling
 
 from serac.domain.geo import GridSpec
-from serac.domain.manifest import DataSource, ManifestEntry
+from serac.domain.manifest import DataSource, ManifestEntry, ManifestStatus, Provenance
 from serac.pipelines.layers._base import (
     coverage_fraction,
     empty_attrs,
@@ -39,23 +44,40 @@ CORR_SUFFIX = "_corr.tif"
 LOS_SUFFIX = "_los_disp.tif"
 DAYS_PER_YEAR = 365.25
 COHERENCE_PROCESSING = (
-    "HyP3 INSAR_GAMMA coherence (*_corr.tif, 80 m at 20x4 looks) warped to the grid by bilinear "
-    "resampling"
+    "HyP3 coherence (*_corr.tif from INSAR_GAMMA or INSAR_ISCE_MULTI_BURST, 80 m at 20x4 looks) "
+    "warped to the grid by bilinear resampling"
 )
 VELOCITY_PROCESSING = (
-    "HyP3 INSAR_GAMMA line-of-sight displacement (*_los_disp.tif, m over the pair) divided by "
+    "HyP3 line-of-sight displacement (*_los_disp.tif, m over the pair) divided by "
     "the temporal baseline in years; warped to the grid by bilinear resampling; positive away "
-    "from the satellite as delivered"
+    "from the satellite as delivered. Burst products often omit this raster."
 )
+
+
+def _pair_is_real(files: dict[str, ManifestEntry]) -> bool:
+    return any(
+        e.status is ManifestStatus.fetched and e.provenance is Provenance.real
+        for e in files.values()
+    )
 
 
 def pairs(
-    entries: Sequence[ManifestEntry], window: tuple[datetime, datetime]
+    entries: Sequence[ManifestEntry],
+    window: tuple[datetime, datetime],
+    *,
+    repo_root: Path | None = None,
 ) -> list[tuple[str, dict[str, ManifestEntry]]]:
-    """pair_id -> {"corr": entry, "los": entry} for pairs whose secondary date is in window."""
+    """pair_id -> {"corr": entry, "los": entry} for pairs whose secondary date is in window.
+
+    Real fetched pairs win over synthetic placeholders when both exist. Paths that are not on
+    disk (a DVC crop that has not been pulled) are skipped so a fresh clone still builds from
+    the committed synthetic pair.
+    """
     by_pair: dict[str, dict[str, ManifestEntry]] = defaultdict(dict)
     for e in usable(entries):
         if e.source is not DataSource.hyp3_insar or not e.path:
+            continue
+        if repo_root is not None and not resolve_path(repo_root, e).is_file():
             continue
         when = entry_time(e, prefer_end=True)
         if when is None or not (window[0] <= when <= window[1]):
@@ -65,8 +87,10 @@ def pairs(
         elif e.path.endswith(LOS_SUFFIX):
             by_pair[e.product_id]["los"] = e
     found = [(pid, files) for pid, files in by_pair.items() if "corr" in files]
+    real = [(pid, files) for pid, files in found if _pair_is_real(files)]
+    chosen = real if real else found
     return sorted(
-        found, key=lambda kv: (entry_time(kv[1]["corr"], prefer_end=True) or datetime.min, kv[0])
+        chosen, key=lambda kv: (entry_time(kv[1]["corr"], prefer_end=True) or datetime.min, kv[0])
     )
 
 
@@ -96,7 +120,11 @@ class _S1Builder:
     def build(
         self, grid: GridSpec, entries: Sequence[ManifestEntry], window: tuple[datetime, datetime]
     ) -> xr.DataArray:
-        found = [(pid, files) for pid, files in pairs(entries, window) if self.key in files]
+        found = [
+            (pid, files)
+            for pid, files in pairs(entries, window, repo_root=self.repo_root)
+            if self.key in files
+        ]
         if not found:
             return self.build_empty(grid)
         slices: list[np.ndarray] = []

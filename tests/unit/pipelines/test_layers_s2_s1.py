@@ -1,7 +1,13 @@
-"""Sentinel-2 layers from the real Chamoli crops; Sentinel-1 layers from the synthetic pair."""
+"""Sentinel-2 layers from the real Chamoli crops; Sentinel-1 layers from HyP3 pairs.
+
+The cube honours `raw_root` (`build_cube.select_entries`) and then prefers real fetched
+pairs over labelled synthetic placeholders when both exist. On a fresh clone there are no
+HyP3 burst crops (DVC); the committed synthetic pair still fills the S1 layers.
+"""
 
 from __future__ import annotations
 
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -9,7 +15,8 @@ import numpy as np
 import pytest
 
 from serac.adapters.storage.manifest_ledger import JsonlManifestLedger
-from serac.domain.manifest import DataSource, ManifestEntry, ManifestStatus
+from serac.domain.manifest import DataSource, ManifestEntry, ManifestStatus, Provenance
+from serac.pipelines.build_cube import select_entries
 from serac.pipelines.grid import grid_from_bbox
 from serac.pipelines.layers._base import REQUIRED_LAYER_ATTRS
 from serac.pipelines.layers.s1 import (
@@ -27,30 +34,38 @@ T0 = datetime(2021, 1, 1, tzinfo=UTC)
 T1 = datetime(2021, 2, 15, 23, 59, 59, tzinfo=UTC)
 SCENES = ["S2A_44RLU_20210126_1_L2A", "S2B_44RLU_20210131_1_L2A", "S2B_44RLU_20210210_1_L2A"]
 PAIR = "S1_063_20210130_20210211"
+SYNTHETIC_PAIR_DIR = Path("tests/fixtures/synthetic/hyp3/chamoli-rishiganga") / PAIR
+BURST_PAIR_ID = "S1_BURST_20210130_20210211"
+SHA = "a" * 64
 
 
 @pytest.fixture(scope="module")
 def entries(repo_root: Path) -> list[ManifestEntry]:
-    """Fixture-backed entries only.
-
-    M3 writes real HyP3 burst-InSAR crops into the same ledger under the same DataSource, and
-    their `_corr.tif` files match the same suffix the S1 layer builders look for. This module
-    is about the *synthetic* pair and the committed S2 crops, so it excludes anything fetched
-    into `data/raw/`.
-
-    TODO(RELEASE_STATUS.md Known gaps 11): the cube's S1 layers would otherwise now prefer the
-    real burst products over the synthetic placeholder, and nothing decides which should win.
-    `build_cube` already has a `raw_root` for exactly this, so the fix is for the cube pipeline
-    to select by root rather than for this test to filter; until that is settled the exclusion
-    here keeps the module testing what it says it tests.
-    """
+    """Fixture-backed entries: real crops under `data/fixtures` plus labelled synthetic."""
     ledger = JsonlManifestLedger(repo_root / "data" / "manifest.jsonl")
-    return [
-        e
-        for e in ledger.entries()
-        if e.aoi_id == "chamoli-rishiganga"
-        and not (e.path or "").startswith("data/raw/hyp3_burst_insar/")
-    ]
+    return select_entries(ledger, "chamoli-rishiganga", raw_root_rel="data/fixtures")
+
+
+def _burst_entry(path: Path, *, params_file: str) -> ManifestEntry:
+    return ManifestEntry(
+        source=DataSource.hyp3_insar,
+        product_id=BURST_PAIR_ID,
+        product_level="INSAR_ISCE_MULTI_BURST",
+        aoi_id="chamoli-rishiganga",
+        path=str(path),
+        sha256=SHA,
+        size_bytes=path.stat().st_size,
+        retrieved_at=datetime(2026, 9, 3, tzinfo=UTC),
+        licence="test double; not a HyP3 fetch",
+        provenance=Provenance.real,
+        status=ManifestStatus.fetched,
+        time_start=datetime(2021, 1, 30, tzinfo=UTC),
+        time_end=datetime(2021, 2, 11, tzinfo=UTC),
+        adapter="test",
+        adapter_version="0",
+        params={"dt_days": 12.0, "file": params_file},
+        notes="unit-test stand-in for a burst crop under raw_root; not a claimed HyP3 retrieval",
+    )
 
 
 def test_scene_grouping(entries: list[ManifestEntry]) -> None:
@@ -105,7 +120,7 @@ def test_s2_layers_empty_outside_window(repo_root: Path, entries: list[ManifestE
 
 def test_synthetic_pair_layers(repo_root: Path, entries: list[ManifestEntry]) -> None:
     grid = grid_from_bbox("chamoli-rishiganga", 32644, WINDOW_BBOX)
-    found = pairs(entries, (T0, T1))
+    found = pairs(entries, (T0, T1), repo_root=repo_root)
     assert [pid for pid, _ in found] == [PAIR]
     corr_entry = found[0][1]["corr"]
     assert baseline_days(corr_entry) == 12.0
@@ -131,3 +146,58 @@ def test_s1_layers_empty_outside_window(repo_root: Path, entries: list[ManifestE
     coh = S1CoherenceLayerBuilder(repo_root).build(grid, entries, window)
     assert coh.sizes["time"] == 0 and coh.attrs["status"] == "not_fetched"
     assert coh.attrs["source"] == DataSource.hyp3_insar.value
+
+
+def test_missing_real_burst_files_fall_back_to_synthetic(
+    repo_root: Path, entries: list[ManifestEntry], tmp_path: Path
+) -> None:
+    missing = ManifestEntry(
+        source=DataSource.hyp3_insar,
+        product_id=BURST_PAIR_ID,
+        product_level="INSAR_ISCE_MULTI_BURST",
+        aoi_id="chamoli-rishiganga",
+        path=str(tmp_path / "absent_corr.tif"),
+        sha256=SHA,
+        size_bytes=1,
+        retrieved_at=datetime(2026, 9, 3, tzinfo=UTC),
+        licence="test double; file not on disk",
+        provenance=Provenance.real,
+        status=ManifestStatus.fetched,
+        time_start=datetime(2021, 1, 30, tzinfo=UTC),
+        time_end=datetime(2021, 2, 11, tzinfo=UTC),
+        adapter="test",
+        adapter_version="0",
+        params={"dt_days": 12.0, "file": "corr"},
+    )
+    mixed = [*entries, missing]
+    found = pairs(mixed, (T0, T1), repo_root=repo_root)
+    assert [pid for pid, _ in found] == [PAIR]
+    grid = grid_from_bbox("chamoli-rishiganga", 32644, WINDOW_BBOX)
+    coh = S1CoherenceLayerBuilder(repo_root).build(grid, mixed, (T0, T1))
+    assert coh.attrs["status"] == "synthetic" and coh.attrs["product_ids"] == [PAIR]
+
+
+def test_real_burst_pair_wins_over_synthetic(
+    repo_root: Path, entries: list[ManifestEntry], tmp_path: Path
+) -> None:
+    src = repo_root / SYNTHETIC_PAIR_DIR
+    dest = tmp_path / "data" / "raw" / "hyp3_burst_insar" / "chamoli-rishiganga" / BURST_PAIR_ID
+    dest.mkdir(parents=True)
+    corr = dest / f"{BURST_PAIR_ID}_corr.tif"
+    los = dest / f"{BURST_PAIR_ID}_los_disp.tif"
+    shutil.copy(src / f"{PAIR}_corr.tif", corr)
+    shutil.copy(src / f"{PAIR}_los_disp.tif", los)
+    real = [
+        _burst_entry(corr, params_file="corr"),
+        _burst_entry(los, params_file="los_disp"),
+    ]
+    mixed = [*entries, *real]
+    found = pairs(mixed, (T0, T1), repo_root=repo_root)
+    assert [pid for pid, _ in found] == [BURST_PAIR_ID]
+    grid = grid_from_bbox("chamoli-rishiganga", 32644, WINDOW_BBOX)
+    coh = S1CoherenceLayerBuilder(repo_root).build(grid, mixed, (T0, T1))
+    vel = S1LosVelocityLayerBuilder(repo_root).build(grid, mixed, (T0, T1))
+    assert coh.attrs["status"] == "fetched" and coh.attrs["provenance"] == "real"
+    assert vel.attrs["status"] == "fetched" and vel.attrs["provenance"] == "real"
+    assert coh.attrs["product_ids"] == [BURST_PAIR_ID]
+    assert "SYNTHETIC" not in (vel.attrs.get("notes") or "")

@@ -10,7 +10,7 @@ from typing import Any
 import pytest
 from pydantic import SecretStr
 
-from serac.adapters.eo._asf import bbox_wkt, feature_bbox, parse_asf_time
+from serac.adapters.eo._asf import bbox_wkt, earthdata_auth_mode, feature_bbox, parse_asf_time
 from serac.adapters.eo.asf_sentinel1 import (
     Sentinel1AsfAdapter,
     feature_to_record,
@@ -133,7 +133,10 @@ def test_plan_sums_catalogue_bytes_and_lists_earthdata(features: list[dict[str, 
     )
     assert plan.estimated_bytes == expected
     assert "properties.bytes" in plan.estimate_basis
-    assert [c.name for c in plan.requires_credentials] == ["Earthdata Login"]
+    assert [c.name for c in plan.requires_credentials] == [
+        "Earthdata Login",
+        "Earthdata Login bearer token",
+    ]
     assert any("path 63: 6" in w for w in plan.warnings)
     assert plan.estimated_bytes and plan.estimated_bytes > 5 * 1024**3
     assert any("exceeds" in w for w in plan.warnings)
@@ -180,3 +183,47 @@ def test_fetch_with_credentials_streams_and_hashes(
     assert (tmp_path / e.path).read_bytes() == b"granule-bytes"
     assert downloader.urls == [plan.products[0].url]
     assert e.params["pathNumber"] == 63
+
+
+def test_credentials_advertise_username_password_or_token() -> None:
+    names = [c.name for c in Sentinel1AsfAdapter.credentials]
+    assert names == ["Earthdata Login", "Earthdata Login bearer token"]
+    empty = settings()
+    assert earthdata_auth_mode(empty) is None
+    token_only = settings(earthdata_token=SecretStr("t"))
+    assert earthdata_auth_mode(token_only) == "token"
+    creds = settings(earthdata_username=SecretStr("u"), earthdata_password=SecretStr("p"))
+    assert earthdata_auth_mode(creds) == "creds"
+    both = settings(
+        earthdata_username=SecretStr("u"),
+        earthdata_password=SecretStr("p"),
+        earthdata_token=SecretStr("t"),
+    )
+    assert earthdata_auth_mode(both) == "creds"
+
+
+def test_fetch_with_token_only_streams_and_hashes(
+    features: list[dict[str, Any]], tmp_path: Path
+) -> None:
+    token = settings(earthdata_token=SecretStr("t"))
+    downloader = FakeDownloader()
+    adapter = Sentinel1AsfAdapter(
+        FakeAsf(features), downloader=downloader, settings=token, repo_root=tmp_path, git_sha=None
+    )
+    plan = adapter.plan(
+        IngestRequest(
+            aoi_id=AOI,
+            bbox_4326=BBOX,
+            time_start=datetime(2021, 1, 30, tzinfo=UTC),
+            time_end=datetime(2021, 1, 30, 23, 59, tzinfo=UTC),
+            params={"relative_orbit": 63},
+        )
+    )
+    assert plan.requires_credentials == []
+    assert len(plan.products) == 1
+    ledger = JsonlManifestLedger(tmp_path / "manifest.jsonl")
+    entries = adapter.fetch(plan, dest_root=tmp_path, ledger=ledger, confirm=lambda _q: True)
+    assert len(entries) == 1
+    assert entries[0].status is ManifestStatus.fetched
+    assert downloader.urls == [plan.products[0].url]
+    assert (tmp_path / entries[0].path).read_bytes() == b"granule-bytes"  # type: ignore[operator]

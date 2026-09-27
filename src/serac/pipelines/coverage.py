@@ -65,7 +65,7 @@ COLUMN_SOURCES: dict[str, tuple[DataSource, ...]] = {
     "gacos": (DataSource.gacos,),
     "fdsn_waveforms": (DataSource.fdsn_waveforms, DataSource.seedlink),
     "usgs_comcat": (DataSource.usgs_comcat,),
-    "hydrometric": (DataSource.hydrometric_icimod,),
+    "hydrometric": (DataSource.hydrometric_icimod, DataSource.geoglows_ecmwf),
 }
 
 # Dated availability: a column is `n/a` for a window that ends before the product existed.
