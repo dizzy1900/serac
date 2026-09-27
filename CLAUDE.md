@@ -150,7 +150,7 @@ mapping a schema name (kebab-case, e.g. `mass-movement-event`) to the pydantic m
 Each model carries a contract version constant (see `MANIFEST_CONTRACT_VERSION` in
 `src/serac/domain/manifest.py`). `serac schema export` walks the registries and
 writes `contracts/<name>.v<major>.json`; a contract test in `tests/contract/` fails on drift.
-There are 18 published contracts.
+There are 23 published contracts.
 Changing a contract means bumping its version and regenerating the schema. ADR-0002.
 
 ## Provenance ledger
