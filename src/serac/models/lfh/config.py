@@ -162,6 +162,21 @@ class BootstrapConfig(BaseModel):
     n_draws: int = Field(default=200, ge=20)
     seed: int = 20260903
     resample_stations: bool = True
+    #: An execution knob, not an inversion setting, so it is excluded from serialisation and
+    #: therefore from `LfhConfig.config_hash()`. Hashing it would make the seal notice a change
+    #: of thread count as if it were a change to the inversion -- the committed seal predates
+    #: this field and would stop validating, and the only honest remedy for a broken seal
+    #: (re-sealing after the new events were run) is the thing the seal exists to prevent.
+    max_workers: int | None = Field(
+        default=None,
+        ge=1,
+        exclude=True,
+        description=(
+            "Threads used to re-invert draws. None uses the machine's CPU count. Draws are "
+            "independent by construction (each has its own spawned RNG stream), so this changes "
+            "the wall clock and not the numbers; `max_workers=1` runs them in order."
+        ),
+    )
     #: Multiplicative jitter applied to each band corner, drawn log-uniformly.
     band_jitter: float = Field(default=1.25, ge=1.0)
     #: Multiplicative jitter applied to lambda, drawn log-uniformly.

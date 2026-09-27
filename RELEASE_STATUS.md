@@ -46,14 +46,17 @@ Consequences, all intended:
 | `validate-cube` | 24 | pass |
 | `validate-stream` | 33 | pass |
 | `validate-contracts` | 26 | pass (22 contracts) |
-| `validate-lfh` | 22 | pass |
+| **`validate-lfh`** | **25** | **FAIL — 2 unmet criteria** (within stated uncertainty: 1 of 4 reproductions; Taan Fiord duration) |
 | **`validate-discriminator`** | **27** | **FAIL — 2 unmet criteria, 5 warnings** |
 | `validate-runout` | 30 | pass (1 warning: arrival coverage 0.794) |
 | `validate-watch` | 37 | pass (1 warning: transient rows) |
 | `validate-e2e` | 23 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
-| **total** | **401** | |
+| **total** | **404** | |
 
 Check counts are from a measured `make validate-serac` on 2026-09-10. Four rows moved: `validate-e2e` 15 -> 23 (the committed-record checks of Gap 66), `validate-discriminator` 24 -> 27 (the receiver-count leak, the balancing rule's effect, and the orphaned-window check of Gap 17), and `validate-cube` 23 -> 24 and `validate-watch` 36 -> 37, which were already stale and are corrected here rather than left to be rediscovered.
+`validate-lfh` 22 -> 25 and pass -> FAIL was measured on 2026-09-27, when the mutual-containment
+criterion of major 7 below landed on `main`; CI's `--allow-unmet` names its two unmet criteria
+alongside the discriminator's, and fails if either stops being unmet.
 
 `make test` passes: **1,483 offline tests** as of 2026-09-10, network blocked (1,466 before the
 receiver-balancing and live-detector work; 1,418 before the drift, CLI-mounting and
@@ -130,7 +133,32 @@ The ten majors, in the order I would take them:
    `not_implemented` — now asserts what its name always said.
 6. **M2's "≤120 s met warm (~75 s)" latency claim traces to no committed artefact**, and the
    timings that are committed contradict it.
-7. **`validate-lfh`'s pass criterion is weaker than the brief's** "within stated uncertainty".
+7. ~~**`validate-lfh`'s pass criterion is weaker than the brief's** "within stated
+   uncertainty".~~ **Closed 2026-09-10, and the gate went red as a result — which is the point.**
+   The suite compared reproductions by interval *overlap*, and overlap is a weaker relation than
+   the brief's: two intervals can overlap while each one's centre sits outside the other. The
+   criterion is now mutual containment — serac's median inside the published interval **and** the
+   published centre inside serac's 5–95 % — and the same rule is applied to published peak force
+   and duration, which were previously judged by a factor-of-two band invented at the gate and by
+   nothing at all.
+
+   What that changes: `lfh.reproductions_within_stated_uncertainty` reports **1 of 4** where
+   overlap reported 3 of 4, and `lfh.duration_within_stated_uncertainty` is unmet because serac's
+   296 s disagrees with Higman's published 90 s — a disagreement `reports/MODEL_CARD_lfh.md`
+   already described in prose and the gate could not see. `validate-lfh` now fails with **2 unmet
+   criteria**, and unmet criteria are `criterion_unmet`, not `error`: the code worked and a
+   criterion of the brief was not met.
+
+   **A defect found in review, in the fix itself.** The new checks raised their criterion over a
+   list built only from targets that had both a published value and a loadable run, so with zero
+   comparisons the criterion passed — green precisely where it knew least, which is the disease
+   this suite was audited for, reintroduced one level up. The checks now refuse on an empty
+   comparison set, distinguish "no publication states this quantity" from "no computed run to
+   compare against", and report their coverage (`1 of 1 published duration value(s) compared`).
+
+   **Still open on this suite:** `_check_runout_bearing` retains an invented 45-degree band, and
+   `reports/validation/lfh.json` was deliberately not rewritten, so the stale report still reads
+   `passed` until the suite is re-run on a sealed tree.
 8. **DVC tracking is nominal**: no `dvc.lock` is committed, so 5,606 `fetched` ledger rows are
    not recoverable from the repository alone.
 9. **The cube's `s1_coherence_t` / `s1_los_velocity_t` layers cannot consume the 517 real HyP3
@@ -200,6 +228,42 @@ entry. Ordered by what blocks the most.
 - **Gap 42 — the surrogate fails one of its five gates** (5–95 % arrival coverage 0.794 against
   a 0.85–0.95 target), and the arrival gate that *passes* rests on 3 held-out members at one
   transect. Three of four transects scored nothing.
+  **A fix is implemented and has not been fitted on real data (2026-09-10).** The interval is
+  mis-calibrated, not under-trained — training longer cannot move it — so
+  `serac.models.runout.conformal` adds conformalized quantile regression (Romano, Patterson &
+  Candès 2019): score each held-out point by how far outside its own predicted interval the
+  truth fell, take the conservative `ceil((n+1)(1−α))/n` quantile of those scores, and widen by
+  it. `train()` now fits the correction on the **val** split (never test, and disjoint by
+  `run_id`), stores it in the checkpoint, and `RunoutSurrogate.infer` applies it, so the
+  intervals reaching the cascade and alerting layers are the calibrated ones. The correction is
+  two-sided: an over-covering interval is *narrowed* rather than left needlessly wide.
+  `evaluate()` reports calibrated and uncalibrated coverage side by side, so a gate cannot be
+  passed by calibration alone without the size of the calibration being visible.
+
+  **Not fitted here.** The ensemble member directories are not in this repository, so no
+  correction has been computed from the frozen ensemble and `reports/runout/surrogate_metrics.json`
+  is unchanged — 0.794 is still the committed number and the gate still fails. The next rebuild
+  produces the real figure. Three limits travel with the method and are in the module docstring:
+  exchangeability is assumed and the ensemble was drawn to a design rather than at random; the
+  guarantee is marginal, not per transect, while the gate also scores per transect; and arrival
+  time is clamped at zero, which only ever removes coverage.
+- **The M2 bootstrap's draws were not independent of each other's failures (fixed 2026-09-10).**
+  All 200 draws shared one generator consumed in loop order, so a draw that raised before
+  reaching its friction sample consumed fewer numbers and shifted every later draw onto different
+  values. The seed was pinned and the result still was not reproducible across anything that
+  changed the failure pattern — a different station set, a new ObsPy release. Draws now take
+  independent streams spawned from the seed, so draw *k* is a pure function of `(seed, k)`;
+  verified by planning draw 4 with draws 0–3 skipped entirely and getting the same plan. The same
+  change makes them safe to run concurrently (`BootstrapConfig.max_workers`, threads, because the
+  cost is numpy linear algebra that releases the GIL and the Green's cache would have to be
+  pickled to cross a process boundary). **The published M2 numbers were produced under the old
+  scheme and have not been regenerated**: the draws are differently *placed*, not differently
+  *distributed*, so the intervals should move by resampling noise and that is a claim nobody has
+  checked, because the waveform inputs are not in this clone.
+  `max_workers` is an execution knob and is excluded from `LfhConfig.config_hash()`, so the
+  2026-09-03 seal still validates and every committed run still carries the sealed hash. The
+  seal hashes configuration, not code: it cannot see that the draw scheme changed after it was
+  written, which is why the sentence above has to say so.
 - **Gap 39 — no independent simulator.** `serac-swe-voellmy` has never been cross-validated
   against r.avaflow or any other code, so its structural bias cannot be separated from
   implementation error.
@@ -300,7 +364,7 @@ Prompt 2.
 
 | Component | designed | implemented | tested-offline | tested-online | validated-against-events | production |
 |---|---|---|---|---|---|---|
-| gSF grid search + regularised single-force inversion (`serac.models.lfh`) | yes (card) | yes | yes (`validate-lfh` 22 checks, offline re-inversion to 1.7 %) | yes — Syngine + FDSN 2026-09-03 | **partial — 3 of 4 published reproductions overlap by interval (Bingham Canyon, Taan Fiord, Lamplugh); Chamoli refused** | no |
+| gSF grid search + regularised single-force inversion (`serac.models.lfh`) | yes (card) | yes | yes (`validate-lfh` 22 checks, offline re-inversion to 1.7 %) | yes — Syngine + FDSN 2026-09-03 | **partial — 3 of 4 published reproductions overlap by interval (Bingham Canyon, Taan Fiord, Lamplugh), but only 1 of 4 (Bingham Canyon) agrees within stated uncertainty, and Taan Fiord's duration (296 s) disagrees with the published 90 s; Chamoli refused** | no |
 | Two mass estimators, published as a union (`MassEstimate`) | yes (card) | yes | yes (a point mass is unconstructible) | n/a | as above; medians 0.36–1.40 × published centres | no |
 | Refusal rules (< 5 stations, > 200° gap, VR < 0.20) | yes (card) | yes | yes | n/a | **fired on all three new events — Langtang (3 stations, 317° gap), Chamoli (VR 0.089), Blatten (VR 0.191)** | no |
 | Green's-function library (PREM `prem_a_20s`, Syngine) | ADR-0016 | yes | yes (committed, byte-stable) | yes — 419 rows | n/a | no |

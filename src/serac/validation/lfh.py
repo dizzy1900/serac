@@ -5,10 +5,12 @@ The suite is built around the ways this component could look validated without b
 * **Published numbers recalled rather than fetched.** Every reference must have been fetched,
   hashed and DOI-resolved in session. Fewer than three clearing that bar and the suite fails
   with `published_refs_fetched=False`. It does not pass on two.
-* **Overlap achieved by a vacuously wide interval.** Interval overlap is the pass criterion,
-  but a magnitude sanity check reports a warning whenever the median is more than a factor of
-  three from the published centre (two, for peak force) -- an interval so wide it would
-  overlap anything is not a reproduction.
+* **Overlap achieved by a vacuously wide interval.** The brief's criterion is reproduction
+  *within stated uncertainty*, so the pass criterion is mutual containment of the two stated
+  intervals (`reproductions_within_stated_uncertainty`, `peak_force_within_stated_uncertainty`),
+  not the intersection of them. Bare overlap is still reported, because a comparison that does
+  not even overlap is a different and larger failure, and a magnitude sanity check still warns
+  when the median is more than a factor of three from the published centre.
 * **A point mass.** `MassEstimate` forbids one; the suite proves the validator actually fires
   rather than trusting that it exists.
 * **A location the geometry cannot support.** The suite constructs a sparse, wide-gap station
@@ -43,13 +45,103 @@ REPORTS_DIR = Path("reports/m2")
 GREENS_FIXTURE_DIR = Path("data/fixtures/greens")
 WAVEFORM_FIXTURE_DIR = Path("data/fixtures/lfh")
 
-#: How many published reproductions must overlap for the gate to pass.
+#: How many published reproductions must agree within stated uncertainty for the gate to pass.
 REQUIRED_REPRODUCTIONS = 3
 #: Fewer sources than this clearing the citation bar and the suite fails outright.
 REQUIRED_REFERENCES = 3
 #: Magnitude sanity bands: overlap alone is not evidence if the median is this far out.
 MASS_SANITY = (1.0 / 3.0, 3.0)
 FORCE_SANITY = (0.5, 2.0)
+
+
+@dataclass(frozen=True)
+class Agreement:
+    """Does serac's interval agree with a published one *within the stated uncertainty*?
+
+    The brief's criterion for M2 is "reproduction of >= 3 published force histories **within
+    stated uncertainty**". Interval *intersection* -- what this suite used to pass on -- is a
+    weaker statement than that, and weaker in the direction that matters: two intervals
+    intersect whenever `|c_serac - c_published| <= h_serac + h_published`, so a serac interval
+    spanning a decade and a half clips the end of a published interval it centres nowhere
+    near, and the gate goes green on a number that disagrees. Lamplugh Glacier is exactly that
+    case: 1.9e11 kg against a published 1.34-1.41e11, overlapping only because serac's p95 is
+    1.2e12.
+
+    "Within stated uncertainty" is read here as mutual containment of the two *stated*
+    intervals, which is the only reading that uses the uncertainties as published rather than
+    a tolerance chosen here:
+
+    * serac's central estimate must lie inside the published interval -- the reproduced value
+      is within the uncertainty the publication stated; and
+    * the published central value must lie inside serac's own 5-95 % interval -- serac's
+      stated uncertainty admits the published number.
+
+    Neither leg alone is enough. The first alone would pass an interval so wide it says
+    nothing; the second alone would pass a serac interval whose centre sits far outside what
+    the publication allows.
+
+    The published centre is the published `best` when one was printed, and otherwise the
+    geometric mean of the published interval, because these masses span decades and the
+    geometric mean is the centre in the space the quantity actually varies in. It is the same
+    centre the magnitude ratio already uses.
+
+    When a publication stated *no* uncertainty (`low == high`, e.g. Higman's "about 2 x 10^11
+    N"), the first leg is dropped: there is no stated interval to lie inside, and demanding
+    that a point estimate equal a published point is a criterion no measurement can meet. That
+    is recorded in `published_has_width` so the evidence line says which rule was applied,
+    rather than the gate silently applying a weaker one.
+    """
+
+    published_centre: float
+    published_has_width: bool
+    median_inside_published: bool
+    published_centre_inside_serac: bool
+
+    @property
+    def ok(self) -> bool:
+        return (
+            self.median_inside_published or not self.published_has_width
+        ) and self.published_centre_inside_serac
+
+    def reason(self) -> str:
+        if self.ok:
+            return (
+                "agrees within stated uncertainty"
+                if self.published_has_width
+                else "agrees: the published point lies inside serac's stated interval "
+                "(publication stated no uncertainty)"
+            )
+        problems = []
+        if self.published_has_width and not self.median_inside_published:
+            problems.append("serac's median is outside the published interval")
+        if not self.published_centre_inside_serac:
+            problems.append("the published centre is outside serac's 5-95 % interval")
+        return "NOT within stated uncertainty: " + " and ".join(problems)
+
+
+def agreement(
+    published_low: float,
+    published_high: float,
+    published_best: float | None,
+    p05: float,
+    p50: float,
+    p95: float,
+) -> Agreement:
+    """Apply the within-stated-uncertainty rule to one published/serac interval pair."""
+    has_width = published_high > published_low
+    centre = (
+        published_best
+        if published_best is not None
+        else (published_low * published_high) ** 0.5
+        if published_low > 0 and published_high > 0
+        else 0.5 * (published_low + published_high)
+    )
+    return Agreement(
+        published_centre=centre,
+        published_has_width=has_width,
+        median_inside_published=published_low <= p50 <= published_high,
+        published_centre_inside_serac=p05 <= centre <= p95,
+    )
 
 
 @dataclass(frozen=True)
@@ -67,12 +159,19 @@ class Reproduction:
     overlaps: bool
     ratio: float | None
     variance_reduction: float | None
+    published_best: float | None = None
+    agreement: Agreement | None = None
 
     @property
     def sanity_ok(self) -> bool:
         if self.ratio is None:
             return True
         return MASS_SANITY[0] <= self.ratio <= MASS_SANITY[1]
+
+    @property
+    def within_stated_uncertainty(self) -> bool:
+        """The brief's criterion. Absent a comparison at all, it is not met."""
+        return self.agreement is not None and self.agreement.ok
 
     def row(self) -> str:
         if self.status != "computed":
@@ -90,6 +189,23 @@ class Reproduction:
             + (f", ratio {self.ratio:.2f}" if self.ratio is not None else "")
         )
 
+    def uncertainty_row(self) -> str:
+        """One line of evidence for the within-stated-uncertainty criterion."""
+        if self.status != "computed":
+            return f"{self.target_id}: {self.status.upper()} (no comparison possible)"
+        if self.agreement is None:
+            return f"{self.target_id}: no published mass or convertible volume to compare against"
+        assert self.serac_p05 is not None
+        assert self.serac_p50 is not None
+        assert self.serac_p95 is not None
+        assert self.published_low is not None and self.published_high is not None
+        return (
+            f"{self.target_id}: published {self.published_low:.3g}-{self.published_high:.3g} kg "
+            f"(centre {self.agreement.published_centre:.3g}) vs serac "
+            f"{self.serac_p05:.3g}/{self.serac_p50:.3g}/{self.serac_p95:.3g} kg -> "
+            f"{self.agreement.reason()}"
+        )
+
 
 def _load_run(repo: Path, target_id: str, reports_dir: Path) -> dict[str, Any] | None:
     path = repo / reports_dir / f"{target_id}.json"
@@ -100,7 +216,12 @@ def _load_run(repo: Path, target_id: str, reports_dir: Path) -> dict[str, Any] |
 
 
 def compare(target: LfhTarget, payload: dict[str, Any] | None) -> Reproduction:
-    """serac's interval against the published one, by overlap plus a magnitude ratio."""
+    """serac's interval against the published one: within stated uncertainty, plus overlap.
+
+    `agreement` carries the brief's criterion; `overlaps` and `ratio` are kept because a
+    comparison that does not even overlap, or whose median is a decade out, is worth naming
+    separately in the evidence.
+    """
     comparison = target.comparison_mass_kg()
     if payload is None:
         return Reproduction(
@@ -138,7 +259,11 @@ def compare(target: LfhTarget, payload: dict[str, Any] | None) -> Reproduction:
             history.get("variance_reduction"),
         )
     low, high, provenance = comparison
-    centre = (low * high) ** 0.5
+    # A converted interval (a published volume times a density range) has no published best
+    # value: the publication printed a volume, not a mass, so the centre is derived below.
+    best = target.published_mass_kg.best if target.published_mass_kg is not None else None
+    agreed = agreement(low, high, best, p05, p50, p95)
+    centre = agreed.published_centre
     return Reproduction(
         target_id=target.target_id,
         status="computed",
@@ -151,6 +276,8 @@ def compare(target: LfhTarget, payload: dict[str, Any] | None) -> Reproduction:
         overlaps=p05 <= high and p95 >= low,
         ratio=(p50 / centre) if centre > 0 else None,
         variance_reduction=history.get("variance_reduction"),
+        published_best=best,
+        agreement=agreed,
     )
 
 
@@ -201,14 +328,41 @@ def _check_reproductions(
         compare(target, _load_run(repo, target.target_id, reports_dir))
         for target in references.reproductions
     ]
-    passing = [r for r in rows if r.status == "computed" and r.overlaps]
-    suite.check(
+    overlapping = [r for r in rows if r.status == "computed" and r.overlaps]
+    # Overlap is necessary but not sufficient, and it is not the brief's criterion, so it is
+    # reported as a criterion of its own rather than as the gate's pass condition. Its
+    # severity is `criterion_unmet` for the same reason the check below is: a reproduction
+    # that does not overlap means the physics disagreed with the literature, not that the
+    # suite is broken.
+    suite.criterion(
         "lfh.reproductions_overlap",
-        len(passing) >= REQUIRED_REPRODUCTIONS,
-        f"{len(passing)} of {len(rows)} published reproductions overlap by interval "
-        f"(need {REQUIRED_REPRODUCTIONS}): " + " | ".join(r.row() for r in rows),
+        len(overlapping) >= REQUIRED_REPRODUCTIONS,
+        f"{len(overlapping)} of {len(rows)} published reproductions overlap by interval "
+        f"(need {REQUIRED_REPRODUCTIONS}; overlap alone does not meet the brief -- see "
+        f"lfh.reproductions_within_stated_uncertainty): " + " | ".join(r.row() for r in rows),
     )
-    unsane = [r for r in passing if not r.sanity_ok]
+    agreeing = [r for r in rows if r.within_stated_uncertainty]
+    suite.criterion(
+        "lfh.reproductions_within_stated_uncertainty",
+        len(agreeing) >= REQUIRED_REPRODUCTIONS,
+        (
+            f"the brief requires >= {REQUIRED_REPRODUCTIONS} published reproductions within "
+            f"stated uncertainty; {len(agreeing)} of {len(rows)} meet it "
+            f"({', '.join(r.target_id for r in agreeing) or 'none'}). Within stated uncertainty "
+            "means serac's median lies inside the published interval AND the published centre "
+            "lies inside serac's 5-95 % interval -- mutual containment of the two stated "
+            "uncertainties, not intersection. "
+            + " | ".join(r.uncertainty_row() for r in rows)
+            + (
+                ". This is a criterion of the brief that is not met, not a defect in the code: "
+                "the inversion ran, and its answer disagrees with the published one by more "
+                "than the published uncertainty allows."
+                if len(agreeing) < REQUIRED_REPRODUCTIONS
+                else ""
+            )
+        ),
+    )
+    unsane = [r for r in overlapping if not r.sanity_ok]
     suite.check(
         "lfh.magnitude_sanity",
         not unsane,
@@ -224,7 +378,7 @@ def _check_reproductions(
         ),
         Severity.warning,
     )
-    _check_peak_force_sanity(suite, references, repo, reports_dir)
+    _check_published_scalars(suite, references, repo, reports_dir)
     refused = [r for r in rows if r.status == "failed"]
     if refused:
         suite.info(
@@ -238,9 +392,110 @@ def _check_reproductions(
     return rows
 
 
+#: The other published scalars serac reports an interval for: `(check suffix, reference field,
+#: run-artefact field)`. Mass is not here because it is the reproduction count and because it
+#: can also come from a converted volume; these two are read straight off the run.
+_PUBLISHED_SCALARS = (
+    ("peak_force", "published_peak_force_n", "peak_force_n"),
+    ("duration", "published_duration_s", "duration_s"),
+)
+
+
+def _check_published_scalars(
+    suite: Suite, references: LfhReferences, repo: Path, reports_dir: Path
+) -> None:
+    """Published peak force and duration, against the uncertainty each publication stated.
+
+    The brief's quantity is the *force history*, not the mass alone, so every published scalar
+    serac reports an interval for is held to the same within-stated-uncertainty rule. Before
+    this, peak force was compared only against a factor-of-two band invented here and duration
+    was not compared at all -- so the one published quantity serac is known to disagree with
+    outright (296 s against Higman's 90 s, see reports/MODEL_CARD_lfh.md) was documented in
+    prose and invisible to the gate.
+    """
+    for suffix, reference_field, artefact_field in _PUBLISHED_SCALARS:
+        disagreements: list[str] = []
+        evidence: list[str] = []
+        # Counted separately so an empty comparison can say *why* it is empty, and so the
+        # criterion cannot pass on no evidence at all. `not disagreements` is True when nothing
+        # was compared, which would make this check green precisely when it knows least --
+        # the failure mode this suite was audited for, reintroduced one level up.
+        n_published = 0
+        n_uncomputed = 0
+        for target in references.targets:
+            published = getattr(target, reference_field)
+            if published is None:
+                continue
+            n_published += 1
+            payload = _load_run(repo, target.target_id, reports_dir)
+            if payload is None:
+                n_uncomputed += 1
+                continue
+            history = payload["force_history"]
+            if history["status"] != "computed" or history.get(artefact_field) is None:
+                n_uncomputed += 1
+                continue
+            serac = history[artefact_field]
+            agreed = agreement(
+                published.low,
+                published.high,
+                published.best,
+                serac["p05"],
+                serac["p50"],
+                serac["p95"],
+            )
+            evidence.append(
+                f"{target.target_id}: published {published.low:.3g}-{published.high:.3g} "
+                f"{published.units} (centre {agreed.published_centre:.3g}) vs serac "
+                f"{serac['p05']:.3g}/{serac['p50']:.3g}/{serac['p95']:.3g} -> {agreed.reason()}"
+            )
+            if not agreed.ok:
+                disagreements.append(target.target_id)
+        quantity = suffix.replace("_", " ")
+        if not evidence:
+            # Undecidable, and undecidable is not met. Which of the two causes it is matters:
+            # "nobody published this number" is a fact about the literature, "we never computed
+            # it" is a fact about this tree, and the old message said the first when it meant
+            # either.
+            detail = (
+                f"no publication in the reference set states a {quantity}, so the brief's "
+                "within-stated-uncertainty rule has nothing to bind"
+                if n_published == 0
+                else (
+                    f"{n_published} publication(s) state a {quantity} and none has a computed "
+                    f"run to compare against ({n_uncomputed} missing or refused), so the "
+                    "criterion could not be evaluated"
+                )
+            )
+            suite.criterion(f"lfh.{suffix}_within_stated_uncertainty", False, detail)
+            continue
+        coverage = f"{len(evidence)} of {n_published} published {quantity} value(s) compared"
+        if n_uncomputed:
+            coverage += f", {n_uncomputed} without a computed run"
+        suite.criterion(
+            f"lfh.{suffix}_within_stated_uncertainty",
+            not disagreements,
+            f"{coverage}. "
+            + "; ".join(evidence)
+            + (
+                ". This is a criterion of the brief that is not met, not a defect in the code."
+                if disagreements
+                else ""
+            ),
+        )
+    _check_peak_force_sanity(suite, references, repo, reports_dir)
+
+
 def _check_peak_force_sanity(
     suite: Suite, references: LfhReferences, repo: Path, reports_dir: Path
 ) -> None:
+    """The factor-of-two band on peak force, kept as a warning underneath the criterion.
+
+    The band is a tolerance invented here rather than one any publication stated, so it may
+    flag a suspicious comparison but it must never be what the gate passes on. That confusion
+    -- an invented tolerance standing in for a published uncertainty -- is the defect this
+    suite was audited for.
+    """
     problems: list[str] = []
     checked = 0
     for target in references.targets:
@@ -547,7 +802,23 @@ def _check_greens_never_on_the_bus(suite: Suite, repo: Path) -> None:
 
 
 def _check_seal(suite: Suite, repo: Path, references: LfhReferences, reports_dir: Path) -> None:
-    seal = read_seal(repo)
+    try:
+        seal = read_seal(repo)
+    except ValueError as exc:
+        # `Seal` re-hashes its own embedded config on load, so a seal written before a config
+        # field changed raises here. Letting that propagate aborts the whole suite with a
+        # traceback and writes no report at all -- every other check, passing or failing,
+        # becomes invisible. A gate must report its findings even when one artefact is
+        # unreadable, so the unreadable artefact is itself a finding.
+        suite.check(
+            "lfh.seal_present",
+            False,
+            f"reports/m2/seal.json does not validate ({exc}). The seal records a config hash "
+            "that is not the hash of the config it carries, so it cannot be used to show the "
+            "reproductions and the new events ran under one configuration. Re-record it with "
+            "`serac lfh seal` and re-run the affected events.",
+        )
+        return
     if seal is None:
         suite.check(
             "lfh.seal_present",

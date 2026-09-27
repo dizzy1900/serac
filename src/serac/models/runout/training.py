@@ -20,7 +20,7 @@ from __future__ import annotations
 import copy
 import json
 import time
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -31,6 +31,18 @@ import torch
 from numpy.typing import NDArray
 from torch import Tensor
 
+from serac.models.runout.conformal import (
+    DEFAULT_LEVEL,
+    ConformalCalibration,
+    ConformalMode,
+    apply_correction,
+)
+from serac.models.runout.conformal import (
+    coverage as interval_coverage,
+)
+from serac.models.runout.conformal import (
+    fit as fit_conformal,
+)
 from serac.models.runout.corridor import TransectChainage, load_frame, transect_chainages
 from serac.models.runout.driver import iter_index
 from serac.models.runout.params import SOLVER_NAME, SOLVER_VERSION
@@ -139,6 +151,10 @@ class TrainedSurrogate:
     arrival_scale: float
     transect_ids: list[str]
     split: SplitAssignment
+    calibration: dict[str, ConformalCalibration] = field(default_factory=dict)
+    """Conformal corrections fitted on the **val** split, keyed by target. Empty on a model
+    trained before ADR-era calibration existed, which is why every consumer treats a missing
+    entry as "no correction" rather than as an error."""
 
     def save(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -155,6 +171,7 @@ class TrainedSurrogate:
                 "arrival_scale": self.arrival_scale,
                 "transect_ids": self.transect_ids,
                 "split": self.split.as_dict(),
+                "calibration": {target: asdict(cal) for target, cal in self.calibration.items()},
                 "fno_config": {
                     "n_parameters": self.fno.n_parameters,
                     "n_static": self.fno.n_static,
@@ -269,7 +286,7 @@ def train(
     if best_state is not None:
         fno.load_state_dict(best_state["fno"])
         regressor.load_state_dict(best_state["regressor"])
-    return TrainedSurrogate(
+    model = TrainedSurrogate(
         fno=fno,
         regressor=regressor,
         standardiser=standardiser,
@@ -279,6 +296,75 @@ def train(
         transect_ids=data.transect_ids,
         split=split,
     )
+    # Calibrate before returning, so a saved artefact always carries its correction and no
+    # consumer has to remember to fit one. Fitted on val; test is never touched here.
+    model.calibration.update(calibrate(model, data))
+    return model
+
+
+def _predict(
+    model: TrainedSurrogate, data: Dataset, subset: Dataset, *, device: str = "cpu"
+) -> tuple[F32, F32, F32]:
+    """``(depth quantiles, arrival quantiles, reach probability)`` for one subset, in real units."""
+    dev = torch.device(device)
+    static_t = torch.as_tensor(data.static, device=dev)
+    params = torch.as_tensor(model.standardiser.apply(subset.parameters), device=dev)
+    model.fno.eval()
+    with torch.no_grad():
+        depth_q, arrival_q, reach_logit = model.fno(params, static_t)
+    return (
+        depth_q.cpu().numpy() * model.depth_scale,
+        arrival_q.cpu().numpy() * model.arrival_scale,
+        torch.sigmoid(reach_logit).cpu().numpy(),
+    )
+
+
+def calibrate(
+    model: TrainedSurrogate,
+    data: Dataset,
+    *,
+    level: float = DEFAULT_LEVEL,
+    device: str = "cpu",
+) -> dict[str, ConformalCalibration]:
+    """Fit conformal corrections for the depth and arrival intervals on the **val** split.
+
+    The val split, never test. Calibrating on test would make the reported coverage a fitted
+    quantity and the gate would be scoring the calibration rather than the model. The split is
+    disjoint by ``run_id``, so no simulation contributes to both.
+
+    Only the bins the gate scores are used: wet bins for depth, and reached members for arrival.
+    Calibrating on the dry bins would be calibrating on the trivial ones — a 5th-percentile head
+    that outputs exactly zero covers them for free, which is why the all-bins coverage figure is
+    0.99 and says nothing.
+    """
+    _, idx = split_by_run(data.run_ids, seed=20260903)
+    val = data.subset(idx["val"])
+    depth, arrival, _reach = _predict(model, data, val, device=device)
+
+    out: dict[str, ConformalCalibration] = {}
+    wet = val.max_depth > DEPTH_THRESHOLD_M
+    if wet.any():
+        out["max_depth_m"] = fit_conformal(
+            depth[:, 0][wet],
+            depth[:, 2][wet],
+            val.max_depth[wet],
+            target="max_depth_m",
+            level=level,
+            mode=ConformalMode.SCALED,
+            non_negative=True,
+        )
+    reached = val.reached > 0.5
+    if reached.any():
+        out["arrival_time_s"] = fit_conformal(
+            arrival[:, 0][reached],
+            arrival[:, 2][reached],
+            val.arrival[reached],
+            target="arrival_time_s",
+            level=level,
+            mode=ConformalMode.SCALED,
+            non_negative=True,
+        )
+    return out
 
 
 def evaluate(model: TrainedSurrogate, data: Dataset, *, device: str = "cpu") -> dict[str, Any]:
@@ -349,17 +435,58 @@ def evaluate(model: TrainedSurrogate, data: Dataset, *, device: str = "cpu") -> 
     # 5th-percentile head can output exactly 0 there, and those bins are covered trivially. The
     # gated number is therefore coverage over the **wet** bins, where the interval has to do
     # some work; the all-bins figure is reported beside it so the difference stays visible.
-    inside = (test.max_depth >= depth[:, 0]) & (test.max_depth <= depth[:, 2])
+    # A quantile head is not a calibrated interval. Where a conformal correction was fitted on
+    # the val split it is applied here, and the uncalibrated figure is reported beside it so the
+    # size of the correction stays visible rather than being absorbed into a passing gate.
+    depth_lo_raw, depth_hi_raw = depth[:, 0], depth[:, 2]
+    arrival_lo_raw, arrival_hi_raw = arrival[:, 0], arrival[:, 2]
+    depth_cal = model.calibration.get("max_depth_m")
+    arrival_cal = model.calibration.get("arrival_time_s")
+    depth_lo, depth_hi = (
+        apply_correction(
+            depth_lo_raw,
+            depth_hi_raw,
+            depth_cal.correction,
+            mode=depth_cal.mode,
+            non_negative=depth_cal.non_negative,
+        )
+        if depth_cal is not None
+        else (depth_lo_raw, depth_hi_raw)
+    )
+    arrival_lo, arrival_hi = (
+        apply_correction(
+            arrival_lo_raw,
+            arrival_hi_raw,
+            arrival_cal.correction,
+            mode=arrival_cal.mode,
+            non_negative=arrival_cal.non_negative,
+        )
+        if arrival_cal is not None
+        else (arrival_lo_raw, arrival_hi_raw)
+    )
+
+    inside = (test.max_depth >= depth_lo) & (test.max_depth <= depth_hi)
     depth_cover_all = float(inside.mean())
     wet_truth = test.max_depth > DEPTH_THRESHOLD_M
     depth_cover = float(inside[wet_truth].mean()) if wet_truth.any() else float("nan")
+    depth_cover_raw = (
+        interval_coverage(
+            depth_lo_raw[wet_truth], depth_hi_raw[wet_truth], test.max_depth[wet_truth]
+        )
+        if wet_truth.any()
+        else float("nan")
+    )
     reached_mask = test.reached > 0.5
     if reached_mask.any():
         arrival_cover = float(
-            ((test.arrival >= arrival[:, 0]) & (test.arrival <= arrival[:, 2]))[reached_mask].mean()
+            ((test.arrival >= arrival_lo) & (test.arrival <= arrival_hi))[reached_mask].mean()
+        )
+        arrival_cover_raw = interval_coverage(
+            arrival_lo_raw[reached_mask], arrival_hi_raw[reached_mask], test.arrival[reached_mask]
         )
     else:
         arrival_cover = float("nan")
+        arrival_cover_raw = float("nan")
 
     # --- latency ------------------------------------------------------------------------------
     latencies: list[float] = []
@@ -410,6 +537,29 @@ def evaluate(model: TrainedSurrogate, data: Dataset, *, device: str = "cpu") -> 
             "max_depth_5_95_all_bins": round(depth_cover_all, 4),
             "wet_bins_scored": int(wet_truth.sum()),
             "arrival_5_95": round(arrival_cover, 4) if np.isfinite(arrival_cover) else None,
+            # The same two figures before any conformal correction, so the size of the
+            # correction is visible and a gate cannot be passed by calibration alone without
+            # anyone seeing how much calibration it took.
+            "uncalibrated": {
+                "max_depth_5_95": (
+                    round(depth_cover_raw, 4) if np.isfinite(depth_cover_raw) else None
+                ),
+                "arrival_5_95": (
+                    round(arrival_cover_raw, 4) if np.isfinite(arrival_cover_raw) else None
+                ),
+            },
+            "conformal": {
+                target: {
+                    "mode": cal.mode.value,
+                    "level": cal.level,
+                    "correction": round(cal.correction, 6),
+                    "fitted_on": "val",
+                    "n_calibration": cal.n_calibration,
+                    "coverage_on_calibration_split": round(cal.coverage_after, 4),
+                }
+                for target, cal in sorted(model.calibration.items())
+            }
+            or None,
             "depth_gate_pass": bool(
                 np.isfinite(depth_cover) and COVERAGE_TARGET[0] <= depth_cover <= COVERAGE_TARGET[1]
             ),

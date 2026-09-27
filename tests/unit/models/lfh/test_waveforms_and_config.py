@@ -14,6 +14,7 @@ import pytest
 
 from serac.models.lfh.config import (
     BandConfig,
+    BootstrapConfig,
     LfhConfig,
     MassConfig,
     RegularisationConfig,
@@ -213,6 +214,24 @@ def test_the_config_hash_is_stable_and_order_independent() -> None:
 def test_any_knob_changes_the_hash(update: dict[str, object]) -> None:
     """Whatever moves, the seal must notice."""
     assert LfhConfig().model_copy(update=update).config_hash() != LfhConfig().config_hash()
+
+
+def test_a_bootstrap_knob_changes_the_hash_but_the_thread_count_does_not() -> None:
+    """`max_workers` changes the wall clock, not the numbers, so it must not move the seal."""
+    base = LfhConfig()
+    more_draws = base.model_copy(update={"bootstrap": BootstrapConfig(n_draws=201)})
+    assert more_draws.config_hash() != base.config_hash()
+    one_thread = base.model_copy(update={"bootstrap": BootstrapConfig(max_workers=1)})
+    assert one_thread.config_hash() == base.config_hash()
+    assert "max_workers" not in base.canonical_json()
+
+
+def test_the_committed_seal_still_describes_the_working_config() -> None:
+    """The committed seal must load, and must hash to the config the code runs today."""
+    repo = Path(__file__).resolve().parents[4]
+    seal = read_seal(repo)
+    assert seal is not None
+    assert seal.config_hash == LfhConfig().config_hash()
 
 
 def test_a_seal_round_trips_and_rejects_a_forged_hash(tmp_path: Path) -> None:
