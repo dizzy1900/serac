@@ -7,6 +7,11 @@ feature tracking and assigns each an ordinal watch tier (Quiet / Elevated / Watc
 one positive event in the archive no ROC is claimable and no probability is estimable; the
 tier is an ordinal ranking whose thresholds were pre-registered before any backtest ran
 (`reports/watch/PREREGISTRATION.md`). See `reports/MODEL_CARD_watch.md`.
+
+Scoring is behind `serac.ports.watch.WatchAnomalyModel`. v0 (`RobustZWatch`) wraps the
+pre-registered robust-z functions. v1 (`CubeAutoencoderWatch`) is the feature-cube
+autoencoder interface; no model has been trained in this repository. The backtest still
+calls `anomaly.walk_forward` directly and is not remounted on the port.
 """
 
 from __future__ import annotations

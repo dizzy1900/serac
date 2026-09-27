@@ -1,8 +1,10 @@
 """The real CAP 1.2 generator: a `CascadeForecast` becomes a signed, XSD-valid alert.
 
-This is what `serac.streaming.cap_stub` was a placeholder for. The stub stays where it is --
-`validate-stream` asserts on it and the detector stub still needs a CAP stage -- and this
-module sits alongside it for the forecast lane.
+This is what `serac.streaming.cap_stub` was a placeholder for. The stub stays in the tree
+for golden-ratio tests and `--cap stub`. Replay and `serac stream run cap` default to
+`serac.streaming.cap_stage`, which reuses the helpers below for detection-path messages
+(always `status=Test` while no detector is validated) and calls `build_alert` for a
+`CascadeForecast`. This module still owns the forecast-lane derivation rules.
 
 Everything the message claims is derived from the forecast by a **stated rule**, and the rule
 that fired is written into the message as a `parameter` so a recipient can see why it was

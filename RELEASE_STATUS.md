@@ -45,15 +45,19 @@ Consequences, all intended:
 | `validate-ingest` | 15 | pass (1 warning: 517 transient rows) |
 | `validate-cube` | 24 | pass |
 | `validate-stream` | 33 | pass |
-| `validate-contracts` | 26 | pass (22 contracts) |
-| `validate-lfh` | 22 | pass |
+| `validate-contracts` | 27 | pass (23 contracts) |
+| **`validate-lfh`** | **25** | **FAIL — 2 unmet criteria** (within stated uncertainty: 1 of 4 reproductions; Taan Fiord duration) |
 | **`validate-discriminator`** | **27** | **FAIL — 2 unmet criteria, 5 warnings** |
 | `validate-runout` | 30 | pass (1 warning: arrival coverage 0.794) |
 | `validate-watch` | 37 | pass (1 warning: transient rows) |
 | `validate-e2e` | 23 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
-| **total** | **401** | |
+| **total** | **405** | |
 
 Check counts are from a measured `make validate-serac` on 2026-09-10. Four rows moved: `validate-e2e` 15 -> 23 (the committed-record checks of Gap 66), `validate-discriminator` 24 -> 27 (the receiver-count leak, the balancing rule's effect, and the orphaned-window check of Gap 17), and `validate-cube` 23 -> 24 and `validate-watch` 36 -> 37, which were already stale and are corrected here rather than left to be rediscovered.
+`validate-lfh` 22 -> 25 and pass -> FAIL was measured on 2026-09-27, when the mutual-containment
+criterion of major 7 below landed on `main`; `validate-contracts` 26 -> 27 the same day, when
+`watch-anomaly-score` became the 23rd contract; CI's `--allow-unmet` names its two unmet criteria
+alongside the discriminator's, and fails if either stops being unmet.
 
 `make test` passes: **1,483 offline tests** as of 2026-09-10, network blocked (1,466 before the
 receiver-balancing and live-detector work; 1,418 before the drift, CLI-mounting and
@@ -112,8 +116,17 @@ The ten majors, in the order I would take them:
    without anything noticing.
 3. **The M3 measurability-threshold sensitivity sweep** that the model card and ledger say is
    committed is not in the tree.
-4. **`cap_stub` is still wired into the replay and stream lanes** — the real CAP v1.2 generator
-   reaches only `serac cascade e2e`.
+4. ~~**`cap_stub` is still wired into the replay and stream lanes** — the real CAP v1.2 generator
+   reaches only `serac cascade e2e`.~~ **Closed 2026-09-27** (ADR-0017). `serac replay` and
+   `serac stream run cap` default to `serac.streaming.cap_stage`, which renders through
+   `serac.adapters.cap.cap12.render` — the XSD path the forecast generator uses — so
+   `validate-stream` now XSD-checks the real renderer's output. What did **not** change:
+   detection-path messages are still `status=Test`, `scope=Private`, Unknown
+   urgency/severity/certainty and carry **no `area`**; `STATUS_BY_TIER` is untouched; the lane is
+   still not an alert system. `--cap stub` keeps `CapStub` selectable, and the committed
+   `reports/replay/` artefacts were not re-recorded, so they still describe stub runs. Signing
+   is opportunistic: the lane signs only when `SERAC_CAP_SIGNING_KEY` names a key that loads, and
+   a key that is configured but unreadable is treated as absent (unsigned output, no error).
 5. ~~**The avoided-loss engine does not honour its own `0.1.0` contract**, including the per-asset
    losses the response type declares.~~ **Closed 2026-09-10.** Three things were wrong and they
    compounded. A computation that *ran* reported `status=not_implemented`, so a working engine
@@ -257,6 +270,10 @@ entry. Ordered by what blocks the most.
   scheme and have not been regenerated**: the draws are differently *placed*, not differently
   *distributed*, so the intervals should move by resampling noise and that is a claim nobody has
   checked, because the waveform inputs are not in this clone.
+  `max_workers` is an execution knob and is excluded from `LfhConfig.config_hash()`, so the
+  2026-09-03 seal still validates and every committed run still carries the sealed hash. The
+  seal hashes configuration, not code: it cannot see that the draw scheme changed after it was
+  written, which is why the sentence above has to say so.
 - **Gap 39 — no independent simulator.** `serac-swe-voellmy` has never been cross-validated
   against r.avaflow or any other code, so its structural bias cannot be separated from
   implementation error.
@@ -268,9 +285,9 @@ entry. Ordered by what blocks the most.
   `build_trained_detector` factory: `serac stream run detector --detector discriminator` mounts
   the LORO-HMA model and reports `is_stub=False`. The **stub stays the default** while
   `validate-discriminator` reports an unmet criterion, a missing artifact is an error rather than
-  a silent fall back to the stub, and the command prints that the CAP stage downstream is still
-  `cap_stub` and still emits `status=Test`. **The lane is not an alert system and mounting a real
-  detector did not make it one** — that is major #4, still open.
+  a silent fall back to the stub, and the command prints that the CAP stage downstream emits
+  `status=Test`. **The lane is not an alert system and mounting a real detector did not make it
+  one.** Major #4 (closed 2026-09-27) replaced the CAP renderer in this lane, not the status.
 - **Gap 62 — `SourceRef` exists twice.** A contract test now fails on divergence, but the two
   copies have not been merged.
 - **Gap 61 — no job manifest in `infra/jobs/` has ever been executed.** Every core-hour and
@@ -308,7 +325,7 @@ Prompt 2.
 | Settings / `.env` (`SeracSettings`) | yes | yes | yes (import) | no | n/a | no |
 | CLI skeleton (`serac --help`, `--version`) | yes | yes | yes | n/a | n/a | no |
 | Domain contracts (`Range`, `SourceRef`, `FieldNote`, `MassMovementEvent`, geo, forecast, avoided-loss, slope-watch) | yes | yes | yes (validators, both paths) | n/a | no | no |
-| `serac schema export` + `contracts/*.v0.json` + drift test | yes | yes (22 contracts) | yes | n/a | n/a | no |
+| `serac schema export` + `contracts/*.v0.json` + drift test | yes | yes (23 contracts) | yes | n/a | n/a | no |
 | Event library (11 records / 9 items) + `serac events add/report/build-index` | yes | yes | yes (`validate-events` 64 checks) | sources fetched live 2026-09-03 | n/a | no |
 | AOIs (lhende-khola-trishuli, chamoli-rishiganga, blatten-lotschental) | yes | yes | yes (`validate-aoi` 100 checks, 3 warnings) | OSM/agency sources fetched 2026-09-03 | n/a | no |
 | Sentinel-1 ASF adapter | yes | yes | yes | search only | no | no |
@@ -357,7 +374,7 @@ Prompt 2.
 
 | Component | designed | implemented | tested-offline | tested-online | validated-against-events | production |
 |---|---|---|---|---|---|---|
-| gSF grid search + regularised single-force inversion (`serac.models.lfh`) | yes (card) | yes | yes (`validate-lfh` 22 checks, offline re-inversion to 1.7 %) | yes — Syngine + FDSN 2026-09-03 | **partial — 3 of 4 published reproductions overlap by interval (Bingham Canyon, Taan Fiord, Lamplugh); Chamoli refused** | no |
+| gSF grid search + regularised single-force inversion (`serac.models.lfh`) | yes (card) | yes | yes (`validate-lfh` 22 checks, offline re-inversion to 1.7 %) | yes — Syngine + FDSN 2026-09-03 | **partial — 3 of 4 published reproductions overlap by interval (Bingham Canyon, Taan Fiord, Lamplugh), but only 1 of 4 (Bingham Canyon) agrees within stated uncertainty, and Taan Fiord's duration (296 s) disagrees with the published 90 s; Chamoli refused** | no |
 | Two mass estimators, published as a union (`MassEstimate`) | yes (card) | yes | yes (a point mass is unconstructible) | n/a | as above; medians 0.36–1.40 × published centres | no |
 | Refusal rules (< 5 stations, > 200° gap, VR < 0.20) | yes (card) | yes | yes | n/a | **fired on all three new events — Langtang (3 stations, 317° gap), Chamoli (VR 0.089), Blatten (VR 0.191)** | no |
 | Green's-function library (PREM `prem_a_20s`, Syngine) | ADR-0016 | yes | yes (committed, byte-stable) | yes — 419 rows | n/a | no |
@@ -371,7 +388,8 @@ Prompt 2.
 | MintPy SBAS time series (2 AOIs, 260/260 and 257/257 interferograms) | yes (card) | yes | yes | yes — HyP3 2026-09-03 | n/a | no |
 | Anomaly model v0 + tiers (Quiet / Elevated / Watch / insufficient_data) | yes (card, pre-registered) | yes | yes (`validate-watch` 36 checks, causality proved mechanically) | n/a | **no — Chamoli: labelled unit `insufficient_data` at all 56 steps, 0 of 780 source-zone units ever measurable. Langtang: 5 of 48 source-zone units measurable at 38 of 122 steps, 4 Quiet, 1 Elevated** | no |
 | Optical feature tracking (orientation-correlation NCC; **not autoRIFT**) | yes (card) | yes | yes | yes (S2 COGs) | **no — noise floor degenerate on Langtang (median 0.0 m) and heavy-tailed on Chamoli; does not enter the tier** | no |
-| v1 autoencoder hook | interface only | no | n/a | n/a | no | no |
+| v1 autoencoder hook (`CubeAutoencoderWatch` on the `WatchAnomalyModel` port, `contracts/watch-anomaly-score.v0.json`) | interface only | **interface only — no weight format, no backend, never trained**; every unit scores `insufficient_data` / `not_fitted`, never Quiet and never a residual | yes (the refusal, causality `max_input_time <= as_of`, and no torch import) | n/a | no | no |
+| v0 robust-z on the same port (`RobustZWatch`) | yes (wraps the pre-registered functions) | yes | yes (matches `walk_forward` on synthetic series) | n/a | no — the backtest still calls `anomaly.walk_forward` directly and is not remounted on the port | no |
 
 ### M4 — runout surrogate (L3)
 
