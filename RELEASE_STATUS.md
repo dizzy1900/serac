@@ -115,8 +115,17 @@ The ten majors, in the order I would take them:
    without anything noticing.
 3. **The M3 measurability-threshold sensitivity sweep** that the model card and ledger say is
    committed is not in the tree.
-4. **`cap_stub` is still wired into the replay and stream lanes** — the real CAP v1.2 generator
-   reaches only `serac cascade e2e`.
+4. ~~**`cap_stub` is still wired into the replay and stream lanes** — the real CAP v1.2 generator
+   reaches only `serac cascade e2e`.~~ **Closed 2026-09-27** (ADR-0017). `serac replay` and
+   `serac stream run cap` default to `serac.streaming.cap_stage`, which renders through
+   `serac.adapters.cap.cap12.render` — the XSD path the forecast generator uses — so
+   `validate-stream` now XSD-checks the real renderer's output. What did **not** change:
+   detection-path messages are still `status=Test`, `scope=Private`, Unknown
+   urgency/severity/certainty and carry **no `area`**; `STATUS_BY_TIER` is untouched; the lane is
+   still not an alert system. `--cap stub` keeps `CapStub` selectable, and the committed
+   `reports/replay/` artefacts were not re-recorded, so they still describe stub runs. Signing
+   is opportunistic: the lane signs only when `SERAC_CAP_SIGNING_KEY` names a key that loads, and
+   a key that is configured but unreadable is treated as absent (unsigned output, no error).
 5. ~~**The avoided-loss engine does not honour its own `0.1.0` contract**, including the per-asset
    losses the response type declares.~~ **Closed 2026-09-10.** Three things were wrong and they
    compounded. A computation that *ran* reported `status=not_implemented`, so a working engine
@@ -275,9 +284,9 @@ entry. Ordered by what blocks the most.
   `build_trained_detector` factory: `serac stream run detector --detector discriminator` mounts
   the LORO-HMA model and reports `is_stub=False`. The **stub stays the default** while
   `validate-discriminator` reports an unmet criterion, a missing artifact is an error rather than
-  a silent fall back to the stub, and the command prints that the CAP stage downstream is still
-  `cap_stub` and still emits `status=Test`. **The lane is not an alert system and mounting a real
-  detector did not make it one** — that is major #4, still open.
+  a silent fall back to the stub, and the command prints that the CAP stage downstream emits
+  `status=Test`. **The lane is not an alert system and mounting a real detector did not make it
+  one.** Major #4 (closed 2026-09-27) replaced the CAP renderer in this lane, not the status.
 - **Gap 62 — `SourceRef` exists twice.** A contract test now fails on divergence, but the two
   copies have not been merged.
 - **Gap 61 — no job manifest in `infra/jobs/` has ever been executed.** Every core-hour and
