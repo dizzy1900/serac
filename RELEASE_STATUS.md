@@ -171,8 +171,9 @@ The ten majors, in the order I would take them:
    `passed` until the suite is re-run on a sealed tree.
 8. **DVC tracking is nominal**: no `dvc.lock` is committed, so 5,606 `fetched` ledger rows are
    not recoverable from the repository alone.
-9. **The cube's `s1_coherence_t` / `s1_los_velocity_t` layers cannot consume the 517 real HyP3
-   products**, and Known gap 11 misstates the reason.
+9. ~~**The cube's `s1_coherence_t` / `s1_los_velocity_t` layers cannot consume the 517 real HyP3
+   products**, and Known gap 11 misstates the reason.~~ **Addressed in code 2026-09-27, not yet
+   exercised on the real crops** — see Known gap 11.
 10. **The v1 self-supervised autoencoder interface over the feature cube** was never designed;
     the brief asks for the interface, not the model.
 
@@ -328,7 +329,7 @@ Prompt 2.
 | `serac schema export` + `contracts/*.v0.json` + drift test | yes | yes (23 contracts) | yes | n/a | n/a | no |
 | Event library (11 records / 9 items) + `serac events add/report/build-index` | yes | yes | yes (`validate-events` 64 checks) | sources fetched live 2026-09-03 | n/a | no |
 | AOIs (lhende-khola-trishuli, chamoli-rishiganga, blatten-lotschental) | yes | yes | yes (`validate-aoi` 100 checks, 3 warnings) | OSM/agency sources fetched 2026-09-03 | n/a | no |
-| Sentinel-1 ASF adapter | yes | yes | yes | search only | no | no |
+| Sentinel-1 ASF adapter (download: Earthdata username/password or `EARTHDATA_TOKEN`) | yes | yes | yes | search only; neither download auth path has run live | no | no |
 | HyP3 InSAR adapter + pair planner | yes | yes | yes | **yes — 517 burst-InSAR products delivered 2026-09-03** | no | no |
 | Sentinel-2 CDSE adapter | yes | yes | yes (fakes) | search only | no | no |
 | Sentinel-2 Earth Search adapter | yes | yes | yes (fake STAC, real crops) | yes (smoke 2026-09-03; M3 optical pairs) | no | no |
@@ -345,6 +346,7 @@ Prompt 2.
 | SeedLink feed + ingestor | yes | yes | yes (fake client) | no (endpoint unverified) | n/a | no |
 | USGS ComCat adapter | yes | yes | yes (57-event fixture) | fetched live 2026-09-03 | no | no |
 | Hydrometric port + ICIMOD fixture adapter | yes | yes | yes | n/a | 2 reported stage changes, no clock time | no |
+| GEOGLOWS ECMWF hydrometric adapter (modelled discharge, not a gauge) | yes | yes | yes (38-day cut of one real retrospective payload) | partial — the cut's 38 values were re-checked against the live `retrospectivedaily/441020026` response on 2026-09-27 and matched exactly; the adapter's own HTTP client has not run online | no | no |
 | RGI 7.0 glacier outlines (Bremen mirror) | yes | yes | yes | fetched live 2026-09-03 | n/a | no |
 | Detector **stub** (`detector_stub.py`) | yes | yes (placeholder LP/SP ratio, threshold 10 untuned) | yes (golden on chamoli-2021) | n/a | **no — fires on pre-event background noise in both real fixtures** | no |
 | CAP 1.2 renderer + **stub** + XSD validation | yes | yes | yes (offline XSD) | n/a | n/a | no |
@@ -425,7 +427,10 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
    returns only ancillary SCLKSCET files; NISAR is `listed`, never `fetched`.
 2. **No open real-time Nepal/China hydrometric feed.** Nepal DHM gauges have no stable open
    API. The hydrometric adapter reads a fixture built from ICIMOD public reporting; anything
-   else raises `DatasetNotFetchedError`.
+   else raises `DatasetNotFetchedError`. Since 2026-09-27 a second adapter reads GEOGLOWS
+   ECMWF (`adapters/hydro/geoglows.py`): **modelled**, ERA5-driven retrospective daily discharge
+   on TDX-Hydro reach 441020026 (Trishuli near Galchhi), not a gauge and not real time; its
+   forecast endpoints are not wired. The gap stands.
 3. **ERA5 and GACOS are absent.** No CDS key and no GACOS email workflow were available. The
    ERA5 cube layer is a labelled synthetic placeholder under `tests/fixtures/synthetic/`;
    GACOS is `not_fetched`. M3 therefore corrects the troposphere with MintPy
@@ -461,11 +466,16 @@ regrouped by component 2026-09-04; the eight citations in the tree were updated 
    cropped to the AOI and deleted; those rows can never be re-hashed. The crops that replaced
    them are ordinary retained rows and are re-hashed by `validate-ingest`.
 10. **No `dvc.lock`**: producing one requires running an ingest stage over the network.
-11. **The cube's S1 layers still prefer the synthetic placeholder over real burst products.**
-    `tests/unit/pipelines/test_layers_s2_s1.py` excludes `data/raw/hyp3_burst_insar/` to keep
-    that behaviour pinned. The fix is for the cube pipeline to select by `raw_root` rather than
-    scanning the ledger; until then the layer is not reading the 517 real interferograms M3
-    fetched.
+11. ~~**The cube's S1 layers still prefer the synthetic placeholder over real burst products.**~~
+    **Fixed in code 2026-09-27; no cube has been rebuilt from the real crops.** The S1 builders
+    now take the entries `build_cube.select_entries` filtered by `raw_root`, prefer real fetched
+    pairs over the labelled synthetic pair when both are in the window, and skip rows whose
+    files are not on disk, so a fresh clone without the DVC data still builds from the committed
+    synthetic pair and says so. Two limits: the crops live under DVC and were not present in the
+    clone that made this change, so the preference is proved by unit tests on a stand-in pair,
+    not by a rebuilt cube; and the 517 fetched burst products carry `_corr.tif` but no
+    `_los_disp.tif`, so once real pairs are selected `s1_los_velocity_t` is **empty**, not
+    synthetic, until a displacement raster is produced for them.
 12. **Terrain layers in the Chamoli fixture cube are partial.** The committed GLO-30 crop covers
     the source zone, not the whole corridor AOI, so `dem`/`slope`/`aspect` cover 11.7 % of the
     cube grid and are `status: partial`, NaN elsewhere.
