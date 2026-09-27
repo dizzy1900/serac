@@ -229,9 +229,7 @@ class GeoglowsHydrometric(HydrometricSource):
         raw_meta = payload.get("metadata")
         metadata: dict[str, Any] = raw_meta if isinstance(raw_meta, dict) else {}
         series_raw = metadata.get("series")
-        series = (
-            series_raw if isinstance(series_raw, str) and series_raw else "retrospectivedaily"
-        )
+        series = series_raw if isinstance(series_raw, str) and series_raw else "retrospectivedaily"
         raw_units = metadata.get("units")
         units: dict[str, Any] = raw_units if isinstance(raw_units, dict) else {}
         unit_short = str(units.get("short") or "cms")
