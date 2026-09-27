@@ -1,0 +1,119 @@
+{
+  "$defs": {
+    "WatchScoreInsufficientReason": {
+      "description": "Why `score_unit` did not assess the unit. A unit that cannot be scored is never Quiet.\n\nThe first five members match `WatchInsufficientReason` / the pre-registered v0 model so a\nwrapper can pass reasons through. The rest are port-level: no weights, missing cube layers,\nor a unit the view does not contain. This enum is *not* a change to `slope-watch-state`.",
+      "enum": [
+        "outside_footprint",
+        "low_los_sensitivity",
+        "too_few_samples",
+        "low_coherence",
+        "too_little_history",
+        "not_fitted",
+        "missing_layers",
+        "unit_not_in_view"
+      ],
+      "title": "WatchScoreInsufficientReason",
+      "type": "string"
+    },
+    "WatchTier": {
+      "description": "Ordinal state of a slope unit. Never a probability, never a date.",
+      "enum": [
+        "quiet",
+        "elevated",
+        "watch",
+        "insufficient_data"
+      ],
+      "title": "WatchTier",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/dizzy1900/serac/contracts/watch-anomaly-score.v0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One slope unit scored at one `as_of` by a `WatchAnomalyModel`.\n\n`score` is the implementing model's anomaly statistic (v0: robust z; v1: a reconstruction\nresidual, once weights exist). It is not a probability of collapse and not a predicted\ndate of collapse. `max_input_time` is the latest sample the model actually used and must\nsatisfy `max_input_time <= as_of`, matching `anomaly.py`'s `t <= T` inclusive window.",
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "contract_version": {
+      "default": "0.1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "insufficient_reason": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WatchScoreInsufficientReason"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "max_input_time": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Latest sample time actually consumed. Inclusive trailing windows allow equality with as_of (t <= as_of). Null when no causal sample was present.",
+      "title": "Max Input Time"
+    },
+    "model_name": {
+      "minLength": 1,
+      "title": "Model Name",
+      "type": "string"
+    },
+    "model_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Model Version",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Anomaly statistic from the implementing model. Null when the unit was not assessed. NOT a probability of collapse and NOT a predicted date of collapse.",
+      "title": "Score"
+    },
+    "tier": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WatchTier"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Ordinal watch tier, or null when the model did not assess the unit. Unmeasurable/unfitted units use insufficient_data (or null), never quiet."
+    },
+    "unit_id": {
+      "minLength": 1,
+      "title": "Unit Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "unit_id",
+    "as_of",
+    "model_name",
+    "model_version"
+  ],
+  "title": "UnitWatchScore",
+  "type": "object"
+}
