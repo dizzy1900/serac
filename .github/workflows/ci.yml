@@ -37,11 +37,13 @@ jobs:
       # The gates are the point of this repository, and until now CI ran none of them: a
       # green tick meant lint, types and tests only. Every suite runs offline from committed
       # fixtures. `--allow-unmet` names the criteria of the brief that this repository
-      # already reports as unmet in RELEASE_STATUS.md and the M1 model card; any other unmet
-      # criterion, and any broken suite, fails the run.
+      # already reports as unmet in RELEASE_STATUS.md and the M1/M2 model cards; any other
+      # unmet criterion, and any broken suite, fails the run.
+      # M1: Langtang is not detected under either split.
+      # M2: only Bingham Canyon agrees within stated uncertainty; Taan Fiord duration does not.
       - name: Validation gates
         run: |
           uv run serac validate all \
-            --allow-unmet 'forced_groups_detected[loro_hma],forced_groups_detected[time_forward]'
+            --allow-unmet 'forced_groups_detected[loro_hma],forced_groups_detected[time_forward],lfh.reproductions_within_stated_uncertainty,lfh.duration_within_stated_uncertainty'
       - name: Avoided loss computes
         run: uv run serac underwriting-check

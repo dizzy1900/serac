@@ -46,14 +46,17 @@ Consequences, all intended:
 | `validate-cube` | 24 | pass |
 | `validate-stream` | 33 | pass |
 | `validate-contracts` | 26 | pass (22 contracts) |
-| `validate-lfh` | 22 | pass |
+| **`validate-lfh`** | **25** | **FAIL — 2 unmet criteria** (within stated uncertainty: 1 of 4 reproductions; Taan Fiord duration) |
 | **`validate-discriminator`** | **27** | **FAIL — 2 unmet criteria, 5 warnings** |
 | `validate-runout` | 30 | pass (1 warning: arrival coverage 0.794) |
 | `validate-watch` | 37 | pass (1 warning: transient rows) |
 | `validate-e2e` | 23 | pass (3 warnings: no forecast on either replay, 0 of 14 assets costed) |
-| **total** | **401** | |
+| **total** | **404** | |
 
 Check counts are from a measured `make validate-serac` on 2026-09-10. Four rows moved: `validate-e2e` 15 -> 23 (the committed-record checks of Gap 66), `validate-discriminator` 24 -> 27 (the receiver-count leak, the balancing rule's effect, and the orphaned-window check of Gap 17), and `validate-cube` 23 -> 24 and `validate-watch` 36 -> 37, which were already stale and are corrected here rather than left to be rediscovered.
+`validate-lfh` 22 -> 25 and pass -> FAIL was measured on 2026-09-27, when the mutual-containment
+criterion of major 7 below landed on `main`; CI's `--allow-unmet` names its two unmet criteria
+alongside the discriminator's, and fails if either stops being unmet.
 
 `make test` passes: **1,483 offline tests** as of 2026-09-10, network blocked (1,466 before the
 receiver-balancing and live-detector work; 1,418 before the drift, CLI-mounting and
@@ -257,6 +260,10 @@ entry. Ordered by what blocks the most.
   scheme and have not been regenerated**: the draws are differently *placed*, not differently
   *distributed*, so the intervals should move by resampling noise and that is a claim nobody has
   checked, because the waveform inputs are not in this clone.
+  `max_workers` is an execution knob and is excluded from `LfhConfig.config_hash()`, so the
+  2026-09-03 seal still validates and every committed run still carries the sealed hash. The
+  seal hashes configuration, not code: it cannot see that the draw scheme changed after it was
+  written, which is why the sentence above has to say so.
 - **Gap 39 — no independent simulator.** `serac-swe-voellmy` has never been cross-validated
   against r.avaflow or any other code, so its structural bias cannot be separated from
   implementation error.
@@ -357,7 +364,7 @@ Prompt 2.
 
 | Component | designed | implemented | tested-offline | tested-online | validated-against-events | production |
 |---|---|---|---|---|---|---|
-| gSF grid search + regularised single-force inversion (`serac.models.lfh`) | yes (card) | yes | yes (`validate-lfh` 22 checks, offline re-inversion to 1.7 %) | yes — Syngine + FDSN 2026-09-03 | **partial — 3 of 4 published reproductions overlap by interval (Bingham Canyon, Taan Fiord, Lamplugh); Chamoli refused** | no |
+| gSF grid search + regularised single-force inversion (`serac.models.lfh`) | yes (card) | yes | yes (`validate-lfh` 22 checks, offline re-inversion to 1.7 %) | yes — Syngine + FDSN 2026-09-03 | **partial — 3 of 4 published reproductions overlap by interval (Bingham Canyon, Taan Fiord, Lamplugh), but only 1 of 4 (Bingham Canyon) agrees within stated uncertainty, and Taan Fiord's duration (296 s) disagrees with the published 90 s; Chamoli refused** | no |
 | Two mass estimators, published as a union (`MassEstimate`) | yes (card) | yes | yes (a point mass is unconstructible) | n/a | as above; medians 0.36–1.40 × published centres | no |
 | Refusal rules (< 5 stations, > 200° gap, VR < 0.20) | yes (card) | yes | yes | n/a | **fired on all three new events — Langtang (3 stations, 317° gap), Chamoli (VR 0.089), Blatten (VR 0.191)** | no |
 | Green's-function library (PREM `prem_a_20s`, Syngine) | ADR-0016 | yes | yes (committed, byte-stable) | yes — 419 rows | n/a | no |
