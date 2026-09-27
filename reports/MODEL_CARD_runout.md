@@ -210,23 +210,25 @@ Coverage is consequently reported twice. Over **all** chainage bins it is domina
 which the fixed head covers trivially by outputting zero. The gated figure is coverage over bins
 whose true max depth exceeds 1 m, where the interval has to do some work.
 
-### The arrival interval is mis-calibrated, and calibration is implemented but not yet fitted
+### The arrival interval under-covers, and a conformal correction is implemented but not yet applied
 
 Depth coverage is 0.9142 and inside the gate. **Arrival coverage is 0.7939 against the same
-0.85-0.95 target and fails it** (Gap 42). That is a calibration problem rather than a training
-one: a quantile head minimises pinball loss, which does not make its 5th and 95th percentiles
-deliver 90 % coverage on data it did not fit.
+0.85-0.95 target and fails it** (Gap 42). That is a problem of interval coverage rather than of
+training: a quantile head minimises pinball loss, which does not make its 5th and 95th
+percentiles deliver 90 % coverage on data it did not see.
 
 `serac.models.runout.conformal` implements conformalized quantile regression for it. The
-correction is fitted on the **val** split — never test, and disjoint by `run_id` — stored in the
-checkpoint, and applied by `RunoutSurrogate.infer`, so the intervals that reach the cascade and
-alerting layers are the calibrated ones. It is two-sided: an interval that over-covers is
-narrowed rather than left needlessly wide.
+correction is estimated on the **val** split — never test, and disjoint by `run_id` — stored in
+the checkpoint, and applied by `RunoutSurrogate.infer`, so the intervals that reach the cascade
+and alerting layers are the corrected ones. It is two-sided: an interval that over-covers is
+narrowed rather than left needlessly wide. It is a statistical correction of the surrogate's
+interval against held-out ensemble members; it uses no observation of any event, Langtang
+included.
 
-**No correction has been fitted from the frozen ensemble.** The member directories are not in this
-repository, so the numbers above are unchanged and the gate still fails; the next rebuild produces
-the real figure, and `evaluate()` will report calibrated and uncalibrated coverage side by side so
-the size of the correction cannot hide inside a passing gate. Three limits travel with the method:
-exchangeability is assumed, and this ensemble was drawn to a design rather than at random; the
-guarantee is marginal rather than per transect, while the gate also scores per transect; and
-arrival time is clamped at zero, which only ever removes coverage.
+**No correction has been estimated from the frozen ensemble.** The member directories are not in
+this repository, so the numbers above are unchanged and the gate still fails; the next rebuild
+produces the real figure, and `evaluate()` will report corrected and uncorrected coverage side
+by side so the size of the correction cannot hide inside a passing gate. Three limits travel
+with the method: exchangeability is assumed, and this ensemble was drawn to a design rather than
+at random; the guarantee is marginal rather than per transect, while the gate also scores per
+transect; and arrival time is clamped at zero, which only ever removes coverage.
