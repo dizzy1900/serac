@@ -257,6 +257,10 @@ entry. Ordered by what blocks the most.
   scheme and have not been regenerated**: the draws are differently *placed*, not differently
   *distributed*, so the intervals should move by resampling noise and that is a claim nobody has
   checked, because the waveform inputs are not in this clone.
+  `max_workers` is an execution knob and is excluded from `LfhConfig.config_hash()`, so the
+  2026-09-03 seal still validates and every committed run still carries the sealed hash. The
+  seal hashes configuration, not code: it cannot see that the draw scheme changed after it was
+  written, which is why the sentence above has to say so.
 - **Gap 39 — no independent simulator.** `serac-swe-voellmy` has never been cross-validated
   against r.avaflow or any other code, so its structural bias cannot be separated from
   implementation error.
