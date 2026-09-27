@@ -193,6 +193,27 @@ def resolve_key_location(
     return KeyLocation(private_path=private, public_path=public)
 
 
+def load_signing_key_if_present(
+    private_path: Path | None = None,
+    *,
+    env: dict[str, str] | None = None,
+) -> Ed25519PrivateKey | None:
+    """Return the Ed25519 private key if a path is configured and readable.
+
+    A missing environment variable or a missing file returns None. The replay and live
+    stream lanes use this so a deployment without `SERAC_CAP_SIGNING_KEY` still emits
+    unsigned, XSD-valid CAP rather than failing the lane. A key that exists but cannot
+    be loaded (permissions, not Ed25519) is treated the same way: missing, not fatal.
+    """
+    location = resolve_key_location(private_path=private_path, env=env)
+    if location.private_path is None or not location.private_path.exists():
+        return None
+    try:
+        return load_private_key(location.private_path)
+    except SigningKeyError:
+        return None
+
+
 def describe(public_key: Ed25519PublicKey) -> str:
     """One printable line about a key. Contains no private material by construction."""
     return f"Ed25519 {public_key_fingerprint(public_key)}"

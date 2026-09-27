@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from serac.adapters.bus.in_memory import InMemoryBus
+from serac.alerting.generator import DEFAULT_SENDER
 from serac.domain import topics
 from serac.domain.cap import CAPMessage
 from serac.domain.detection import DetectionCandidate
@@ -48,10 +49,36 @@ def test_synthetic_lane_yields_detection_and_valid_cap(repo_root: Path, tmp_path
         message = envelope.payload
         assert isinstance(message, CAPMessage)
         assert message.status == "Test" and message.scope == "Private"
-        assert message.sender == "serac-stub@serac.invalid"
+        assert message.sender == DEFAULT_SENDER
         assert all(info.area == [] for info in message.info)
         assert message.xml is not None and validator.errors(message.xml) == []
+        assert "research output" in (message.info[0].instruction or "")
         assert envelope.causation_id in {d.message_id for d in detections}
 
     assert (tmp_path / f"{SYNTHETIC_EVENT_ID}.json").exists()
     assert not (repo_root / "data" / "fixtures" / "seismic" / SYNTHETIC_EVENT_ID).exists()
+    assert any("serac.streaming.cap_stage" in c for c in report.caveats)
+
+
+def test_cap_stub_flag_still_emits_stub_xml(repo_root: Path, tmp_path: Path) -> None:
+    """`--cap stub` keeps CapStub for fixtures that pin stub XML."""
+    bus = InMemoryBus()
+    report = run_replay(
+        ReplayConfig(
+            event_id=SYNTHETIC_EVENT_ID,
+            speed="max",
+            repo_root=repo_root,
+            report_dir=tmp_path,
+            cap_kind="stub",
+        ),
+        bus=bus,
+    )
+    assert report.status == "completed"
+    assert report.counts.cap_messages_emitted >= 1
+    assert any("CapStub" in c for c in report.caveats)
+    for envelope in bus.log(topics.ALERTS):
+        message = envelope.payload
+        assert isinstance(message, CAPMessage)
+        assert message.sender == "serac-stub@serac.invalid"
+        assert message.status == "Test"
+        assert message.source == "serac.streaming.cap_stub"

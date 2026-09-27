@@ -179,6 +179,11 @@ minutes before the "gegen 15.30 Uhr" in the event library, whose own stated unce
 
 - **Reproduction**: interval overlap on mass, plus a magnitude ratio in [1/3, 3] (peak force,
   [1/2, 2]). 3 of 4 targets pass; the fourth refuses.
+- **Within stated uncertainty** (the brief's criterion, enforced by `validate-lfh` since
+  2026-09-10): serac's median inside the published interval **and** the published centre inside
+  serac's 5-95 %. **1 of 4 targets meet it** (Bingham Canyon); Taan Fiord and Lamplugh overlap
+  but their medians fall outside the published intervals, and Taan Fiord's duration (296 s)
+  disagrees with the published 90 s. Both are reported as unmet criteria, not errors.
 - **Fit**: variance reduction 0.40–0.61 on the three that pass.
 - **Direction**: the one published bearing available is recovered to 3°.
 - **Location resolution**: the radius containing every grid node within 0.02 of the best

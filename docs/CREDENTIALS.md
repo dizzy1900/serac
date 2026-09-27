@@ -28,7 +28,7 @@ Before doing either of the following, stop and ask the human running the session
 | `GACOS_EMAIL` | email address used for GACOS requests | any address you control; GACOS delivers corrections by email after a web-form request | free | GACOS request/poll (`adapters/eo/gacos.py`) |
 | `SERAC_REDIS_URL` | Redis connection URL for the Streams bus | default `redis://localhost:6379/0`; provided by `infra/docker/compose.yaml` | free | `adapters/bus/redis_streams.py`; tests marked `redis` |
 | `SERAC_SEEDLINK_SERVER` | SeedLink `host:port` | default `geofon.gfz.de:18000` (unverified live; see `RELEASE_STATUS.md`) | free | `streaming/seedlink_ingestor.py`, `adapters/seismic/seedlink.py` |
-| `SERAC_CAP_SIGNING_KEY` | path to the Ed25519 **private** key that signs CAP messages | generate locally with `serac alerting keygen` (no account, no service) | free | `alerting/keys.py`, `serac alerting cap --sign` |
+| `SERAC_CAP_SIGNING_KEY` | path to the Ed25519 **private** key that signs CAP messages | generate locally with `serac alerting keygen` (no account, no service) | free | `alerting/keys.py`, `src/serac/streaming/cap_stage.py`, `serac alerting cap --sign`. Optional on the replay/stream lane: if unset or the file is missing, CAP is unsigned and still XSD-valid; the lane does not fail. |
 | `SERAC_CAP_PUBLIC_KEY` | path to the matching **public** key | written beside the private key by `keygen`; publish it to anyone who must verify serac's messages | free | `serac alerting verify` |
 | `SERAC_ALERT_HTTP_ENDPOINT` | where the outbound HTTP alert sink would POST | **you supply it.** There is no default and serac ships none | free | `adapters/alerting/http_sink.py` |
 | `DVC_REMOTE_URL` | DVC remote (e.g. an S3 URL) | your own bucket or storage; written to the gitignored `.dvc/config.local` by `make dvc-remote` | storage costs are yours, not an API charge | DVC only; never read by `serac` code |
@@ -59,6 +59,8 @@ export SERAC_CAP_PUBLIC_KEY=secrets/cap-signing.pub.pem
 
 Then `serac alerting cap --forecast <file> --sign` produces a signed message and
 `serac alerting verify <file.cap.xml> --public-key secrets/cap-signing.pub.pem` checks it.
+The replay and live stream lanes (`serac replay`, `serac stream run cap`) sign when this
+variable is set and emit unsigned valid CAP when it is not.
 
 ### Handling rules, enforced in code rather than by convention
 
