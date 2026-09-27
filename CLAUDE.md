@@ -72,7 +72,7 @@ src/serac/domain/               pydantic contracts; imports nothing from adapter
 src/serac/ports/                abstract interfaces (ABCs)
 src/serac/adapters/{eo,seismic,bus,storage,hydro,cap}/
 src/serac/pipelines/            ingest_*, build_cube, replay
-src/serac/streaming/            seedlink_ingestor, detector_stub, cap_stub
+src/serac/streaming/            seedlink_ingestor, detector_stub, cap_stage (default), cap_stub
 src/serac/models/{discriminator,lfh,watch,runout}/  M1-M4 model components
 src/serac/cascade/              M5 avoided-loss accounting
 src/serac/alerting/             CAP 1.2 generation, Ed25519 signing, sinks

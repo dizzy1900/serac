@@ -4,14 +4,14 @@ Chunks come from a hash-verified fixture (`data/fixtures/seismic/<event>/`), fro
 `--online` is given and no fixture exists, or from the in-code synthetic lane for
 `synthetic-lp-burst`. They are published on `serac.waveforms` in stream-time order, paced by a
 `Clock` at `--speed 1.0` (so a `VirtualClock` can prove the sleep schedule) or as fast as
-possible at `--speed max`. After every chunk the in-process pipeline (detector stub, CAP stub)
+possible at `--speed max`. After every chunk the in-process pipeline (detector, CAP 1.2 generator)
 is drained, so the run is deterministic on the in-memory bus.
 
 The origin time comes from the event-library record `data/events/<id>.json`
 (`MassMovementEvent.time.datetime_utc`), never from a constant here; when the record is
 absent every origin-relative latency is `null`. Wall-clock latencies are flagged valid only at
 speed 1.0. The report is `reports/replay/<event>.json` (`ReplayReport`), and its caveats say
-in every case that the detector is a stub and the figures prove plumbing, not latency.
+in every case that the figures prove plumbing, not latency, and that CAP is status=Test.
 """
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ from serac.errors import SeracError
 from serac.ports.bus import MessageBus, Received
 from serac.ports.clock import Clock, WallClock
 from serac.ports.detector import Detector
-from serac.streaming.cap_stub import CapStub
+from serac.streaming.cap_stage import CapKind, build_cap_stage
 from serac.streaming.detector_stage import DetectorStage
 from serac.streaming.detector_stub import (
     DETECTOR_NAME,
@@ -69,6 +69,7 @@ from serac.streaming.stage import Stage
 Speed = float | Literal["max"]
 DetectorKind = Literal["stub", "discriminator"]
 """Which detector the replay lane runs; `stub` is the default until M1's gate passes."""
+# CapKind is the CAP renderer: `xsd` is the real generator (default); `stub` is CapStub.
 
 BusKind = Literal["in_memory", "redis"]
 
@@ -86,8 +87,8 @@ BASE_CAVEATS = (
     "threshold; whether it fires is an observation, not a validated detection.",
     "Latency figures prove plumbing only (messages traverse the bus and stages); they are not "
     "evidence for the 180 s design budget in docs/ARCHITECTURE.md.",
-    "No source location is inferred anywhere in this lane; CAP messages are status=Test, "
-    "scope=Private and carry no area element.",
+    "No source location is inferred anywhere in this lane; detection-path CAP messages are "
+    "status=Test, scope=Private and carry no area element. This is not an alert system.",
 )
 
 
@@ -123,6 +124,9 @@ class ReplayConfig:
     `validate-discriminator` reports an unmet criterion: the trained model is selectable,
     not presumed."""
     redis_url: str | None = None
+    cap_kind: CapKind = "xsd"
+    """Which CAP renderer the lane runs. Default is the real XSD generator; `stub`
+    selects `CapStub` for fixtures that pin stub XML."""
 
     def __post_init__(self) -> None:
         if self.chunk_seconds <= 0:
@@ -349,7 +353,7 @@ def run_replay(
             is_stub=False,
         )
     xsd_path = config.repo_root / "contracts" / "vendor" / "cap" / "CAP-v1.2.xsd"
-    cap = CapStub(xsd_path=xsd_path, clock=clock)
+    cap = build_cap_stage(config.cap_kind, xsd_path=xsd_path, clock=clock)
     rec_detector = _Recording(detector)
     rec_cap = _Recording(cap)
 
@@ -358,6 +362,15 @@ def run_replay(
     pipeline = Pipeline(bus, [rec_detector, rec_cap])
 
     caveats = list(BASE_CAVEATS) + source.caveats()
+    if config.cap_kind == "stub":
+        caveats.append(
+            "CAP stage is CapStub (--cap stub). Messages are status=Test, not operational alerts."
+        )
+    else:
+        caveats.append(
+            "CAP stage is the real CAP 1.2 generator (serac.streaming.cap_stage). "
+            "Detection-path messages are status=Test. This is not an alert system."
+        )
     if origin.error:
         caveats.append(origin.error)
     if origin.origin_time_utc is None:
